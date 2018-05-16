@@ -29,7 +29,7 @@ public class WholeGenomeAnalysis {
 	private double m_min;
 	private double m_max;
 	private double m_saturatedPixel;
-	private static int m_matrixSize;
+	private int m_matrixSize =0;
 	private int m_resolution;
 	private int m_thresholdMaxima;
 	HashMap<String,Integer> m_chrSize =  new HashMap<String,Integer>();
@@ -105,66 +105,46 @@ public class WholeGenomeAnalysis {
 	 * @return 
 	 * @throws IOException
 	 */
-	public void runAll(String choice) throws IOException{
-		File folder = new File(m_input);
-		File[] listOfFiles = folder.listFiles();
-		System.out.println(listOfFiles.length);
-		
-		
+	public void run(String choice) throws IOException{
+		Iterator<String> key = m_chrSize.keySet().iterator();
 		String resuFile = m_output+File.separator+"loops.bed";
-		
-		if (listOfFiles.length==0){ System.out.println("Input directory empty");}
-		else{
-			for(int i = 0; i < listOfFiles.length;++i){
-				String fileName = listOfFiles[i].toString();
-				if(fileName.contains(".txt")){
-					
-					String tab[] = fileName.split("/");
-					String chr = tab[tab.length-1];
-					chr = chr.replaceAll(".txt", "");
-					String outdir = m_output+File.separator+chr+File.separator;
-					int nbOfbins = m_chrSize.get(chr)/m_resolution;
-					System.out.println(chr+"\t"+m_chrSize.get(chr)+"\t"+nbOfbins);
-					ProcessTuplesFile ptf = new ProcessTuplesFile(listOfFiles[i].toString(), m_resolution, m_matrixSize,m_step,nbOfbins,outdir);
-					ArrayList<String> lmatrixFile = ptf.getList();
-					if(choice.equals("oMe") ) detectLoopsOmE(lmatrixFile,chr);
-					else if (choice.equals("o") ) detectLoopsO(lmatrixFile,chr);
-					saveFile(resuFile);
-				}
-			}
-		}
-	}
-	/**
-	 * @throws IOException 
-	 * 
-	 */
-	public void runImageProcessing(String choice) throws IOException{
-		File folder = new File(m_input);
-		File[] listOfFiles = folder.listFiles();
-		
-		if (listOfFiles.length==0){	System.out.println("Input directory empty");}
-		else{
-			String resuFile = m_output+File.separator+"loops.bed";
-			for(int i = 0; i < listOfFiles.length;++i){
-				String fileName = listOfFiles[i].toString();
-				if(fileName.contains(".txt")){
-					String tab[] = fileName.split("/");
-					String chr = tab[tab.length-1];
-					chr = chr.replaceAll(".txt", "");
-					String outdir = m_output+File.separator+chr+File.separator;
-					int nbOfbins = m_chrSize.get(chr)/m_resolution;
-					System.out.println(chr+"\t"+m_chrSize.get(chr)+"\t"+nbOfbins);
-					ProcessTuplesFile ptf = new ProcessTuplesFile( m_resolution, m_matrixSize,m_step,nbOfbins,outdir);
-					ArrayList<String> lmatrixFile = ptf.getList();
-					if(choice.equals("oMe") ) detectLoopsOmE(lmatrixFile,chr);
-					else if (choice.equals("o") ) detectLoopsO(lmatrixFile,chr);
-					saveFile(resuFile);
-				}
-				
+		while(key.hasNext()){
+			String chr = key.next();
+			String dir = m_output+File.separator+chr+File.separator;
+			File[] listOfFiles =fillList(dir);
+			System.out.println(listOfFiles.length);
+			if (listOfFiles.length==0){ System.out.println("dumped directory of chromosome"+chr+"empty");}
+			else{
+				if(choice.equals("oMe") ) detectLoopsOmE(listOfFiles,chr);
+				else if (choice.equals("o") ) detectLoopsO(listOfFiles,chr);
+				saveFile(resuFile);
 			}
 		}
 	}
 
+	/**
+	 * 
+	 * @param resu
+	 * @param pathFile
+	 * @return 
+	 * @throws IOException
+	 */
+	public void run(String choice,String input) throws IOException{
+		Iterator<String> key = m_chrSize.keySet().iterator();
+		String resuFile = m_output+File.separator+"loops.bed";
+		while(key.hasNext()){
+			String chr = key.next();
+			String dir = input+File.separator+chr+File.separator;
+			File[] listOfFiles =fillList(dir);
+			System.out.println(listOfFiles.length);
+			if (listOfFiles.length==0){ System.out.println("dumped directory of chromosome"+chr+"empty");}
+			else{
+				if(choice.equals("oMe") ) detectLoopsOmE(listOfFiles,chr);
+				else if (choice.equals("o") ) detectLoopsO(listOfFiles,chr);
+				saveFile(resuFile);
+			}
+		}
+	}
 	
 	/**
 	 * 
@@ -172,7 +152,7 @@ public class WholeGenomeAnalysis {
 	 * @param pathFile
 	 * @throws IOException
 	 */
-	public static void saveFile (String pathFile) throws IOException
+	public void saveFile (String pathFile) throws IOException
 	{
 		BufferedWriter writer = new BufferedWriter(new FileWriter(new File(pathFile)));
 		Set<String> key = m_data.keySet();
@@ -201,11 +181,11 @@ public class WholeGenomeAnalysis {
 	 * 
 	 */
 	
-	private void detectLoopsOmE(ArrayList<String> lmatrixFile, String chr) throws IOException{	
+	private void detectLoopsOmE(File[] fileList, String chr) throws IOException{	
 		CoordinatesCorrection coord = new CoordinatesCorrection(m_step, m_resolution,m_matrixSize, m_diagSize);
-		for(int i =0; i < lmatrixFile.size();++i){
-			TupleFileImage readFile = new TupleFileImage(lmatrixFile.get(i),m_matrixSize,m_step,i);
-			String imageName = lmatrixFile.get(i).replaceAll(".txt", ".tif");
+		for(int i =0; i < fileList.length;++i){
+			TupleFileImage readFile = new TupleFileImage(fileList[i].toString(),m_matrixSize,m_step,m_resolution);
+			String imageName = fileList[i].toString().replaceAll(".txt", ".tif");
 			ImagePlus imgRaw = readFile.readTupleFile();
 			NonZeroCorrection nzc =new NonZeroCorrection(imgRaw);
 			ArrayList<Integer> countNonZero = nzc.getNonZeroList();
@@ -216,7 +196,7 @@ public class WholeGenomeAnalysis {
 			
 			ImagePlus imgFilter = img.duplicate();
 			
-			imageProcessing(imgFilter,lmatrixFile.get(i));
+			imageProcessing(imgFilter,fileList[i].toString());
 			
 			
 			EnhanceNoiseScore ens = new EnhanceNoiseScore(imgRaw, imgFilter, chr, m_thresholdMaxima,m_thresholdMaxima+2000);
@@ -231,8 +211,9 @@ public class WholeGenomeAnalysis {
 			
 			coord.setData(m_data);
 			if(i == 0){	m_data = coord.imageToGenomeCoordinate(temp, true, false, i,countNonZero);}
-			else if(i == lmatrixFile.size()-1){	m_data = coord.imageToGenomeCoordinate(temp, false, true, i, countNonZero);}
+			else if(i == fileList.length-1){	m_data = coord.imageToGenomeCoordinate(temp, false, true, i, countNonZero);}
 			else m_data = coord.imageToGenomeCoordinate(temp, false, false, i, countNonZero);
+			
 		}
 	}
 	
@@ -242,45 +223,47 @@ public class WholeGenomeAnalysis {
 	 * @param chr
 	 * @throws IOException
 	 */
-	private void detectLoopsO(ArrayList<String> lmatrixFile, String chr) throws IOException{	
+	private void detectLoopsO(File[] fileList, String chr) throws IOException{	
 		CoordinatesCorrection coord = new CoordinatesCorrection(m_step, m_resolution,m_matrixSize, m_diagSize);
-		for(int i =0; i < lmatrixFile.size();++i){
-			TupleFileImage readFile = new TupleFileImage(lmatrixFile.get(i),m_matrixSize,m_step,i);
-			String imageName = lmatrixFile.get(i).replaceAll(".txt", ".tif");
-			ImagePlus imgRaw = readFile.readTupleFile();
-			NonZeroCorrection nzc = new NonZeroCorrection(imgRaw);
-			ArrayList<Integer> countNonZero = nzc.getNonZeroList();
+		for(int i =0; i < fileList.length;++i){
+			if(fileList[i].toString().contains(".txt")){
+				TupleFileImage readFile = new TupleFileImage(fileList[i].toString(),m_matrixSize,m_step,m_resolution);
+				String imageName = fileList[i].toString().replaceAll(".txt", ".tif");
+				ImagePlus imgRaw = readFile.readTupleFile();
+				NonZeroCorrection nzc = new NonZeroCorrection(imgRaw);
+				ArrayList<Integer> countNonZero = nzc.getNonZeroList();
 
-			imgRaw.setTitle(imageName);
-			saveFile(imgRaw,imageName);
-			ImagePlus img = imgRaw.duplicate();
-			readFile.correctImage(img);
+				imgRaw.setTitle(imageName);
+				saveFile(imgRaw,imageName);
+				ImagePlus img = imgRaw.duplicate();
+				readFile.correctImage(img);
 			
-			ImagePlus imgFilter = img.duplicate();
-			ProcessMethod pm = new ProcessMethod(imgFilter,this.m_gauss,this.m_max,this.m_min);
-			//pm.enhanceContrast(m_saturatedPixel);
-			pm.runGaussian();
-			imageName = lmatrixFile.get(i).replaceAll(".txt", "_processed.tif");
-			saveFile(imgFilter,imageName);
-			EnhanceNoiseScore ens = new EnhanceNoiseScore(imgRaw, imgFilter, chr, m_thresholdMaxima,m_thresholdMaxima+2000);
-			ens.computeEnhanceScore();
-			//ens.findMaxima();
+				ImagePlus imgFilter = img.duplicate();
+				ProcessMethod pm = new ProcessMethod(imgFilter,this.m_gauss,this.m_max,this.m_min);
+				//pm.enhanceContrast(m_saturatedPixel);
+				pm.runGaussian();
+				imageName = fileList[i].toString().replaceAll(".txt", "_processed.tif");
+				saveFile(imgFilter,imageName);
+				EnhanceNoiseScore ens = new EnhanceNoiseScore(imgRaw, imgFilter, chr, m_thresholdMaxima,m_thresholdMaxima+2000);
+				ens.computeEnhanceScore();
+				//ens.findMaxima();
 			
-			HashMap<String,Loop> temp = ens.getDataMaxima();
-			System.out.println("before "+ temp.size());
-			removeMaximaCloseToZero(imgRaw,temp);
-			System.out.println("after "+ temp.size());
+				HashMap<String,Loop> temp = ens.getDataMaxima();
+				System.out.println("before "+ temp.size());
+				removeMaximaCloseToZero(imgRaw,temp);
+				System.out.println("after "+ temp.size());
 			
-			PeakAnalysisScore pas = new PeakAnalysisScore(imgRaw,temp,countNonZero);
-			pas.computeScore();
+				PeakAnalysisScore pas = new PeakAnalysisScore(imgRaw,temp,countNonZero);
+				pas.computeScore();
 			
-			coord.setData(m_data);
-			if(i == 0){	m_data = coord.imageToGenomeCoordinate(temp, true, true, i,countNonZero);}
-			else if(i == lmatrixFile.size()-1){	m_data = coord.imageToGenomeCoordinate(temp, true, true, i, countNonZero);}
-			else m_data = coord.imageToGenomeCoordinate(temp, true, true, i, countNonZero);
-			//if(i == 0){	m_data = coord.imageToGenomeCoordinate(temp, true, false, i,countNonZero);}
-			//else if(i == lmatrixFile.size()-1){	m_data = coord.imageToGenomeCoordinate(temp, false, true, i, countNonZero);}
-			//else m_data = coord.imageToGenomeCoordinate(temp, false, false, i, countNonZero);
+				coord.setData(m_data);
+				if(i == 0){	m_data = coord.imageToGenomeCoordinate(temp, true, true, i,countNonZero);}
+				else if(i == fileList.length-1){	m_data = coord.imageToGenomeCoordinate(temp, true, true, i, countNonZero);}
+				else m_data = coord.imageToGenomeCoordinate(temp, true, true, i, countNonZero);
+				//if(i == 0){	m_data = coord.imageToGenomeCoordinate(temp, true, false, i,countNonZero);}
+				//else if(i == lmatrixFile.size()-1){	m_data = coord.imageToGenomeCoordinate(temp, false, true, i, countNonZero);}
+				//else m_data = coord.imageToGenomeCoordinate(temp, false, false, i, countNonZero);
+			}
 		}
 	}
 	
@@ -358,7 +341,20 @@ public class WholeGenomeAnalysis {
 	 * @return
 	 */
 	public String getinputDir() { return m_input; }
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public int getMatrixSize() { return this.m_matrixSize; }
 
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public int getStep() { return this.m_step; }
+	
 	/**
 	 * 
 	 * @param inputDir
@@ -453,4 +449,21 @@ public class WholeGenomeAnalysis {
 	 * @param thresholdMaxima
 	 */
 	public void setThresholdMaxima(int thresholdMaxima) {	this.m_thresholdMaxima = thresholdMaxima; }
+	
+	/**
+	 * 
+	 * @param createFile
+	 * @param m_nbFile
+	 * @param matrixSize
+	 * @param step
+	 * @param outdir
+	 * @return
+	 * @throws IOException
+	 */
+	private File[] fillList(String dir) throws IOException
+	{
+		File folder = new File(dir);
+		File[] listOfFiles = folder.listFiles();
+		return listOfFiles;
+	}
 }

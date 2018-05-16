@@ -20,19 +20,20 @@ public class TupleFileImage {
 	private String m_file = "";
 	/** */
 	private int m_size = 0 ;
+	private int m_resolution = 0 ;
 	private int m_step = 0 ;
 	/** */
-	private int m_numImage = 0 ;
 	private double m_avg = 0;
 	private double m_std = 0;
 	
 	/**
 	 * 
 	 */
-	public TupleFileImage(String fileMatrix, int size, int step, int numImg){
+	public TupleFileImage(String fileMatrix, int size, int step, int resolution){
 		m_file = fileMatrix;
 		m_size = size;
-		m_numImage = numImg;
+		m_resolution = resolution;
+		System.out.println(fileMatrix);
 		m_step = step;
 	}
 	
@@ -44,23 +45,27 @@ public class TupleFileImage {
 	public ImagePlus readTupleFile(){
 		BufferedReader br;
 		ShortProcessor p = new ShortProcessor(m_size,m_size);
+		String[] tfile = m_file.split("_");
+		int numImage = Integer.parseInt(tfile[tfile.length-2])/(m_step*m_resolution);
 		try {
 			p.abs();
 			br = new BufferedReader(new FileReader(m_file));
 			StringBuilder sb = new StringBuilder();
 			String line = br.readLine();
+			System.out.println("\t"+line);
 			while (line != null){
 				sb.append(line);
 				String[] parts = line.split("\\t");
 				float a = 0;
-				if(!(parts[2].equals("nan"))){
+				
+				if(!(parts[2].equals("NAN"))){
 					a =Float.parseFloat(parts[2]);
 					if (a < 0){ a = 0;}
 				}
-				
-				int i = Integer.parseInt(parts[0]) - this.m_numImage*m_step; 
-				int j = Integer.parseInt(parts[1]) - this.m_numImage*m_step;
-				
+				int plop = numImage*m_step*m_resolution;
+				int i = (Integer.parseInt(parts[0]) - plop)/m_resolution; 
+				int j = (Integer.parseInt(parts[1]) - plop)/m_resolution;
+		
 				//System.out.println(m_size+"\t"+parts[0]+" "+parts[1]+" "+i+"\t"+j+"\t"+a);
 				p.setf(i, j, a);
 				p.setf(j, i, a);

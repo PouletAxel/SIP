@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" path="src"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.7"/>
 	<classpathentry kind="lib" path="/home/plop/workspace/jar/Auto_Threshold-1.16.1.jar"/>
 	<classpathentry kind="lib" path="/home/plop/Tools/Fiji .app/jars/imglib2-4.6.1.jar"/>
 	<classpathentry kind="lib" path="/home/plop/Tools/Fiji .app/jars/ij-1.51v.jar"/>
 	<classpathentry kind="lib" path="/home/plop/workspace/jar/MorphoLibJ_-1.3.3.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

@@ -51,7 +51,6 @@ public class GuiAnalysis extends JFrame
 	private JLabel m_jlInputFileType;
 	private ButtonGroup m_bGroupInputType = new ButtonGroup();
 	private JRadioButton m_jrbHic = new JRadioButton("hic file");
-    private JRadioButton m_jrbDump = new JRadioButton("dump file");
     private JRadioButton m_jrbProcessed = new JRadioButton("file processed");
 
     private String m_juiceBoxTools;
@@ -209,11 +208,9 @@ public class GuiAnalysis extends JFrame
 	   	);
 	   	
 	   	m_bGroupInputType.add(m_jrbProcessed);
-		m_bGroupInputType.add(m_jrbDump);
 	 	m_bGroupInputType.add(m_jrbHic);
 	 	
 		m_jrbHic.setFont(new java.awt.Font("Albertus Extra Bold (W1)",2,12));
-		m_jrbDump.setFont(new java.awt.Font("Albertus Extra Bold (W1)",2,12));
 		m_jrbProcessed.setFont(new java.awt.Font("Albertus Extra Bold (W1)",2,12));
 		
 		m_container.add(m_jrbHic,new GridBagConstraints
@@ -222,16 +219,10 @@ public class GuiAnalysis extends JFrame
 						GridBagConstraints.NONE, new Insets(260, 20, 0, 0), 0, 0
 				)
 		);
-		m_container.add(m_jrbDump,new GridBagConstraints
+		m_container.add(m_jrbProcessed,new GridBagConstraints
 				(
 						0, 1, 0, 0,  0.0, 0.0, GridBagConstraints.NORTHWEST,
 						GridBagConstraints.NONE,new Insets(260, 100, 0, 0), 0, 0
-				)
-		);
-		m_container.add(m_jrbProcessed, new GridBagConstraints
-				(
-						0,1, 0, 0, 0.0, 0.0,GridBagConstraints.NORTHWEST,
-						GridBagConstraints.NONE, new Insets(260, 200, 0, 0), 0, 0
 				)
 		);
 		m_jrbHic.setSelected(true);
@@ -593,7 +584,6 @@ public class GuiAnalysis extends JFrame
 	  	this.m_jrbObservedMExpected.addActionListener(rbl);
 	  	RBHicListener hic = new RBHicListener(this);
 	  	this.m_jrbHic.addActionListener(hic);
-	  	this.m_jrbDump.addActionListener(hic);
 	  	this.m_jrbProcessed.addActionListener(hic);
 
 	  	WorkDirectoryListener wdListener = new WorkDirectoryListener();
@@ -680,7 +670,6 @@ public class GuiAnalysis extends JFrame
 
 	public boolean isProcessed() {	return m_jrbProcessed.isSelected(); }
 	public boolean isHic() {	return m_jrbHic.isSelected(); }
-	public boolean isDump() {	return m_jrbDump.isSelected(); }
 	
 	public boolean isVC_SQRT() {	return m_jrbVC_sqrt.isSelected(); }
 	public boolean isVC() {	return m_jrbVC.isSelected(); }

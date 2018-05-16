@@ -23,7 +23,7 @@ public class DumpData {
 	private String m_hicFile = "";
 	private int m_resolution;
 	private static String m_juiceBoxTools = "";
-	
+	private ArrayList<Double> m_lExpected =  new ArrayList<Double>();
 	
 	public DumpData(String juiceboxTools,String hicFile, String norm, int resolution){
 		m_juiceBoxTools = juiceboxTools;
@@ -36,6 +36,14 @@ public class DumpData {
 				+m_normalisation+"\n");*/
 	}
 	
+	/**
+	 * dump observed KR https://hicfiles.s3.amazonaws.com/hiseq/gm12878/in-situ/combined.hic 1:20480000:40960000 1:20480000:40960000 BP 10000 combined_10Kb.txt
+
+	 * @param chr
+	 * @param output
+	 * @return
+	 * @throws IOException
+	 */
 	public boolean dumpObserved(String chr, String output) throws IOException{
 		int exitValue=1;
 		Runtime runtime = Runtime.getRuntime();
@@ -62,31 +70,23 @@ public class DumpData {
 		int exitValue=1;
 		Runtime runtime = Runtime.getRuntime();
 		String obs = output.replaceAll(".txt", "_obs.txt");
-		String expected = output.replaceAll(".txt", "_expected.txt");
-		/*System.out.println(obs+"\n"
-				+ expected+"\n"
-				+ output+"\n");*/
-
+		
 		try {
 			String line = "java"+" -jar "+m_juiceBoxTools+" dump observed "+m_normalisation+" "+m_hicFile+" "+chr+" "+chr+" BP "+m_resolution+" "+obs;
 			m_log = m_log+"\n"+obs+"\t"+line;
 			Process process = runtime.exec(line);
-			//System.out.println(line);
 			new ReturnFlux(process.getInputStream()).start();
 			new ReturnFlux(process.getErrorStream()).start();
 			exitValue=process.waitFor();
-			line = "java"+" -jar "+m_juiceBoxTools+" dump expected "+m_normalisation+" "+m_hicFile+" "+chr+" BP "+m_resolution+" "+expected;
-			m_log = m_log+"\n"+expected+"\t"+line;
-			process = runtime.exec(line);
-			new ReturnFlux(process.getInputStream()).start();
-			new ReturnFlux(process.getErrorStream()).start();
-			exitValue=process.waitFor();
+			
 		}
 		catch (IOException e) {	e.printStackTrace();}
 		catch (InterruptedException e) {e.printStackTrace();}
-		observedMExpected(obs,expected,output);
+		observedMExpected(obs,output);
 		return exitValue==0;
 	}
+	
+	
 	
 	
 	/**
@@ -96,29 +96,23 @@ public class DumpData {
 	 * @param chr
 	 * @throws IOException
 	 */
-	private void observedMExpected(String obs, String expected, String chr) throws IOException{
-		ArrayList<Double> lExpected = new ArrayList<Double>();
-		BufferedReader br = Files.newBufferedReader(Paths.get(expected), StandardCharsets.UTF_8);
-		for (String line = null; (line = br.readLine()) != null;)
-			lExpected.add(Double.parseDouble(line));
-		br.close();
-		
-		br = Files.newBufferedReader(Paths.get(obs), StandardCharsets.UTF_8);
+	private void observedMExpected(String obs, String chr) throws IOException{
+
+		BufferedReader br = Files.newBufferedReader(Paths.get(obs), StandardCharsets.UTF_8);
 		System.out.println(chr);
 		BufferedWriter 	writer = new BufferedWriter(new FileWriter(new File(chr)));
 		for (String line = null; (line = br.readLine()) != null;){
 			String [] tline = line.split("\t");
 			int dist = Math.abs((Integer.parseInt(tline[0])-Integer.parseInt(tline[1]))/m_resolution);
 			if(!tline[2].equals("NaN")){
-				double oMe = Double.parseDouble(tline[2])-lExpected.get(dist);
+				double oMe = Double.parseDouble(tline[2])-m_lExpected.get(dist);
 				writer.write(tline[0]+"\t"+tline[1]+"\t"+oMe+"\n");
 			}
 		}
 		
 		File file = new File(obs);
 		file.delete();
-		file =  new File(expected);
-		file.delete();
+		
 		writer.close();
 	}
 	
@@ -137,6 +131,27 @@ public class DumpData {
 	public String getLog(){return this.m_log;}
 	
 	
+	public boolean getExpected(String chr,String output) throws IOException, InterruptedException{
+		int exitValue=1;
+		Runtime runtime = Runtime.getRuntime();
+		String expected = output.replaceAll(".txt", "_expected.txt");
+		String cmd = "java"+" -jar "+m_juiceBoxTools+" dump expected "+m_normalisation+" "+m_hicFile+" "+chr+" BP "+m_resolution+" "+expected;
+		m_log = m_log+"\n"+expected+"\t"+cmd;
+		Process process = runtime.exec(cmd);
+		
+		new ReturnFlux(process.getInputStream()).start();
+		new ReturnFlux(process.getErrorStream()).start();
+		exitValue=process.waitFor();
+		
+		BufferedReader br = Files.newBufferedReader(Paths.get(expected), StandardCharsets.UTF_8);
+		for (String line = null; (line = br.readLine()) != null;)
+			m_lExpected.add(Double.parseDouble(line));
+		br.close();
+		
+		File file =  new File(expected);
+		file.delete();
+		return exitValue==0;
+	}
 	
 	
 	/**

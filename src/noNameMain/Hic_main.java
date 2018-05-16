@@ -47,8 +47,6 @@ public class Hic_main {
 	private static boolean m_isObserved = false;
 	/** boolean if true run all the process (dump data + image +image processing*/
 	private static boolean m_isHic = true;
-	/** boolean if true run  the creation of the image + image processing*/
-	private static boolean m_isDump = false;
 	/** if true run only image Processing step*/
 	private static boolean m_isProcessed = false;
 	/** hash map stocking in key the name of the chr and in value the size*/
@@ -56,7 +54,6 @@ public class Hic_main {
 	/**the doc of the prog*/
 	private static String m_doc = ("No Name Version 0.0.1 run with java 8\n"
 			+"Usage: hic <observed/oMe> <hicFile> <chrSizeFile> <Output> <juicerToolsPath> [options]\n"
-			+"\tdumped <observed/oMe> <inputDirectory> <chrSizeFile> <Output> [options]\n"
 			+"\tprocessed <observed/oMe> <Directory with porocessed data> <chrSizeFile> <Output> [options]\n"
 			+"chrSizeFile: path to the chr file size, with the same name of the chr than in the hic file\n"
 			+"-res: resolution in bases (default 5000 bases)\n"
@@ -79,8 +76,9 @@ public class Hic_main {
 	 * 
 	 * @param args
 	 * @throws IOException 
+	 * @throws InterruptedException 
 	 */
-	public static void main(String[] args) throws IOException {
+	public static void main(String[] args) throws IOException, InterruptedException {
 		if (args.length >0 && args.length <5){
 			System.out.println(m_doc);
 			System.exit(0);
@@ -106,10 +104,9 @@ public class Hic_main {
 				readOption(args,6);
 				m_juiceBoxTools = args[5];
 			}	
-			else if(args[0].equals("dumped") || args[0].equals("processed")){
+			else if(args[0].equals("processed")){
 				m_isHic = false;
-				if(args[0].equals("dumped")) m_isDump =true;
-				else m_isProcessed = true;
+				m_isProcessed = true;
 				readOption(args,5);
 			}
 				
@@ -149,7 +146,6 @@ public class Hic_main {
 					
 				m_isObserved = gui.isObserved();
 				m_isHic  = gui.isHic();
-				m_isDump = gui.isDump();
 				m_isProcessed = gui.isProcessed();
 				m_juiceBoxTools = gui.getJuiceBox();
 				
@@ -162,10 +158,10 @@ public class Hic_main {
 				System.exit(0);
 			}
 		}
-		
-		/*m_input = "/home/plop/Bureau/DataSetImageHiC/Droso/test/Kc167_combo_q30.hic";
+		/*m_output= "/home/plop/Bureau/DataSetImageHiC/Droso/test/prout_observed";
+		m_input = "/home/plop/Bureau/DataSetImageHiC/Droso/test/Kc167_combo_q30.hic";
 		readChrSizeFile("/home/plop/Documents/Genome/dm6.chrom.sizes");
-		m_output= "/home/plop/Bureau/DataSetImageHiC/Droso/test/prout";
+		
 		m_juiceBoxTools = "/home/plop/Tools/juicer_tools.1.8.9_jcuda.0.8.jar";
 		m_step = 500;
 		m_matrixSize = 1000;
@@ -174,7 +170,8 @@ public class Hic_main {
 		m_gauss = 1;
 		m_thresholdMax =70;
 		m_juiceBoXNormalisation = "KR";
-		m_isObserved = false;*/
+		m_isObserved = false;
+		m_isHic = true;*/
 		
 		File file = new File(m_output);
 		if (file.exists()==false){file.mkdir();}
@@ -194,32 +191,24 @@ public class Hic_main {
 				+ "step "+m_step+"\n"
 				+ "isObserved "+m_isObserved+"\n"
 				+ "isHic "+m_isHic+"\n"
-				+ "isDump "+m_isDump+"\n"
 				+ "isProcessed "+m_isProcessed+"\n");
-		
+		WholeGenomeAnalysis wga = new WholeGenomeAnalysis(m_output, m_chrSize, m_gauss, m_min, m_max, m_step, 
+				m_resolution, m_saturatedPixel, m_thresholdMax, m_diagSize, m_matrixSize);
 		if(m_isHic){
-			WholeGenomeAnalysis wga = new WholeGenomeAnalysis(m_output, m_chrSize, m_gauss, m_min, m_max, m_step, 
-					m_resolution, m_saturatedPixel, m_thresholdMax, m_diagSize, m_matrixSize);
+			
 			HicFileProcessing hfp =  new HicFileProcessing(m_input, wga, m_chrSize, m_juiceBoxTools, m_juiceBoXNormalisation);
-			if(m_isObserved){hfp.runObserved(); }
-			else{hfp.runOmE();}
+			if(m_isObserved){hfp.runObserved(true); }
+			else{System.out.println("plopi");
+				hfp.runObserved(false);}
+			
 		}
 		else{
-			WholeGenomeAnalysis wga = new WholeGenomeAnalysis(m_input,m_output, m_chrSize, m_gauss, m_min, m_max, m_step, 
-					m_resolution, m_saturatedPixel, m_thresholdMax, m_diagSize, m_matrixSize);
-			if(m_isProcessed){
-				if(m_isObserved) wga.runImageProcessing("o");
-				else wga.runImageProcessing("oMe");
-			}
-			else if(m_isDump){
-				if(m_isObserved) wga.runAll("o");
-				else wga.runAll("oMe");
-			}
+			if(m_isObserved) wga.run("o",m_input);
+			else wga.run("oMe",m_input);
 		}
-		
+				
 		System.out.println("End");
 	}
-	
 	
 	/**
 	 * 
