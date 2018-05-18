@@ -31,6 +31,11 @@ public class ProcessMethod{
 		m_minFilterRadius = minFilterRad;		
 	}
 	
+	public ProcessMethod(ImagePlus img, double gaussianFilterRad){
+		m_img = img;
+		m_ip = m_img.getProcessor();
+		m_gaussianFilterRadius = gaussianFilterRad;		
+	}
 	/**
 	 * 
 	 */

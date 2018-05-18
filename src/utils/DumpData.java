@@ -11,9 +11,6 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Set;
 
 public class DumpData {
 
@@ -30,12 +27,17 @@ public class DumpData {
 		m_normalisation = norm;
 		m_resolution = resolution;
 		m_hicFile = hicFile;
-		/*System.out.println(m_hicFile+"\n"
+		
+		System.out.println(m_hicFile+"\n"
 				+ m_juiceBoxTools+"\n"
 				+m_resolution+"\n"
-				+m_normalisation+"\n");*/
+				+m_normalisation+"\n");
 	}
 	
+	public DumpData() {
+		// TODO Auto-generated constructor stub
+	}
+
 	/**
 	 * dump observed KR https://hicfiles.s3.amazonaws.com/hiseq/gm12878/in-situ/combined.hic 1:20480000:40960000 1:20480000:40960000 BP 10000 combined_10Kb.txt
 
@@ -97,7 +99,7 @@ public class DumpData {
 	 * @throws IOException
 	 */
 	private void observedMExpected(String obs, String chr) throws IOException{
-
+		//System.out.println("je passe par la: "+obs+"\t"+chr);
 		BufferedReader br = Files.newBufferedReader(Paths.get(obs), StandardCharsets.UTF_8);
 		System.out.println(chr);
 		BufferedWriter 	writer = new BufferedWriter(new FileWriter(new File(chr)));

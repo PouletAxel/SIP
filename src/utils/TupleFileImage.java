@@ -52,7 +52,7 @@ public class TupleFileImage {
 			br = new BufferedReader(new FileReader(m_file));
 			StringBuilder sb = new StringBuilder();
 			String line = br.readLine();
-			System.out.println("\t"+line);
+			//System.out.println("\t"+line);
 			while (line != null){
 				sb.append(line);
 				String[] parts = line.split("\\t");

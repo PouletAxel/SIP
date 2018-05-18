@@ -1,6 +1,7 @@
 package utils;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import ij.ImagePlus;
 import ij.io.FileSaver;
@@ -11,22 +12,44 @@ import ij.process.ImageProcessor;
 public class FindMaxima{
 	/**	 */
 	private ImagePlus m_img;
+	private String m_chr;
+	private ImagePlus m_imgFilter;
 	private ImagePlus m_imgResu = new ImagePlus();
 	private double m_noiseTolerance;
+	private int m_nbZero = 0;
+	private HashMap<String,Loop> m_data = new HashMap<String,Loop>();
 
 	/**
 	 * 
-	 * @param ip
+	 * @param img
+	 * @param imgFilter
+	 * @param chr
+	 * @param noiseTolerance
 	 */
-	public FindMaxima(ImagePlus img, double noiseTolerance){
+	public FindMaxima(ImagePlus img, ImagePlus imgFilter, String chr, double noiseTolerance){
 		m_img = img;
+		m_imgFilter = imgFilter;
 		m_noiseTolerance = noiseTolerance;
+		m_nbZero = nbZero(m_img);
+		m_chr = chr;
 	}
 	
 	/**
 	 * 
-	 * @return
 	 */
+	public HashMap<String,Loop> findloop(){
+		ArrayList<String> temp = getMaxima(runSimple(m_imgFilter));
+		for(int j = 0; j < temp.size();++j){
+			String[] parts = temp.get(j).split("\\t");
+			int x = Integer.parseInt(parts[0]);
+			int y = Integer.parseInt(parts[1]);
+			String name= m_chr+"\t"+temp.get(j);
+			Loop maxima = new Loop(temp.get(j),x,y,m_chr);
+			maxima.setNbZeroInTheImage(m_nbZero);
+			m_data.put(name, maxima);
+		}
+		return m_data;
+	}
 	
 	
 	/**
@@ -137,6 +160,18 @@ public class FindMaxima{
 		return listMaxima;
 	}	
 	
+	private int nbZero(ImagePlus img){ 
+		int nb = 0;  
+		ImageProcessor ip = img.getProcessor();
+		for(int i = 0; i < img.getWidth(); ++i){
+			for(int j = 0; j < img.getHeight(); ++j){
+				if(ip.getPixel(i, j)==0){
+					nb++;
+				}
+			}
+		}
+		return nb;
+	}
 	
 	public double getNoiseTolerance(){	return this.m_noiseTolerance; }
 	public void setNoiseTolerance(double noiseTolerance){	this.m_noiseTolerance = noiseTolerance; }

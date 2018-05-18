@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 
 import utils.DumpData;
+import utils.WholeGenomeAnalysis;
 
 public class HicFileProcessing {
 	
@@ -23,13 +24,15 @@ public class HicFileProcessing {
 		System.out.println(hicFile+"\n");
 	}
 	
+	
+	
 	/**
 	 * dump observed KR https://hicfiles.s3.amazonaws.com/hiseq/gm12878/in-situ/combined.hic 1:20480000:40960000 1:20480000:40960000 BP 10000 combined_10Kb.txt
 	 * 
 	 * @throws IOException
 	 * @throws InterruptedException 
 	 */
-	public void runObserved(boolean isObserved) throws IOException, InterruptedException{
+	public void run(boolean isObserved) throws IOException, InterruptedException{
 		boolean juicerTools;
 		while(m_key.hasNext()){
 			String expected ="";
@@ -45,11 +48,12 @@ public class HicFileProcessing {
 				String name = outdir+chr+"_0_"+j+".txt";
 				m_dumpData.getExpected(test,name);
 			}
+			System.out.println("start dump "+chr+" size "+chrsize);
 			for(int i = 0 ; j < chrsize; i+=step,j+=step){
 				int end =j-1;
 				String dump = chr+":"+i+":"+end;
 				String name = outdir+chr+"_"+i+"_"+end+".txt";
-				System.out.println("start dump "+chr+" size "+chrsize+" dump "+dump);
+				System.out.println("\tstart dump "+chr+" size "+chrsize+" dump "+dump);
 				if(isObserved) 
 					juicerTools = m_dumpData.dumpObserved(dump,name);
 				else{
@@ -66,7 +70,7 @@ public class HicFileProcessing {
 					i+=step;
 					dump = chr+":"+i+":"+j;
 					name = outdir+chr+"_"+i+"_"+j+".txt";
-					System.out.println("start dump "+chr+" size "+chrsize+" dump "+dump);
+					System.out.println("\tstart dump "+chr+" size "+chrsize+" dump "+dump);
 					juicerTools = m_dumpData.dumpObserved(dump,name);
 					m_log = m_dumpData.getLog();
 					if (juicerTools == false){
@@ -82,6 +86,9 @@ public class HicFileProcessing {
 		else m_wga.run("oMe");
 	}
 	
+	/**
+	 * 
+	 * @return
+	 */
 	public String getLog(){ return m_log; }
-
 }

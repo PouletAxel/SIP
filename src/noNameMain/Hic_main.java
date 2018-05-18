@@ -7,9 +7,11 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.HashMap;
+
+import core.HiCFileComparison;
 import core.HicFileProcessing;
-import core.WholeGenomeAnalysis;
 import gui.GuiAnalysis;
+import utils.WholeGenomeAnalysis;
 
 /**
  * 
@@ -19,6 +21,8 @@ import gui.GuiAnalysis;
 public class Hic_main {
 	/** Path of input data directory if dumped or processed data else .hic for hic option*/
 	private static String m_input = "";
+	/** Path of input data directory if dumped or processed data else .hic for hic option*/
+	private static String m_input2 = "";
 	/**	 Path of output if not existed it is created*/
 	private static String m_output = "";
 	/** Path to the jucier_tools_box to dump the data not necessary for Processed and dumped method */
@@ -158,23 +162,24 @@ public class Hic_main {
 				System.exit(0);
 			}
 		}
-		/*m_output= "/home/plop/Bureau/DataSetImageHiC/Droso/test/prout_observed";
-		m_input = "/home/plop/Bureau/DataSetImageHiC/Droso/test/Kc167_combo_q30.hic";
+		
+		/*m_input= "/home/plop/Bureau/DataSetImageHiC/Droso/test/plop";
+		m_output= "/home/plop/Bureau/DataSetImageHiC/Droso/test/plop";
+		//m_input = "/home/plop/Bureau/DataSetImageHiC/Droso/Kc167_combo_q30.hic";
+		m_input2 = "/home/plop/Bureau/DataSetImageHiC/Droso/S2_cattoni_wang_ramirez_q30.hic";
 		readChrSizeFile("/home/plop/Documents/Genome/dm6.chrom.sizes");
 		
 		m_juiceBoxTools = "/home/plop/Tools/juicer_tools.1.8.9_jcuda.0.8.jar";
 		m_step = 500;
 		m_matrixSize = 1000;
 		m_resolution = 5000;
-		m_diagSize = 2;
-		m_gauss = 1;
+		m_diagSize = 4;
+		m_gauss = 0.5;
 		m_thresholdMax =70;
 		m_juiceBoXNormalisation = "KR";
-		m_isObserved = false;
-		m_isHic = true;*/
+		m_isObserved = true;
+		m_isHic = false;
 		
-		File file = new File(m_output);
-		if (file.exists()==false){file.mkdir();}
 		
 		System.out.println("input "+m_input+"\n"
 				+ "output "+m_output+"\n"
@@ -191,15 +196,26 @@ public class Hic_main {
 				+ "step "+m_step+"\n"
 				+ "isObserved "+m_isObserved+"\n"
 				+ "isHic "+m_isHic+"\n"
-				+ "isProcessed "+m_isProcessed+"\n");
+				+ "isProcessed "+m_isProcessed+"\n");*/
+		
+		
+		File file = new File(m_output);
+		if (file.exists()==false){file.mkdir();}
+		
+		
 		WholeGenomeAnalysis wga = new WholeGenomeAnalysis(m_output, m_chrSize, m_gauss, m_min, m_max, m_step, 
 				m_resolution, m_saturatedPixel, m_thresholdMax, m_diagSize, m_matrixSize);
+		
+	//	HiCFileComparison plopi = new HiCFileComparison(m_input,m_input2,m_chrSize,m_juiceBoxTools,m_juiceBoXNormalisation, wga);
+	//	plopi.runOmE();
+	
+		
+	
 		if(m_isHic){
 			
 			HicFileProcessing hfp =  new HicFileProcessing(m_input, wga, m_chrSize, m_juiceBoxTools, m_juiceBoXNormalisation);
-			if(m_isObserved){hfp.runObserved(true); }
-			else{System.out.println("plopi");
-				hfp.runObserved(false);}
+			if(m_isObserved) hfp.run(true);
+			else		hfp.run(false);
 			
 		}
 		else{

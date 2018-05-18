@@ -9,7 +9,6 @@ public class Loop {
 	private int m_y;
 	private int m_xEnd;
 	private int m_yEnd;
-	private double m_noiseScore = -1;
 	private double m_paScoreMed = -1;
 	private double m_paScoreAvg = -1;
 	private double m_RpaScoreMed = -1;
@@ -31,19 +30,7 @@ public class Loop {
 		this.setY(y);
 		m_chr = chr;
 	}
-	
-	/**
-	 * 
-	 * @param noise
-	 */
-	public void addNoiseScore(double noise){ this.m_noiseScore += noise;}
-	
-	/**
-	 * 
-	 * @param nbStep
-	 */
-	public void meanNoiseScore(int nbStep){ this.m_noiseScore = this.m_noiseScore/nbStep;}
-	
+		
 	/**
 	 * 
 	 * @return
@@ -80,17 +67,6 @@ public class Loop {
 	 */
 	public void setY(int m_y){ this.m_y = m_y;	}
 	
-	/**
-	 * 
-	 * @return
-	 */
-	public double getNoiseScore(){	return m_noiseScore/1000; }
-	
-	/**
-	 * 
-	 * @param m_noiseScore
-	 */
-	public void setNoiseScore(double m_noiseScore){ this.m_noiseScore = m_noiseScore; }
 
 	/**
 	 * 
