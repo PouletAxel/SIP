@@ -90,6 +90,30 @@ public class CoordinatesCorrection {
 		return m_data;
 	}
 	
+	
+	public HashMap<String,Loop> imageToGenomeCoordinate(HashMap<String,Loop> temp, int index){
+		int x;
+		int y;
+		Set<String> key = temp.keySet();
+		Iterator<String> it = key.iterator();
+		while (it.hasNext()){
+			Loop loop = temp.get(it.next());
+			x = loop.getX();
+			y = loop.getY();
+			int a = (x+(index*m_step))*m_resolution;
+			int a_end = a+m_resolution;
+			int b = (y+(index*m_step))*m_resolution;
+			int b_end =b+m_resolution;
+			String newName = loop.getChr()+"\t"+a+"\t"+b;
+			if(Math.abs(a-b) > m_diagSize){
+				loop.setCoordinates(a, a_end, b, b_end);
+				loop.setName(newName);
+				m_data.put(newName, loop);
+			}
+		}
+		return m_data;
+	}
+	
 	/**
 	 * 
 	 * @param i

@@ -19,21 +19,21 @@ public class TestCallLoopsHicFile{
 	 * @throws InterruptedException 
 	 */
 	public static void main(String[] args) throws IOException, InterruptedException {
-		String output= "/home/plop/Bureau/DataSetImageHiC/mouseYonHee/10kb";
-		String input = "/home/plop/Bureau/DataSetImageHiC/mouseYonHee/inter.hic";
-		readChrSizeFile("/home/plop/Bureau/DataSetImageHiC/mm9_sizes.txt");
+		String output= "/home/plop/Bureau/DataSetImageHiC/mouseYonHee/25kb30q";
+		String input = "/home/plop/Bureau/DataSetImageHiC/mouseYonHee/inter_30.hic";
+		HashMap<String,Integer> chrsize = readChrSizeFile("/home/plop/Bureau/DataSetImageHiC/mm9_sizes.txt");
 		String juiceBoxTools = "/home/plop/Tools/juicer_tools.1.8.9_jcuda.0.8.jar";
 		int step = 500;
 		int matrixSize = 1000;
-		int resolution = 5000;
-		int diagSize = 4;
-		double gauss = 1;
-		double min = 1.25;
-		double max = 1.25;
-		int thresholdMax =70;
+		int resolution = 25000;
+		int diagSize = 1;
+		double gauss = 0.25;
+		double min = 1;
+		double max = 1;
+		int thresholdMax = 2500;
 		String juiceBoXNormalisation = "KR";
-		double saturatedPixel = 0.05;
-		boolean isObserved = true;
+		double saturatedPixel = 0.04;
+		boolean isObserved = false;
 					
 		System.out.println("input "+input+"\n"
 				+ "output "+output+"\n"
@@ -53,9 +53,9 @@ public class TestCallLoopsHicFile{
 			File file = new File(output);
 			if (file.exists()==false){file.mkdir();}
 			
-			
-			WholeGenomeAnalysis wga = new WholeGenomeAnalysis(output, readChrSizeFile("/home/plop/Documents/Genome/dm6.chrom.sizes"), gauss, min, max, step, resolution, saturatedPixel, thresholdMax, diagSize, matrixSize);
-			HicFileProcessing hfp =  new HicFileProcessing(input, wga, readChrSizeFile("/home/plop/Documents/Genome/dm6.chrom.sizes"), juiceBoxTools, juiceBoXNormalisation);
+///-d 4 -g 0.25 -t 20 -norm K
+			WholeGenomeAnalysis wga = new WholeGenomeAnalysis(output, chrsize, gauss, min, max, step, resolution, saturatedPixel, thresholdMax, diagSize, matrixSize);
+			HicFileProcessing hfp =  new HicFileProcessing(input, wga, chrsize, juiceBoxTools, juiceBoXNormalisation);
 			if(isObserved) hfp.run(true);
 			else		hfp.run(false);
 				

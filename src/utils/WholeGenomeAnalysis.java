@@ -21,7 +21,7 @@ public class WholeGenomeAnalysis {
 	private double m_min;
 	private double m_max;
 	private double m_saturatedPixel;
-	private int m_matrixSize =0;
+	private int m_matrixSize = 0;
 	private int m_resolution;
 	private int m_thresholdMaxima;
 	HashMap<String,Integer> m_chrSize =  new HashMap<String,Integer>();
@@ -166,7 +166,7 @@ public class WholeGenomeAnalysis {
 			Loop loop = m_data.get(cle);
 			ArrayList<Integer> coord = loop.getCoordinates();
 			double plop = loop.getNbZeroInTheImage()/(m_matrixSize*m_matrixSize);
-			writer.write(loop.getChr()+"\t"+coord.get(2)+"\t"+coord.get(3)+"\t"+loop.getChr()+"\t"+coord.get(0)+"\t"+coord.get(1)+"\t255,125,255\t"
+			writer.write(loop.getChr()+"\t"+coord.get(2)+"\t"+coord.get(3)+"\t"+loop.getChr()+"\t"+coord.get(0)+"\t"+coord.get(1)+"\t255,125,255"
 				+"\t"+loop.getPaScoreMed()+"\t"+loop.getRegionalPaScoreMed()+"\t"+loop.getPaScoreAvg()+"\t"+loop.getRegionalPaScoreAvg()
 				+"\t"+loop.getPercentage()+"\t"+loop.getPercentageOfZero()+"\t"+plop+"\n"); 
 		}
@@ -203,7 +203,7 @@ public class WholeGenomeAnalysis {
 				FindMaxima findLoop = new FindMaxima(imgRaw, imgFilter, chr, m_thresholdMaxima);
 				HashMap<String,Loop> temp = findLoop.findloop();
 				System.out.println("before "+ temp.size());
-				removeMaximaCloseToZero(imgRaw,temp);
+				removeMaximaCloseToZero(imgRaw,temp,false);
 				System.out.println("after "+ temp.size());
 			
 				PeakAnalysisScore pas = new PeakAnalysisScore(imgRaw,temp,countNonZero);
@@ -250,7 +250,7 @@ public class WholeGenomeAnalysis {
 				HashMap<String,Loop> temp = findLoop.findloop();
 			
 				System.out.println("before "+ temp.size());
-				removeMaximaCloseToZero(imgRaw,temp);
+				removeMaximaCloseToZero(imgRaw,temp,true);
 				System.out.println("after "+ temp.size());
 			
 				PeakAnalysisScore pas = new PeakAnalysisScore(imgRaw,temp,countNonZero);
@@ -284,15 +284,17 @@ public class WholeGenomeAnalysis {
 	
 	/**
 	 * 
-	 * @param imgFilter
+	 * @param img
 	 * @param fileName
 	 */
 	
-	private void  removeMaximaCloseToZero(ImagePlus imgFilter, HashMap<String,Loop> temp){ 
+	private void  removeMaximaCloseToZero(ImagePlus img, HashMap<String,Loop> temp,boolean isObserved){ 
 		Set<String> key = temp.keySet();
 		Iterator<String> it = key.iterator();
-		ImageProcessor ip = imgFilter.getProcessor();
+		ImageProcessor ip = img.getProcessor();
 		ArrayList<String> toRemove = new ArrayList<String>();
+		int thresh = 3;
+		if (isObserved)	thresh = 1;
 		while (it.hasNext()){
 			String cle = it.next();
 			Loop loop = temp.get(cle);
@@ -300,13 +302,13 @@ public class WholeGenomeAnalysis {
 			int j = loop.getY();
 			//System.out.println("cle  "+cle+" "+i+" "+j);
 			int nb =0;
-			if (i-1> 0 && i+1< imgFilter.getWidth()){
-				if(j-1 > 0 && j+1 < imgFilter.getHeight()){
+			if (i-1> 0 && i+1< img.getWidth()){
+				if(j-1 > 0 && j+1 < img.getHeight()){
 					for(int ii = i-1; ii <= i+1; ++ii){
 						for(int jj = j-1; jj <= j+1; ++jj){
 							if (ip.getPixel(ii, jj)<=0){
 								nb++;
-								if (nb >=1 ){
+								if (nb >= thresh ){
 									toRemove.add(cle);
 									break;
 								}

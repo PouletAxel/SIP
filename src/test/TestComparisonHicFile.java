@@ -76,22 +76,20 @@ public class TestComparisonHicFile {
 		 * @throws InterruptedException 
 		 */
 		public static void main(String[] args) throws IOException, InterruptedException{
-			m_output= "/home/plop/Bureau/DataSetImageHiC/Droso/test/plop";
-			m_input = "/home/plop/Bureau/DataSetImageHiC/Droso/Kc167_combo_q30.hic";
-			m_input2 = "/home/plop/Bureau/DataSetImageHiC/Droso/S2_cattoni_wang_ramirez_q30.hic";
-			readChrSizeFile("/home/plop/Documents/Genome/dm6_bis.chrom.sizes");
+			m_output= "/home/plop/Bureau/DataSetImageHiC/rao2017/TestCompare";
+			m_input = "/home/plop/Bureau/DataSetImageHiC/rao2017/Untreated";
+			m_input2 = "/home/plop/Bureau/DataSetImageHiC/rao2017/6hr";
+			//readChrSizeFile("/home/plop/Documents/Genome/dm6_bis.chrom.sizes");
 			
-			m_juiceBoxTools = "/home/plop/Tools/juicer_tools.1.8.9_jcuda.0.8.jar";
+			//m_juiceBoxTools = "/home/plop/Tools/juicer_tools.1.8.9_jcuda.0.8.jar";
 			m_step = 500;
 			m_matrixSize = 1000;
-			m_resolution = 5000;
-			m_diagSize = 4;
-			m_gauss = 0.5;
-			m_thresholdMax =70;
-			m_juiceBoXNormalisation = "KR";
+			m_resolution = 10000;
+			m_diagSize = 2;
+			m_thresholdMax = 10;
+			//m_juiceBoXNormalisation = "KR";
 			m_isObserved = true;
 			m_isHic = false;
-			
 			
 			System.out.println("input "+m_input+"\n"
 					+ "output "+m_output+"\n"
@@ -118,35 +116,9 @@ public class TestComparisonHicFile {
 			WholeGenomeAnalysis wga = new WholeGenomeAnalysis(m_output, m_chrSize, m_gauss, m_min, m_max, m_step, 
 					m_resolution, m_saturatedPixel, m_thresholdMax, m_diagSize, m_matrixSize);
 			
-		HiCFileComparison plopi = new HiCFileComparison(m_input,m_input2,m_chrSize,m_juiceBoxTools,m_juiceBoXNormalisation, wga);
-		plopi.runOmE();
-		
-			
-		
-	
-					
+			HiCFileComparison plopi = new HiCFileComparison(m_input,m_input2, wga);
+			plopi.run();
 			System.out.println("End");
 		}
-		
-		/**
-		 * 
-		 * @param chrSizeFile
-		 * @throws IOException
-		 */
-		private static void readChrSizeFile( String chrSizeFile) throws IOException{
-			BufferedReader br = new BufferedReader(new FileReader(chrSizeFile));
-			StringBuilder sb = new StringBuilder();
-			String line = br.readLine();
-			while (line != null){
-				sb.append(line);
-				String[] parts = line.split("\\t");				
-				String chr = parts[0]; 
-				int size = Integer.parseInt(parts[1]);
-				m_chrSize.put(chr, size);
-				sb.append(System.lineSeparator());
-				line = br.readLine();
-			}
-			br.close();
-		} 
 		
 }

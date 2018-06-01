@@ -26,6 +26,13 @@ public class PeakAnalysisScore {
 		m_countNonZero = countNonZero;
 	}
 	
+	public PeakAnalysisScore(ImagePlus imgRaw, HashMap<String,Loop> data){
+		this.m_imgRaw = imgRaw;
+		this.m_data = data;
+		this.m_ipRaw = m_imgRaw.getProcessor();
+	}
+	
+	
 	/**
 	 * 
 	 */
@@ -98,6 +105,45 @@ public class PeakAnalysisScore {
 	
 	
 	
+	
+	/**
+	 * 
+	 */
+	public void computeScoreBis(){
+		Set<String> key = m_data.keySet();
+		Iterator<String> it = key.iterator();
+		while (it.hasNext()){
+			String cle = it.next();
+			Loop loop = m_data.get(cle);
+			int x = loop.getX();
+			int y = loop.getY();
+			double corner = 0;
+			double cornerAvg = 0;
+			double center = m_ipRaw.getPixel(x, y);
+			int nbPixel = 0;
+			int nbZero = 0;
+			double squareCenterMed = process3By3Square(x,y);
+			double squareCenterAvg = process3By3SquareAvg(x,y);
+			int nbCorner = 0;
+			if(x>=5 && y>=5 && x<m_imgRaw.getWidth()-5 && y < m_imgRaw.getHeight()-5){
+				corner += process3By3Square(x-4,y-4);
+				cornerAvg += process3By3SquareAvg(x-4,y-4); 
+				nbPixel += process3By3SquareSup(x-4,y-4,(int)center);
+				nbZero += process3By3SquareZero(x-4,y-4);
+				nbCorner++;
+			}
+		if(nbCorner > 0){
+			corner = corner/nbCorner;
+			cornerAvg = cornerAvg/nbCorner;
+			loop.setPaScoreMed(center/corner);
+			loop.setPaScoreAvg(center/cornerAvg);
+			loop.setRegionalPaScoreMed(squareCenterMed/corner);
+			loop.setRegionalPaScoreAvg(squareCenterAvg/cornerAvg);	
+			loop.setPercentage(100*nbPixel/(nbCorner*9));
+			loop.setPercentageOfZero(100*nbZero/(nbCorner*9));
+		}
+	}
+}	
 	/**
 	 * 
 	 * @param x

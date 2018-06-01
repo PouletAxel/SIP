@@ -30,7 +30,7 @@ public class FindMaxima{
 		m_img = img;
 		m_imgFilter = imgFilter;
 		m_noiseTolerance = noiseTolerance;
-		m_nbZero = nbZero(m_img);
+		m_nbZero = nbZero();
 		m_chr = chr;
 	}
 	
@@ -38,7 +38,7 @@ public class FindMaxima{
 	 * 
 	 */
 	public HashMap<String,Loop> findloop(){
-		ArrayList<String> temp = getMaxima(runSimple(m_imgFilter));
+		ArrayList<String> temp = getMaxima(runSimple());
 		for(int j = 0; j < temp.size();++j){
 			String[] parts = temp.get(j).split("\\t");
 			int x = Integer.parseInt(parts[0]);
@@ -56,14 +56,14 @@ public class FindMaxima{
 	 * 
 	 * @return
 	 */
-	public ImagePlus runSimple(ImagePlus rawImage){
-		ImagePlus temp = m_img.duplicate();
+	public ImagePlus runSimple(){
+		ImagePlus temp = m_imgFilter.duplicate();
 		ImageProcessor ip = temp.getProcessor();
 		MaximumFinder mf = new MaximumFinder(); 
 		ByteProcessor bp = mf.findMaxima(ip, m_noiseTolerance, MaximumFinder.SINGLE_POINTS, true);
 		m_imgResu.setProcessor(bp);
-		this.correctMaxima(rawImage);
-		this.removedCloseMaxima(rawImage);
+		this.correctMaxima();
+		this.removedCloseMaxima();
 		return m_imgResu;
 	}
 	
@@ -83,8 +83,8 @@ public class FindMaxima{
 	 * 
 	 * @return
 	 */
-	private void correctMaxima(ImagePlus rawImage){
-		ImageProcessor rawIp  = rawImage.getProcessor();
+	private void correctMaxima(){
+		ImageProcessor rawIp  = m_img.getProcessor();
 		int w = rawIp.getWidth();
 		int h = rawIp.getHeight();
 		ImageProcessor ipMaxima = m_imgResu.getProcessor();
@@ -117,8 +117,8 @@ public class FindMaxima{
 	 * 
 	 * @param rawImage
 	 */
-	private void removedCloseMaxima(ImagePlus rawImage){
-		ImageProcessor rawIp  = rawImage.getProcessor();
+	private void removedCloseMaxima(){
+		ImageProcessor rawIp  = m_img.getProcessor();
 		int w = rawIp.getWidth();
 		int h = rawIp.getHeight();
 		ImageProcessor ipMaxima = m_imgResu.getProcessor();
@@ -160,11 +160,11 @@ public class FindMaxima{
 		return listMaxima;
 	}	
 	
-	private int nbZero(ImagePlus img){ 
+	private int nbZero(){ 
 		int nb = 0;  
-		ImageProcessor ip = img.getProcessor();
-		for(int i = 0; i < img.getWidth(); ++i){
-			for(int j = 0; j < img.getHeight(); ++j){
+		ImageProcessor ip = m_img.getProcessor();
+		for(int i = 0; i < m_img.getWidth(); ++i){
+			for(int j = 0; j < m_img.getHeight(); ++j){
 				if(ip.getPixel(i, j)==0){
 					nb++;
 				}
@@ -172,8 +172,5 @@ public class FindMaxima{
 		}
 		return nb;
 	}
-	
-	public double getNoiseTolerance(){	return this.m_noiseTolerance; }
-	public void setNoiseTolerance(double noiseTolerance){	this.m_noiseTolerance = noiseTolerance; }
 		
 }

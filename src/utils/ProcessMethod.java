@@ -46,10 +46,8 @@ public class ProcessMethod{
 		//rao 2015 => 0.05
 		//cubenas 0.02
 	}
-	/**
-	 * 
-	 * @return
 	
+	public void runMin(double min){	m_rF.rank(m_ip, min, RankFilters.MIN); }
 	
 		
 	/**

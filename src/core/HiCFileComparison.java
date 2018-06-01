@@ -9,11 +9,16 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Set;
 
+import ij.IJ;
 import ij.ImagePlus;
-import utils.DumpData;
+import ij.process.ImageProcessor;
+import utils.CoordinatesCorrection;
+import utils.FindMaxima;
 import utils.Loop;
 import utils.PeakAnalysisScore;
+import utils.ProcessMethod;
 import utils.TupleFileImage;
 import utils.WholeGenomeAnalysis;
 
@@ -21,10 +26,12 @@ import utils.WholeGenomeAnalysis;
 public class HiCFileComparison {
 	private String m_log = "";
 	private WholeGenomeAnalysis m_wga;
-	private Iterator<String> m_key;
-	private DumpData m_dumpData1;
-	private DumpData m_dumpData2;
-	private HashMap<String,Integer> m_chrSize = new HashMap<String,Integer>();
+	private String m_dir1;
+	private String m_dir2;
+	private String m_outdir1;
+	private String m_outdir2;
+	private HashMap<String,Loop> m_data1 = new HashMap<String,Loop>();
+	private HashMap<String,Loop> m_data2 = new HashMap<String,Loop>();
 
 	/**
 	 * 
@@ -35,13 +42,17 @@ public class HiCFileComparison {
 	 * @param normJuiceBox
 	 * @param wga
 	 */
-	public HiCFileComparison(String hicFile1, String hicFile2, HashMap<String,Integer> chrSize, String juiceBoxTools, String normJuiceBox, WholeGenomeAnalysis wga){
-		m_key = chrSize.keySet().iterator();
-		m_chrSize = chrSize;
+	public HiCFileComparison(String dir1, String dir2, WholeGenomeAnalysis wga){
 		m_wga = wga;
-		m_dumpData1 = new DumpData(juiceBoxTools, hicFile1, normJuiceBox, m_wga.getResolution());
-		m_dumpData2 = new DumpData(juiceBoxTools, hicFile2, normJuiceBox, m_wga.getResolution());
-		System.out.println(hicFile1+"\t"+hicFile2+"\n");
+		m_outdir1 = wga.getOutputDir()+File.separator+"1";
+		m_outdir2 = wga.getOutputDir()+File.separator+"2";
+		m_dir1 = dir1;
+		m_dir2 = dir2;
+		File file = new File(m_outdir1);
+		if (file.exists()==false){file.mkdir();}
+		file = new File(m_outdir2);
+		if (file.exists()==false){file.mkdir();}
+		System.out.println(m_dir1+"\t"+m_dir2+"\n");
 	}
 	
 	
@@ -52,65 +63,45 @@ public class HiCFileComparison {
 	 * @throws IOException
 	 * @throws InterruptedException 
 	 */
-	public void runOmE() throws IOException, InterruptedException{
-		boolean juicerTools;
-		while(m_key.hasNext()){
-			ArrayList<String> file1 = new ArrayList<String>();
+	public void run() throws IOException, InterruptedException{
+		File file = new File(m_dir1);
+        File[] files = file.listFiles();
+        for(int i = 0; i < files.length; ++i ){
+        	ArrayList<String> file1 = new ArrayList<String>();
 			ArrayList<String> file2 = new ArrayList<String>();
-			String chr = m_key.next();
-			String outdir = m_wga.getOutputDir()+File.separator+chr+File.separator;
-			File file = new File(outdir);
-			if (file.exists()==false){file.mkdir();}
-			int chrsize = m_chrSize.get(chr);
-			int step = m_wga.getStep()*m_wga.getResolution();
-			int j = m_wga.getMatrixSize()*m_wga.getResolution();
-			String test = chr+":0:"+j;
-			String nameExpected = outdir+chr+"_0_"+j+"plopo.txt";
-			m_dumpData1.getExpected(test,nameExpected);
-			nameExpected = outdir+chr+"_0_"+j+"plopi.txt";
-			m_dumpData2.getExpected(test,nameExpected);
-			for(int i = 0 ; j < chrsize; i+=step,j+=step){
-				int end =j-1;
-				String dump = chr+":"+i+":"+end;
-				String name = outdir+chr+"_"+i+"_"+end+"_1.txt";
-				String outputName1 = outdir+"diff1_"+chr+"_"+i+"_"+end+".txt";
-				System.out.println("start dump "+chr+" size "+chrsize+" dump "+dump);
-				juicerTools = m_dumpData1.dumpObservedMExpected(dump,name);
-				String name2 = outdir+chr+"_"+i+"_"+end+"_2.txt";
-				String outputName2 = outdir+"diff2_"+chr+"_"+i+"_"+end+".txt";
-				juicerTools = m_dumpData2.dumpObservedMExpected(dump,name2);
-				compare(name,name2,outputName1,outputName2);
-				File rm = new File(name);
-				rm.delete();
-				rm = new File(name2);
-				rm.delete();
-				if (juicerTools == false){
-					System.out.print(dump+" "+"\n"+juicerTools+"\n"+m_log);
-					System.exit(0);
+			if (files[i].isDirectory() == true){
+				String [] tab = files[i].toString().split(File.separator);
+				String chr = tab[tab.length-1];
+				String outDir1Chr = m_outdir1+File.separator+chr;
+				File fileOut = new File(outDir1Chr);
+				if (fileOut.exists()==false){fileOut.mkdir();}
+				String outDir2Chr = m_outdir2+File.separator+tab[tab.length-1];
+				file = new File(outDir2Chr);
+				if (file.exists()==false){file.mkdir();}
+				outDir2Chr = outDir2Chr.replaceAll(m_dir1, m_dir2);
+				File fileChr = new File(files[i].toString());
+				File[] tFileChr = fileChr.listFiles();
+				//System.out.println(outDir1Chr+"\t"+outDir2Chr);
+				for(int j = 0; j < tFileChr.length; ++j){
+					if (tFileChr[j].isFile() == true && tFileChr[j].toString().contains(".txt")){
+						String bisFile = tFileChr[j].toString();
+						tab = bisFile.split(File.separator);
+						String fileName = tab[tab.length-1];
+						bisFile = bisFile.replaceAll(m_dir1, m_dir2);
+						//System.out.println("\t"+tFileChr[j]+"\t"+bisFile);
+						String outputName1 = outDir1Chr+File.separator+fileName;
+						String outputName2 = outDir2Chr+File.separator+fileName;
+						compare(tFileChr[j].toString(),bisFile,outputName1,outDir2Chr+File.separator+fileName);
+						file1.add(createImageFile(outputName1));
+						file2.add(createImageFile(outputName2));
+					}
 				}
-				if(j+step>chrsize){
-					j= chrsize;
-					i+=step;
-					dump = chr+":"+i+":"+end;
-					name = outdir+chr+"_"+i+"_"+end+"_1.txt";
-					outputName1 = outdir+"diff1_"+chr+"_"+i+"_"+end+".txt";
-					System.out.println("start dump "+chr+" size "+chrsize+" dump "+dump);
-					juicerTools = m_dumpData1.dumpObservedMExpected(dump,name);
-					name2 = outdir+chr+"_"+i+"_"+end+"_2.txt";
-					outputName2 = outdir+"diff2_"+chr+"_"+i+"_"+end+".txt";
-					juicerTools = m_dumpData2.dumpObservedMExpected(dump,name2);
-					compare(name,name2,outputName1,outputName2);
-					rm = new File(name);
-					rm.delete();
-					rm = new File(name2);
-					rm.delete();
-				}	
-				
-				file1.add(createImageFile(outputName1));
-				file2.add(createImageFile(outputName2));
+				System.out.println(file1+" debut");
+				callLoop(file1,chr.toString().replaceAll("chr", ""),m_outdir1+File.separator+"loopsDiff1.bed",m_data1);
+				System.out.println(file1+" fin\n"+file2+" debut");
+				callLoop(file2,chr,m_outdir2+File.separator+"loopsDiff2.bed",m_data2);
+				System.out.println(file2+" debut");
 			}
-			
-			callLoop(file1);
 		}
 	}
 	
@@ -125,6 +116,7 @@ public class HiCFileComparison {
 		String imageName = input.replaceAll(".txt", ".tif");
 		ImagePlus imgRaw = readFile.readTupleFile();
 		imgRaw.setTitle(imageName);
+		readFile.correctImage(imgRaw);
 		m_wga.saveFile(imgRaw,imageName);
 		return imageName;
 	}
@@ -132,34 +124,56 @@ public class HiCFileComparison {
 	/**
 	 * 
 	 * @param file
+	 * @throws IOException 
 	 */
-	private void callLoop(ArrayList<String> file){
+	private void callLoop(ArrayList<String> file, String chr, String output,HashMap<String,Loop> data) throws IOException{
+		CoordinatesCorrection coord = new CoordinatesCorrection(m_wga.getStep(), m_wga.getResolution() ,m_wga.getMatrixSize(), 2);
 		for(int i =0; i < file.size();++i){
 			String[] tfile = file.get(i).split("_");
 			int numImage = Integer.parseInt(tfile[tfile.length-2])/(m_wga.getStep()*m_wga.getResolution());
 			tfile = file.get(i).split(File.separator);
-			System.out.println(tfile[tfile.length-2]);
-			/*ImagePlus img = imgRaw.duplicate();
-			readFile.correctImage(img);
+			//System.out.println(tfile[tfile.length-2]);
+			ImagePlus img = IJ.openImage(file.get(i));
 			ImagePlus imgFilter = img.duplicate();
-			imageProcessing(imgFilter,fileList[i].toString());	
-			
-			
-			HashMap<String,Loop> temp = ens.getDataMaxima();
-			System.out.println("before "+ temp.size());
-			removeMaximaCloseToZero(imgRaw,temp);
-			System.out.println("after "+ temp.size());
-		
-			PeakAnalysisScore pas = new PeakAnalysisScore(imgRaw,temp,countNonZero);
-			pas.computeScore();
-		
-			coord.setData(m_data);
-			if(i == 0){	m_data = coord.imageToGenomeCoordinate(temp, true, false, numImage,countNonZero);}
-			else if(i == fileList.length-1){	m_data = coord.imageToGenomeCoordinate(temp, false, true, numImage, countNonZero);}
-			else m_data = coord.imageToGenomeCoordinate(temp, false, false, numImage, countNonZero)*/
+			ProcessMethod pm = new ProcessMethod(imgFilter,m_wga.getGauss());
+			pm.runMin(1);	
+			FindMaxima findLoop = new FindMaxima(img, imgFilter, chr, m_wga.getThresholdMaxima());
+			HashMap<String,Loop> temp = findLoop.findloop();
+			System.out.println("before: "+temp.size());
+			temp = removeMaximaCloseToZero(img,temp,false);
+			System.out.println("after: "+temp.size());
+			PeakAnalysisScore pas = new PeakAnalysisScore(img,temp);
+			pas.computeScoreBis();
+			coord.setData(data);
+			data = coord.imageToGenomeCoordinate(temp, numImage);
 		}
+		saveFile(output,data);
 	}
 	
+	
+	/**
+	 * 
+	 * @param resu
+	 * @param pathFile
+	 * @throws IOException
+	 */
+	public void saveFile (String pathFile,HashMap<String,Loop> data) throws IOException
+	{
+		BufferedWriter writer = new BufferedWriter(new FileWriter(new File(pathFile)));
+		Set<String> key = data.keySet();
+		Iterator<String> it = key.iterator();
+		writer.write("chromosome1\tx1\tx2\tchromosome2\ty1\ty2\tcolor\tAPScoreMed\tRegAPScoreMED\tAPScoreAVG\tRegAPScoreAVG\t%OfPixelInfToTheCenter\t%of0\tnbZero\n");
+		while (it.hasNext()){
+			String cle = it.next();
+			Loop loop = data.get(cle);
+			ArrayList<Integer> coord = loop.getCoordinates();
+			double plop = loop.getNbZeroInTheImage()/(m_wga.getMatrixSize()*m_wga.getMatrixSize());
+			writer.write(loop.getChr()+"\t"+coord.get(2)+"\t"+coord.get(3)+"\t"+loop.getChr()+"\t"+coord.get(0)+"\t"+coord.get(1)+"\t255,125,255"
+				+"\t"+loop.getPaScoreMed()+"\t"+loop.getRegionalPaScoreMed()+"\t"+loop.getPaScoreAvg()+"\t"+loop.getRegionalPaScoreAvg()
+				+"\t"+loop.getPercentage()+"\t"+loop.getPercentageOfZero()+"\t"+plop+"\n"); 
+		}
+		writer.close();
+	}
 	
 	/**
 	 * 
@@ -221,6 +235,53 @@ public class HiCFileComparison {
 		writer1.close();
 		writer2.close();
 	}
+	
+	/**
+	 * 
+	 * @param imgFilter
+	 * @param temp
+	 * @param isObserved
+	 */
+	
+	private HashMap<String,Loop>  removeMaximaCloseToZero(ImagePlus imgFilter, HashMap<String,Loop> temp,boolean isObserved){ 
+		Set<String> key = temp.keySet();
+		Iterator<String> it = key.iterator();
+		ImageProcessor ip = imgFilter.getProcessor();
+		ArrayList<String> toRemove = new ArrayList<String>();
+		int thresh = 3;
+		if (isObserved)	thresh = 1;
+		while (it.hasNext()){
+			String cle = it.next();
+			Loop loop = temp.get(cle);
+			int i = loop.getX();
+			int j = loop.getY();
+			int nb =0;
+			if (i-1> 0 && i+1< imgFilter.getWidth()){
+				if(j-1 > 0 && j+1 < imgFilter.getHeight()){
+					for(int ii = i-1; ii <= i+1; ++ii){
+						for(int jj = j-1; jj <= j+1; ++jj){
+							if (ip.getPixel(ii, jj)<=0){
+								nb++;
+								if (nb >= thresh ){
+									toRemove.add(cle);
+									break;
+								}
+							}
+						}
+					}
+				}
+			}
+			else{
+				
+			}
+		}
+		
+		for(int i = 0; i < toRemove.size();++i){
+			temp.remove(toRemove.get(i));
+		}
+		return temp;
+	}
+	
 	
 	/**
 	 * 
