@@ -46,11 +46,29 @@ public class FindMaxima{
 			String name= m_chr+"\t"+temp.get(j);
 			Loop maxima = new Loop(temp.get(j),x,y,m_chr);
 			maxima.setNbZeroInTheImage(m_nbZero);
+			System.out.println(name);
 			m_data.put(name, maxima);
 		}
 		return m_data;
 	}
 	
+	/**
+	 * 
+	 */
+	public HashMap<String,Loop> findloopCompare(){
+		ArrayList<String> temp = getMaxima(runSimpleBis());
+		for(int j = 0; j < temp.size();++j){
+			String[] parts = temp.get(j).split("\\t");
+			int x = Integer.parseInt(parts[0]);
+			int y = Integer.parseInt(parts[1]);
+			String name= m_chr+"\t"+temp.get(j);
+			Loop maxima = new Loop(temp.get(j),x,y,m_chr);
+			maxima.setNbZeroInTheImage(m_nbZero);
+			//System.out.println(name);
+			m_data.put(name, maxima);
+		}
+		return m_data;
+	}
 	
 	/**
 	 * 
@@ -67,6 +85,16 @@ public class FindMaxima{
 		return m_imgResu;
 	}
 	
+	public ImagePlus runSimpleBis(){
+		ImagePlus temp = m_imgFilter.duplicate();
+		ImageProcessor ip = temp.getProcessor();
+		MaximumFinder mf = new MaximumFinder(); 
+		ByteProcessor bp = mf.findMaxima(ip, m_noiseTolerance, MaximumFinder.SINGLE_POINTS, true);
+		m_imgResu.setProcessor(bp);
+		//this.correctMaxima();
+		this.removedCloseMaxima();
+		return m_imgResu;
+	}
 	
 	/**
 	 * 

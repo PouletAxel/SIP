@@ -20,15 +20,15 @@ public class TestCallLoopsProcessedFile {
 	 * @throws InterruptedException 
 	 */
 	public static void main(String[] args) throws IOException, InterruptedException {
-	String	output= "/home/plop/Bureau/DataSetImageHiC/Droso/test/plop";
-	String	input = "/home/plop/Bureau/DataSetImageHiC/Droso/test/plop";
-	int step = 500;
-	int matrixSize = 1000;
+	String	output= "/home/plop/Bureau/DataSetImageHiC/GM12878/WholeGenome_3000_1_125_125_";
+	String	input = "/home/plop/Bureau/DataSetImageHiC/GM12878/WholeGenome_3000_1_125_125_005_30q";
+	int step = 1000;
+	int matrixSize = 2000;
 	int resolution = 5000;
 	int diagSize = 4;
-	double gauss = 0.5;
+	double gauss = 1;
 	int thresholdMax =70;
-	boolean isObserved = true;
+	boolean isObserved = false;
 	
 	double min =1.25;
 	double max =1.25;
@@ -50,7 +50,7 @@ public class TestCallLoopsProcessedFile {
 		if (file.exists()==false){file.mkdir();}
 		
 		
-		WholeGenomeAnalysis wga = new WholeGenomeAnalysis(output, readChrSizeFile("/home/plop/Documents/Genome/dm6.chrom.sizes"), gauss, min, max, step, 
+		WholeGenomeAnalysis wga = new WholeGenomeAnalysis(output, readChrSizeFile("/home/plop/Documents/Genome/HumanGenomeHg19/hg19.sizes"), gauss, min, max, step, 
 				resolution, saturatedPixel, thresholdMax, diagSize, matrixSize);
 
 		if(isObserved) wga.run("o",input);

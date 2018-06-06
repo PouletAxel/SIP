@@ -45,26 +45,6 @@ public class WholeGenomeAnalysis {
 	 * @param thresholdMaxima
 	 * @throws IOException 
 	 */
-	public WholeGenomeAnalysis(String input, String output, HashMap<String,Integer> chrSize, double gauss, double min, double max,
-			int step, int res, double saturatedPixel, int thresholdMaxima, int diagSize, int matrixSize) throws IOException{
-		m_input = input;
-		m_output = output;
-		m_chrSize = chrSize;
-		m_gauss = gauss;
-		m_min = min;
-		m_max = max;
-		m_matrixSize = matrixSize;
-		m_resolution = res;
-		m_saturatedPixel = saturatedPixel;
-		m_thresholdMaxima = thresholdMaxima;
-		m_diagSize = diagSize;
-		m_step = step;
-		System.out.println("input "+m_input+"\n"
-				+ "output "+m_output+"\n"
-				+ "matrix size "+m_matrixSize+" \n"
-				+ "resolution "+m_resolution+"\n"
-				+ "step "+m_step);
-	}
 	
 	public WholeGenomeAnalysis(String output, HashMap<String, Integer> chrSize, double gauss, double min,
 			double max, int step, int resolution, double saturatedPixel, int thresholdMax,
@@ -83,11 +63,11 @@ public class WholeGenomeAnalysis {
 		m_diagSize = diagSize;
 		m_step = step;
 		
-		System.out.println("output "+m_output+"\n"
+	/*	System.out.println("output "+m_output+"\n"
 				+ "matrix size "+m_matrixSize+" \n"
 				+ "resolution "+m_resolution+"\n"
 				+ "step "+m_step+"\n"
-				+ "thresh "+m_thresholdMaxima);
+				+ "thresh "+m_thresholdMaxima);*/
 	}
 	
 	

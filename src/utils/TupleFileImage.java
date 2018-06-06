@@ -63,6 +63,7 @@ public class TupleFileImage {
 					if (a < 0){ a = 0;}
 				}
 				int plop = numImage*m_step*m_resolution;
+				//System.out.println(plop+"\t"+parts[0]+" "+parts[1]+" "+numImage+" "+m_step+" "+m_resolution );
 				int i = (Integer.parseInt(parts[0]) - plop)/m_resolution; 
 				int j = (Integer.parseInt(parts[1]) - plop)/m_resolution;
 		
