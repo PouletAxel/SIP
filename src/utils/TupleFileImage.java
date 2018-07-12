@@ -20,6 +20,7 @@ public class TupleFileImage {
 	private String m_file = "";
 	/** */
 	private int m_size = 0 ;
+	
 	private int m_resolution = 0 ;
 	private int m_step = 0 ;
 	/** */
@@ -33,7 +34,6 @@ public class TupleFileImage {
 		m_file = fileMatrix;
 		m_size = size;
 		m_resolution = resolution;
-		System.out.println(fileMatrix);
 		m_step = step;
 	}
 	
@@ -52,7 +52,6 @@ public class TupleFileImage {
 			br = new BufferedReader(new FileReader(m_file));
 			StringBuilder sb = new StringBuilder();
 			String line = br.readLine();
-			//System.out.println("\t"+line);
 			while (line != null){
 				sb.append(line);
 				String[] parts = line.split("\\t");
@@ -63,11 +62,8 @@ public class TupleFileImage {
 					if (a < 0){ a = 0;}
 				}
 				int plop = numImage*m_step*m_resolution;
-				//System.out.println(plop+"\t"+parts[0]+" "+parts[1]+" "+numImage+" "+m_step+" "+m_resolution );
 				int i = (Integer.parseInt(parts[0]) - plop)/m_resolution; 
 				int j = (Integer.parseInt(parts[1]) - plop)/m_resolution;
-		
-				//System.out.println(m_size+"\t"+parts[0]+" "+parts[1]+" "+i+"\t"+j+"\t"+a);
 				p.setf(i, j, a);
 				p.setf(j, i, a);
 				sb.append(System.lineSeparator());
@@ -76,7 +72,6 @@ public class TupleFileImage {
 			br.close();
 		} catch (IOException e) { e.printStackTrace();}
 		m_img.setProcessor(p);
-		//correctImage();
 		return m_img;
 	}
 	
@@ -102,7 +97,8 @@ public class TupleFileImage {
 		for(int i = 0; i< ip.getWidth(); i++){
 			for(int j = 0; j< ip.getWidth(); j++){
 				int a = ip.getPixel(i, j);
-				if (Math.abs(j-i) <= 2 && a >= m_avg+m_std*2){ ip.set(i,j,(int)m_avg);}
+				if (Math.abs(j-i) <= 2 && a >= m_avg+m_std*2)
+					ip.set(i,j,(int)m_avg);
 			}
 		}
 		img.setProcessor(ip);
@@ -110,6 +106,8 @@ public class TupleFileImage {
 	
 	/**
 	 * 
+	 * @param mean
+	 * @return
 	 */
 	private double std(double mean){
 		double semc = 0;

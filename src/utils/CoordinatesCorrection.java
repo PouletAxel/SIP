@@ -5,107 +5,112 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Set;
 
-
+/**
+ * Class to change the image coordinate in genome coordinate, with the name of the image, the resolution, the size of the image,
+ * the step and the size of the diagonal.
+ * 
+ * Loops detected with white strips are removed. Furthermore the corner of the images are not take account. We test also the proximal loops to avoid overlaping loops.
+ * 
+ * @author axel poulet
+ *
+ */
 public class CoordinatesCorrection {
 
+	/** HashMap of the loops with new coordinates*/
 	private HashMap<String,Loop> m_data = new HashMap<String,Loop>();
-	private int index;
-	private ArrayList<Integer> m_countNonZero = new ArrayList<Integer>();
-	private int m_step;
-	private int m_resolution;
-	private int m_imageSize;
-	private int m_diagSize;
+	int m_resolution = 0;
 	
 	/**
 	 * 
-	 * @param step
-	 * @param resolution
-	 * @param imageSize
-	 * @param diagSize
 	 */
-	public CoordinatesCorrection(int step, int resolution, int imageSize, int diagSize){
-		this.m_step = step;
-		this.m_resolution = resolution;
-		this.m_imageSize = imageSize;
-		this.m_diagSize = diagSize*resolution;
+	public CoordinatesCorrection(int resolution){
+		m_resolution =resolution;
+	
 	}	
 	
 	/**
+	 * Method to change the image coordinates in genomes coordinates, the method calls other methods to remove the loops close to some withe strips, or close to other loops.
 	 * 
-	 * @param temp
-	 * @param first
-	 * @param last
-	 * @param index
+	 * @param temp: HashMap of loops with the image coordinates
+	 * @param first: boolean if true it is the first image of the chromosome
+	 * @param last: boolean if true it is the last image of the chromosome
+	 * @param index: num of the image
+	 * @param nonZero: list of int containing the non zero information
+	 * @return a HashMap containing the loops with the new coordinates
 	 */
-	public HashMap<String,Loop> imageToGenomeCoordinate(HashMap<String,Loop> temp, boolean first, boolean last, int index, ArrayList<Integer> nonZero){
+	public HashMap<String,Loop> imageToGenomeCoordinate(HashMap<String,Loop> temp, int index){
 		int x;
 		int y;
-		m_countNonZero = nonZero;
-		int xtop_lim = 0;
+		/*int xtop_lim = 0;
 		int ytop_lim = 0;
 		int xbottom_lim = m_imageSize;
 		int ybottom_lim = m_imageSize;
 		
 		if(first == false){
-			xtop_lim = 100;
-			ytop_lim = 100;
+			System.out.println("plop");
+			xtop_lim = m_imageSize/15;
+			ytop_lim = m_imageSize/15;
 		}
 		if(last==false){
-			 xbottom_lim = m_imageSize-100;
-			 ybottom_lim = m_imageSize-100;
-		}
+			 xbottom_lim = m_imageSize-m_imageSize/15;
+			 ybottom_lim = m_imageSize-m_imageSize/15;
+		}*/
 		Set<String> key = temp.keySet();
 		Iterator<String> it = key.iterator();
+		
 		while (it.hasNext()){
 			Loop loop = temp.get(it.next());
 			x = loop.getX();
 			y = loop.getY();
-			int a = (x+(index*m_step))*m_resolution;
-			int a_end = a+m_resolution;
-			int b = (y+(index*m_step))*m_resolution;
-			int b_end =b+m_resolution;
+			int resolution = loop.getResolution(); 
+			int diagSize = loop.getDiagSize()*resolution;
+			int imageSize = loop.getMatrixSize();
+			int step = imageSize/2;
+			int a = (x+(index*step))*resolution;
+			int a_end = a+resolution;
+			int b = (y+(index*step))*resolution;
+			int b_end =b+resolution;
 			String newName = loop.getChr()+"\t"+a+"\t"+b;
-			//System.out.println(x+" "+y);
-			if((x > xtop_lim || y > ytop_lim) && 
-				(x < xbottom_lim || y < ybottom_lim) &&
-				a!=b && testProximalLoop(loop.getChr(),a,b,newName) == false &&
-				Math.abs(a-b) > m_diagSize){
-				if (x > 1 && y > 1 && y < m_imageSize-2 && x < m_imageSize-2){
-					if(m_data.containsKey(newName)==false  && (testStripNeighbour(x)==true && testStripNeighbour(y)==true)){
+			//if((x > xtop_lim || y > ytop_lim) && (x < xbottom_lim || y < ybottom_lim) &&
+			if(a!=b && testProximalLoop(loop.getChr(),a,b,newName,resolution) == false && Math.abs(a-b) > diagSize){
+				if (x > 1 && y > 1 && y < imageSize-2 && x < imageSize-2){
+					if(m_data.containsKey(newName)==false){//  && (testStripNeighbour(x)==true && testStripNeighbour(y)==true)){
 						loop.setCoordinates(a, a_end, b, b_end);
 						loop.setName(newName);
 						m_data.put(newName, loop);
 					}
 				}
 			}	 
-				//else{
-				//	if(m_data.containsKey(newName)==false && (testStrip(x)==true && testStrip(y)==true)){
-				//		loop.setCoordinates(a, a_end, b, b_end);
-				//		loop.setName(newName);
-				//		m_data.put(newName, loop);
-				//	}
-				//}
-			//}
 		}
 		return m_data;
 	}
 	
-	
-	public HashMap<String,Loop> imageToGenomeCoordinate(HashMap<String,Loop> temp, int index){
+	/**
+	 * Method similar to the previous use for the HiC comparison.
+	 * 
+	 * @param temp
+	 * @param index
+	 * @return
+	 */
+	public HashMap<String,Loop> imageToGenomeCoordinateCompare(HashMap<String,Loop> temp, int index){
 		int x;
 		int y;
 		Set<String> key = temp.keySet();
 		Iterator<String> it = key.iterator();
 		while (it.hasNext()){
 			Loop loop = temp.get(it.next());
+			int resolution = loop.getResolution(); 
+			int diagSize = loop.getDiagSize()*resolution;
+			int imageSize = loop.getMatrixSize();
+			int step = imageSize/2;
 			x = loop.getX();
 			y = loop.getY();
-			int a = (x+(index*m_step))*m_resolution;
-			int a_end = a+m_resolution;
-			int b = (y+(index*m_step))*m_resolution;
-			int b_end =b+m_resolution;
+			int a = (x+(index*step))*resolution;
+			int a_end = a+resolution;
+			int b = (y+(index*step))*resolution;
+			int b_end =b+resolution;
 			String newName = loop.getChr()+"\t"+a+"\t"+b;
-			if(Math.abs(a-b) > m_diagSize){
+			if(Math.abs(a-b) > diagSize){
 				loop.setCoordinates(a, a_end, b, b_end);
 				loop.setName(newName);
 				m_data.put(newName, loop);
@@ -115,57 +120,68 @@ public class CoordinatesCorrection {
 	}
 	
 	/**
+	 * test the presence of proximal loops in the hashMap m_data, return false if no proximal loops are detected.
+	 * else retrun true,
 	 * 
-	 * @param i
-	 * @return
+	 * @param x: int x loop coordinate's
+	 * @param y: int y loop coordinate's 
+	 * @param newKey: new key in teh hashMap.
+	 * @return boolean true (proximal loop detected) flase (no loops detected)
 	 */
-	private boolean testStripNeighbour(int i){
-		if(m_countNonZero.get(i) > 0 && m_countNonZero.get(i+1) > 0 && m_countNonZero.get(i-1) > 0 ){
-				//&& m_countNonZero.get(i+2) > 0 && m_countNonZero.get(i-2) > 0){
-			return true;
-		}
-		else return false;
-	}
-	
-	/**
-	 * 
-	 * @param x
-	 * @param y
-	 * @param newKey
-	 * @return
-	 */
-	private boolean testProximalLoop(String chr, int x, int y, String newKey){
-		boolean test= false;
-		for(int i = x-m_resolution; i <= x+m_resolution; i = i+m_resolution){
-			for(int j = y-m_resolution; j <= y+m_resolution; j = j+m_resolution){
-				String key = chr+i+"\t"+j;
-				if (newKey != key && m_data.containsKey(key)){
-					//System.out.println("plopi");
-					test = true;
+	private boolean testProximalLoop(String chr, int x, int y, String newKey, int resolution){
+		boolean test = false;
+		if (resolution > m_resolution){
+			for(int i = x-resolution; i <= x+resolution; i = i+resolution){
+				for(int j = y-resolution; j <= y+resolution; j = j+resolution){
+					String key = chr+"\t"+i+"\t"+j;
+					if (newKey != key && m_data.containsKey(key)){
+						test = true;
+						return true;
+					}
+				}
+			}
+			if(test == false){
+				for(int i = x-m_resolution; i <= x+m_resolution; i = i+m_resolution){
+					for(int j = y-m_resolution; j <= y+m_resolution; j = j+m_resolution){
+						String key = chr+"\t"+i+"\t"+j;
+						//System.out.println("prout "+key);
+						if (newKey != key && m_data.containsKey(key)){
+							System.out.println("prout "+key);
+							test = true;
+							return true;
+						}
+					}
 				}
 			}
 		}
-		return test;
+		else{
+			for(int i = x-resolution; i <= x+resolution; i = i+resolution){
+				for(int j = y-resolution; j <= y+resolution; j = j+resolution){
+					String key = chr+"\t"+i+"\t"+j;
+					if (newKey != key && m_data.containsKey(key)){
+						test = true;
+						return true;
+					}
+				}
+			}
+		}
+			return test;
 	}
-	/**
-	 * 
-	 * @param i
-	 * @return
-	 */
-	/*private boolean testStrip(int i){
-		if(m_countNonZero.get(i) > 0 ){	return true; }
-		else return false;
-	}*/
+	
 	
 	/**
-	 * 
-	 * @return
+	 * getter of m_data
+	 * @return HashMap of loops
 	 */
-	public HashMap<String,Loop> getData(){ return this.m_data;}
+	public HashMap<String,Loop> getData(){
+		return this.m_data;
+	}
 	
 	/**
-	 * 
-	 * @param data
+	 * setter of m_data
+	 * @param data 
 	 */
-	public void setData(HashMap<String,Loop> data){ this.m_data = data;}
+	public void setData(HashMap<String,Loop> data){
+		this.m_data = data;
+	}
 }

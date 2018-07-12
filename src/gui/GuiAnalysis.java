@@ -23,90 +23,126 @@ import javax.swing.JTextPane;
 /**
  * Class to construct graphical interface for the chromocenter analysis pipeline in batch
  * 
- * @author pouletaxel
+ * @author poulet axel
  *
  */
 
 public class GuiAnalysis extends JFrame
 {
+	/** */
 	private static final long serialVersionUID = 1L;
+	/** */
 	private Container m_container;
-	
+	/** */
 	private JLabel m_jlWorkDir;
+	/** */
 	private JButton m_jbWorkDir = new JButton("Output directory");
+	/** */
 	private JButton m_jbRawData = new JButton("Raw data");
+	/** */
 	private JButton m_jbRawData2 = new JButton("Raw data 2");
+	/** */
 	private JButton m_jbBedFile1 = new JButton("loop file 1");
+	/** */
 	private JButton m_jbBedFile2 = new JButton("loop file 2");
+	/** */
 	private JButton m_jbChrSize = new JButton("Chr size file");
-	
+	/** */
 	private JTextField m_jtfChrSize  =  new JTextField();
+	/** */
 	private JTextField m_jtfWorkDir  =  new JTextField();
+	/** */
 	private JTextField m_jtfRawData = new JTextField();
+	/** */
 	private JTextField m_jtfRawData2 = new JTextField();
-	
+	/** */
 	private JTextField m_jtfBedFile1 = new JTextField();
+	/** */
 	private JTextField m_jtfBedFile2 = new JTextField();
-	
+	/** */
 	private JButton m_jbStart = new JButton("Start");
+	/** */
 	private JButton m_jbQuit = new JButton("Quit");
-	
+	/** */
 	private JLabel m_jlInputFileType;
+	/** */
 	private ButtonGroup m_bGroupInputType = new ButtonGroup();
+	/** */
 	private JRadioButton m_jrbHic = new JRadioButton("hic");
-    private JRadioButton m_jrbProcessed = new JRadioButton("processed");
-    private JRadioButton m_jrbCompare = new JRadioButton("compare");
-    
+	/** */
+	private JRadioButton m_jrbProcessed = new JRadioButton("processed");
+	/** */
+	private JRadioButton m_jrbCompare = new JRadioButton("compare");
+	/** */
     private String m_juiceBoxTools;
+    /** */
     private JTextField m_jtfBoxTools = new JTextField();
+    /** */
     private JButton m_jbBoxTools = new JButton("JuiceBox Tools");
-    
+    /** */
     private JLabel m_jlNorm;
-	private ButtonGroup m_bNorm = new ButtonGroup();
-	private JRadioButton m_jrbNone = new JRadioButton("NONE");
+    /** */
+    private ButtonGroup m_bNorm = new ButtonGroup();
+    /** */
+    private JRadioButton m_jrbNone = new JRadioButton("NONE");
+    /** */
     private JRadioButton m_jrbKR = new JRadioButton("KR");
+    /** */
     private JRadioButton m_jrbVC = new JRadioButton("VC");
+    /** */
     private JRadioButton m_jrbVC_sqrt = new JRadioButton("VC SQRT");
-    
-    
+    /** */    
     private JLabel m_imgParam;
-	
+    /** */
 	private JFormattedTextField m_matrixSize = new JFormattedTextField(Number.class);
+	/** */
 	private JFormattedTextField m_resolution = new JFormattedTextField(Number.class);
-    private JFormattedTextField m_step =  new JFormattedTextField(Number.class);
-    private JFormattedTextField m_diagSize =  new JFormattedTextField(Number.class);
-    
-    
-	
+	/** */
+	private JFormattedTextField m_step =  new JFormattedTextField(Number.class);
+	/** */
+	private JFormattedTextField m_diagSize =  new JFormattedTextField(Number.class);
+	/** */
     private JLabel m_jlMatrixSize;
+    /** */
     private JLabel m_jlResolution;
+    /** */
     private JLabel m_jlStep;
+    /** */
     private JLabel m_jldiagSize;
-	
+    /** */
     private ButtonGroup m_bgTypOFMatrix = new ButtonGroup();
-	private JRadioButton m_jrbObserved = new JRadioButton("Observed");
+    /** */
+    private JRadioButton m_jrbObserved = new JRadioButton("Observed");
+    /** */
     private JRadioButton m_jrbObservedMExpected = new JRadioButton("Observed minus Expected");
-    
-
+    /** */
     private JFormattedTextField m_gaussian = new JFormattedTextField(Number.class);
-	private JFormattedTextField m_min = new JFormattedTextField(Number.class);
+    /** */
+    private JFormattedTextField m_min = new JFormattedTextField(Number.class);
+    /** */
     private JFormattedTextField m_max =  new JFormattedTextField(Number.class);
+    /** */
     private JFormattedTextField m_enhanceContrast =  new JFormattedTextField(Number.class);
+    /** */
     private JFormattedTextField m_noiseTolerance =  new JFormattedTextField(Number.class);
-    
+    /** */
     private JLabel m_jlGaussian;
+    /** */
     private JLabel m_jlMin;
+    /** */
     private JLabel m_jlMax;
+    /** */
     private JLabel m_jlEnhance;
+    /** */
     private JLabel m_jlNT;
-	private boolean _start = false;
+    /** */
+    private boolean _start = false;
 	
 	/**
 	 * 
 	 * @param args
 	 */
-	public static void main(String[] args)  
-    {
+	public static void main(String[] args)  {
 		GuiAnalysis gui = new GuiAnalysis();
 		gui.setLocationRelativeTo(null);
     }
@@ -117,8 +153,7 @@ public class GuiAnalysis extends JFrame
      *
      */
     
-	public GuiAnalysis ()
-	{
+	public GuiAnalysis(){
 		///////////////////////////////////////////// Global parameter of the JFram and def of the gridBaglayout
 		this.setTitle("NO NAME program.....");
 		this.setSize(550, 780);
@@ -271,6 +306,7 @@ public class GuiAnalysis extends JFrame
 	   	);
 	   	
 	   	///////////////////// Rawdata and work dir button and text.	   	
+	   	
 	   	m_jbRawData.setPreferredSize(new java.awt.Dimension(120, 21));
 	   	m_jbRawData.setFont(new java.awt.Font("arial",2,10));
 	   	m_container.add ( m_jbRawData, new GridBagConstraints
@@ -718,56 +754,187 @@ public class GuiAnalysis extends JFrame
 		String x = m_step.getText();
 		return Integer.parseInt(x.replaceAll(",", "."));
 	}
-
+	
+	/**
+	 * 
+	 * @return
+	 */
 	public double getMax(){
 		String x = m_max.getText();
 		return Double.parseDouble(x.replaceAll(",", "."));
 	}
 	
+	/**
+	 * 
+	 * @return
+	 */
 	public double getMin(){
 		String x = m_min.getText();
 		return Double.parseDouble(x.replaceAll(",", "."));
 	}
 	
+	/**
+	 * 
+	 * @return
+	 */
 	public double getEnhanceSignal(){
 		String x = this.m_enhanceContrast.getText();
 		return Double.parseDouble(x.replaceAll(",", "."));
 	}
 	
+	/**
+	 * 
+	 * @return
+	 */
 	public int getNoiseTolerance(){
 		String x = this.m_noiseTolerance.getText();
 		return Integer.parseInt(x.replaceAll(",", "."));
 	}
 	
+	/**
+	 * 
+	 * @return
+	 */
 	public double getGaussian(){
 		String x = m_gaussian.getText();
 		return Double.parseDouble(x.replaceAll(",", "."));
 	}
 	
+	/**
+	 * 
+	 * @return
+	 */
 	public int getDiagSize(){
 		String x = m_gaussian.getText();
 		return Integer.parseInt(x.replaceAll(",", "."));
 	}
 	
+	/**
+	 * 
+	 * @return
+	 */
+	public String getOutputDir(){
+		return m_jtfWorkDir.getText();
+	}
 	
-	public String getOutputDir(){return m_jtfWorkDir.getText();}
-	public String getRawDataDir2(){return m_jtfRawData2.getText();}
-	public String getLoopFile1(){return m_jtfBedFile1.getText();}
-	public String getLoopFile2(){return m_jtfBedFile2.getText();}
-	public String getRawDataDir(){return m_jtfRawData.getText();}
-	public String getChrSizeFile(){return m_jtfChrSize.getText();}
-	public String getJuiceBox(){return m_jtfBoxTools.getText();}
+	/**
+	 * 
+	 * @return
+	 */
+	public String getRawDataDir2(){
+		return m_jtfRawData2.getText();
+	}
 	
-	public boolean isStart() {	return _start; }
-	public boolean isObserved() {	return m_jrbObserved.isSelected(); }
-
-	public boolean isProcessed() {	return m_jrbProcessed.isSelected(); }
-	public boolean isHic() {	return m_jrbHic.isSelected(); }
-	public boolean isCompare() {	return m_jrbCompare.isSelected(); }
-	public boolean isVC_SQRT() {	return m_jrbVC_sqrt.isSelected(); }
-	public boolean isVC() {	return m_jrbVC.isSelected(); }
-	public boolean isNONE() {	return m_jrbNone.isSelected(); }
-	public boolean isKR() {	return m_jrbKR.isSelected(); }
+	/**
+	 * 
+	 * @return
+	 */
+	public String getLoopFile1(){
+		return m_jtfBedFile1.getText();
+	}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public String getLoopFile2(){
+		return m_jtfBedFile2.getText();
+	}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public String getRawDataDir(){
+		return m_jtfRawData.getText();
+	}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public String getChrSizeFile(){
+		return m_jtfChrSize.getText();
+	}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public String getJuiceBox(){
+		return m_jtfBoxTools.getText();
+	}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public boolean isStart(){
+		return _start;
+	}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public boolean isObserved(){
+		return m_jrbObserved.isSelected();
+	}
+	/**
+	 * 
+	 * @return
+	 */
+	public boolean isProcessed(){
+		return m_jrbProcessed.isSelected();
+	}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public boolean isHic(){
+		return m_jrbHic.isSelected();
+	}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public boolean isCompare(){
+		return m_jrbCompare.isSelected();
+	}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public boolean isVC_SQRT(){
+		return m_jrbVC_sqrt.isSelected();
+	}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public boolean isVC(){
+		return m_jrbVC.isSelected();
+	}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public boolean isNONE(){
+		return m_jrbNone.isSelected();
+	}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public boolean isKR(){
+		return m_jrbKR.isSelected();
+	}
 
 
 
@@ -779,16 +946,28 @@ public class GuiAnalysis extends JFrame
 	 /********************************************************************************************************************************************
 	 /********************************************************************************************************************************************/
 	
+	/**
+	 * 
+	 * @author plop
+	 *
+	 */
 	class RBObservedListener implements ActionListener 
 	{
+		/** */
 		GuiAnalysis m_gui;
-		public  RBObservedListener (GuiAnalysis gui)
-		{
+		/**
+		 * 
+		 * @param gui
+		 */
+		public  RBObservedListener (GuiAnalysis gui){
 			m_gui = gui;
 		}
 		
-		public void actionPerformed(ActionEvent actionEvent) {
-	        if (m_gui.isObserved()) {
+		/**
+		 * 
+		 */
+		public void actionPerformed(ActionEvent actionEvent){
+	        if (m_gui.isObserved()){
 	        	m_gui.m_max.setEditable(false);
 	        	m_gui.m_min.setEditable(false);
 	        	m_gui.m_enhanceContrast.setEditable(false);
@@ -817,13 +996,21 @@ public class GuiAnalysis extends JFrame
 	 * @author plop
 	 *
 	 */
-	class RBHicListener implements ActionListener {
+	class RBHicListener implements ActionListener{
+		/** */
 		GuiAnalysis m_gui;
+		/**
+		 * 
+		 * @param gui
+		 */
 		public  RBHicListener (GuiAnalysis gui){
 			m_gui = gui;
 		}
 		
-		public void actionPerformed(ActionEvent actionEvent) {
+		/**
+		 * 
+		 */
+		public void actionPerformed(ActionEvent actionEvent){
 			m_jbRawData2.setEnabled(false);
         	m_jtfRawData2.setEnabled(false);
         	m_jbBedFile1.setEnabled(false);
@@ -919,26 +1106,23 @@ public class GuiAnalysis extends JFrame
 	
 	/**
 	 * 
-	 * 
+	 * @author plop
 	 *
 	 */
-	class StartListener implements ActionListener 
-	{
-	
+	class StartListener implements ActionListener {
+		/** */
 		GuiAnalysis m_gui;
 		/**
 		 * 
-		 * @param chromocentersAnalysisPipelineBatchDialog
+		 * @param gui
 		 */
-		public  StartListener (GuiAnalysis gui)
-		{
+		public  StartListener (GuiAnalysis gui){
 			m_gui = gui;
 		}
 		/**
 		 * 
 		 */
-		public void actionPerformed(ActionEvent actionEvent)
-		{
+		public void actionPerformed(ActionEvent actionEvent){
 			if (m_jtfWorkDir.getText().isEmpty() || m_jtfRawData.getText().isEmpty())
 				JOptionPane.showMessageDialog
 				(
@@ -956,25 +1140,24 @@ public class GuiAnalysis extends JFrame
 	
 	/**
 	 * 
-	 * 
+	 * @author plop
 	 *
 	 */
-	class QuitListener implements ActionListener 
-	{
+	class QuitListener implements ActionListener {
+		/** */
 		GuiAnalysis m_gui;	
 		/**
 		 * 
-		 * @param chromocentersAnalysisPipelineBatchDialog
+		 * @param gui
 		 */
-		public  QuitListener (GuiAnalysis gui)
-		{
+		public  QuitListener (GuiAnalysis gui){
 			m_gui = gui;
 		}
+		
 		/**
 		 * 
 		 */
-		public void actionPerformed(ActionEvent actionEvent)
-		{
+		public void actionPerformed(ActionEvent actionEvent){
 			m_gui.dispose();
 			System.exit(0);
 		}
@@ -984,11 +1167,10 @@ public class GuiAnalysis extends JFrame
 	
 	/**
 	 * 
-	 * 
+	 * @author plop
 	 *
 	 */
-	class WorkDirectoryListener implements ActionListener
-	{
+	class WorkDirectoryListener implements ActionListener{
 		/**
 		 * 
 		 */
@@ -1011,99 +1193,99 @@ public class GuiAnalysis extends JFrame
 	
 	/**
 	 * 
-	 * 
+	 * @author plop
 	 *
 	 */
-	class RawDataDirectoryListener implements ActionListener
-	{
-		
+	class RawDataDirectoryListener implements ActionListener{
+		/** */
 		GuiAnalysis m_gui;
+		/** */
 		JTextField m_jtf;
 		/**
 		 * 
+		 * @param gui
+		 * @param jtf
 		 */
 		public RawDataDirectoryListener(GuiAnalysis gui,JTextField jtf){
 			m_gui = gui;
 			m_jtf = jtf;
 		}
-		public void actionPerformed(ActionEvent actionEvent )
-		 {
-			
-			 setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-			 JFileChooser jFileChooser = new JFileChooser();
-			 jFileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-			 if(m_gui.m_jrbHic.isSelected()){
-				 jFileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
-			 }
-			 int returnValue = jFileChooser.showOpenDialog(getParent());
-			 if(returnValue == JFileChooser.APPROVE_OPTION)
-			 {
-				 @SuppressWarnings("unused")
-				 String run = jFileChooser.getSelectedFile().getName();
-				 String text= jFileChooser.getSelectedFile().getAbsolutePath();
-				 m_jtf.setText(text);
+		/**
+		 * 
+		 */
+		public void actionPerformed(ActionEvent actionEvent ){
+			setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+			JFileChooser jFileChooser = new JFileChooser();
+			jFileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+			if(m_gui.m_jrbHic.isSelected())
+				jFileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+			int returnValue = jFileChooser.showOpenDialog(getParent());
+			if(returnValue == JFileChooser.APPROVE_OPTION){
+				@SuppressWarnings("unused")
+				String run = jFileChooser.getSelectedFile().getName();
+				String text= jFileChooser.getSelectedFile().getAbsolutePath();
+				m_jtf.setText(text);
 			 }
 			 setCursor (Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 		 }	
 	 }
 	
-	
 	/**
 	 * 
-	 * 
+	 * @author plop
 	 *
 	 */
 	class FileListener implements ActionListener
 	{
+		/** */
+		JTextField m_jtf;
+		/**
+		 * 
+		 * @param jtf
+		 */
+		public FileListener(JTextField jtf){
+			m_jtf = jtf;
+		}
+		
 		/**
 		 * 
 		 */
-		JTextField m_jtf;
-		public FileListener(JTextField jtf){
-			
-			m_jtf = jtf;
-		}
-		public void actionPerformed(ActionEvent actionEvent)
-		 {
-			 setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-			 JFileChooser jFileChooser = new JFileChooser();
-			 jFileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
-			 int returnValue = jFileChooser.showOpenDialog(getParent());
-			 if(returnValue == JFileChooser.APPROVE_OPTION)
-			 {
-				 @SuppressWarnings("unused")
-				 String run = jFileChooser.getSelectedFile().getName();
-				 String chrSize = jFileChooser.getSelectedFile().getAbsolutePath();
-				 m_jtf.setText(chrSize);
-			 }
-			 setCursor (Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
-		 }	
-	 }
+		public void actionPerformed(ActionEvent actionEvent){
+			setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+			JFileChooser jFileChooser = new JFileChooser();
+			jFileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+			int returnValue = jFileChooser.showOpenDialog(getParent());
+			if(returnValue == JFileChooser.APPROVE_OPTION){
+				@SuppressWarnings("unused")
+				String run = jFileChooser.getSelectedFile().getName();
+				String chrSize = jFileChooser.getSelectedFile().getAbsolutePath();
+				m_jtf.setText(chrSize);
+			}
+			setCursor (Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+		}	
+	}
 	
 	/**
 	 * 
-	 * 
+	 * @author plop
 	 *
 	 */
-	class JuiceBoxListener implements ActionListener
-	{
+	class JuiceBoxListener implements ActionListener{
 		/**
 		 * 
 		 */
-		public void actionPerformed(ActionEvent actionEvent)
-		 {
-			 setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-			 JFileChooser jFileChooser = new JFileChooser();
-			 jFileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
-			 int returnValue = jFileChooser.showOpenDialog(getParent());
-			 if(returnValue == JFileChooser.APPROVE_OPTION)
-			 {
-				 @SuppressWarnings("unused")
-				 String run = jFileChooser.getSelectedFile().getName();
-				 m_juiceBoxTools = jFileChooser.getSelectedFile().getAbsolutePath();
-				 m_jtfBoxTools.setText(m_juiceBoxTools);
-			 }
-			 setCursor (Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
-		 }	
-	 }
+		public void actionPerformed(ActionEvent actionEvent){
+			setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+			JFileChooser jFileChooser = new JFileChooser();
+			jFileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+			int returnValue = jFileChooser.showOpenDialog(getParent());
+			if(returnValue == JFileChooser.APPROVE_OPTION){
+				@SuppressWarnings("unused")
+				String run = jFileChooser.getSelectedFile().getName();
+				m_juiceBoxTools = jFileChooser.getSelectedFile().getAbsolutePath();
+				m_jtfBoxTools.setText(m_juiceBoxTools);
+			}
+			setCursor (Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+		}	
+	}
 }

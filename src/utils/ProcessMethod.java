@@ -6,14 +6,23 @@ import ij.plugin.filter.GaussianBlur;
 import ij.plugin.filter.RankFilters;
 import ij.process.ImageProcessor;
 
-
+/**
+ * 
+ * @author plop
+ *
+ */
 public class ProcessMethod{
-	
+	/** */
 	ImagePlus m_img = new ImagePlus();
+	/** */
 	ImageProcessor m_ip;
+	/** */
 	double m_minFilterRadius = 0;
+	/** */
 	double m_maxFilterRadius = 0;
+	/** */
 	double m_gaussianFilterRadius = 0;
+	/** */
 	RankFilters m_rF = new RankFilters();
 
 	/**
@@ -31,23 +40,35 @@ public class ProcessMethod{
 		m_minFilterRadius = minFilterRad;		
 	}
 	
+	/**
+	 * 
+	 * @param img
+	 * @param gaussianFilterRad
+	 */
 	public ProcessMethod(ImagePlus img, double gaussianFilterRad){
 		m_img = img;
 		m_ip = m_img.getProcessor();
 		m_gaussianFilterRadius = gaussianFilterRad;		
 	}
+	
 	/**
-	 * 
+	 * //rao 2015 => 0.05
+	 * //cubenas 0.02
 	 */
 	public void enhanceContrast(double saturatedPixel){
 		ContrastEnhancer enh = new ContrastEnhancer();
 		enh.setNormalize(true);
 		enh.stretchHistogram(m_img, saturatedPixel);
-		//rao 2015 => 0.05
-		//cubenas 0.02
+		
 	}
 	
-	public void runMin(double min){	m_rF.rank(m_ip, min, RankFilters.MIN); }
+	/**
+	 * 
+	 * @param min
+	 */
+	public void runMin(double min){	
+		m_rF.rank(m_ip, min, RankFilters.MIN);
+	}
 	
 		
 	/**
@@ -66,21 +87,24 @@ public class ProcessMethod{
 	 * 
 	 * @return
 	 */
-	public ImagePlus getImg() { return m_img; }
+	public ImagePlus getImg(){
+		return m_img;
+	}
 	
 	/**
 	 * 
 	 * @param m_img
 	 */
-	public void setImg(ImagePlus img) {this.m_img = img;}
+	public void setImg(ImagePlus img){
+		this.m_img = img;
+	}
 	
 
-
+	/**
+	 * 
+	 */
 	public void runGaussian() {
-		// TODO Auto-generated method stub
 		GaussianBlur gb = new GaussianBlur();
 		gb.blurGaussian(m_ip, this.m_gaussianFilterRadius);
 	}
-	
-	
 }

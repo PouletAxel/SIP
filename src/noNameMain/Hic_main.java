@@ -8,15 +8,11 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Set;
 
 import core.HiCFileComparison;
 import core.HicFileProcessing;
 import gui.GuiAnalysis;
-import utils.Loop;
 import utils.WholeGenomeAnalysis;
 
 /**
@@ -31,6 +27,7 @@ public class Hic_main {
 	private static String m_input2 = "";
 	/** Path of input data directory if dumped or processed data else .hic for hic option*/
 	private static String m_bedfile2 = "";
+	/** Path of input data directory if dumped or processed data else .hic for hic option*/
 	private static String m_bedfile1 = "";
 	/**	 Path of output if not existed it is created*/
 	private static String m_output = "";
@@ -191,42 +188,6 @@ public class Hic_main {
 			}
 		}
 		
-		/*m_input= "/home/plop/Bureau/DataSetImageHiC/Droso/test/plop";
-		m_output= "/home/plop/Bureau/DataSetImageHiC/Droso/test/plop";
-		//m_input = "/home/plop/Bureau/DataSetImageHiC/Droso/Kc167_combo_q30.hic";
-		m_input2 = "/home/plop/Bureau/DataSetImageHiC/Droso/S2_cattoni_wang_ramirez_q30.hic";
-		readChrSizeFile("/home/plop/Documents/Genome/dm6.chrom.sizes");
-		
-		m_juiceBoxTools = "/home/plop/Tools/juicer_tools.1.8.9_jcuda.0.8.jar";
-		m_step = 500;
-		m_matrixSize = 1000;
-		m_resolution = 5000;
-		m_diagSize = 4;
-		m_gauss = 0.5;
-		m_thresholdMax =70;
-		m_juiceBoXNormalisation = "KR";
-		m_isObserved = true;
-		m_isHic = false;
-		
-		
-		System.out.println("input "+m_input+"\n"
-				+ "output "+m_output+"\n"
-				+ "juiceBox "+m_juiceBoxTools+"\n"
-				+ "norm "+ m_juiceBoXNormalisation+"\n"
-				+ "gauss "+m_gauss+"\n"
-				+ "min "+m_min+"\n"
-				+ "max "+m_max+"\n"
-				+ "matrix size "+m_matrixSize+"\n"
-				+ "diag size "+m_diagSize+"\n"
-				+ "resolution "+m_resolution+"\n"
-				+ "saturated pixel "+m_saturatedPixel+"\n"
-				+ "threshold "+m_thresholdMax+"\n"
-				+ "step "+m_step+"\n"
-				+ "isObserved "+m_isObserved+"\n"
-				+ "isHic "+m_isHic+"\n"
-				+ "isProcessed "+m_isProcessed+"\n");*/
-		
-		
 		File file = new File(m_output);
 		if (file.exists()==false){file.mkdir();}
 		BufferedWriter writer = new BufferedWriter(new FileWriter(new File(m_output+File.separator+"parameters.txt")));
@@ -234,7 +195,6 @@ public class Hic_main {
 		if (m_isCompare==false){
 			WholeGenomeAnalysis wga = new WholeGenomeAnalysis(m_output, m_chrSize, m_gauss, m_min, m_max, m_step, m_resolution, m_saturatedPixel, m_thresholdMax, m_diagSize, m_matrixSize);
 			if(m_isHic){
-				//hic <observed/oMe> <hicFile> <chrSizeFile> <Output> <juicerToolsPath> [options]
 				System.out.println("hic mode:\ninput: "+m_input+"\noutput: "+m_output+"\njuiceBox: "+m_juiceBoxTools+"\nnorm: "+ m_juiceBoXNormalisation+"\ngauss: "+m_gauss+"\n"
 						+ "min: "+m_min+"\nmax: "+m_max+"\nmatrix size: "+m_matrixSize+"\ndiag size: "+m_diagSize+"\nresolution: "+m_resolution+"\nsaturated pixel: "+m_saturatedPixel
 						+"\nthreshold: "+m_thresholdMax+"\nstep: "+m_step+"\nisObserved: "+m_isObserved+"\n");
@@ -256,7 +216,6 @@ public class Hic_main {
 						+"\nmin: "+m_min+"\nmax: "+m_max+"\nmatrix size: "+m_matrixSize+"\ndiag size: "+m_diagSize+"\nresolution: "+m_resolution+"\nsaturated pixel: "+m_saturatedPixel
 						+"\nthreshold: "+m_thresholdMax+"\nstep: "+m_step+"\nisObserved: "+m_isObserved+"\nisHic: "+m_isHic+"\nisProcessed: "+m_isProcessed+"\n");
 				if(m_isObserved){
-					//processed <observed/oMe> <Directory with porocessed data> <chrSizeFile> <Output> [options]
 					writer.write("java -jar noName processed observed "+m_input+" "+m_chrSizeFile+" "+m_output+" "+m_gauss+" -mat "+m_matrixSize+" -d "+m_diagSize+" -res "+m_resolution
 							+" -t "+m_thresholdMax+" -s "+m_step+"\n");
 					wga.run("o",m_input);
@@ -273,7 +232,6 @@ public class Hic_main {
 			System.out.println("Compare parameter:\ninput 1 "+m_input+"\nbed file 1: "+m_bedfile1+"\ninput 2:"+m_input2+"\nbed file 2:"+m_bedfile2+"\noutput: "+m_output
 					+"\ngauss: "+m_gauss+"\nmin: "+m_min+"\nmatrix size: "+m_matrixSize+"\ndiag size: "+m_diagSize+"\nresolution: "+m_resolution+"\nthreshold: "+m_thresholdMax
 					+"\nstep: "+m_step+"\n");
-			//compare <Directory with porocessed data 1> <loops file 1> <Directory with porocessed data 2> <loops file 2> <Output> [options]
 			writer.write("java -jar noNameCompare "+m_input+" "+m_bedfile1+" "+m_input2+" "+m_bedfile2+" "+m_output+" -g "+m_gauss+" -min "+m_min+" -mat "+m_matrixSize
 					+" -d "+m_diagSize+" -res "+m_resolution+" -t "+m_thresholdMax+" -s "+m_step+"\n");
 			HiCFileComparison plopi = new HiCFileComparison(m_input,m_bedfile1,m_input2,m_bedfile2, m_output, m_resolution, m_matrixSize, m_step);
@@ -306,7 +264,6 @@ public class Hic_main {
 			line = br.readLine();
 		}
 		br.close();
-		
 	} 
 	
 	/**

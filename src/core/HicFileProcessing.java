@@ -8,14 +8,31 @@ import java.util.Iterator;
 import utils.DumpData;
 import utils.WholeGenomeAnalysis;
 
+/**
+ * 
+ * @author plop
+ *
+ */
 public class HicFileProcessing {
-	
+	/** */
 	private String m_log = "";
+	/** */
 	private WholeGenomeAnalysis m_wga;
+	/** */
 	private Iterator<String> m_key;
+	/** */
 	private DumpData m_dumpData;
+	/** */
 	private HashMap<String,Integer> m_chrSize = new HashMap<String,Integer>();
 	
+	/**
+	 * 
+	 * @param hicFile
+	 * @param wga
+	 * @param chrSize
+	 * @param juiceBoxTools
+	 * @param normJuiceBox
+	 */
 	public HicFileProcessing(String hicFile, WholeGenomeAnalysis wga, HashMap<String,Integer> chrSize, String juiceBoxTools, String normJuiceBox){
 		m_wga = wga;
 		m_key = chrSize.keySet().iterator();
@@ -65,7 +82,7 @@ public class HicFileProcessing {
 					System.out.print(dump+" "+"\n"+juicerTools+"\n"+m_log);
 					System.exit(0);
 				}
-				if(j+step>chrsize){
+				if(j+step > chrsize){
 					j= chrsize;
 					i+=step;
 					dump = chr+":"+i+":"+j;
@@ -90,5 +107,7 @@ public class HicFileProcessing {
 	 * 
 	 * @return
 	 */
-	public String getLog(){ return m_log; }
+	public String getLog(){
+		return m_log;
+	}
 }

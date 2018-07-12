@@ -22,23 +22,48 @@ import utils.PeakAnalysisScore;
 import utils.ProcessMethod;
 import utils.TupleFileImage;
 
-
+/**
+ * Class to compare two experiments of HiC with the same resolution. The loops for the individual file have to be call. Then the program dump the observed and expected value
+ * with the help juicer tools box. Foreach chromosome the program first compute the observed minu expected matrices for the two experiments, then we do the difference (hic1-hic2).
+ * Two files are created, one for the positive value (higher value in hic1)  and the other for the negative value (higher value for hic2). the file contains the value for the image.
+ * The size of the image is dependent of the matrix size parameter,
+ * 
+ * 
+ * @author axel poulet
+ *
+ */
 public class HiCFileComparison {
+	/** */
 	private int m_resolution;
+	/** */
 	private int m_step;
+	/** */
 	private int m_matrixSize;
+	/** */
 	private int m_diagSize = 4;
+	/** */
 	private double m_gauss =0.5;
+	/** */
 	private double m_min = 1;
+	/** */
 	private double m_threshold = 3;
+	/** */
 	private String m_dir1;
+	/** */
 	private String m_dir2;
+	/** */
 	private String m_outdir1;
+	/** */
 	private String m_outdir2;
+	/** */
 	private HashMap<String,Loop> m_data1 = new HashMap<String,Loop>();
+	/** */
 	private HashMap<String,Loop> m_data2 = new HashMap<String,Loop>();
+	/** */
 	private HashMap<String,String> m_ref1 = new HashMap<String,String>();
+	/** */
 	private HashMap<String,String> m_ref2 = new HashMap<String,String>();
+	
 	/**
 	 * 
 	 * @param hicFile1
@@ -53,7 +78,6 @@ public class HiCFileComparison {
 		m_step =step;
 		m_resolution = res;
 		m_matrixSize =matrixSize;
-		
 		m_outdir1 = outdir+File.separator+"1";
 		m_outdir2 = outdir+File.separator+"2";
 		m_dir1 = dir1;
@@ -62,7 +86,6 @@ public class HiCFileComparison {
 		if (file.exists()==false){file.mkdir();}
 		file = new File(m_outdir2);
 		if (file.exists()==false){file.mkdir();}
-		//System.out.println(m_dir1+"\t"+m_dir2+"\n");
 		m_ref1 = readFile(bedFile1);
 		m_ref2 = readFile(bedFile2);
 	}
@@ -93,14 +116,12 @@ public class HiCFileComparison {
 				outDir2Chr = outDir2Chr.replaceAll(m_dir1, m_dir2);
 				File fileChr = new File(files[i].toString());
 				File[] tFileChr = fileChr.listFiles();
-				//System.out.println(outDir1Chr+"\t"+outDir2Chr);
 				for(int j = 0; j < tFileChr.length; ++j){
 					if (tFileChr[j].isFile() == true && tFileChr[j].toString().contains(".txt")){
 						String bisFile = tFileChr[j].toString();
 						tab = bisFile.split(File.separator);
 						String fileName = tab[tab.length-1];
 						bisFile = bisFile.replaceAll(m_dir1, m_dir2);
-						//System.out.println("\t"+tFileChr[j]+"\t"+bisFile);
 						String outputName1 = outDir1Chr+File.separator+fileName;
 						String outputName2 = outDir2Chr+File.separator+fileName;
 						compare(tFileChr[j].toString(),bisFile,outputName1,outDir2Chr+File.separator+fileName);
@@ -108,11 +129,8 @@ public class HiCFileComparison {
 						file2.add(createImageFile(outputName2));
 					}
 				}
-				//System.out.println(file1+" debut");
 				callLoop(file1,chr.toString().replaceAll("chr", ""),m_outdir1+File.separator+"loopsDiff1.bed",m_data1,m_ref1);
-				//System.out.println(file1+" fin\n"+file2+" debut");
 				callLoop(file2,chr,m_outdir2+File.separator+"loopsDiff2.bed",m_data2,m_ref2);
-				//System.out.println(file2+" debut");
 			}
 		}
 	}
@@ -140,30 +158,27 @@ public class HiCFileComparison {
 	 * @throws IOException 
 	 */
 	private void callLoop(ArrayList<String> file, String chr, String output,HashMap<String,Loop> data,HashMap<String,String> ref) throws IOException{
-		CoordinatesCorrection coord = new CoordinatesCorrection(m_step, m_resolution, m_matrixSize, m_diagSize);
+		CoordinatesCorrection coord = new CoordinatesCorrection(m_resolution);
 		for(int i =0; i < file.size();++i){
 			String[] tfile = file.get(i).split("_");
 			int numImage = Integer.parseInt(tfile[tfile.length-2])/(m_step*m_resolution);
 			tfile = file.get(i).split(File.separator);
-			//System.out.println(tfile[tfile.length-2]);
 			ImagePlus img = IJ.openImage(file.get(i));
 			ImagePlus imgFilter = img.duplicate();
 			ProcessMethod pm = new ProcessMethod(imgFilter,m_gauss);
 			pm.runGaussian();
 			pm.runMin(m_min);
-			FindMaxima findLoop = new FindMaxima(img, imgFilter, chr, m_threshold);
+			FindMaxima findLoop = new FindMaxima(img, imgFilter, chr, m_threshold, m_diagSize, m_resolution);
 			HashMap<String,Loop> temp = findLoop.findloopCompare();
 			System.out.println("before: "+temp.size());
 			temp = removeMaximaCloseToZero(img,temp,false);
 			System.out.println("after: "+temp.size());
 			PeakAnalysisScore pas = new PeakAnalysisScore(img,temp);
-			pas.computeScoreBis();
+			pas.computeScoreCompareMethod();
 			coord.setData(data);
-			data = coord.imageToGenomeCoordinate(temp, numImage);
+			data = coord.imageToGenomeCoordinateCompare(temp, numImage);
 		}
-		//System.out.println(data.size());
 		data = testLoop(data,ref);
-		//System.out.println(data.size());
 		saveFile(output,data);
 	}
 
@@ -181,10 +196,8 @@ public class HiCFileComparison {
 		while (it.hasNext()){
 			String cle = it.next();
 			String name = data.get(cle).getChr()+"\t"+data.get(cle).getY()+"\t"+data.get(cle).getX();
-			//System.out.println(name);
-			if (ref.containsKey(name)){
+			if (ref.containsKey(name))
 				filtered.put(cle, data.get(cle));
-			}
 			else{
 				int x = data.get(cle).getX();
 				int y = data.get(cle).getY();
@@ -195,7 +208,6 @@ public class HiCFileComparison {
 							Loop loop= new Loop(name,i,j,data.get(cle).getChr());
 							int i_end = i+m_resolution;
 							int j_end = j+m_resolution;
-							//System.out.println("######################################prout "+name+"\ti "+i+"\tj "+j);
 							loop.setCoordinates(i, i_end, j, j_end);
 							filtered.put(name, loop);
 						}
@@ -218,14 +230,13 @@ public class HiCFileComparison {
 		BufferedWriter writer = new BufferedWriter(new FileWriter(new File(pathFile)));
 		Set<String> key = data.keySet();
 		Iterator<String> it = key.iterator();
-		writer.write("chromosome1\tx1\tx2\tchromosome2\ty1\ty2\tcolor\tAPScoreMed\tRegAPScoreMED\tAPScoreAVG\tRegAPScoreAVG\t%OfPixelInfToTheCenter\t%of0\n");
+		writer.write("chromosome1\tx1\tx2\tchromosome2\ty1\ty2\tcolor\tAPScoreAVG\tRegAPScoreAVG\t%OfPixelInfToTheCenter\n");
 		while (it.hasNext()){
 			String cle = it.next();
 			Loop loop = data.get(cle);
 			ArrayList<Integer> coord = loop.getCoordinates();
 			writer.write(loop.getChr()+"\t"+coord.get(2)+"\t"+coord.get(3)+"\t"+loop.getChr()+"\t"+coord.get(0)+"\t"+coord.get(1)+"\t255,125,255"
-				+"\t"+loop.getPaScoreMed()+"\t"+loop.getRegionalPaScoreMed()+"\t"+loop.getPaScoreAvg()+"\t"+loop.getRegionalPaScoreAvg()
-				+"\t"+loop.getPercentage()+"\t"+loop.getPercentageOfZero()+"\n"); 
+				+"\t"+loop.getPaScoreAvg()+"\t"+loop.getRegionalPaScoreAvg()+"\t"+loop.getPercentage()+"\n"); 
 		}
 		writer.close();
 	}
@@ -355,7 +366,6 @@ public class HiCFileComparison {
 			String[] parts = line.split("\\t");				
 			String loops = parts[0].replaceAll("chr","")+"\t"+parts[1]+"\t"+parts[4]; 
 			resu.put(loops, "");
-			//System.out.println(loops);
 			sb.append(System.lineSeparator());
 			line = br.readLine();
 		}
@@ -367,10 +377,31 @@ public class HiCFileComparison {
 	 * 
 	 * @param min
 	 */
-	public void setMin(double min){ this.m_min = min; }
+	public void setMin(double min){
+		this.m_min = min;
+	}
 	
-	public void setGauss(double gauss){ this.m_gauss = gauss; }
+	/**
+	 * 
+	 * @param gauss
+	 */
+	public void setGauss(double gauss){
+		this.m_gauss = gauss;
+	}
 	
-	public void setDiag(int diag){ this.m_diagSize = diag; }
-	public void setThreshold(int thresh){ this.m_threshold = thresh; }
+	/**
+	 * 
+	 * @param diag
+	 */
+	public void setDiag(int diag){
+		this.m_diagSize = diag;
+	}
+	
+	/**
+	 * 
+	 * @param thresh
+	 */
+	public void setThreshold(int thresh){
+		this.m_threshold = thresh;
+	}
 }

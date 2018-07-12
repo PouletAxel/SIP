@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.HashMap;
-import core.HicFileProcessing;
 import utils.WholeGenomeAnalysis;
 
 public class TestCallLoopsProcessedFile {
@@ -20,20 +19,20 @@ public class TestCallLoopsProcessedFile {
 	 * @throws InterruptedException 
 	 */
 	public static void main(String[] args) throws IOException, InterruptedException {
-	String	output= "/home/plop/Bureau/DataSetImageHiC/GM12878/WholeGenome_3000_1_125_125_";
-	String	input = "/home/plop/Bureau/DataSetImageHiC/GM12878/WholeGenome_3000_1_125_125_005_30q";
-	int step = 1000;
-	int matrixSize = 2000;
-	int resolution = 5000;
-	int diagSize = 4;
-	double gauss = 1;
-	int thresholdMax =70;
-	boolean isObserved = false;
+		String	output= "/home/plop/Bureau/DataSetImageHiC/GM12878/test";
+		String	input = "/home/plop/Bureau/DataSetImageHiC/GM12878/test_3000_1_125_125_005_30q";
+		int step = 1000;
+		int matrixSize = 2000;
+		int resolution = 5000;
+		int diagSize = 6;
+		double gauss = 1;
+		int thresholdMax = 3000;
+		boolean isObserved = false;
 	
-	double min =1.25;
-	double max =1.25;
-	double saturatedPixel =0.05;
-	System.out.println("input "+input+"\n"
+		double min =1.5;
+		double max =1.5;
+		double saturatedPixel =0.05;
+		System.out.println("input "+input+"\n"
 			+ "output "+output+"\n"
 			+ "gauss "+gauss+"\n"
 			+ "min "+min+"\n"
@@ -47,10 +46,10 @@ public class TestCallLoopsProcessedFile {
 			+ "isObserved "+isObserved+"\n");
 	
 		File file = new File(output);
-		if (file.exists()==false){file.mkdir();}
-		
-		
-		WholeGenomeAnalysis wga = new WholeGenomeAnalysis(output, readChrSizeFile("/home/plop/Documents/Genome/HumanGenomeHg19/hg19.sizes"), gauss, min, max, step, 
+		if (file.exists()==false) 
+			file.mkdir();
+	
+		WholeGenomeAnalysis wga = new WholeGenomeAnalysis(output, readChrSizeFile("/home/plop/Documents/Genome/HumanGenomeHg19/hg19_withoutChr.sizes"), gauss, min, max, step, 
 				resolution, saturatedPixel, thresholdMax, diagSize, matrixSize);
 
 		if(isObserved) wga.run("o",input);
