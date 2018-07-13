@@ -19,8 +19,8 @@ public class TestCallLoopsProcessedFile {
 	 * @throws InterruptedException 
 	 */
 	public static void main(String[] args) throws IOException, InterruptedException {
-		String	output= "/home/plop/Bureau/DataSetImageHiC/GM12878/test";
-		String	input = "/home/plop/Bureau/DataSetImageHiC/GM12878/test_3000_1_125_125_005_30q";
+		String	output= "/home/plop/Bureau/DataSetImageHiC/GM12878/test_bis";
+		String	input = "/home/plop/Bureau/DataSetImageHiC/GM12878/3000_1_125_125_005_30q";
 		int step = 1000;
 		int matrixSize = 2000;
 		int resolution = 5000;

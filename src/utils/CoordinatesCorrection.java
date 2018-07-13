@@ -146,7 +146,7 @@ public class CoordinatesCorrection {
 						String key = chr+"\t"+i+"\t"+j;
 						//System.out.println("prout "+key);
 						if (newKey != key && m_data.containsKey(key)){
-							System.out.println("prout "+key);
+							//System.out.println("prout "+key);
 							test = true;
 							return true;
 						}

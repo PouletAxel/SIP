@@ -92,7 +92,7 @@ public class PeakAnalysisScore {
 						//nbZero += process3By3SquareZero(x+4,y-4);
 						nbCorner++;
 					}
-					if(m_countNonZero.get(y+3)> 0 && m_countNonZero.get(y+4)>0 &&  m_countNonZero.get(y+5)> 0 && x-y >= 7){
+					if(m_countNonZero.get(y+3)> 0 && m_countNonZero.get(y+4)>0 &&  m_countNonZero.get(y+5)> 0 && x-y >= 10){
 						//corner += process3By3Square(x+4,y+4);
 						cornerAvg += process3By3SquareAvg(x+4,y+4);
 						nbPixel += process3By3SquareSup(x+4,y+4,(int)center);

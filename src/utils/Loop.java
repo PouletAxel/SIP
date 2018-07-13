@@ -43,6 +43,8 @@ public class Loop {
 	/** */
 	private double m_avg = -1;
 	/** */
+	private double m_peakValue = -1;
+	/** */
 	private double m_std = -1;
 	
 	
@@ -69,13 +71,14 @@ public class Loop {
 	 * @param avg
 	 * @param std
 	 */
-	public Loop(String name, int x, int y, String chr, double avg, double std){
+	public Loop(String name, int x, int y, String chr, double avg, double std, double peakValue){
 		this.setName(name);
 		this.setX(x);
 		this.setY(y);
 		m_chr = chr;
 		m_avg = avg;
 		m_std = std;
+		m_peakValue = peakValue;
 	}
 	
 	
@@ -175,6 +178,13 @@ public class Loop {
 		this.m_y = y;
 	}
 	
+	/**
+	 * 
+	 * @return
+	 */
+	public double getValue(){
+		return m_peakValue;
+	}
 	/**
 	 * 
 	 * @return

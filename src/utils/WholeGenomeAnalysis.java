@@ -141,15 +141,17 @@ public class WholeGenomeAnalysis {
 		BufferedWriter writer = new BufferedWriter(new FileWriter(new File(pathFile)));
 		Set<String> key = m_data.keySet();
 		Iterator<String> it = key.iterator();
-		writer.write("chromosome1\tx1\tx2\tchromosome2\ty1\ty2\tcolor\tAPScoreAVG\tRegAPScoreAVG\t%OfPixelInfToTheCenter\tAvg_diffMaxNeihgboor_1\tAvg_diffMaxNeihgboor_2\tavg\n");
+		writer.write("chromosome1\tx1\tx2\tchromosome2\ty1\ty2\tcolor\tAPScoreAVG\tRegAPScoreAVG\t%OfPixelInfToTheCenter\tAvg_diffMaxNeihgboor_1\tAvg_diffMaxNeihgboor_2\tavg\tstd\tvalue\t%ofZeroInneigh\n");
 		while (it.hasNext()){
 			String cle = it.next();
 			Loop loop = m_data.get(cle);
 			ArrayList<Integer> coord = loop.getCoordinates();
 			double a =  loop.getAvg();//getNeigbhoord1()/loop.getNeigbhoord2();
-			writer.write(loop.getChr()+"\t"+coord.get(2)+"\t"+coord.get(3)+"\t"+loop.getChr()+"\t"+coord.get(0)+"\t"+coord.get(1)+"\t0,0,0"
-				+"\t"+loop.getPaScoreAvg()+"\t"+loop.getRegionalPaScoreAvg()
-				+"\t"+loop.getPercentage()+"\t"+loop.getNeigbhoord1()+"\t"+loop.getNeigbhoord2()+"\t"+a+"\n"); 
+			//if(loop.getPaScoreAvg()>0){
+				writer.write(loop.getChr()+"\t"+coord.get(2)+"\t"+coord.get(3)+"\t"+loop.getChr()+"\t"+coord.get(0)+"\t"+coord.get(1)+"\t0,0,0"
+					+"\t"+loop.getPaScoreAvg()+"\t"+loop.getRegionalPaScoreAvg()
+					+"\t"+loop.getPercentage()+"\t"+loop.getNeigbhoord1()+"\t"+loop.getNeigbhoord2()+"\t"+loop.getAvg()+"\t"+loop.getStd()+"\t"+loop.getValue()+"\t"+loop.getPercentageOfZero()+"\n");
+			//}
 		}
 		writer.close();
 	}
@@ -228,7 +230,6 @@ public class WholeGenomeAnalysis {
 				System.out.println(temp.size());
 				coord.setData(m_data);
 				System.out.println("before "+ m_data.size());
-				int finChr = Integer.parseInt(tfile[tfile.length-1].replaceAll(".txt", ""));
 				m_data = coord.imageToGenomeCoordinate(temp, numImage);
 				System.out.println("after "+ m_data.size());
 			}
@@ -251,8 +252,8 @@ public class WholeGenomeAnalysis {
 			String [] tname = name.split("\t");
 			int x = Integer.parseInt(tname[1])*2;
 			int y = Integer.parseInt(tname[2])*2;
-			for(int i = x-2; i <= x+2; ++i){
-				for(int j = y-2; j <= y+2; ++j){
+			for(int i = x-3; i <= x+3; ++i){
+				for(int j = y-3; j <= y+3; ++j){
 					String test = tname[0]+"\t"+i+"\t"+j+"\t"+tname[3];
 					if(temp.containsKey(test)){
 						removed.add(name);
