@@ -21,7 +21,6 @@ public class TestCallLoopsProcessedFile {
 	public static void main(String[] args) throws IOException, InterruptedException {
 		String	output= "/home/plop/Bureau/DataSetImageHiC/SpermCtl_test";
 		String	input = "/home/plop/Bureau/DataSetImageHiC/SpermCtl/";
-		int step = 500;
 		int matrixSize = 1000;
 		int resolution = 10000;
 		int diagSize = 3;
@@ -42,14 +41,13 @@ public class TestCallLoopsProcessedFile {
 			+ "resolution "+resolution+"\n"
 			+ "saturated pixel "+saturatedPixel+"\n"
 			+ "threshold "+thresholdMax+"\n"
-			+ "step "+step+"\n"
 			+ "isObserved "+isObserved+"\n");
 	
 		File file = new File(output);
 		if (file.exists()==false) 
 			file.mkdir();
 		///home/plop/Documents/Genome/HumanGenomeHg19/hg19_withoutChr.sizes
-		WholeGenomeAnalysis wga = new WholeGenomeAnalysis(output, readChrSizeFile("/home/plop/Documents/Genome/mm9/mm9_sizes_noY.txt"), gauss, min, max, step, 
+		WholeGenomeAnalysis wga = new WholeGenomeAnalysis(output, readChrSizeFile("/home/plop/Documents/Genome/mm9/mm9_sizes_noY.txt"), gauss, min, max, 
 				resolution, saturatedPixel, thresholdMax, diagSize, matrixSize);
 
 		if(isObserved) wga.run("o",input);

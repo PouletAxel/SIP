@@ -1,4 +1,4 @@
-package utils;
+ package utils;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -14,58 +14,60 @@ import inra.ijpb.morphology.Morphology;
 import inra.ijpb.morphology.Strel;
 
 /**
+ * Analyse and detect a whole genome HiC with .hic file or already processed data.
+ * The class is used for the observed and oMe method.
  * 
- * @author plop
+ * @author axel poulet
  *
  */
 public class WholeGenomeAnalysis {
-	/** */
+	/** String path of the input data*/
 	private String m_input;
-	/** */
+	/** Path of the output file*/
 	private String m_output;
-	/** */
+	/** Strength of the gaussian filter*/
 	private double m_gauss;
-	/** */
+	/** Strength of the min filter*/
 	private double m_min;
-	/** */
+	/** Strength of the max filter*/
 	private double m_max;
-	/** */
+	/** % of staurated pixel after enhance contrast*/
 	private double m_saturatedPixel;
-	/** */
+	/** Image size*/
 	private int m_matrixSize = 0;
-	/** */
+	/** Resolution of the bin dump in base*/
 	private int m_resolution;
-	/** */
+	/** Threshold for the maxima detection*/
 	private int m_thresholdMaxima;
-	/** */
+	/** HashMap of the chr size, the key = chr name, value = size of chr*/
 	HashMap<String,Integer> m_chrSize =  new HashMap<String,Integer>();
-	/** */
+	/** Diage size to removed maxima close to diagonal*/
 	private int m_diagSize;
-	/** */
+	/** Size of the step to process each chr (step = matrixSize/2)*/
 	private int m_step;
-	/** */
+	/** boolean: true = observed, false = oMe*/
 	private boolean m_isObserved = false;
-	/** */
+	/** loop coolection*/
 	static HashMap<String,Loop> m_data = new HashMap<String,Loop>();
 	
 	/**
+	 * WholeGenomeAnalysis constructor
 	 * 
-	 * @param input
-	 * @param output
-	 * @param lbw
-	 * @param gauss
-	 * @param min
-	 * @param max
-	 * @param step
-	 * @param res
-	 * @param saturatedPixel
-	 * @param chrSize
-	 * @param thresholdMaxima
-	 * @throws IOException 
+	 * @param output: String path of the results 
+	 * @param chrSize: HashMap<String, Integer> hashmap with the chr size info
+	 * @param gauss: double of the strength of the gaussian filter
+	 * @param min: double of the strength of the min filter
+	 * @param max: double of the strength of the max filter
+	 * @param resolution: int size of the bins
+	 * @param saturatedPixel: % of staurated pixel after enhance contrast
+	 * @param thresholdMax: threshold for the maxima detection 
+	 * @param diagSize: size of the diag
+	 * @param matrixSize: size of the image to analyse
 	 */
+	 
 	
 	public WholeGenomeAnalysis(String output, HashMap<String, Integer> chrSize, double gauss, double min,
-			double max, int step, int resolution, double saturatedPixel, int thresholdMax,
+			double max, int resolution, double saturatedPixel, int thresholdMax,
 			int diagSize, int matrixSize) {
 		m_output = output;
 		m_input = output;
@@ -78,14 +80,12 @@ public class WholeGenomeAnalysis {
 		m_saturatedPixel = saturatedPixel;
 		m_thresholdMaxima = thresholdMax;
 		m_diagSize = diagSize;
-		m_step = step;
+		m_step = matrixSize/2;
 	}
 
 	/**
-	 * 
-	 * @param resu
-	 * @param pathFile
-	 * @return 
+	 * run the whole genome analysis to detect the maxima
+	 * @param choice isObserved or oMe
 	 * @throws IOException
 	 */
 	public void run(String choice) throws IOException{
@@ -94,11 +94,13 @@ public class WholeGenomeAnalysis {
 		while(key.hasNext()){
 			String chr = key.next();
 			String dir = m_output+File.separator+chr+File.separator;
-			File[] listOfFiles =fillList(dir);
+			File[] listOfFiles = fillList(dir);
 			System.out.println(listOfFiles.length);
-			if (listOfFiles.length==0){ System.out.println("dumped directory of chromosome"+chr+"empty");}
+			if (listOfFiles.length == 0)
+				System.out.println("dumped directory of chromosome"+chr+"empty");
 			else{
-				if (choice.equals("o")) 	m_isObserved = true; 
+				if (choice.equals("o"))
+					m_isObserved = true; 
 				detectLoops(listOfFiles,chr);
 				saveFile(resuFile);
 			}
@@ -106,10 +108,10 @@ public class WholeGenomeAnalysis {
 	}
 
 	/**
+	 * run the whole genome analysis to detect the maxima
 	 * 
-	 * @param resu
-	 * @param pathFile
-	 * @return 
+	 * @param choice choice isObserved or oMe
+	 * @param input path of the input file
 	 * @throws IOException
 	 */
 	public void run(String choice,String input) throws IOException{
@@ -120,10 +122,10 @@ public class WholeGenomeAnalysis {
 			String dir = input+File.separator+chr+File.separator;
 			File[] listOfFiles =fillList(dir);
 			System.out.println(dir);
-			if (listOfFiles.length==0)
+			if (listOfFiles.length == 0)
 				System.out.println("dumped directory of chromosome"+chr+"empty");
 			else{
-				if (choice.equals("o")) 	m_isObserved = true; 
+				if (choice.equals("o"))m_isObserved = true; 
 				detectLoops(listOfFiles,chr);
 				saveFile(resuFile);
 			}
@@ -131,13 +133,13 @@ public class WholeGenomeAnalysis {
 	}
 	
 	/**
+	 * Save the result file in tabulated file
 	 * 
-	 * @param pathFile
+	 * @param pathFile path of output file
 	 * @throws IOException
 	 */
 	
-	public void saveFile (String pathFile) throws IOException
-	{
+	public void saveFile(String pathFile) throws IOException{
 		BufferedWriter writer = new BufferedWriter(new FileWriter(new File(pathFile)));
 		Set<String> key = m_data.keySet();
 		Iterator<String> it = key.iterator();
@@ -160,22 +162,21 @@ public class WholeGenomeAnalysis {
 	
 	
 	/**
-	 * rao 2014 good results with default parameters
-	 * droso cubenas ProcessMethod(imgFilter,2,1.25,1.25); => 4000
-	 * @throws IOException 
+	 * Detect loops methods
+	 * detect the loops at two different resolution, initial resolution + 2 fold bigger
 	 * 
-	 * @param fileList
-	 * @param chr
+	 * @param fileList list fo the tuple file
+	 * @param chr name of the chr
 	 * @throws IOException
 	 */
 	private void detectLoops(File[] fileList, String chr) throws IOException{	
 		CoordinatesCorrection coord = new CoordinatesCorrection(m_resolution);
-		for(int i =0; i < fileList.length;++i){
+		for(int i = 0; i < fileList.length; ++i){
 			if(fileList[i].toString().contains(".txt")){
 				// make and save image at two differents resolution (m_resolution and m_resolution*2)
 				String[] tfile = fileList[i].toString().split("_");
 				int numImage = Integer.parseInt(tfile[tfile.length-2])/(m_step*m_resolution);
-				TupleFileToImage readFile = new TupleFileToImage(fileList[i].toString(),m_matrixSize,m_step,m_resolution);
+				TupleFileToImage readFile = new TupleFileToImage(fileList[i].toString(),m_matrixSize,m_resolution);
 				String imageName = fileList[i].toString().replaceAll(".txt", ".tif");
 				ImagePlus imgRaw = readFile.readTupleFile();
 				imgRaw.setTitle(imageName);
@@ -193,7 +194,7 @@ public class WholeGenomeAnalysis {
 				ImagePlus imgRawBiggerRes = test.run();
 				String testName = fileList[i].toString().replaceAll(".txt", "_10kb.tif");
 				saveFile(imgRawBiggerRes,testName); 
-				nzc =new NonZeroCorrection(imgRawBiggerRes);
+				nzc = new NonZeroCorrection(imgRawBiggerRes);
 				ArrayList<Integer> countNonZeroBigger = nzc.getNonZeroList();
 				ImagePlus imgFilterBiggerRes = imgRawBiggerRes.duplicate();
 
@@ -236,10 +237,12 @@ public class WholeGenomeAnalysis {
 	}
 	
 	/**
+	 * Compare loops between the two resolution, if at the same location the are one loops call at bigger resolution and snmaller resolution,
+	 * keep the smaller one 
 	 * 
-	 * @param temp
-	 * @param tempBiggerRes
-	 * @return
+	 * @param temp collection of the loop call at small resolution
+	 * @param tempBiggerRes collection of the loop call at smaller resolution
+	 * @return HashMap<String, Loop> the sorted HashMap
 	 */
 	private HashMap<String, Loop>  compareLoops(HashMap<String, Loop> temp, HashMap<String, Loop> tempBiggerRes){
 		Set<String> key = tempBiggerRes.keySet();
@@ -268,11 +271,11 @@ public class WholeGenomeAnalysis {
 	}
 
 	/**
+	 * method to process the image with oMe
 	 * 
-	 * @param imgFilter
-	 * @param fileName
+	 * @param imgFilter image filtered
+	 * @param fileName input file
 	 */
-	
 	private void imageProcessing(ImagePlus imgFilter, String fileName){ 
 		ProcessMethod pm = new ProcessMethod(imgFilter,this.m_min,this.m_max,this.m_gauss);
 		pm.enhanceContrast(this.m_saturatedPixel);
@@ -284,27 +287,28 @@ public class WholeGenomeAnalysis {
 	
 		
 	/**
+	 * Save the image file
 	 * 
-	 * @param imagePlusInput
-	 * @param pathFile
+	 * @param imagePlusInput image to save
+	 * @param pathFile path to save the image
 	 */	
-	public void saveFile ( ImagePlus imagePlusInput, String pathFile)
-	{
+	public void saveFile ( ImagePlus imagePlusInput, String pathFile){
 		FileSaver fileSaver = new FileSaver(imagePlusInput);
 	    fileSaver.saveAsTiff(pathFile);
 	}
 
 	/**
-	 * 
-	 * @return
+	 * Getter of the input dir
+	 * @return path of the input dir
 	 */
 	public String getinputDir(){
 		return m_input;
 	}
 	
 	/**
+	 * Getter of the matrix size
 	 * 
-	 * @return
+	 * @return the size of the image
 	 */
 	public int getMatrixSize(){
 		return this.m_matrixSize;
@@ -312,31 +316,31 @@ public class WholeGenomeAnalysis {
 
 	
 	/**
-	 * 
-	 * @return
+	 * Getter of step 
+	 * @return the step
 	 */
 	public int getStep(){
 		return this.m_step;
 	}
 	
 	/**
-	 * 
-	 * @param inputDir
+	 * Setter of the path of the input directory
+	 * @param inputDir String of the input directory
 	 */
 	public void setInputDir(String inputDir){
 		this.m_input = inputDir;
 	}
 
 	/**
-	 * 
-	 * @return
+	 * Getter of the path of the output directory
+	 * @return path 
 	 */
 	public String getOutputDir(){
 		return m_output;
 	}
 
 	/**
-	 * 
+	 * Setter of the path of the output directory
 	 * @param outputDir
 	 */
 	public void setOutputDir(String outputDir){
@@ -344,39 +348,39 @@ public class WholeGenomeAnalysis {
 	}
 
 	/**
-	 * 
-	 * @return
+	 * Getter of the gaussian blur strength
+	 * @return double gaussian 
 	 */
 	public double getGauss(){
 		return m_gauss;
 	}
 	
 	/**
-	 * 
-	 * @param gauss
+	 * Setter of the gaussian blur strength
+	 * @param gauss double
 	 */
 	public void setGauss(double gauss){
 		this.m_gauss = gauss;
 	}
 	
 	/**
-	 * 
-	 * @param diagSize
+	 * Setter of the diagonal size
+	 * @param diagSize int of the size of the diagonal
 	 */
 	public void setDiagSize(int diagSize){
 		this.m_diagSize = diagSize;
 	}
 	
 	/**
-	 * 
-	 * @return
+	 * Getter of the min filter strength
+	 * @return double strength of the min filter
 	 */
 	public double getMin(){
 		return m_min;
 	}
 
 	/**
-	 * 
+	 * Setter of the min filter strength
 	 * @param min
 	 */
 	public void setMin(double min){
@@ -384,15 +388,15 @@ public class WholeGenomeAnalysis {
 	}
 
 	/**
-	 * 
-	 * @return
+	 * Getter of the max filter strength
+	 * @return double max filter
 	 */
 	public double getMax(){
 		return m_max;
 	}
 	
 	/**
-	 * 
+	 * Setter of the min filter strength
 	 * @param max
 	 */
 	public void setMax(double max){
@@ -400,15 +404,15 @@ public class WholeGenomeAnalysis {
 	}
 
 	/**
-	 * 
-	 * @return
+	 * Getter % of saturated pixel for the contrast enhancement
+	 * @return double percentage of saturated
 	 */
 	public double getSaturatedPixel(){
 		return m_saturatedPixel;
 	}
 
 	/**
-	 * 
+	 * Setter % of saturated pixel for the contrast enhancement
 	 * @param saturatedPixel
 	 */
 	public void setSaturatedPixel(double saturatedPixel){
@@ -416,7 +420,7 @@ public class WholeGenomeAnalysis {
 	}
 
 	/**
-	 * 
+	 * Getter of resolution of the bin 
 	 * @return
 	 */
 	public int getResolution(){
@@ -424,7 +428,7 @@ public class WholeGenomeAnalysis {
 	}
 	
 	/**
-	 * 
+	 * Setter of resolution of the bin 
 	 * @param resolution
 	 */
 	public void setResolution(int resolution){
@@ -432,7 +436,7 @@ public class WholeGenomeAnalysis {
 	}
 
 	/**
-	 * 
+	 * Setter of size of the matrix 
 	 * @param size
 	 */
 	public void setMatrixSize(int size){
@@ -440,7 +444,7 @@ public class WholeGenomeAnalysis {
 	}
 	
 	/**
-	 * 
+	 * c 
 	 * @param step
 	 */
 	public void setStep(int step){
@@ -448,7 +452,7 @@ public class WholeGenomeAnalysis {
 	}
 	
 	/**
-	 * 
+	 * Getter of threshold for the detction of the maxima 
 	 * @return
 	 */
 	public int getThresholdMaxima(){
@@ -456,7 +460,7 @@ public class WholeGenomeAnalysis {
 	}
 
 	/**
-	 * 
+	 * Setter of threshold for the detection of the maxima
 	 * @param thresholdMaxima
 	 */
 	public void setThresholdMaxima(int thresholdMaxima) {
@@ -464,13 +468,12 @@ public class WholeGenomeAnalysis {
 	}
 
 	/**
-	 * 
+	 * Full the list with file in directory
 	 * @param dir
 	 * @return
 	 * @throws IOException
 	 */
-	private File[] fillList(String dir) throws IOException
-	{
+	private File[] fillList(String dir) throws IOException{
 		File folder = new File(dir);
 		File[] listOfFiles = folder.listFiles();
 		return listOfFiles;

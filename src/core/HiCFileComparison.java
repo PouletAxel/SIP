@@ -65,17 +65,19 @@ public class HiCFileComparison {
 	private HashMap<String,String> m_ref2 = new HashMap<String,String>();
 	
 	/**
+	 * Constrcutor 
 	 * 
-	 * @param hicFile1
-	 * @param hicFile2
-	 * @param chrSize
-	 * @param juiceBoxTools
-	 * @param normJuiceBox
-	 * @param wga
-	 * @throws IOException 
+	 * @param dir1 String: path of the first condition
+	 * @param bedFile1 String: path of the loops file results for the first condition
+	 * @param dir2 String path of the second condition
+	 * @param bedFile2 String: path of the loops file results for the second condition
+	 * @param outdir String: path of the output directory
+	 * @param res int: bin resolution
+	 * @param matrixSize int: size of the image
+	 * @throws IOException
 	 */
-	public HiCFileComparison(String dir1, String bedFile1, String dir2, String bedFile2, String outdir, int res, int matrixSize, int step) throws IOException{
-		m_step =step;
+	public HiCFileComparison(String dir1, String bedFile1, String dir2, String bedFile2, String outdir, int res, int matrixSize) throws IOException{
+		m_step =matrixSize/2;
 		m_resolution = res;
 		m_matrixSize =matrixSize;
 		m_outdir1 = outdir+File.separator+"1";
@@ -83,9 +85,11 @@ public class HiCFileComparison {
 		m_dir1 = dir1;
 		m_dir2 = dir2;
 		File file = new File(m_outdir1);
-		if (file.exists()==false){file.mkdir();}
+		if (file.exists()==false)
+			file.mkdir();
 		file = new File(m_outdir2);
-		if (file.exists()==false){file.mkdir();}
+		if (file.exists()==false)
+			file.mkdir();
 		m_ref1 = readFile(bedFile1);
 		m_ref2 = readFile(bedFile2);
 	}
@@ -93,10 +97,10 @@ public class HiCFileComparison {
 	
 	
 	/**
-	 * dump observed KR https://hicfiles.s3.amazonaws.com/hiseq/gm12878/in-situ/combined.hic 1:20480000:40960000 1:20480000:40960000 BP 10000 combined_10Kb.txt
+	 * run the comparison between the two conditions.
 	 * 
 	 * @throws IOException
-	 * @throws InterruptedException 
+	 * @throws InterruptedException
 	 */
 	public void run() throws IOException, InterruptedException{
 		File file = new File(m_dir1);
@@ -109,10 +113,12 @@ public class HiCFileComparison {
 				String chr = tab[tab.length-1];
 				String outDir1Chr = m_outdir1+File.separator+chr;
 				File fileOut = new File(outDir1Chr);
-				if (fileOut.exists()==false){fileOut.mkdir();}
+				if (fileOut.exists() == false)
+					fileOut.mkdir();
 				String outDir2Chr = m_outdir2+File.separator+tab[tab.length-1];
 				file = new File(outDir2Chr);
-				if (file.exists()==false){file.mkdir();}
+				if (file.exists() == false)
+					file.mkdir();
 				outDir2Chr = outDir2Chr.replaceAll(m_dir1, m_dir2);
 				File fileChr = new File(files[i].toString());
 				File[] tFileChr = fileChr.listFiles();
@@ -125,8 +131,8 @@ public class HiCFileComparison {
 						String outputName1 = outDir1Chr+File.separator+fileName;
 						String outputName2 = outDir2Chr+File.separator+fileName;
 						compare(tFileChr[j].toString(),bisFile,outputName1,outDir2Chr+File.separator+fileName);
-						file1.add(createImageFile(outputName1));
-						file2.add(createImageFile(outputName2));
+						file1.add(makingOfImageFile(outputName1));
+						file2.add(makingOfImageFile(outputName2));
 					}
 				}
 				callLoop(file1,chr.toString(),m_outdir1+File.separator+"loopsDiff1.bed",m_data1,m_ref1);
@@ -136,13 +142,14 @@ public class HiCFileComparison {
 	}
 	
 	/**
-	 * 
-	 * @param fileList
-	 * @param chr
+	 * method making the image after comaparison, value positiove are the pixel higher in the first condition, and negative higher
+	 * value in the second condition 
+	 * @param input path of the input file (tuple file)
+	 * @return the path of the image
 	 * @throws IOException
 	 */
-	private String createImageFile(String input) throws IOException{
-		TupleFileToImage readFile = new TupleFileToImage(input,m_matrixSize,m_step,m_resolution);
+	private String makingOfImageFile(String input) throws IOException{
+		TupleFileToImage readFile = new TupleFileToImage(input,m_matrixSize,m_resolution);
 		String imageName = input.replaceAll(".txt", ".tif");
 		ImagePlus imgRaw = readFile.readTupleFile();
 		imgRaw.setTitle(imageName);
@@ -153,9 +160,14 @@ public class HiCFileComparison {
 	}
 
 	/**
+	 * Detection of the loop of the differential images
 	 * 
-	 * @param file
-	 * @throws IOException 
+	 * @param file liste of string; stock the path of each file of interest
+	 * @param chr name of the chr
+	 * @param output path of the output directory
+	 * @param data colection of loop
+	 * @param ref reference loop 
+	 * @throws IOException
 	 */
 	private void callLoop(ArrayList<String> file, String chr, String output,HashMap<String,Loop> data,HashMap<String,String> ref) throws IOException{
 		CoordinatesCorrection coord = new CoordinatesCorrection(m_resolution);
@@ -178,19 +190,17 @@ public class HiCFileComparison {
 			coord.setData(data);
 			System.out.println("prout: "+data.size());
 			data = coord.imageToGenomeCoordinateCompare(temp, numImage);
-			//System.out.println("after: "+data.size());
 		}
-		//data = testLoop(data,ref);
-		
+		data = testLoop(data,ref);
 		saveFile(output,data);
 	}
 
 	
 	/**
-	 * 
-	 * @param data
-	 * @param ref
-	 * @return
+	 * Test loop calles with the reference loop file of interest. The reference file is stock in HashMap
+	 * @param data loop collection to test
+	 * @param ref reference loop collection
+	 * @return collection of loops tested
 	 */
 	private HashMap<String,Loop> testLoop(HashMap<String,Loop> data, HashMap<String,String> ref){
 		Set<String> key = data.keySet();
@@ -199,13 +209,13 @@ public class HiCFileComparison {
 		while (it.hasNext()){
 			String cle = it.next();
 			String name = data.get(cle).getChr()+"\t"+data.get(cle).getY()+"\t"+data.get(cle).getX();
-			//if (ref.containsKey(name))
-			//	filtered.put(cle, data.get(cle));
-			//else{
+			if (ref.containsKey(name))
+				filtered.put(cle, data.get(cle));
+			else{
 				int x = data.get(cle).getX();
 				int y = data.get(cle).getY();
-				for (int i = x -2*m_resolution; i <= x + 2*m_resolution; i = i + m_resolution){
-					for (int j = y -2*m_resolution ; j <= y + 2*m_resolution; j = j + m_resolution){
+				for (int i = x-2*m_resolution; i <= x+2*m_resolution; i = i+m_resolution){
+					for (int j = y-2*m_resolution ; j <= y+2*m_resolution; j = j+m_resolution){
 						name = data.get(cle).getChr()+"\t"+j+"\t"+i;
 						if(ref.containsKey(name)){
 							Loop loop= new Loop(name,i,j,data.get(cle).getChr());
@@ -217,15 +227,16 @@ public class HiCFileComparison {
 					}
 				}
 				
-			//}
+			}
 		}
 		return filtered;
 	}
 	
 	/**
-	 * 
-	 * @param resu
-	 * @param pathFile
+	 * Save the results file in tab format
+	 * chromosome1	x1	x2	chromosome2	y1	y2	color	APScoreAVG	RegAPScoreAVG	%OfPixelInfToTheCenter\n
+	 * @param pathFile path of the output file
+	 * @param data loops collection
 	 * @throws IOException
 	 */
 	public void saveFile (String pathFile,HashMap<String,Loop> data) throws IOException
@@ -239,8 +250,7 @@ public class HiCFileComparison {
 			String cle = it.next();
 			Loop loop = data.get(cle);
 			ArrayList<Integer> coord = loop.getCoordinates();
-			System.out.println("plopi "+loop.getChr()+"\t"+coord.get(2)+"\t"+coord.get(3));
-			
+			//System.out.println("plopi "+loop.getChr()+"\t"+coord.get(2)+"\t"+coord.get(3));
 			writer.write(loop.getChr()+"\t"+coord.get(2)+"\t"+coord.get(3)+"\t"+loop.getChr()+"\t"+coord.get(0)+"\t"+coord.get(1)+"\t255,125,255"
 				+"\t"+loop.getPaScoreAvg()+"\t"+loop.getRegionalPaScoreAvg()+"\n"); 
 		}
@@ -248,13 +258,14 @@ public class HiCFileComparison {
 	}
 	
 	/**
-	 * @param file1
-	 * @param file2
-	 * @param output1
-	 * @param output2
+	 * Method comapring the two condition, two file are done one for the positive number (higher value in the first condition), the other for teh negative value
+	 *  (higher value in the second condition)
+	 * @param file1 input file for the first condition
+	 * @param file2 input file for the second condition
+	 * @param output1	output directory for the first condition
+	 * @param output2 output directory for the second condition
 	 * @throws IOException
 	 */
-	
 	private void compare(String file1, String file2, String output1, String output2) throws IOException{
 		BufferedWriter writer1 = new BufferedWriter(new FileWriter(new File(output1)));
 		BufferedWriter writer2 = new BufferedWriter(new FileWriter(new File(output2)));
@@ -308,55 +319,9 @@ public class HiCFileComparison {
 	}
 	
 	/**
-	 * 
-	 * @param imgFilter
-	 * @param temp
-	 * @param isObserved
-	 */
-	
-	private HashMap<String,Loop>  removeMaximaCloseToZero(ImagePlus imgFilter, HashMap<String,Loop> temp,boolean isObserved){ 
-		Set<String> key = temp.keySet();
-		Iterator<String> it = key.iterator();
-		ImageProcessor ip = imgFilter.getProcessor();
-		ArrayList<String> toRemove = new ArrayList<String>();
-		int thresh = 3;
-		if (isObserved)	thresh = 1;
-		while (it.hasNext()){
-			String cle = it.next();
-			Loop loop = temp.get(cle);
-			int i = loop.getX();
-			int j = loop.getY();
-			int nb =0;
-			if (i-1> 0 && i+1< imgFilter.getWidth()){
-				if(j-1 > 0 && j+1 < imgFilter.getHeight()){
-					for(int ii = i-1; ii <= i+1; ++ii){
-						for(int jj = j-1; jj <= j+1; ++jj){
-							if (ip.getPixel(ii, jj)<=0){
-								nb++;
-								if (nb >= thresh ){
-									toRemove.add(cle);
-									break;
-								}
-							}
-						}
-					}
-				}
-			}
-			else{
-				
-			}
-		}
-		
-		for(int i = 0; i < toRemove.size();++i){
-			temp.remove(toRemove.get(i));
-		}
-		return temp;
-	}
-	
-	
-	/**
-	 * 
-	 * @param chrSizeFile
+	 * method stocking the reference file of the loops in hashMAP of string and string, 
+	 * @param file
+	 * @return HashMap<String,String>
 	 * @throws IOException
 	 */
 	private HashMap<String,String> readFile( String file) throws IOException{
@@ -369,7 +334,6 @@ public class HiCFileComparison {
 		while (line != null){
 			sb.append(line);
 			String[] parts = line.split("\\t");				
-			//System.out.println(line);
 			String loops = parts[0].replaceAll("chr","")+"\t"+parts[1]+"\t"+parts[4]; 
 			resu.put(loops, "");
 			sb.append(System.lineSeparator());
@@ -380,7 +344,7 @@ public class HiCFileComparison {
 	} 
 	
 	/**
-	 * 
+	 * Setter for the strength of the min filter
 	 * @param min
 	 */
 	public void setMin(double min){
@@ -388,7 +352,7 @@ public class HiCFileComparison {
 	}
 	
 	/**
-	 * 
+	 * Setter of the gaussain blur strength
 	 * @param gauss
 	 */
 	public void setGauss(double gauss){
@@ -396,7 +360,7 @@ public class HiCFileComparison {
 	}
 	
 	/**
-	 * 
+	 * Setter of the diagonal size
 	 * @param diag
 	 */
 	public void setDiag(int diag){
@@ -404,7 +368,7 @@ public class HiCFileComparison {
 	}
 	
 	/**
-	 * 
+	 * Setter of the threshold for the maxima detection
 	 * @param thresh
 	 */
 	public void setThreshold(int thresh){

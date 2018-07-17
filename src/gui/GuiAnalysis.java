@@ -98,15 +98,11 @@ public class GuiAnalysis extends JFrame
 	/** */
 	private JFormattedTextField m_resolution = new JFormattedTextField(Number.class);
 	/** */
-	private JFormattedTextField m_step =  new JFormattedTextField(Number.class);
-	/** */
 	private JFormattedTextField m_diagSize =  new JFormattedTextField(Number.class);
 	/** */
     private JLabel m_jlMatrixSize;
     /** */
     private JLabel m_jlResolution;
-    /** */
-    private JLabel m_jlStep;
     /** */
     private JLabel m_jldiagSize;
     /** */
@@ -155,7 +151,7 @@ public class GuiAnalysis extends JFrame
     
 	public GuiAnalysis(){
 		///////////////////////////////////////////// Global parameter of the JFram and def of the gridBaglayout
-		this.setTitle("NO NAME program.....");
+		this.setTitle("SIP_HiC program.....");
 		this.setSize(550, 780);
 		this.setLocationRelativeTo(null);
 		this.setResizable(false);
@@ -398,12 +394,7 @@ public class GuiAnalysis extends JFrame
 				)
 		);
 		
-	   	
-	   	
-	   	
-	   	
-		/////////////////////////// second case
-		
+		////////////////////////// second case
 		m_imgParam = new JLabel();
 		m_imgParam.setText("Matrix parameters:");
 		m_imgParam.setFont(new java.awt.Font("arial",1,12));
@@ -457,26 +448,6 @@ public class GuiAnalysis extends JFrame
 				)
 			);
 		
-	
-		m_jlStep = new JLabel();
-		m_jlStep.setText("Step (in bins):");
-		m_jlStep.setFont(new java.awt.Font("arial",2,11));
-		m_container.add	( m_jlStep,new GridBagConstraints
-			(
-				0, 2, 0, 0, 0.0, 0.0, GridBagConstraints.NORTHWEST,
-				GridBagConstraints.NONE, new Insets(115, 20, 0, 0), 0, 0
-		    )
-		);
-		
-		m_step.setText("1000");
-		m_step.setPreferredSize(new java.awt.Dimension(60, 21));
-		m_step.setFont(new java.awt.Font("arial",2,11));
-		m_container.add( m_step, new GridBagConstraints
-			(
-				0, 2,0, 0, 0.0, 0.0, GridBagConstraints.NORTHWEST,
-				GridBagConstraints.NONE, new Insets(110, 170, 0, 0), 0, 0
-		    )
-		);
 		
 		m_jlResolution = new JLabel();
 		m_jlResolution.setText("Resolution (in bases):");
@@ -744,15 +715,6 @@ public class GuiAnalysis extends JFrame
 	public int getResolution(){
 		String x = m_resolution.getText();
 		return Integer.parseInt(x.replaceAll(",", ".")); 
-	}
-	
-	/**
-	 * 
-	 * @return
-	 */
-	public int getStep(){
-		String x = m_step.getText();
-		return Integer.parseInt(x.replaceAll(",", "."));
 	}
 	
 	/**

@@ -22,7 +22,6 @@ public class TestComparisonHicFile {
 		String input2 = "/home/plop/Bureau/DataSetImageHiC/SpermCtl_test/";
 		String loopsFile1 = "/home/plop/Bureau/DataSetImageHiC/BPASperm_test/loops_filtered.bed";
 		String loopsFile2 = "/home/plop/Bureau/DataSetImageHiC/SpermCtl_test/loops.bed";
-		int step = 500;
 		int matrixSize = 1000;
 		int resolution = 10000;
 		int diagSize = 4;
@@ -39,12 +38,12 @@ public class TestComparisonHicFile {
 				+ "diag size "+diagSize+"\n"
 				+ "resolution "+resolution+"\n"
 				+ "threshold "+thresholdMax+"\n"
-				+ "step "+step+"\n");
+				+ "\n");
 			
 		File file = new File(output);
 		if (file.exists()==false){file.mkdir();}
 			
-		HiCFileComparison plopi = new HiCFileComparison(input,loopsFile1,input2,loopsFile2, output, resolution, matrixSize, step);
+		HiCFileComparison plopi = new HiCFileComparison(input,loopsFile1,input2,loopsFile2, output, resolution, matrixSize);
 		plopi.setDiag(diagSize);
 		plopi.setGauss(gauss);
 		plopi.setMin(min);

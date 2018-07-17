@@ -72,7 +72,6 @@ public class Hic_main {
 			+"chrSizeFile: path to the chr file size, with the same name of the chr than in the hic file\n"
 			+"-res: resolution in bases (default 5000 bases)\n"
 			+"-mat: matrix size in bins (default 2000 bins)\n"
-			+"-s: step in bins size (default 1000 bins)\n"
 			+"-d: diagonal size in bins, allow to removed the maxima found at this size (eg: a size of 2 at 5000 bases resolution removed all the maxima"
 			+"with a distances inferior or equal to 10kb) (default 4 bins)\n"
 			+"-g: Gaussian filter: smooth the image to reduce the noise (default 1)\n"
@@ -160,7 +159,6 @@ public class Hic_main {
 				m_input2 = gui.getRawDataDir2();
 				m_bedfile1 = gui.getLoopFile1();
 				m_bedfile2 = gui.getLoopFile2();
-				m_step= gui.getStep();
 				m_matrixSize = gui.getMatrixSize();
 				m_diagSize = gui.getDiagSize();
 				m_resolution = gui.getResolution();
@@ -193,7 +191,7 @@ public class Hic_main {
 		BufferedWriter writer = new BufferedWriter(new FileWriter(new File(m_output+File.separator+"parameters.txt")));
 		
 		if (m_isCompare==false){
-			WholeGenomeAnalysis wga = new WholeGenomeAnalysis(m_output, m_chrSize, m_gauss, m_min, m_max, m_step, m_resolution, m_saturatedPixel, m_thresholdMax, m_diagSize, m_matrixSize);
+			WholeGenomeAnalysis wga = new WholeGenomeAnalysis(m_output, m_chrSize, m_gauss, m_min, m_max, m_resolution, m_saturatedPixel, m_thresholdMax, m_diagSize, m_matrixSize);
 			if(m_isHic){
 				System.out.println("hic mode:\ninput: "+m_input+"\noutput: "+m_output+"\njuiceBox: "+m_juiceBoxTools+"\nnorm: "+ m_juiceBoXNormalisation+"\ngauss: "+m_gauss+"\n"
 						+ "min: "+m_min+"\nmax: "+m_max+"\nmatrix size: "+m_matrixSize+"\ndiag size: "+m_diagSize+"\nresolution: "+m_resolution+"\nsaturated pixel: "+m_saturatedPixel
@@ -217,12 +215,12 @@ public class Hic_main {
 						+"\nthreshold: "+m_thresholdMax+"\nstep: "+m_step+"\nisObserved: "+m_isObserved+"\nisHic: "+m_isHic+"\nisProcessed: "+m_isProcessed+"\n");
 				if(m_isObserved){
 					writer.write("java -jar noName processed observed "+m_input+" "+m_chrSizeFile+" "+m_output+" "+m_gauss+" -mat "+m_matrixSize+" -d "+m_diagSize+" -res "+m_resolution
-							+" -t "+m_thresholdMax+" -s "+m_step+"\n");
+							+" -t "+m_thresholdMax+"\n");
 					wga.run("o",m_input);
 				}
 				else{
 					writer.write("java -jar noName processed oMe "+m_input+" "+m_chrSizeFile+" "+m_output+" "+m_gauss+" -mat "+m_matrixSize+" -d "+m_diagSize+" -res "+m_resolution
-							+" -t "+m_thresholdMax+" -s "+m_step+" -min: "+m_min+" -max: "+m_max+" -sat "+m_saturatedPixel+"\n");
+							+" -t "+m_thresholdMax+" -min: "+m_min+" -max: "+m_max+" -sat "+m_saturatedPixel+"\n");
 					wga.run("oMe",m_input);
 				}
 			}
@@ -230,11 +228,10 @@ public class Hic_main {
 		else if (m_isCompare){
 		
 			System.out.println("Compare parameter:\ninput 1 "+m_input+"\nbed file 1: "+m_bedfile1+"\ninput 2:"+m_input2+"\nbed file 2:"+m_bedfile2+"\noutput: "+m_output
-					+"\ngauss: "+m_gauss+"\nmin: "+m_min+"\nmatrix size: "+m_matrixSize+"\ndiag size: "+m_diagSize+"\nresolution: "+m_resolution+"\nthreshold: "+m_thresholdMax
-					+"\nstep: "+m_step+"\n");
+					+"\ngauss: "+m_gauss+"\nmin: "+m_min+"\nmatrix size: "+m_matrixSize+"\ndiag size: "+m_diagSize+"\nresolution: "+m_resolution+"\nthreshold: "+m_thresholdMax+"\n");
 			writer.write("java -jar noNameCompare "+m_input+" "+m_bedfile1+" "+m_input2+" "+m_bedfile2+" "+m_output+" -g "+m_gauss+" -min "+m_min+" -mat "+m_matrixSize
-					+" -d "+m_diagSize+" -res "+m_resolution+" -t "+m_thresholdMax+" -s "+m_step+"\n");
-			HiCFileComparison plopi = new HiCFileComparison(m_input,m_bedfile1,m_input2,m_bedfile2, m_output, m_resolution, m_matrixSize, m_step);
+					+" -d "+m_diagSize+" -res "+m_resolution+" -t "+m_thresholdMax+"\n");
+			HiCFileComparison plopi = new HiCFileComparison(m_input,m_bedfile1,m_input2,m_bedfile2, m_output, m_resolution, m_matrixSize);
 			plopi.setDiag(m_diagSize);
 			plopi.setGauss(m_gauss);
 			plopi.setMin(m_min);
@@ -269,7 +266,6 @@ public class Hic_main {
 	/**
 	 * -res: resolution in bases (default 5000 bases)
 	 * -mat: matrix size in bins (default 2000 bins)
-	 * -s: step in bins size (default 1000 bins)
 	 * -d: diagonal size in bins (default 2 bins)
 	 * -g: Gaussian filter (default 1)
 	 * -max: Maximum filter: increase the region of high intensity (default 1.5)
@@ -283,11 +279,7 @@ public class Hic_main {
 	private static void readOption(String args[], int index) throws IOException{
 		if(index < args.length){
 			for(int i = index; i < args.length;i+=2){
-				if(args[i].equals("-s")){
-					try{m_step =Integer.parseInt(args[i+1]);}
-					catch(NumberFormatException e){ returnError("-s",args[i+1],"int");} 
-				}
-				else if(args[i].equals("-res")){
+				if(args[i].equals("-res")){
 					try{m_resolution =Integer.parseInt(args[i+1]);}
 					catch(NumberFormatException e){ returnError("-res",args[i+1],"int");} 
 				}

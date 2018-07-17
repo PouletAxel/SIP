@@ -23,7 +23,6 @@ public class TestCallLoopsHicFile{
 		String input = "/home/plop/Bureau/DataSetImageHiC/mouseYonHee/inter_30.hic";
 		HashMap<String,Integer> chrsize = readChrSizeFile("/home/plop/Bureau/DataSetImageHiC/mm9_sizes.txt");
 		String juiceBoxTools = "/home/plop/Tools/juicer_tools.1.8.9_jcuda.0.8.jar";
-		int step = 500;
 		int matrixSize = 1000;
 		int resolution = 25000;
 		int diagSize = 1;
@@ -47,14 +46,13 @@ public class TestCallLoopsHicFile{
 				+ "resolution "+resolution+"\n"
 				+ "saturated pixel "+saturatedPixel+"\n"
 				+ "threshold "+thresholdMax+"\n"
-				+ "step "+step+"\n"
 				+ "isObserved "+isObserved+"\n");
 			
 			File file = new File(output);
 			if (file.exists()==false){file.mkdir();}
 			
 ///-d 4 -g 0.25 -t 20 -norm K
-			WholeGenomeAnalysis wga = new WholeGenomeAnalysis(output, chrsize, gauss, min, max, step, resolution, saturatedPixel, thresholdMax, diagSize, matrixSize);
+			WholeGenomeAnalysis wga = new WholeGenomeAnalysis(output, chrsize, gauss, min, max, resolution, saturatedPixel, thresholdMax, diagSize, matrixSize);
 			HicFileProcessing hfp =  new HicFileProcessing(input, wga, chrsize, juiceBoxTools, juiceBoXNormalisation);
 			if(isObserved) hfp.run(true);
 			else		hfp.run(false);
