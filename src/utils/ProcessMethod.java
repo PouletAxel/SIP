@@ -7,30 +7,32 @@ import ij.plugin.filter.RankFilters;
 import ij.process.ImageProcessor;
 
 /**
+ * Method of image pre-processing before call maxima, to enhance the loops and reduce the noise
+ * This class is using the ImageJ methode for the different filters (min, max, gaussian).
  * 
- * @author plop
+ * @author axel poulet
  *
  */
 public class ProcessMethod{
-	/** */
-	ImagePlus m_img = new ImagePlus();
-	/** */
+	/** Raw image*/
+	ImagePlus m_img;
+	/** ImageProcessor of the raw image*/
 	ImageProcessor m_ip;
-	/** */
+	/** value for the min filter strength*/
 	double m_minFilterRadius = 0;
-	/** */
+	/** max filter strength*/
 	double m_maxFilterRadius = 0;
-	/** */
+	/** gaussian filter strength*/
 	double m_gaussianFilterRadius = 0;
-	/** */
+	/** ImageJ object to run the different filters*/
 	RankFilters m_rF = new RankFilters();
 
 	/**
-	 * 
-	 * @param img
-	 * @param minFilterRad
-	 * @param maxFilterRad
-	 * @param gaussianFilterRad
+	 * Constructor of ProcessMethod
+	 * @param img ImagePlus, raw image  
+	 * @param minFilterRad double, value of the min strength filter
+	 * @param maxFilterRad double, value of the max strength filter
+	 * @param gaussianFilterRad double, value of the gaussian strength filter
 	 */
 	public ProcessMethod(ImagePlus img, double minFilterRad, double maxFilterRad, double gaussianFilterRad){
 		m_img = img;
@@ -41,9 +43,9 @@ public class ProcessMethod{
 	}
 	
 	/**
-	 * 
-	 * @param img
-	 * @param gaussianFilterRad
+	 * Constructor of ProcessMethod
+	 * @param img ImagePlus, raw image 
+	 * @param gaussianFilterRad double, value of the gaussian strength filter
 	 */
 	public ProcessMethod(ImagePlus img, double gaussianFilterRad){
 		m_img = img;
@@ -52,8 +54,9 @@ public class ProcessMethod{
 	}
 	
 	/**
-	 * //rao 2015 => 0.05
-	 * //cubenas 0.02
+	 * ImageJ method to enhance the image contrats, and enhance the structures of interest
+	 * @param saturatedPixel double of the % of the saturated pixel want in the ehanced image
+	 * 
 	 */
 	public void enhanceContrast(double saturatedPixel){
 		ContrastEnhancer enh = new ContrastEnhancer();
@@ -63,8 +66,8 @@ public class ProcessMethod{
 	}
 	
 	/**
-	 * 
-	 * @param min
+	 * Minimum filter method
+	 * @param min double strength of the min filter
 	 */
 	public void runMin(double min){	
 		m_rF.rank(m_ip, min, RankFilters.MIN);
@@ -72,6 +75,7 @@ public class ProcessMethod{
 	
 		
 	/**
+	 * White "tophat" method to enhance the light structure
 	 * 
 	 */
 	public void topHat(){
@@ -84,16 +88,16 @@ public class ProcessMethod{
 	}
 	
 	/**
-	 * 
-	 * @return
+	 * Getter of the image filtered
+	 * @return ImagePlus image filtered
 	 */
 	public ImagePlus getImg(){
 		return m_img;
 	}
 	
 	/**
-	 * 
-	 * @param m_img
+	 * Setter of the raw image
+	 * @param m_img raw Image
 	 */
 	public void setImg(ImagePlus img){
 		this.m_img = img;
@@ -101,7 +105,8 @@ public class ProcessMethod{
 	
 
 	/**
-	 * 
+	 * Gaussian blur method
+	 * run this methode on m_img
 	 */
 	public void runGaussian() {
 		GaussianBlur gb = new GaussianBlur();

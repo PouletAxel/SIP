@@ -8,25 +8,26 @@ import ij.ImagePlus;
 import ij.process.ImageProcessor;
 
 /**
- * 
- * @author plop
+ * Peak analysis score. 
+ * peaks analysis score is adapted from the APA score from Rao&Huntley et al., 2014: 
+ * @author axel poulet
  *
  */
 public class PeakAnalysisScore {
-	/** */
+	/** Raw image of the matrix*/
 	private ImagePlus m_imgRaw = new ImagePlus();
-	/** */
+	/** HashMap of object loops*/
 	private HashMap<String,Loop> m_data = new HashMap<String,Loop>();
-	/** */
+	/** ImageProcessor of the raw ImagePlus*/
 	private ImageProcessor m_ipRaw;
-	/** */
+	/** arrayList of integer */
 	private ArrayList<Integer> m_countNonZero = new ArrayList<Integer> (); 
 	
 	/**
-	 * 
-	 * @param imgRaw
-	 * @param data
-	 * @param countNonZero
+	 * Constructor of PeakAnalysisScore
+	 * @param imgRaw ImagePlus raw image
+	 * @param data HashMap of loops
+	 * @param countNonZero ArrayList of integer to know which col possess to much zero => white Strips.
 	 */
 	public PeakAnalysisScore(ImagePlus imgRaw, HashMap<String,Loop> data,ArrayList<Integer> countNonZero){
 		this.m_imgRaw = imgRaw;
@@ -36,9 +37,9 @@ public class PeakAnalysisScore {
 	}
 	
 	/**
-	 * 
-	 * @param imgRaw
-	 * @param data
+	 * Constructor of PeakAnalysisScore
+	 * @param imgRaw Image raw
+	 * @param data HashMap of loops.
 	 */
 	public PeakAnalysisScore(ImagePlus imgRaw, HashMap<String,Loop> data){
 		this.m_imgRaw = imgRaw;
@@ -48,6 +49,9 @@ public class PeakAnalysisScore {
 	
 	
 	/**
+	 * Method to compute the score of each loop. on a 11*11 square, the average of the corner (3*3) are computed. then the ration between the loops value and this avg is computed.
+	 * For the regional value, the avg of the n_8 value of the loops are done, then a ratio is computed with the avg value of the corner,
+	 * This method is used for the observed and oMe method.
 	 * 
 	 */
 	public void computeScore(){
@@ -61,43 +65,28 @@ public class PeakAnalysisScore {
 			double corner = 0;
 			double cornerAvg = 0;
 			double center = m_ipRaw.getPixel(x, y);
-			int nbPixel = 0;
-			//int nbZero = 0;
-			//double squareCenterMed = process3By3Square(x,y);
 			double squareCenterAvg = process3By3SquareAvg(x,y);
 			int nbCorner = 0;
-			if(x>=5 && y>=5 && x<m_imgRaw.getWidth()-5 && y < m_imgRaw.getHeight()-5){
-				if(m_countNonZero.get(x-3)> 0 && m_countNonZero.get(x-4)>0 &&  m_countNonZero.get(x-5)> 0){
-					if(m_countNonZero.get(y-3)> 0 && m_countNonZero.get(y-4)>0 &&  m_countNonZero.get(y-5)> 0){
-						//corner += process3By3Square(x-4,y-4);
+			if(x >= 5 && y >= 5 && x < m_imgRaw.getWidth()-5 && y < m_imgRaw.getHeight()-5){
+				if(m_countNonZero.get(x-3) > 0 && m_countNonZero.get(x-4) > 0 &&  m_countNonZero.get(x-5) > 0){
+					if(m_countNonZero.get(y-3) > 0 && m_countNonZero.get(y-4) >0 &&  m_countNonZero.get(y-5) > 0){
 						cornerAvg += process3By3SquareAvg(x-4,y-4); 
-						nbPixel += process3By3SquareSup(x-4,y-4,(int)center);
-						//nbZero += process3By3SquareZero(x-4,y-4);
-						nbCorner++;
+						++nbCorner;
 					}
-					if(m_countNonZero.get(y+3)> 0 && m_countNonZero.get(y+4)>0 &&  m_countNonZero.get(y+5)> 0){
-						//corner += process3By3Square(x-4,y+4);
+					if(m_countNonZero.get(y+3) > 0 && m_countNonZero.get(y+4) > 0 &&  m_countNonZero.get(y+5) > 0){
 						cornerAvg += process3By3SquareAvg(x-4,y+4);
-						nbPixel += process3By3SquareSup(x-4,y+4,(int)center);
-						//nbZero += process3By3SquareZero(x-4,y+4);
-						nbCorner++;
+						++nbCorner;
 					}
 				}
 			
-				if(m_countNonZero.get(x+3)> 0 && m_countNonZero.get(x+4)>0 &&  m_countNonZero.get(x+5)> 0){
-					if(m_countNonZero.get(y-3)> 0 && m_countNonZero.get(y-4)>0 &&  m_countNonZero.get(y-5)> 0){
-						//corner += process3By3Square(x+4,y-4);
+				if(m_countNonZero.get(x+3) > 0 && m_countNonZero.get(x+4) > 0 &&  m_countNonZero.get(x+5) > 0){
+					if(m_countNonZero.get(y-3) > 0 && m_countNonZero.get(y-4) > 0 &&  m_countNonZero.get(y-5) > 0){
 						cornerAvg += process3By3SquareAvg(x+4,y-4);
-						nbPixel += process3By3SquareSup(x+4,y-4,(int)center);
-						//nbZero += process3By3SquareZero(x+4,y-4);
-						nbCorner++;
+						++nbCorner;
 					}
-					if(m_countNonZero.get(y+3)> 0 && m_countNonZero.get(y+4)>0 &&  m_countNonZero.get(y+5)> 0 && x-y >= 10){
-						//corner += process3By3Square(x+4,y+4);
+					if(m_countNonZero.get(y+3) > 0 && m_countNonZero.get(y+4) > 0 &&  m_countNonZero.get(y+5) > 0 && x-y >= 10){
 						cornerAvg += process3By3SquareAvg(x+4,y+4);
-						nbPixel += process3By3SquareSup(x+4,y+4,(int)center);
-						//nbZero += process3By3SquareZero(x+4,y+4);
-						nbCorner++;
+						++nbCorner;
 					}
 				}
 			}
@@ -105,21 +94,16 @@ public class PeakAnalysisScore {
 			if(nbCorner > 0){
 				corner = corner/nbCorner;
 				cornerAvg = cornerAvg/nbCorner;
-				//loop.setPaScoreMed(center/corner);
 				loop.setPaScoreAvg(center/cornerAvg);
-				//loop.setRegionalPaScoreMed(squareCenterMed/corner);
 				loop.setRegionalPaScoreAvg(squareCenterAvg/cornerAvg);	
-				loop.setPercentage(100*nbPixel/(nbCorner*9));
-				//loop.setPercentageOfZero(100*nbZero/(nbCorner*9));
 			}
 		}
 	}
 	
-	
-	
-	
 	/**
-	 * 
+	 * Method to compute the score of each loop. on a 11*11 square, the average of the corner (3*3) are computed. then the ration between the loops value and this avg is computed.
+	 * For the regional value, the avg of the n_8 value of the loops are done, then a ratio is computed with the avg value of the corner,
+	 * This method is used for compare method. in theis method the white strips are ignored.
 	 */
 	public void computeScoreCompareMethod(){
 		Set<String> key = m_data.keySet();
@@ -132,80 +116,26 @@ public class PeakAnalysisScore {
 			double corner = 0;
 			double cornerAvg = 0;
 			double center = m_ipRaw.getPixel(x, y);
-			int nbPixel = 0;
-			//int nbZero = 0;
-			//double squareCenterMed = process3By3Square(x,y);
 			double squareCenterAvg = process3By3SquareAvg(x,y);
 			int nbCorner = 0;
-			if(x>=5 && y>=5 && x<m_imgRaw.getWidth()-5 && y < m_imgRaw.getHeight()-5){
-				//corner += process3By3Square(x-4,y-4);
+			if(x >= 5 && y >= 5 && x < m_imgRaw.getWidth()-5 && y < m_imgRaw.getHeight()-5){
 				cornerAvg += process3By3SquareAvg(x-4,y-4); 
-				nbPixel += process3By3SquareSup(x-4,y-4,(int)center);
-				//nbZero += process3By3SquareZero(x-4,y-4);
-				nbCorner++;
+				++nbCorner;
 			}
-		if(nbCorner > 0){
-			corner = corner/nbCorner;
-			cornerAvg = cornerAvg/nbCorner;
-			//loop.setPaScoreMed(center/corner);
-			loop.setPaScoreAvg(center/cornerAvg);
-			//loop.setRegionalPaScoreMed(squareCenterMed/corner);
-			loop.setRegionalPaScoreAvg(squareCenterAvg/cornerAvg);	
-			loop.setPercentage(100*nbPixel/(nbCorner*9));
-			//loop.setPercentageOfZero(100*nbZero/(nbCorner*9));
-		}
-	}
-}	
-	/**
-	 * 
-	 * @param x
-	 * @param y
-	 * @param pixelValue
-	 * @return
-	 */
-	private int process3By3SquareSup(int x, int y, int pixelValue){
-		int cmp = 0;
-		for(int i = x-1; i <= x+1; ++i){
-			for(int j = y-1; j <= y+1; ++j){		
-				if(pixelValue > this.m_ipRaw.getPixel(i, j)) ++cmp;
+			if(nbCorner > 0){
+				corner = corner/nbCorner;
+				cornerAvg = cornerAvg/nbCorner;
+				loop.setPaScoreAvg(center/cornerAvg);
+				loop.setRegionalPaScoreAvg(squareCenterAvg/cornerAvg);	
 			}
-		}
-		return cmp;
-	}
+		}	
+	}	
 	
-	/*
-	private int process3By3SquareZero(int x, int y){
-		int cmp = 0;
-		for(int i = x-1; i <= x+1; ++i){
-			for(int j = y-1; j <= y+1; ++j){		
-				if(this.m_ipRaw.getPixel(i, j) == 0) ++cmp;
-			}
-		}
-		return cmp;
-	}*/
 	
 	/**
-	 * 
-	 * @param x
-	 * @param y
-	 * @return
-	 */
-	/*private double process3By3Square(int x, int y){
-		int []value = new int [9];
-		int cmp = 0;
-		for(int i = x-1; i <= x+1; ++i){
-			for(int j = y-1; j <= y+1; ++j){		
-				value[cmp] = this.m_ipRaw.getPixel(i, j);
-				++cmp;
-			}
-		}
-		return median(value);
-	}*/
-	
-	/**
-	 * 
-	 * @param x
-	 * @param y
+	 * compute the avg of3*3 square
+	 * @param x int coordinate of the pixel center
+	 * @param y int coordinat of the pixel center
 	 * @return
 	 */
 	private double process3By3SquareAvg(int x, int y){
@@ -217,15 +147,4 @@ public class PeakAnalysisScore {
 		}
 		return sum/9;
 	}
-	
-	
-	/*private double median (int[] value ){
-		Arrays.sort(value);
-		double median;
-		if (value.length % 2 == 0)
-			median = ((double)value[value.length/2] + (double)value[value.length/2 - 1])/2;
-		else
-			median = (double) value[value.length/2];
-		return median;
-	}*/
 }

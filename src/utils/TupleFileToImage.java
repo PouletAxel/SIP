@@ -9,10 +9,10 @@ import ij.process.ShortProcessor;
 
 /**
  * 
- * @author plop
+ * @author axel poulet
  *
  */
-public class TupleFileImage {
+public class TupleFileToImage {
 	
 	/** */
 	private ImagePlus m_img = new ImagePlus();
@@ -20,17 +20,19 @@ public class TupleFileImage {
 	private String m_file = "";
 	/** */
 	private int m_size = 0 ;
-	
+	/** */
 	private int m_resolution = 0 ;
+	/** */
 	private int m_step = 0 ;
 	/** */
 	private double m_avg = 0;
+	/** */
 	private double m_std = 0;
 	
 	/**
 	 * 
 	 */
-	public TupleFileImage(String fileMatrix, int size, int step, int resolution){
+	public TupleFileToImage(String fileMatrix, int size, int step, int resolution){
 		m_file = fileMatrix;
 		m_size = size;
 		m_resolution = resolution;

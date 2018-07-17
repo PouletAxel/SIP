@@ -20,7 +20,7 @@ import utils.FindMaxima;
 import utils.Loop;
 import utils.PeakAnalysisScore;
 import utils.ProcessMethod;
-import utils.TupleFileImage;
+import utils.TupleFileToImage;
 
 /**
  * Class to compare two experiments of HiC with the same resolution. The loops for the individual file have to be call. Then the program dump the observed and expected value
@@ -142,7 +142,7 @@ public class HiCFileComparison {
 	 * @throws IOException
 	 */
 	private String createImageFile(String input) throws IOException{
-		TupleFileImage readFile = new TupleFileImage(input,m_matrixSize,m_step,m_resolution);
+		TupleFileToImage readFile = new TupleFileToImage(input,m_matrixSize,m_step,m_resolution);
 		String imageName = input.replaceAll(".txt", ".tif");
 		ImagePlus imgRaw = readFile.readTupleFile();
 		imgRaw.setTitle(imageName);
@@ -242,7 +242,7 @@ public class HiCFileComparison {
 			System.out.println("plopi "+loop.getChr()+"\t"+coord.get(2)+"\t"+coord.get(3));
 			
 			writer.write(loop.getChr()+"\t"+coord.get(2)+"\t"+coord.get(3)+"\t"+loop.getChr()+"\t"+coord.get(0)+"\t"+coord.get(1)+"\t255,125,255"
-				+"\t"+loop.getPaScoreAvg()+"\t"+loop.getRegionalPaScoreAvg()+"\t"+loop.getPercentage()+"\n"); 
+				+"\t"+loop.getPaScoreAvg()+"\t"+loop.getRegionalPaScoreAvg()+"\n"); 
 		}
 		writer.close();
 	}

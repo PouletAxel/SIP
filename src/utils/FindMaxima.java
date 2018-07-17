@@ -9,6 +9,9 @@ import ij.process.ByteProcessor;
 import ij.process.ImageProcessor;
 
 /**
+ * Class to detect the Maxima in image. Return the HashMap<String,Loop>, the loop can be corrected.
+ * 
+ * the class use the imageJ class to detect the maxima.
  * 
  * @author axel poulet
  *
@@ -16,7 +19,7 @@ import ij.process.ImageProcessor;
 public class FindMaxima{
 	/**	 raw image*/
 	private ImagePlus m_img;
-	/**	 name of teh chromosome*/
+	/**	 name of the chromosome*/
 	private String m_chr;
 	/**	 Image fileterred with min, max and gaussian filter*/
 	private ImagePlus m_imgFilter;
@@ -195,7 +198,6 @@ public class FindMaxima{
 					else{
 						for(int ii=i-2; ii<=i+2; ++ii){
 							for(int jj = j-2; jj <= j+2; ++jj){
-								//System.out.println(ii+" "+jj);
 								if(max < rawIp.get(ii, jj)){
 									imax = ii;
 									jmax = jj;

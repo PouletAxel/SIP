@@ -141,16 +141,15 @@ public class WholeGenomeAnalysis {
 		BufferedWriter writer = new BufferedWriter(new FileWriter(new File(pathFile)));
 		Set<String> key = m_data.keySet();
 		Iterator<String> it = key.iterator();
-		writer.write("chromosome1\tx1\tx2\tchromosome2\ty1\ty2\tcolor\tAPScoreAVG\tRegAPScoreAVG\t%OfPixelInfToTheCenter\tAvg_diffMaxNeihgboor_1\tAvg_diffMaxNeihgboor_2\tavg\tstd\tvalue\t%ofZeroInneigh\n");
+		writer.write("chromosome1\tx1\tx2\tchromosome2\ty1\ty2\tcolor\tAPScoreAVG\tRegAPScoreAVG\tAvg_diffMaxNeihgboor_1\tAvg_diffMaxNeihgboor_2\tavg\tstd\tvalue\t%ofZeroInneigh\n");
 		while (it.hasNext()){
 			String cle = it.next();
 			Loop loop = m_data.get(cle);
 			ArrayList<Integer> coord = loop.getCoordinates();
-			double a =  loop.getAvg();//getNeigbhoord1()/loop.getNeigbhoord2();
 			//if(loop.getPaScoreAvg()>0){
 				writer.write(loop.getChr()+"\t"+coord.get(2)+"\t"+coord.get(3)+"\t"+loop.getChr()+"\t"+coord.get(0)+"\t"+coord.get(1)+"\t0,0,0"
 					+"\t"+loop.getPaScoreAvg()+"\t"+loop.getRegionalPaScoreAvg()
-					+"\t"+loop.getPercentage()+"\t"+loop.getNeigbhoord1()+"\t"+loop.getNeigbhoord2()+"\t"+loop.getAvg()+"\t"+loop.getStd()+"\t"+loop.getValue()+"\t"+loop.getPercentageOfZero()+"\n");
+					+"\t"+loop.getNeigbhoord1()+"\t"+loop.getNeigbhoord2()+"\t"+loop.getAvg()+"\t"+loop.getStd()+"\t"+loop.getValue()+"\t"+loop.getPercentageOfZero()+"\n");
 			//}
 		}
 		writer.close();
@@ -176,7 +175,7 @@ public class WholeGenomeAnalysis {
 				// make and save image at two differents resolution (m_resolution and m_resolution*2)
 				String[] tfile = fileList[i].toString().split("_");
 				int numImage = Integer.parseInt(tfile[tfile.length-2])/(m_step*m_resolution);
-				TupleFileImage readFile = new TupleFileImage(fileList[i].toString(),m_matrixSize,m_step,m_resolution);
+				TupleFileToImage readFile = new TupleFileToImage(fileList[i].toString(),m_matrixSize,m_step,m_resolution);
 				String imageName = fileList[i].toString().replaceAll(".txt", ".tif");
 				ImagePlus imgRaw = readFile.readTupleFile();
 				imgRaw.setTitle(imageName);
