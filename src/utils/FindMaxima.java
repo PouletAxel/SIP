@@ -10,36 +10,37 @@ import ij.process.ImageProcessor;
 
 /**
  * 
- * @author plop
+ * @author axel poulet
  *
  */
 public class FindMaxima{
-	/**	 */
+	/**	 raw image*/
 	private ImagePlus m_img;
-	/**	 */
+	/**	 name of teh chromosome*/
 	private String m_chr;
-	/**	 */
+	/**	 Image fileterred with min, max and gaussian filter*/
 	private ImagePlus m_imgFilter;
-	/**	 */
+	/**	binary image pixel white = the maxima detected*/
 	private ImagePlus m_imgResu = new ImagePlus();
-	/**	 */
-	private double m_noiseTolerance;
-	/**	 */
-	private int m_diagSize;
-	/**	 */
-	private int m_resolution;
-	/**	 */
+	/**	 threshold for the imageJ class MaximumFinder, this class is call to detecte the maxima */
+	private double m_noiseTolerance =-1;
+	/**	diagonal size in bin*/
+	private int m_diagSize =-1;
+	/**	 Resolution of the image in base*/
+	private int m_resolution = -1;
+	/**	 HashMap<String,Loop>  collection of Object loop initialised in this class.*/
 	private HashMap<String,Loop> m_data = new HashMap<String,Loop>();
-	/** */
+	/** arrayList of int each occurence is a x coordinate of the image, the value of this arrayList is an integer if = 0 it is a whithe strip*/
 	ArrayList<Integer> m_countNonZero = new ArrayList<Integer>(); 
 	
 	/**
-	 * 
-	 * @param img
-	 * @param imgFilter
-	 * @param chr
-	 * @param noiseTolerance
-	 * @param diag
+	 * Constructor of FindMaxima
+	 * @param img ImagePlus raw image
+	 * @param imgFilter ImagePlus filtered image
+	 * @param chr String chromosome
+	 * @param noiseTolerance double threshold to detect maxima
+	 * @param diag int the size of the diagonal
+	 * @param resolution int size of the pixel in base
 	 */
 	public FindMaxima(ImagePlus img, ImagePlus imgFilter, String chr, double noiseTolerance, int diag, int resolution){
 		m_img = img;
@@ -51,12 +52,14 @@ public class FindMaxima{
 	}
 	
 	/**
-	 * 
-	 * @param img
-	 * @param imgFilter
-	 * @param chr
-	 * @param noiseTolerance
-	 * @param diag
+	 * Constructor of FindMaxima
+	 * @param img ImagePlus raw image
+	 * @param imgFilter ImagePlus filtered image
+	 * @param chr String chromosome
+	 * @param noiseTolerance double threshold to detect maxima
+	 * @param diag	int the size of the diagonal
+	 * @param resolution int  the size of the diagonal
+	 * @param countNonZero ArrayList<Integer> array list locate the whit strip in the original matrix
 	 */
 	public FindMaxima(ImagePlus img, ImagePlus imgFilter, String chr, double noiseTolerance, int diag, int resolution,ArrayList<Integer> countNonZero){
 		m_img = img;
@@ -69,9 +72,9 @@ public class FindMaxima{
 	}
 	
 	/**
-	 * 
+	 * Method to find loops in the image for observed and oMe, and fill the loop collection. This method also initiate the object loop,
 	 * @param isObserved
-	 * @return
+	 * @return HashMap<String,Loop>
 	 */
 	public HashMap<String,Loop> findloop(boolean isObserved){
 		run(isObserved);
@@ -90,7 +93,6 @@ public class FindMaxima{
 				Loop maxima = new Loop(temp.get(j),x,y,m_chr,avg,std,value);
 				maxima.setNeigbhoord1(da.getNeighbourhood1());
 				maxima.setNeigbhoord2(da.getNeighbourhood2());
-				//maxima.setAvg(avg);
 				maxima.setPercentageOfZero(PercentOfneihgboordEqual0(x,y));
 				maxima.setResolution(m_resolution);
 				maxima.setDiagSize(m_diagSize);
@@ -104,7 +106,8 @@ public class FindMaxima{
 	}
 	
 	/**
-	 * 
+	 * Method to find loops in the image for the compare method, and fill the loop collection. This method also initiate the object loop,
+	 * @return HashMap<String,Loop>
 	 */
 	public HashMap<String,Loop> findloopCompare(){
 		runForComparison();
@@ -115,17 +118,20 @@ public class FindMaxima{
 			int y = Integer.parseInt(parts[1]);
 			String name= m_chr+"\t"+temp.get(j);
 			Loop maxima = new Loop(temp.get(j),x,y,m_chr);
+			maxima.setResolution(m_resolution);
+			maxima.setDiagSize(m_diagSize);
+			maxima.setMatrixSize(m_img.getWidth());
 			m_data.put(name, maxima);
 		}
 		return m_data;
 	}
 	
 	/**
-	 * 
-	 * @param isObserved
-	 * @return
+	 * Detect maxima with the oMe or observed methods, call the different methods 
+	 * to detect the maxima and correct them. 
+	 * @param isObserved, if true =>obersved method, else oMe
 	 */
-	public void run(boolean isObserved){
+	private void run(boolean isObserved){
 		ImagePlus temp = m_imgFilter.duplicate();
 		ImageProcessor ip = temp.getProcessor();
 		MaximumFinder mf = new MaximumFinder(); 
@@ -137,10 +143,9 @@ public class FindMaxima{
 	}
 	
 	/**
-	 * 
-	 * @return
+	 * detect the maxima for the comparison method, to detect the maxima and correct them.
 	 */
-	public void runForComparison(){
+	private void runForComparison(){
 		ImagePlus temp = m_imgFilter.duplicate();
 		ImageProcessor ip = temp.getProcessor();
 		MaximumFinder mf = new MaximumFinder(); 
@@ -150,19 +155,20 @@ public class FindMaxima{
 	}
 	
 	/**
-	 * 
-	 * @param imagePlusInput
-	 * @param pathFile
+	 * Save the image 
+	 * @param imagePlusInput: ImagePlus to save
+	 * @param pathFile: path file for the image
 	 */	
-	public static void saveFile ( ImagePlus imagePlusInput, String pathFile)
-	{
+	public static void saveFile ( ImagePlus imagePlusInput, String pathFile){
 		FileSaver fileSaver = new FileSaver(imagePlusInput);
 	    fileSaver.saveAsTiff(pathFile);
 	}
 
 	/**
+	 * Correction of the maxima. Search around the detected maxima on the raw image,
+	 * To correct the shift of maxima due to the gaussian, min and max filter.
+	 *   
 	 * 
-	 * @return
 	 */
 	private void correctMaxima(){
 		ImageProcessor rawIp  = m_img.getProcessor();
@@ -209,21 +215,21 @@ public class FindMaxima{
 	}
 	
 	/**
-	 * 
-	 * @param rawImage
+	 * Test if two maxima are close removed this one which possess the smaller value.
+	 * Test a 48 neighbourhood region
 	 */
 	private void removedCloseMaxima(){
 		ImageProcessor rawIp  = m_img.getProcessor();
 		int w = rawIp.getWidth();
 		int h = rawIp.getHeight();
 		ImageProcessor ipMaxima = m_imgResu.getProcessor();
-		for(int i = 1; i< w-1; ++i){
-			for(int j= 1; j< h-1; ++j){		
+		for(int i = 1; i < w-1; ++i){
+			for(int j= 1; j < h-1; ++j){		
 				if (ipMaxima.getPixel(i,j) > 0){
-					for(int ii=i-3; ii <= i+3; ++ii){
+					for(int ii = i-3; ii <= i+3; ++ii){
 						for(int jj = j-3; jj <= j+3; ++jj){	
 							if(ipMaxima.getPixel(ii,jj) > 0){
-								if(i != ii || j !=jj){
+								if(i != ii || j != jj){
 									if(rawIp.get(ii, jj) > rawIp.get(i,j))	ipMaxima.set(i,j,0);
 									else ipMaxima.set(ii,jj,0);							
 								}
@@ -237,9 +243,9 @@ public class FindMaxima{
 	}
 
 	/**
-	 * 
-	 * @param rawImage
-	 * @return
+	 * getter of maxima
+	 * retrun the list of maxima as list of string i\tj\tvalue
+	 * @return  ArrayList<String> 
 	 */
 	public ArrayList<String> getMaxima(){
 		int w = m_imgResu.getWidth();
@@ -247,8 +253,8 @@ public class FindMaxima{
 		ImageProcessor ipResu = m_imgResu.getProcessor();
 		ImageProcessor ip = m_img.getProcessor();
 		ArrayList<String> listMaxima = new ArrayList<String>();
-		for(int i =0; i< w; ++i){
-			for(int j=0;j< h;++j){
+		for(int i = 0; i < w; ++i){
+			for(int j = 0; j < h; ++j){
 				if (ipResu.getPixel(i,j) > 0 && i-j > 0){
 					listMaxima.add(i+"\t"+j+"\t"+ip.getPixel(i, j));
 				}
@@ -261,10 +267,10 @@ public class FindMaxima{
 	
 	
 	/**
-	 * 
-	 * @param x
-	 * @param y
-	 * @return
+	 * Compute the average on the neighbourhood 9
+	 * @param x  int x coordinate's of the loop
+	 * @param y  int y coordinate's of the loop
+	 * @return double avg around the loop on the neighbourhood
 	 */
 	private double average(int x, int y){
 		double sum = 0;
@@ -273,17 +279,17 @@ public class FindMaxima{
 		for(int i = x-1; i <= x+1; ++i){
 			for(int j = y-1; j <= y+1; ++j){		
 				sum +=ip.getPixel(i, j);
-				nb++;
+				++nb;
 			}
 		}
 		return sum/nb;
 	}
 	
 	/**
-	 * 
-	 * @param x
-	 * @param y
-	 * @return
+	 * Compute the percentage of the zero around the loop on the 24 neighbourhood and return the value 
+	 * @param x: int x coordinate's of the loop
+	 * @param y: int y coordinate's of the loop
+	 * @return double: percenatge of 0 around the loop
 	 */
 	private double PercentOfneihgboordEqual0(int x, int y){
 		double sum = 0;
@@ -291,27 +297,27 @@ public class FindMaxima{
 		ImageProcessor ip = m_img.getProcessor();
 		for(int i = x-2; i <= x+2; ++i){
 			for(int j = y-2; j <= y+2; ++j){
-				if((i != x || j != y) && ip.getPixel(i, j)<=0){
-					++sum;
-				}
-				nb++;
+				if((i != x || j != y) && ip.getPixel(i, j)<=0) ++sum;
+				++nb;
 			}
 		}
 		return 100*(sum/nb);
 	}
+	
 	/**
+	 * Compute standard deviation of the loop region at the neighbourhood 8.
 	 * 
-	 * @param x
-	 * @param y
-	 * @param mean
-	 * @return
+	 * @param x: int the x coordinate's of the loop
+	 * @param y: int y coordinate's of the loop
+	 * @param avg: double average of the same region
+	 * @return double: teh standard deviation
 	 */
-	private double standardDeviation(int x, int y, double mean){
+	private double standardDeviation(int x, int y, double avg){
 		double semc = 0;
 		ImageProcessor ip = m_img.getProcessor();
 		for(int i = x-1; i <= x+1; ++i){
 			for(int j = y-1; j <= y+1; ++j){
-				semc += (ip.getPixel(i, j)-mean)*(ip.getPixel(i, j)-mean);
+				semc += (ip.getPixel(i, j)-avg)*(ip.getPixel(i, j)-avg);
 			}	
 		}	
 		semc = semc/(double)9;
@@ -319,15 +325,17 @@ public class FindMaxima{
 	}
 	
 	/**
-	 * 
-	 * @param isObserved
+	 *	Removed maxima surrounded by several pixel with the 0 value. 
+	 *The method search the pixel with value 0 in the 24 neighbourhood around the initial maxima.
+	 * for the oMe method if the loops is suurounded by more than 6 0 the loops will be removed. For observed the thsreshold is smaller, 3.
+	 * ig the loops is closed too the diagonal the test is less stringent 7 for oMe methods and 4 for observed method. 
+	 * @param isObserved: boolean to know which methods is used allow to manage. if true it is the observed methode else the oMe method.
 	 */
 	private void removeMaximaCloseToZero(boolean isObserved){ 
 		int w = m_imgResu.getWidth();
 		int h = m_imgResu.getHeight();
 		ImageProcessor ipResu = m_imgResu.getProcessor();
 		ImageProcessor ip = m_img.getProcessor();
-	
 		for(int i =0; i< w; ++i){
 			for(int j=0;j< h;++j){
 				if(ipResu.getPixel(i, j) > 0){
@@ -352,6 +360,7 @@ public class FindMaxima{
 		}
 	}
 	
+	
 	/**
 	 * Method testing the presence of white strip in the neighboorhood 
 	 * 
@@ -368,12 +377,13 @@ public class FindMaxima{
 	
 	
 	/**
-	 * 
-	 * @param n
+	 * Setter of the noise tolerance parameter 
+	 * @param n int the value of the new noiseTolerance
 	 */
 	public void setNoiseTolerance( int n){
 		this.m_noiseTolerance = n;
 	}
+	
 	/*private void findOtherMaxima(){
 		ImagePlus img = m_img.duplicate();
 		ProcessMethod pm = new ProcessMethod(img,1.25);

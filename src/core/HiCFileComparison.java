@@ -129,7 +129,7 @@ public class HiCFileComparison {
 						file2.add(createImageFile(outputName2));
 					}
 				}
-				callLoop(file1,chr.toString().replaceAll("chr", ""),m_outdir1+File.separator+"loopsDiff1.bed",m_data1,m_ref1);
+				callLoop(file1,chr.toString(),m_outdir1+File.separator+"loopsDiff1.bed",m_data1,m_ref1);
 				callLoop(file2,chr,m_outdir2+File.separator+"loopsDiff2.bed",m_data2,m_ref2);
 			}
 		}
@@ -170,15 +170,18 @@ public class HiCFileComparison {
 			pm.runMin(m_min);
 			FindMaxima findLoop = new FindMaxima(img, imgFilter, chr, m_threshold, m_diagSize, m_resolution);
 			HashMap<String,Loop> temp = findLoop.findloopCompare();
-			System.out.println("before: "+temp.size());
-			temp = removeMaximaCloseToZero(img,temp,false);
-			System.out.println("after: "+temp.size());
+			//System.out.println("before: "+temp.size());
+			//temp = removeMaximaCloseToZero(img,temp,false);
+			
 			PeakAnalysisScore pas = new PeakAnalysisScore(img,temp);
 			pas.computeScoreCompareMethod();
 			coord.setData(data);
+			System.out.println("prout: "+data.size());
 			data = coord.imageToGenomeCoordinateCompare(temp, numImage);
+			//System.out.println("after: "+data.size());
 		}
-		data = testLoop(data,ref);
+		//data = testLoop(data,ref);
+		
 		saveFile(output,data);
 	}
 
@@ -196,9 +199,9 @@ public class HiCFileComparison {
 		while (it.hasNext()){
 			String cle = it.next();
 			String name = data.get(cle).getChr()+"\t"+data.get(cle).getY()+"\t"+data.get(cle).getX();
-			if (ref.containsKey(name))
-				filtered.put(cle, data.get(cle));
-			else{
+			//if (ref.containsKey(name))
+			//	filtered.put(cle, data.get(cle));
+			//else{
 				int x = data.get(cle).getX();
 				int y = data.get(cle).getY();
 				for (int i = x -2*m_resolution; i <= x + 2*m_resolution; i = i + m_resolution){
@@ -214,7 +217,7 @@ public class HiCFileComparison {
 					}
 				}
 				
-			}
+			//}
 		}
 		return filtered;
 	}
@@ -230,11 +233,14 @@ public class HiCFileComparison {
 		BufferedWriter writer = new BufferedWriter(new FileWriter(new File(pathFile)));
 		Set<String> key = data.keySet();
 		Iterator<String> it = key.iterator();
+		System.out.println(data.size());
 		writer.write("chromosome1\tx1\tx2\tchromosome2\ty1\ty2\tcolor\tAPScoreAVG\tRegAPScoreAVG\t%OfPixelInfToTheCenter\n");
 		while (it.hasNext()){
 			String cle = it.next();
 			Loop loop = data.get(cle);
 			ArrayList<Integer> coord = loop.getCoordinates();
+			System.out.println("plopi "+loop.getChr()+"\t"+coord.get(2)+"\t"+coord.get(3));
+			
 			writer.write(loop.getChr()+"\t"+coord.get(2)+"\t"+coord.get(3)+"\t"+loop.getChr()+"\t"+coord.get(0)+"\t"+coord.get(1)+"\t255,125,255"
 				+"\t"+loop.getPaScoreAvg()+"\t"+loop.getRegionalPaScoreAvg()+"\t"+loop.getPercentage()+"\n"); 
 		}
@@ -242,7 +248,6 @@ public class HiCFileComparison {
 	}
 	
 	/**
-	 * 
 	 * @param file1
 	 * @param file2
 	 * @param output1
@@ -269,7 +274,7 @@ public class HiCFileComparison {
 			line = br.readLine();
 		}
 		br.close();
-		
+		System.out.println(file2);
 		br = new BufferedReader(new FileReader(file2));
 		sb = new StringBuilder();
 		line = br.readLine();
@@ -364,6 +369,7 @@ public class HiCFileComparison {
 		while (line != null){
 			sb.append(line);
 			String[] parts = line.split("\\t");				
+			//System.out.println(line);
 			String loops = parts[0].replaceAll("chr","")+"\t"+parts[1]+"\t"+parts[4]; 
 			resu.put(loops, "");
 			sb.append(System.lineSeparator());

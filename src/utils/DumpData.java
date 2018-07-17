@@ -60,11 +60,6 @@ public class DumpData {
 		m_normalisation = norm;
 		m_resolution = resolution;
 		m_hicFile = hicFile;
-		
-		System.out.println(m_hicFile+"\n"
-				+ m_juiceBoxTools+"\n"
-				+m_resolution+"\n"
-				+m_normalisation+"\n");
 	}
 	
 	/**
@@ -93,9 +88,10 @@ public class DumpData {
 	}
 	
 	/**
+	 * Method to dump the oMe matrix
 	 * 
-	 * @param chr
-	 * @param output
+	 * @param chr: String for the name of teh chromosome
+	 * @param output: String path of the output
 	 * @return
 	 * @throws IOException
 	 */
@@ -123,10 +119,11 @@ public class DumpData {
 	
 	
 	/**
+	 * Compute the value observed-expected, and write the output file the tuple: x y value.
+	 * this methode are only for the intra chromosomal interaction.
 	 * 
-	 * @param obs
-	 * @param expected
-	 * @param chr
+	 * @param obs: String path with the file of the observed value
+	 * @param chr: name of the chr
 	 * @throws IOException
 	 */
 	private void observedMExpected(String obs, String chr) throws IOException{
@@ -149,21 +146,24 @@ public class DumpData {
 	
 	
 	/**
+	 * getter of the logerror file if necessary
 	 * 
-	 * @return
+	 * @return return the String with the error
 	 */
 	public String getLogError(){return this.m_logError;}
+	
 	/**
-	 * 
-	 * @return
+	 * getter of the lof info if necessary 
+	 * @return return a String with the log info
 	 */
 	public String getLog(){return this.m_log;}
 	
 	/**
+	 * getter of the expected matrix. 
 	 * 
-	 * @param chr
-	 * @param output
-	 * @return
+	 * @param chr: String name of the chromosme
+	 * @param output: path to the output
+	 * @return 
 	 * @throws IOException
 	 * @throws InterruptedException
 	 */
@@ -191,19 +191,19 @@ public class DumpData {
 	
 	
 	/**
-	 * 
-	 * @author plop
+	 * Class to run command line in java
+	 * @author axel poulet
 	 *
 	 */
 	public class ReturnFlux extends Thread {  
 
-		/**  Le flux à rediriger  */
+		/**  Flux to redirect  */
 		private InputStream flux;
 
 		/**
-		 * <b>Constructeur de RecuperationSorties</b>
+		 * <b>Constructor of ReturnFlux</b>
 		 * @param flux
-		 *  Le flux à rediriger
+		 *  flux to redirect
 		 */
 		public ReturnFlux(InputStream flux){
 			this.flux = flux;
