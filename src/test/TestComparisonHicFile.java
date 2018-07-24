@@ -17,11 +17,11 @@ public class TestComparisonHicFile {
 	 * @throws InterruptedException 
 	 */
 	public static void main(String[] args) throws IOException, InterruptedException{
-		String output= "/home/plop/Bureau/DataSetImageHiC/TestCompareTestMouse";
-		String input = "/home/plop/Bureau/DataSetImageHiC/BPASperm_test/";
-		String input2 = "/home/plop/Bureau/DataSetImageHiC/SpermCtl_test/";
-		String loopsFile1 = "/home/plop/Bureau/DataSetImageHiC/BPASperm_test/loops_filtered.bed";
-		String loopsFile2 = "/home/plop/Bureau/DataSetImageHiC/SpermCtl_test/loops.bed";
+		String output= "/home/plop/Bureau/DataSetImageHiC/Mouse_YoonheeProject/TestCompareTestMouse";
+		String input = "/home/plop/Bureau/DataSetImageHiC/Mouse_YoonheeProject/Q30_ctl/";
+		String input2 = "/home/plop/Bureau/DataSetImageHiC/Mouse_YoonheeProject/Q30_BPA/";
+		String loopsFile1 = "/home/plop/Bureau/DataSetImageHiC/Mouse_YoonheeProject/Q30_ctl/loops_ctl.bed";
+		String loopsFile2 = "/home/plop/Bureau/DataSetImageHiC/Mouse_YoonheeProject/Q30_BPA/loops_bpa.bed";
 		int matrixSize = 1000;
 		int resolution = 10000;
 		int diagSize = 4;

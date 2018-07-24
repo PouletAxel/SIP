@@ -19,19 +19,19 @@ public class TestCallLoopsHicFile{
 	 * @throws InterruptedException 
 	 */
 	public static void main(String[] args) throws IOException, InterruptedException {
-		String output= "/home/plop/Bureau/DataSetImageHiC/mouseYonHee/25kb30q";
-		String input = "/home/plop/Bureau/DataSetImageHiC/mouseYonHee/inter_30.hic";
-		HashMap<String,Integer> chrsize = readChrSizeFile("/home/plop/Bureau/DataSetImageHiC/mm9_sizes.txt");
+		String output= "/home/plop/Bureau/DataSetImageHiC/Mouse_YoonheeProject/Q30_BPA";
+		String input = "/home/plop/Bureau/DataSetImageHiC/Mouse_YoonheeProject/BPArep1rep2_NF16_map30.hic";
+		HashMap<String,Integer> chrsize = readChrSizeFile("/home/plop/Documents/Genome/mm9/mm9_sizes_noY.txt");
 		String juiceBoxTools = "/home/plop/Tools/juicer_tools.1.8.9_jcuda.0.8.jar";
 		int matrixSize = 1000;
-		int resolution = 25000;
-		int diagSize = 1;
-		double gauss = 0.25;
+		int resolution = 10000;
+		int diagSize = 3;
+		double gauss = 1.25;
 		double min = 1;
 		double max = 1;
 		int thresholdMax = 2500;
 		String juiceBoXNormalisation = "KR";
-		double saturatedPixel = 0.04;
+		double saturatedPixel = 0.08;
 		boolean isObserved = false;
 					
 		System.out.println("input "+input+"\n"

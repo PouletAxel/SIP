@@ -260,6 +260,7 @@ public class WholeGenomeAnalysis {
 					if(temp.containsKey(test)){
 						removed.add(name);
 						keepLoop = false;
+						//System.out.println("plop : "+test);
 						break;
 					}
 				}

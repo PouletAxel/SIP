@@ -122,8 +122,8 @@ public class CoordinatesCorrection {
 	private boolean testProximalLoop(String chr, int x, int y, String newKey, int resolution){
 		boolean test = false;
 		if (resolution > m_resolution){
-			for(int i = x-resolution; i <= x+resolution; i = i+resolution){
-				for(int j = y-resolution; j <= y+resolution; j = j+resolution){
+			for(int i = x-2*resolution; i <= x+2*resolution; i = i+resolution){
+				for(int j = y-2*resolution; j <= y+2*resolution; j = j+resolution){
 					String key = chr+"\t"+i+"\t"+j;
 					if (newKey != key && m_data.containsKey(key)){
 						test = true;
@@ -132,10 +132,11 @@ public class CoordinatesCorrection {
 				}
 			}
 			if(test == false){
-				for(int i = x-m_resolution; i <= x+m_resolution; i = i+m_resolution){
-					for(int j = y-m_resolution; j <= y+m_resolution; j = j+m_resolution){
+				for(int i = x-4*m_resolution; i <= x+4*m_resolution; i = i+m_resolution){
+					for(int j = y-4*m_resolution; j <= y+4*m_resolution; j = j+m_resolution){
 						String key = chr+"\t"+i+"\t"+j;
 						if (newKey != key && m_data.containsKey(key)){
+							//System.out.println("prout");
 							test = true;
 							return true;
 						}
@@ -144,8 +145,8 @@ public class CoordinatesCorrection {
 			}
 		}
 		else{
-			for(int i = x-resolution; i <= x+resolution; i = i+resolution){
-				for(int j = y-resolution; j <= y+resolution; j = j+resolution){
+			for(int i = x-2*resolution; i <= x+2*resolution; i = i+resolution){
+				for(int j = y-2*resolution; j <= y+2*resolution; j = j+resolution){
 					String key = chr+"\t"+i+"\t"+j;
 					if (newKey != key && m_data.containsKey(key)){
 						test = true;

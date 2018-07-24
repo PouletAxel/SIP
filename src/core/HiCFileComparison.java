@@ -14,7 +14,6 @@ import java.util.Set;
 import ij.IJ;
 import ij.ImagePlus;
 import ij.io.FileSaver;
-import ij.process.ImageProcessor;
 import utils.CoordinatesCorrection;
 import utils.FindMaxima;
 import utils.Loop;

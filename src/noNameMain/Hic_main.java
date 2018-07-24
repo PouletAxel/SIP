@@ -1,6 +1,3 @@
-/**
- * 
- */
 package noNameMain;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -92,11 +89,11 @@ public class Hic_main {
 	 * @throws InterruptedException 
 	 */
 	public static void main(String[] args) throws IOException, InterruptedException {
-		if (args.length >0 && args.length <5){
+		if (args.length > 0 && args.length < 5){
 			System.out.println(m_doc);
 			System.exit(0);
 		}
-		else if(args.length >=5){
+		else if(args.length >= 5){
 			if (args[0].equals("compare")){
 				m_isHic = false;
 				m_isProcessed = false;
@@ -118,7 +115,8 @@ public class Hic_main {
 					m_isObserved = true ;
 					m_thresholdMax = 100;
 				}
-				else if(args[1].equals("oMe")) m_isObserved = false;
+				else if(args[1].equals("oMe"))
+					m_isObserved = false;
 				else{
 					System.out.println(args[1]+" doesn't existed\n");
 					System.out.println(m_doc);
@@ -146,8 +144,7 @@ public class Hic_main {
 		////////////////////////////////////////GUI parameter initialisation
 		else{
 			GuiAnalysis gui = new GuiAnalysis();
-			while( gui.isShowing())
-			{
+			while( gui.isShowing()){
 				try {Thread.sleep(1);}
 				catch (InterruptedException e) {e.printStackTrace();}
 		    }	
@@ -236,7 +233,7 @@ public class Hic_main {
 			plopi.setGauss(m_gauss);
 			plopi.setMin(m_min);
 			plopi.setThreshold(m_thresholdMax);
-			//plopi.run();
+			plopi.run();
 		}
 		writer.close();		
 		System.out.println("End");
