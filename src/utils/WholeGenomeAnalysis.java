@@ -47,8 +47,11 @@ public class WholeGenomeAnalysis {
 	private int m_step;
 	/** boolean: true = observed, false = oMe*/
 	private boolean m_isObserved = false;
+	private int m_nbZero = -1;
 	/** loop coolection*/
 	static HashMap<String,Loop> m_data = new HashMap<String,Loop>();
+	/** */
+	ArrayList<Integer> m_listFactor = new ArrayList<Integer>();
 	
 	/**
 	 * WholeGenomeAnalysis constructor
@@ -68,7 +71,7 @@ public class WholeGenomeAnalysis {
 	
 	public WholeGenomeAnalysis(String output, HashMap<String, Integer> chrSize, double gauss, double min,
 			double max, int resolution, double saturatedPixel, int thresholdMax,
-			int diagSize, int matrixSize) {
+			int diagSize, int matrixSize, int nbZero,ArrayList<Integer> listFactor) {
 		m_output = output;
 		m_input = output;
 		m_chrSize = chrSize;
@@ -81,6 +84,8 @@ public class WholeGenomeAnalysis {
 		m_thresholdMaxima = thresholdMax;
 		m_diagSize = diagSize;
 		m_step = matrixSize/2;
+		m_nbZero = nbZero;
+		m_listFactor = listFactor;
 	}
 
 	/**
@@ -148,11 +153,13 @@ public class WholeGenomeAnalysis {
 			String cle = it.next();
 			Loop loop = m_data.get(cle);
 			ArrayList<Integer> coord = loop.getCoordinates();
-			//if(loop.getPaScoreAvg()>0){
-				writer.write(loop.getChr()+"\t"+coord.get(2)+"\t"+coord.get(3)+"\t"+loop.getChr()+"\t"+coord.get(0)+"\t"+coord.get(1)+"\t0,0,0"
-					+"\t"+loop.getPaScoreAvg()+"\t"+loop.getRegionalPaScoreAvg()
-					+"\t"+loop.getNeigbhoord1()+"\t"+loop.getNeigbhoord2()+"\t"+loop.getAvg()+"\t"+loop.getStd()+"\t"+loop.getValue()+"\t"+loop.getPercentageOfZero()+"\n");
-			//}
+			if(loop.getPaScoreAvg() > 1.2 && loop.getRegionalPaScoreAvg() > 1.2){
+				if(loop.getAvg()/loop.getStd() > 1.2){
+					writer.write(loop.getChr()+"\t"+coord.get(2)+"\t"+coord.get(3)+"\t"+loop.getChr()+"\t"+coord.get(0)+"\t"+coord.get(1)+"\t0,0,0"
+						+"\t"+loop.getPaScoreAvg()+"\t"+loop.getRegionalPaScoreAvg()
+						+"\t"+loop.getNeigbhoord1()+"\t"+loop.getNeigbhoord2()+"\t"+loop.getAvg()+"\t"+loop.getStd()+"\t"+loop.getValue()+"\t"+loop.getPercentageOfZero()+"\n");
+				}
+			}
 		}
 		writer.close();
 	}
@@ -176,6 +183,7 @@ public class WholeGenomeAnalysis {
 				// make and save image at two differents resolution (m_resolution and m_resolution*2)
 				String[] tfile = fileList[i].toString().split("_");
 				int numImage = Integer.parseInt(tfile[tfile.length-2])/(m_step*m_resolution);
+				//System.out.println(numImage+" mon cul");
 				TupleFileToImage readFile = new TupleFileToImage(fileList[i].toString(),m_matrixSize,m_resolution);
 				String imageName = fileList[i].toString().replaceAll(".txt", ".tif");
 				ImagePlus imgRaw = readFile.readTupleFile();
@@ -189,25 +197,50 @@ public class WholeGenomeAnalysis {
 				ImagePlus imgFilter = imgRaw.duplicate();
 				readFile.correctImage(imgFilter);
 				
-				/// making image with bigger resolution and fill no Zero list
-				ChangeImageRes test =  new ChangeImageRes(imgFilter);
-				ImagePlus imgRawBiggerRes = test.run();
-				String testName = fileList[i].toString().replaceAll(".txt", "_10kb.tif");
-				saveFile(imgRawBiggerRes,testName); 
-				nzc = new NonZeroCorrection(imgRawBiggerRes);
-				ArrayList<Integer> countNonZeroBigger = nzc.getNonZeroList();
-				ImagePlus imgFilterBiggerRes = imgRawBiggerRes.duplicate();
-
-				int noiseBigger = m_thresholdMaxima;
-				if(m_isObserved){
+				/// call the loops first in the smaller resolution 
+				// then making image with bigger resolution and fill no Zero list
+				// faire un gros for deguelasse por passer les faceteur de grossissement seulement si listDefacteur > 1.
+				ImagePlus imgCorrect = imgFilter.duplicate();
+				if(m_isObserved){	
 					ProcessMethod pm = new ProcessMethod(imgFilter,this.m_gauss);
 					pm.runGaussian();
-					pm = new ProcessMethod(imgFilterBiggerRes,this.m_gauss);					
 				}
-				else{
-					imageProcessing(imgFilter,fileList[i].toString());
-					testName = testName.replaceAll(".tif", "_10kb.txt");
-					imageProcessing(imgFilterBiggerRes, testName);
+				else	imageProcessing(imgFilter,fileList[i].toString(), m_gauss, m_saturatedPixel);
+	
+				
+				FindMaxima findLoop = new FindMaxima(imgRaw, imgFilter, chr, m_thresholdMaxima, m_diagSize, m_resolution, m_nbZero,countNonZero);
+				HashMap<String,Loop> temp = findLoop.findloop(m_isObserved,numImage);
+				PeakAnalysisScore pas = new PeakAnalysisScore(imgRaw,temp);
+				pas.computeScore();
+				if (m_listFactor.size() > 1){
+					for (int j = 1; j < m_listFactor.size(); ++j ){
+						ChangeImageRes test =  new ChangeImageRes(imgCorrect,  m_listFactor.get(j));
+						ImagePlus imgRawBiggerRes = test.run();
+						String testName = fileList[i].toString().replaceAll(".txt", "_"+m_listFactor.get(j)+".tif");
+						saveFile(imgRawBiggerRes,testName); 
+						nzc = new NonZeroCorrection(imgRawBiggerRes);
+						ArrayList<Integer> countNonZeroBigger = nzc.getNonZeroList();
+						ImagePlus imgFilterBiggerRes = imgRawBiggerRes.duplicate();
+						
+						if(m_isObserved){
+							ProcessMethod pm = new ProcessMethod(imgFilterBiggerRes,m_gauss/2);
+							pm.runGaussian();
+						}
+						else{
+							imageProcessing(imgFilterBiggerRes, testName, m_gauss/2, m_saturatedPixel/2);
+						}
+						int diag = m_diagSize/m_listFactor.get(j);
+						int res = m_resolution*m_listFactor.get(j);
+						if (diag < 2){diag = 2 ;}
+						findLoop = new FindMaxima(imgRawBiggerRes, imgFilterBiggerRes, chr,m_thresholdMaxima, diag, res, m_nbZero,countNonZeroBigger);
+						HashMap<String,Loop>tempBiggerRes = findLoop.findloop(m_isObserved,numImage);
+						
+						pas = new PeakAnalysisScore(imgRawBiggerRes,tempBiggerRes);
+						pas.computeScore();
+						
+						temp.putAll(tempBiggerRes);
+					}
+					
 				}
 				
 				//appel des loop pour n et 2*2 resolution
@@ -215,22 +248,14 @@ public class WholeGenomeAnalysis {
 				//comparer les deux liste pour savoir si y a des loops prensent dans les meme region 
 				// ensuite corriger les coordonnees
 				
-				FindMaxima findLoop = new FindMaxima(imgRaw, imgFilter, chr, m_thresholdMaxima, m_diagSize, m_resolution,countNonZero);
-				HashMap<String,Loop> temp = findLoop.findloop(m_isObserved);
-				PeakAnalysisScore pas = new PeakAnalysisScore(imgRaw,temp,countNonZero);
-				pas.computeScore();
-				System.out.println(temp.size());
 				
-				findLoop = new FindMaxima(imgRawBiggerRes, imgFilterBiggerRes, chr, noiseBigger, m_diagSize/2, m_resolution*2,countNonZeroBigger);
-				HashMap<String,Loop> tempBiggerRes = findLoop.findloop(m_isObserved);
-				pas = new PeakAnalysisScore(imgRawBiggerRes,tempBiggerRes,countNonZeroBigger);
-				pas.computeScore();
 				
-				compareLoops(temp,tempBiggerRes);
-				System.out.println(temp.size());
 				coord.setData(m_data);
-				System.out.println("before "+ m_data.size());
+				
 				m_data = coord.imageToGenomeCoordinate(temp, numImage);
+				System.out.println("before "+ m_data.size());
+				m_data = removedProximalLoops(m_data);
+				//compareLoops(temp,tempBiggerRes, m_listFactor.get(j));
 				System.out.println("after "+ m_data.size());
 			}
 		}
@@ -240,35 +265,66 @@ public class WholeGenomeAnalysis {
 	 * Compare loops between the two resolution, if at the same location the are one loops call at bigger resolution and snmaller resolution,
 	 * keep the smaller one 
 	 * 
-	 * @param temp collection of the loop call at small resolution
+	 * @param input collection of the loop call at small resolution
 	 * @param tempBiggerRes collection of the loop call at smaller resolution
 	 * @return HashMap<String, Loop> the sorted HashMap
 	 */
-	private HashMap<String, Loop>  compareLoops(HashMap<String, Loop> temp, HashMap<String, Loop> tempBiggerRes){
-		Set<String> key = tempBiggerRes.keySet();
+	private HashMap<String, Loop>  removedProximalLoops(HashMap<String, Loop> input){
+		Set<String> key = input.keySet();
 		Iterator<String> it = key.iterator();
 		ArrayList<String> removed = new ArrayList<String>();
 		while (it.hasNext()){
-			boolean keepLoop = true;
 			String name = it.next();
-			String [] tname = name.split("\t");
-			int x = Integer.parseInt(tname[1])*2;
-			int y = Integer.parseInt(tname[2])*2;
-			for(int i = x-3; i <= x+3; ++i){
-				for(int j = y-3; j <= y+3; ++j){
-					String test = tname[0]+"\t"+i+"\t"+j+"\t"+tname[3];
-					if(temp.containsKey(test)){
-						removed.add(name);
-						keepLoop = false;
-						//System.out.println("plop : "+test);
-						break;
+			if(!(removed.contains(name))){
+				String [] tname = name.split("\t");
+				int x = Integer.parseInt(tname[1]);
+				int y = Integer.parseInt(tname[2]);
+				boolean testBreak = false;
+				
+				for(int i = x-5*m_resolution; i <= x+5*m_resolution; i+=m_resolution){
+					for(int j = y-5*m_resolution; j <= y+5*m_resolution; j+=m_resolution){
+						String test = tname[0]+"\t"+i+"\t"+j;
+						if(!test.equals(name)){
+							if(input.containsKey(test)){
+								if(input.get(test).getResolution() < input.get(name).getResolution()){
+									removed.add(name);
+									testBreak =true;
+									break;
+								}
+								else if(input.get(test).getResolution() == input.get(name).getResolution()){
+									if((Math.abs(x-input.get(test).getX()) < m_resolution*3 || Math.abs(y-input.get(test).getY()) < m_resolution*3)){
+										if(input.get(test).getAvg() > input.get(name).getAvg()){
+											removed.add(name);
+											testBreak =true;
+											break;
+										}
+										else if(input.get(test).getAvg() < input.get(name).getAvg()) 	removed.add(test);
+									
+										else{
+											if(input.get(test).getPaScoreAvg() > input.get(name).getPaScoreAvg()){
+												removed.add(name);
+												testBreak =true;
+												break;
+											}
+											else removed.add(test);
+										}
+									}
+								}
+								else{
+									removed.add(test);
+								}
+							}
+						}
 					}
+					if(testBreak){break;}
 				}
 			}
-			if(keepLoop)
-				temp.put(name, tempBiggerRes.get(name));
 		}
-		return temp;
+		//System.out.println("PROUT  "+removed.size());
+		for (int i = 0; i< removed.size(); ++i){
+			input.remove(removed.get(i));
+		}
+		return input;
 	}
 
 	/**
@@ -277,13 +333,16 @@ public class WholeGenomeAnalysis {
 	 * @param imgFilter image filtered
 	 * @param fileName input file
 	 */
-	private void imageProcessing(ImagePlus imgFilter, String fileName){ 
-		ProcessMethod pm = new ProcessMethod(imgFilter,this.m_min,this.m_max,this.m_gauss);
-		pm.enhanceContrast(this.m_saturatedPixel);
+	private void imageProcessing(ImagePlus imgFilter, String fileName, double gaussian, double enhance){ 
+		ProcessMethod pm = new ProcessMethod(imgFilter,this.m_min,this.m_max,gaussian);
+		pm.enhanceContrast(enhance);
 		pm.topHat();
 		Strel strel = Strel.Shape.DISK.fromRadius(1);
 		imgFilter.setProcessor(Morphology.erosion(imgFilter.getProcessor(), strel));
-		saveFile(imgFilter, fileName.replaceAll(".txt", "_processed.tif"));
+		if(fileName.contains(".tif"))	saveFile(imgFilter, fileName.replaceAll(".tif", "_processed.tif"));
+		else	saveFile(imgFilter, fileName.replaceAll(".txt", "_processed.tif"));
+
+		
 	}
 	
 		

@@ -58,12 +58,26 @@ public class CoordinatesCorrection {
 			int b = (y+(index*step))*resolution;
 			int b_end =b+resolution;
 			String newName = loop.getChr()+"\t"+a+"\t"+b;
-			if(a!=b && testProximalLoop(loop.getChr(),a,b,newName,resolution) == false && Math.abs(a-b) > diagSize){
+			if(a!=b && Math.abs(a-b) > diagSize){
 				if (x > 1 && y > 1 && y < imageSize-2 && x < imageSize-2){
 					if(m_data.containsKey(newName) == false){
 						loop.setCoordinates(a, a_end, b, b_end);
 						loop.setName(newName);
 						m_data.put(newName, loop);
+					}
+					else{
+						if(m_data.get(newName).getResolution() > resolution){
+							loop.setCoordinates(a, a_end, b, b_end);
+							loop.setName(newName);
+							//System.out.println(resolution+" "+m_data.get(newName).getResolution());
+							m_data.put(newName, loop);
+						}
+						else if(loop.getPaScoreAvg()> m_data.get(newName).getPaScoreAvg()){
+							loop.setCoordinates(a, a_end, b, b_end);
+							loop.setName(newName);
+							//System.out.println(resolution+" "+m_data.get(newName).getResolution());
+							m_data.put(newName, loop);
+						}
 					}
 				}
 			}	 

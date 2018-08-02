@@ -60,6 +60,7 @@ public class HicFileProcessing {
 			int chrsize = m_chrSize.get(chr);
 			int step = m_wga.getStep()*m_wga.getResolution();
 			int j = m_wga.getMatrixSize()*m_wga.getResolution();
+			System.out.println(chrsize+" "+step+" "+j);
 			if(isObserved == false){	
 				String test = chr+":0:"+j;
 				String name = outdir+chr+"_0_"+j+".txt";

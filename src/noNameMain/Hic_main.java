@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 import core.HiCFileComparison;
@@ -41,19 +42,24 @@ public class Hic_main {
 	/**Matrix size: size in bins of the final image and defined the zone of interest in the hic map*/
 	private static int m_matrixSize = 2000;
 	/**Distance to the diagonal where the loops are ignored*/
-	private static int m_diagSize = 2;
+	private static int m_diagSize = 6;
 	/**Resolution of the matric in bases*/
 	private static int m_resolution = 5000;
 	/** % of saturated pixel in the image, allow the enhancement of the contrast in the image*/
 	private static double m_saturatedPixel = 0.05;
 	/** Threshold to accepet a maxima in the images as a loop*/
-	private static int m_thresholdMax = 3000;// or 100
+	private static int m_thresholdMax = 3250;// or 100
 	/**Step to process the chromosomes (maybe removed this parameters and only put m_matrixSize/2)*/
 	private static int m_step = 1000;
+	/***/
+	private static int m_nbZero = 6;
 	/** boolean to know if data used is observed or Observed minus Expected */
 	private static boolean m_isObserved = false;
 	/** boolean if true run all the process (dump data + image +image processing*/
 	private static boolean m_isHic = true;
+	/** */
+	private static ArrayList<Integer> m_factor = new ArrayList<Integer>();
+	private static String m_factOption = "4";
 	/** if true run only image Processing step*/
 	private static boolean m_isProcessed = false;
 	private static boolean m_isCompare = false;
@@ -72,10 +78,16 @@ public class Hic_main {
 			+"-d: diagonal size in bins, allow to removed the maxima found at this size (eg: a size of 2 at 5000 bases resolution removed all the maxima"
 			+"with a distances inferior or equal to 10kb) (default 4 bins)\n"
 			+"-g: Gaussian filter: smooth the image to reduce the noise (default 1)\n"
+			+"-factor: Multiple resolutions can be specified using: "
+			+ "\t-factor 1: run only for the input res\n"
+			+ "\t-factor 2: res and res*2\n"
+			+ "\t-factor 3: res and res*5\n"
+			+ "\t-factor 4: res, res*2 and res*5 (default 4)\n"
 			+"-max: Maximum filter: increase the region of high intensity (default 1.5) only oMe\n"
 			+"-min: Minimum filter: removed the isolated high value (default 1.5) only oMe and compare\n"
 			+"-sat: % of staturated pixel: enhance the contrast in the image (default 0.05) only oMe\n"
-			+"-t Threshold for loops detection (default 3000 for only oMe, 100 for observed, 3 for compare)\n"
+			+"-t Threshold for loops detection (default 3000 for oMe, 100 for observed, 3 for compare)\n"
+			+ "-nbZero: number of zero: number of pixel equal at zero allowed in the 24 neighboorhood of the detected maxima, parameter for hic and processed method (oMe default parameter 6, observed default parameter 3)\n"
 			+ "-norm: <NONE/VC/VC_SQRT/KR> only for hic option (default KR)\n"
 			+"-h, --help print help\n");
 	/**
@@ -88,7 +100,11 @@ public class Hic_main {
 	 * @throws IOException 
 	 * @throws InterruptedException 
 	 */
+	
 	public static void main(String[] args) throws IOException, InterruptedException {
+		m_factor.add(1);
+		m_factor.add(2);
+		m_factor.add(5);
 		if (args.length > 0 && args.length < 5){
 			System.out.println(m_doc);
 			System.exit(0);
@@ -114,6 +130,10 @@ public class Hic_main {
 				if(args[1].equals("observed")){
 					m_isObserved = true ;
 					m_thresholdMax = 100;
+					m_nbZero = 3;
+					m_factor.add(1);
+					m_factor.add(2);
+					m_factor.add(5);
 				}
 				else if(args[1].equals("oMe"))
 					m_isObserved = false;
@@ -163,10 +183,23 @@ public class Hic_main {
 				m_gauss = gui.getGaussian();
 				m_max = gui.getMax();
 				m_min = gui.getMin();
-				
+				//m_nbZero = gui.getNbZero();
 				m_saturatedPixel = gui.getEnhanceSignal();
 				m_thresholdMax = gui.getNoiseTolerance();
-					
+				if(gui.getFactorChoice() == 1){
+					m_factor = new ArrayList<Integer>();
+					m_factor.add(1);
+				}
+				else if(gui.getFactorChoice() == 2){
+					m_factor = new ArrayList<Integer>();
+					m_factor.add(1);
+					m_factor.add(2);
+				}
+				else if(gui.getFactorChoice() == 3){
+					m_factor = new ArrayList<Integer>();
+					m_factor.add(1);
+					m_factor.add(5);
+				}
 				m_isObserved = gui.isObserved();
 				m_isHic  = gui.isHic();
 				m_isProcessed = gui.isProcessed();
@@ -188,20 +221,21 @@ public class Hic_main {
 		BufferedWriter writer = new BufferedWriter(new FileWriter(new File(m_output+File.separator+"parameters.txt")));
 		
 		if (m_isCompare==false){
-			WholeGenomeAnalysis wga = new WholeGenomeAnalysis(m_output, m_chrSize, m_gauss, m_min, m_max, m_resolution, m_saturatedPixel, m_thresholdMax, m_diagSize, m_matrixSize);
+			WholeGenomeAnalysis wga = new WholeGenomeAnalysis(m_output, m_chrSize, m_gauss, m_min, m_max, m_resolution, m_saturatedPixel, m_thresholdMax, m_diagSize, m_matrixSize, m_nbZero,m_factor);
 			if(m_isHic){
 				System.out.println("hic mode:\ninput: "+m_input+"\noutput: "+m_output+"\njuiceBox: "+m_juiceBoxTools+"\nnorm: "+ m_juiceBoXNormalisation+"\ngauss: "+m_gauss+"\n"
 						+ "min: "+m_min+"\nmax: "+m_max+"\nmatrix size: "+m_matrixSize+"\ndiag size: "+m_diagSize+"\nresolution: "+m_resolution+"\nsaturated pixel: "+m_saturatedPixel
-						+"\nthreshold: "+m_thresholdMax+"\nstep: "+m_step+"\nisObserved: "+m_isObserved+"\n");
+						+"\nthreshold: "+m_thresholdMax+"\nstep: "+m_step+"\nisObserved: "+m_isObserved+"\n number of zero:"+m_nbZero+"\n factor "+ m_factOption+"\n");
 				HicFileProcessing hfp =  new HicFileProcessing(m_input, wga, m_chrSize, m_juiceBoxTools, m_juiceBoXNormalisation);
 				if(m_isObserved){
 					writer.write("java -jar noName hic observed "+m_input+" "+m_chrSizeFile+" "+m_output+" "+m_juiceBoxTools+" -norm: "+ m_juiceBoXNormalisation+" -g: "+m_gauss+" -mat "
-				+m_matrixSize+" -d "+m_diagSize+" -res "+m_resolution+" -t "+m_thresholdMax+" -s "+m_step+"\n");
+				+m_matrixSize+" -d "+m_diagSize+" -res "+m_resolution+" -t "+m_thresholdMax+" -s "+m_step+" -nbZero "+m_nbZero+" -factor "+ m_factOption+"\n");
 					hfp.run(true);
 				}
 				else{
 					writer.write("java -jar noName hic oMe "+m_input+" "+m_chrSizeFile+" "+m_output+" "+m_juiceBoxTools+" -norm: "+ m_juiceBoXNormalisation+" -g: "+m_gauss+
-							" -min: "+m_min+" -max: "+m_max+" -mat "+m_matrixSize+" -d "+m_diagSize+" -res "+m_resolution+" -sat "+m_saturatedPixel+" -t "+m_thresholdMax+" -s "+m_step+"\n");
+							" -min: "+m_min+" -max: "+m_max+" -mat "+m_matrixSize+" -d "+m_diagSize+" -res "+m_resolution+" -sat "+m_saturatedPixel+" -t "+m_thresholdMax+
+							" -s "+m_step+" -nbZero "+m_nbZero+" -factor "+ m_factOption+"\n");
 					hfp.run(false);
 				}
 			
@@ -209,15 +243,16 @@ public class Hic_main {
 			else if (m_isProcessed){
 				System.out.println("processed mode:\ninput: "+m_input+"\noutput: "+m_output+"\njuiceBox: "+m_juiceBoxTools+"\nnorm: "+ m_juiceBoXNormalisation+"\ngauss: "+m_gauss
 						+"\nmin: "+m_min+"\nmax: "+m_max+"\nmatrix size: "+m_matrixSize+"\ndiag size: "+m_diagSize+"\nresolution: "+m_resolution+"\nsaturated pixel: "+m_saturatedPixel
-						+"\nthreshold: "+m_thresholdMax+"\nstep: "+m_step+"\nisObserved: "+m_isObserved+"\nisHic: "+m_isHic+"\nisProcessed: "+m_isProcessed+"\n");
+						+"\nthreshold: "+m_thresholdMax+"\nstep: "+m_step+"\nisObserved: "+m_isObserved+"\nisHic: "+m_isHic+"\nisProcessed: "+m_isProcessed+"\n number of zero:"
+						+m_nbZero+"\n factor "+ m_factOption+"\n");
 				if(m_isObserved){
 					writer.write("java -jar noName processed observed "+m_input+" "+m_chrSizeFile+" "+m_output+" "+m_gauss+" -mat "+m_matrixSize+" -d "+m_diagSize+" -res "+m_resolution
-							+" -t "+m_thresholdMax+"\n");
+							+" -t "+m_thresholdMax+" -nbZero "+m_nbZero+" -factor "+ m_factOption+"\n");
 					wga.run("o",m_input);
 				}
 				else{
 					writer.write("java -jar noName processed oMe "+m_input+" "+m_chrSizeFile+" "+m_output+" "+m_gauss+" -mat "+m_matrixSize+" -d "+m_diagSize+" -res "+m_resolution
-							+" -t "+m_thresholdMax+" -min: "+m_min+" -max: "+m_max+" -sat "+m_saturatedPixel+"\n");
+							+" -t "+m_thresholdMax+" -min: "+m_min+" -max: "+m_max+" -sat "+m_saturatedPixel+" -nbZero "+m_nbZero+" -factor "+ m_factOption+"\n");
 					wga.run("oMe",m_input);
 				}
 			}
@@ -269,7 +304,8 @@ public class Hic_main {
 	 * -min: minimum filter: removed the isolated high value (default 1.5)
 	 * -sat: % of staturated pixel: enhance the contrast in the image (default 0.05)
 	 * -t Threshold for loops detection (default 3000)
-	 * -norm: <NONE/VC/VC_SQRT/KR> only for hic option (default KR)"
+	 * -norm: <NONE/VC/VC_SQRT/KR> only for hic option (default KR)
+	 * -nbZero: "
 	 * @param m_chrSizeFile
 	 * @throws IOException
 	 */
@@ -284,8 +320,34 @@ public class Hic_main {
 					try{m_matrixSize =Integer.parseInt(args[i+1]);}
 					catch(NumberFormatException e){ returnError("-mat",args[i+1],"int");} 
 				}
+				else if(args[i].equals("-factor")){
+					int a  = Integer.parseInt(args[i+1]);
+					m_factOption = args[i+1];
+					if(a == 1){
+						m_factor = new ArrayList<Integer>();
+						m_factor.add(1);
+					}
+					else if(a == 2){
+						m_factor = new ArrayList<Integer>();
+						m_factor.add(1);
+						m_factor.add(2);
+					}
+					else if(a == 3){
+						m_factor = new ArrayList<Integer>();
+						m_factor.add(1);
+						m_factor.add(5);
+						
+					}
+					else if(a != 4){
+						returnError("-mat",args[i+1],"int");
+					} 
+				}
 				else if(args[i].equals("-d")){
 					try{m_diagSize =Integer.parseInt(args[i+1]);}
+					catch(NumberFormatException e){ returnError("-d",args[i+1],"int");} 
+				}
+				else if(args[i].equals("-nbZero")){
+					try{m_nbZero =Integer.parseInt(args[i+1]);}
 					catch(NumberFormatException e){ returnError("-d",args[i+1],"int");} 
 				}
 				else if(args[i].equals("-g")){
@@ -300,12 +362,10 @@ public class Hic_main {
 				else if(args[i].equals("-min")){
 					try{m_min = Double.parseDouble(args[i+1]);}
 					catch(NumberFormatException e){ returnError("-min",args[i+1],"double");}
-					
 				}
 				else if(args[i].equals("-sat")){
 					try{m_saturatedPixel = Double.parseDouble(args[i+1]);}
 					catch(NumberFormatException e){ returnError("-sat",args[i+1],"double");}
-					
 				}
 				else if(args[i].equals("-t")){
 					try{m_thresholdMax =Integer.parseInt(args[i+1]);}

@@ -3,6 +3,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import utils.WholeGenomeAnalysis;
 
@@ -19,18 +20,27 @@ public class TestCallLoopsProcessedFile {
 	 * @throws InterruptedException 
 	 */
 	public static void main(String[] args) throws IOException, InterruptedException {
-		String	output= "/home/plop/Bureau/DataSetImageHiC/GM12878/test_071718";
-		String	input = "/home/plop/Bureau/DataSetImageHiC/GM12878/3000_1_125_125_005_30q";
+		//String input = "/home/plop/Bureau/DataSetImageHiC/GM12878/subsample/50mil/";
+		//String output= "/home/plop/Bureau/DataSetImageHiC/GM12878/subsample/50mil_test/";
+		//String output= "/home/plop/Bureau/DataSetImageHiC/Hichip_H3k4me1_test";
+		//String input= "/home/plop/Bureau/DataSetImageHiC/Hichip_H3k4me1_test";
+		///home/plop/Bureau/DataSetImageHiC/Hichip_H3k4me1_test
+		String output= "/home/plop/Bureau/DataSetImageHiC/GM12878/test_wholeGenome_3500";
+		String input = "/home/plop/Bureau/DataSetImageHiC/GM12878/3000_1_125_125_005_30q/";
 		int matrixSize = 2000;
 		int resolution = 5000;
 		int diagSize = 6;
 		double gauss = 1;
-		int thresholdMax = 2750;
+		int thresholdMax = 3250;
 		boolean isObserved = false;
-	
+		int nbZero = 6;
 		double min =1.5;
 		double max =1.5;
 		double saturatedPixel =0.05;
+		ArrayList<Integer> factor = new ArrayList<Integer>();
+		factor.add(1);
+		factor.add(2);
+		factor.add(5);
 		System.out.println("input "+input+"\n"
 			+ "output "+output+"\n"
 			+ "gauss "+gauss+"\n"
@@ -47,8 +57,9 @@ public class TestCallLoopsProcessedFile {
 		if (file.exists()==false) 
 			file.mkdir();
 		///home/plop/Documents/Genome/HumanGenomeHg19/hg19_withoutChr.sizes
+		///home/plop/Documents/Genome/hg38.chr2.sizes
 		WholeGenomeAnalysis wga = new WholeGenomeAnalysis(output, readChrSizeFile("/home/plop/Documents/Genome/HumanGenomeHg19/hg19_withoutChr.sizes"), gauss, min, max, 
-				resolution, saturatedPixel, thresholdMax, diagSize, matrixSize);
+				resolution, saturatedPixel, thresholdMax, diagSize, matrixSize,nbZero, factor);
 
 		if(isObserved) wga.run("o",input);
 		else wga.run("oMe",input);

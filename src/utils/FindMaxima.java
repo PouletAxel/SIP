@@ -2,6 +2,9 @@ package utils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Set;
+
 import ij.ImagePlus;
 import ij.io.FileSaver;
 import ij.plugin.filter.MaximumFinder;
@@ -35,6 +38,10 @@ public class FindMaxima{
 	private HashMap<String,Loop> m_data = new HashMap<String,Loop>();
 	/** arrayList of int each occurence is a x coordinate of the image, the value of this arrayList is an integer if = 0 it is a whithe strip*/
 	ArrayList<Integer> m_countNonZero = new ArrayList<Integer>(); 
+	/**	Nunber of zero allowed around the loop n_24*/
+	private int m_nbOfZero =-1;
+	/** */
+	HashMap <String,Loop> m_tmp = new HashMap <String,Loop>(); 
 	
 	/**
 	 * Constructor of FindMaxima
@@ -64,7 +71,7 @@ public class FindMaxima{
 	 * @param resolution int  the size of the diagonal
 	 * @param countNonZero ArrayList<Integer> array list locate the whit strip in the original matrix
 	 */
-	public FindMaxima(ImagePlus img, ImagePlus imgFilter, String chr, double noiseTolerance, int diag, int resolution,ArrayList<Integer> countNonZero){
+	public FindMaxima(ImagePlus img, ImagePlus imgFilter, String chr, double noiseTolerance, int diag, int resolution,int nbZero, ArrayList<Integer> countNonZero){
 		m_img = img;
 		m_imgFilter = imgFilter;
 		m_noiseTolerance = noiseTolerance;
@@ -72,28 +79,41 @@ public class FindMaxima{
 		m_diagSize = diag;
 		m_resolution = resolution;
 		m_countNonZero= countNonZero;
+		m_nbOfZero = nbZero;
 	}
 	
+	public FindMaxima(ImagePlus img, ImagePlus imgFilter, String chr, int noiseTolerance,int diag, int resolution, int nbZero, ArrayList<Integer> countNonZero, HashMap<String, Loop> temp) {
+		m_img = img;
+		m_imgFilter = imgFilter;
+		m_noiseTolerance = noiseTolerance;
+		m_chr = chr;
+		m_diagSize = diag;
+		m_resolution = resolution;
+		m_countNonZero= countNonZero;
+		m_nbOfZero = nbZero;
+		m_tmp = temp;
+	}
+
 	/**
 	 * Method to find loops in the image for observed and oMe, and fill the loop collection. This method also initiate the object loop,
 	 * @param isObserved
 	 * @return HashMap<String,Loop>
 	 */
-	public HashMap<String,Loop> findloop(boolean isObserved){
+	public HashMap<String,Loop> findloop(boolean isObserved, int numImage){
 		run(isObserved);
 		ArrayList<String> temp = getMaxima();
-		int nb =0;
+		ImageProcessor ip = m_img.getProcessor();
 		for(int j = 0; j < temp.size();++j){
 			String[] parts = temp.get(j).split("\\t");
 			int x = Integer.parseInt(parts[0]);
 			int y = Integer.parseInt(parts[1]);
-			double value = Double.parseDouble(parts[2]);
-			String name= m_chr+"\t"+temp.get(j);
+			String name= m_chr+"\t"+temp.get(j)+"\t"+numImage;
 			double avg = average(x,y);
 			double std =standardDeviation(x,y,avg);
 			DecayAnalysis da = new DecayAnalysis(m_img,x,y);
-			if(da.getNeighbourhood1()>1 && da.getNeighbourhood2() > 1 && da.getNeighbourhood2()-da.getNeighbourhood1()>1 && (testStripNeighbour(x)==true && testStripNeighbour(y)==true)){
-				Loop maxima = new Loop(temp.get(j),x,y,m_chr,avg,std,value);
+			if(m_resolution <= 10000 && da.getNeighbourhood1()>1 && da.getNeighbourhood2() > 1 && da.getNeighbourhood2()-da.getNeighbourhood1()>1){
+					//&& (testStripNeighbour(x)==true && testStripNeighbour(y)==true)){
+				Loop maxima = new Loop(temp.get(j),x,y,m_chr,avg,std,ip.getPixelValue(x, y));
 				maxima.setNeigbhoord1(da.getNeighbourhood1());
 				maxima.setNeigbhoord2(da.getNeighbourhood2());
 				maxima.setPercentageOfZero(PercentOfneihgboordEqual0(x,y));
@@ -101,12 +121,28 @@ public class FindMaxima{
 				maxima.setDiagSize(m_diagSize);
 				maxima.setMatrixSize(m_img.getWidth());
 				m_data.put(name, maxima);
+				//System.out.println(name);
 			}
-			else{++nb;}
+			else{
+				if(da.getNeighbourhood1() >= 1 ){
+					//&& (testStripNeighbour(x)==true && testStripNeighbour(y)==true)){
+					Loop maxima = new Loop(temp.get(j),x,y,m_chr,avg,std,ip.getPixelValue(x, y));
+					maxima.setNeigbhoord1(da.getNeighbourhood1());
+					maxima.setNeigbhoord2(da.getNeighbourhood2());
+					maxima.setPercentageOfZero(PercentOfneihgboordEqual0(x,y));
+					maxima.setResolution(m_resolution);
+					maxima.setDiagSize(m_diagSize);
+					maxima.setMatrixSize(m_img.getWidth());
+					m_data.put(name, maxima);
+				}
+			}
 		}
-		System.out.println("nb of loops supressed: "+nb);
 		return m_data;
 	}
+	
+	
+	
+	
 	
 	/**
 	 * Method to find loops in the image for the compare method, and fill the loop collection. This method also initiate the object loop,
@@ -124,6 +160,7 @@ public class FindMaxima{
 			maxima.setResolution(m_resolution);
 			maxima.setDiagSize(m_diagSize);
 			maxima.setMatrixSize(m_img.getWidth());
+			//System.out.println(name);
 			m_data.put(name, maxima);
 		}
 		return m_data;
@@ -184,13 +221,14 @@ public class FindMaxima{
 					int max = rawIp.get(i,j);
 					int imax = i;
 					int jmax =j;
-					if(Math.abs(i-j) <=10){
+					if(Math.abs(i-j) <= m_diagSize*2){
 						for(int ii=i-1; ii<=i+1; ++ii){
 							for(int jj = j-1; jj <= j+1; ++jj){
 								if(max < rawIp.get(ii, jj) && Math.abs(ii-jj) >= Math.abs(i-j)){
 									imax = ii;
 									jmax = jj;
-									max = rawIp.get(ii, jj);	
+									max = rawIp.get(ii, jj);
+									if(i==126 && j == 138){System.out.println(ii+" plopi"+jj);}
 								}
 							}
 						}
@@ -201,7 +239,8 @@ public class FindMaxima{
 								if(max < rawIp.get(ii, jj)){
 									imax = ii;
 									jmax = jj;
-									max = rawIp.get(ii, jj);	
+									max = rawIp.get(ii, jj);
+									if(i==126 && j == 138){System.out.println(ii+" plopi"+jj);}
 								}
 							}
 						}
@@ -209,6 +248,7 @@ public class FindMaxima{
 					if (max > rawIp.get(i,j)){
 						ipMaxima.set(i,j,0);
 						ipMaxima.set(imax,jmax,255);
+						if(i==126 && j == 138){System.out.println(imax+" plopi"+jmax);}
 					}
 				}			
 			}
@@ -253,12 +293,11 @@ public class FindMaxima{
 		int w = m_imgResu.getWidth();
 		int h = m_imgResu.getHeight();
 		ImageProcessor ipResu = m_imgResu.getProcessor();
-		ImageProcessor ip = m_img.getProcessor();
 		ArrayList<String> listMaxima = new ArrayList<String>();
 		for(int i = 0; i < w; ++i){
 			for(int j = 0; j < h; ++j){
 				if (ipResu.getPixel(i,j) > 0 && i-j > 0){
-					listMaxima.add(i+"\t"+j+"\t"+ip.getPixel(i, j));
+					listMaxima.add(i+"\t"+j);
 				}
 			}
 		}
@@ -341,12 +380,12 @@ public class FindMaxima{
 		for(int i =0; i< w; ++i){
 			for(int j=0;j< h;++j){
 				if(ipResu.getPixel(i, j) > 0){
-					int thresh = 6;
+					int thresh = this.m_nbOfZero;//nbOfZero; //6;
 					if (j-i <= m_diagSize+2){
-						thresh = 7;
-						if (isObserved)	thresh = 4;
+						thresh = thresh+1;
+						//if (isObserved)	thresh = 4;
 					}
-					else if(isObserved){ thresh = 3;}
+					//else if(isObserved){ thresh = 3;}
 					int nb =0;
 					for(int ii = i-2; ii <= i+2; ++ii){
 						for(int jj = j-2; jj <= j+2; ++jj){
@@ -370,10 +409,13 @@ public class FindMaxima{
 	 * @return boolean if true no white stripes detected else false 
 	 */
 	private boolean testStripNeighbour(int i){
-		if(m_countNonZero.get(i) > 0 && m_countNonZero.get(i+1) > 0 && m_countNonZero.get(i-1) > 0 ){
-			return true;
+		if(i+1 >=  m_countNonZero.size() ||	i-1 < 0)
+			return false;
+		else{
+			if(m_countNonZero.get(i) > 0 && m_countNonZero.get(i+1) > 0 && m_countNonZero.get(i-1) > 0 )
+				return true;
+			else return false;
 		}
-		else return false;
 	}
 	
 	

@@ -72,8 +72,11 @@ public class TupleFileToImage {
 				int correction = numImage*m_step*m_resolution;
 				int i = (Integer.parseInt(parts[0]) - correction)/m_resolution; 
 				int j = (Integer.parseInt(parts[1]) - correction)/m_resolution;
-				p.setf(i, j, a);
-				p.setf(j, i, a);
+				//System.out.println(i+" "+j+" "+a);
+				if(i < m_size && j< m_size){
+					p.setf(i, j, a);
+					p.setf(j, i, a);
+				}
 				sb.append(System.lineSeparator());
 				line = br.readLine();
 			}

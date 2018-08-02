@@ -12,14 +12,16 @@ import ij.process.ShortProcessor;
  */
 public class ChangeImageRes{
 	/** Image Plus of the raw image*/
-	ImagePlus m_img;
-	
+	private ImagePlus m_img;
+	/** int factor to re scale the image */
+	private int m_factor; 
 	/**
 	 * 
 	 * @param img
 	 */
-	public ChangeImageRes(ImagePlus img){
+	public ChangeImageRes(ImagePlus img, int factor){
 		m_img = img;
+		m_factor = factor;
 	}
 	
 	/**
@@ -29,16 +31,16 @@ public class ChangeImageRes{
 	 * @return ImagePlus
 	 */
 	public ImagePlus run(){
-		ShortProcessor p = new ShortProcessor(m_img.getWidth()/2,m_img.getWidth()/2);
+		ShortProcessor p = new ShortProcessor(m_img.getWidth()/m_factor,m_img.getWidth()/m_factor);
 		ImageProcessor ip =  m_img.getProcessor();
-		for(int i = 0; i <= m_img.getWidth()-1; i+=2){
-			for(int j = 0; j <= m_img.getWidth()-1; j+=2){
+		for(int i = 0; i <= m_img.getWidth()-1; i+=m_factor){
+			for(int j = 0; j <= m_img.getWidth()-1; j+=m_factor){
 				float sum = 0;
-				for(int ii = i; ii <= i+1; ++ii)
-					for(int jj = j ; jj <= j+1; ++jj)
+				for(int ii = i; ii <= i+m_factor-1; ++ii)
+					for(int jj = j ; jj <= j+m_factor-1; ++jj)
 						sum+= ip.getPixel(ii, jj);
-				
-				p.setf(i/2,j/2,sum);
+				//System.out.println(m_factor+"\t"+i/m_factor+"\t"+j/m_factor+"\t"+sum);
+				p.setf(i/m_factor,j/m_factor,sum);
 			}
 		}
 		ImagePlus imgResu = new ImagePlus();
