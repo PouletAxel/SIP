@@ -85,43 +85,7 @@ public class CoordinatesCorrection {
 		return m_data;
 	}
 	
-	/**
-	 * Method similar to the previous use for the HiC comparison.
-	 * 
-	 * @param temp: HashMap of loops with the image coordinates
-	 * @param index: index of the image
-	 * @return key is a string  with the name of the chr start end. And value is Loop class, to stock 
-	 * the loop characteristics.
-	 */
-	public HashMap<String,Loop> imageToGenomeCoordinateCompare(HashMap<String,Loop> temp, int index){
-		int x;
-		int y;
-		Set<String> key = temp.keySet();
-		Iterator<String> it = key.iterator();
-		while (it.hasNext()){
-			Loop loop = temp.get(it.next());
-			System.out.println(loop.getName());
-			int resolution = loop.getResolution(); 
-			int diagSize = loop.getDiagSize()*resolution;
-			int imageSize = loop.getMatrixSize();
-			int step = imageSize/2;
-			x = loop.getX();
-			y = loop.getY();
-			int a = (x+(index*step))*resolution;
-			int a_end = a+resolution;
-			int b = (y+(index*step))*resolution;
-			int b_end =b+resolution;
-			String newName = loop.getChr()+"\t"+a+"\t"+b;
-			System.out.println(loop.getName());
-			if(Math.abs(a-b) > diagSize){
-				loop.setCoordinates(a, a_end, b, b_end);
-				loop.setName(newName);
-				m_data.put(newName, loop);
-			}
-		}
-		return m_data;
-	}
-	
+		
 	/**
 	 * test the presence of proximal loops in the hashMap m_data, return false if no proximal loops are detected.
 	 * else retrun true,

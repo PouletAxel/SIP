@@ -111,7 +111,7 @@ public class FindMaxima{
 			double avg = average(x,y);
 			double std =standardDeviation(x,y,avg);
 			DecayAnalysis da = new DecayAnalysis(m_img,x,y);
-			if(m_resolution <= 10000 && da.getNeighbourhood1()>1 && da.getNeighbourhood2() > 1 && da.getNeighbourhood2()-da.getNeighbourhood1()>1){
+			if(m_resolution <= 10000 && da.getNeighbourhood1()>1 && da.getNeighbourhood2() > 1 && da.getNeighbourhood2()-da.getNeighbourhood1()>0.5){
 					//&& (testStripNeighbour(x)==true && testStripNeighbour(y)==true)){
 				Loop maxima = new Loop(temp.get(j),x,y,m_chr,avg,std,ip.getPixelValue(x, y));
 				maxima.setNeigbhoord1(da.getNeighbourhood1());
@@ -141,31 +141,7 @@ public class FindMaxima{
 	}
 	
 	
-	
-	
-	
-	/**
-	 * Method to find loops in the image for the compare method, and fill the loop collection. This method also initiate the object loop,
-	 * @return HashMap<String,Loop>
-	 */
-	public HashMap<String,Loop> findloopCompare(){
-		runForComparison();
-		ArrayList<String> temp = getMaxima();
-		for(int j = 0; j < temp.size();++j){
-			String[] parts = temp.get(j).split("\\t");
-			int x = Integer.parseInt(parts[0]);
-			int y = Integer.parseInt(parts[1]);
-			String name= m_chr+"\t"+temp.get(j);
-			Loop maxima = new Loop(temp.get(j),x,y,m_chr);
-			maxima.setResolution(m_resolution);
-			maxima.setDiagSize(m_diagSize);
-			maxima.setMatrixSize(m_img.getWidth());
-			//System.out.println(name);
-			m_data.put(name, maxima);
-		}
-		return m_data;
-	}
-	
+		
 	/**
 	 * Detect maxima with the oMe or observed methods, call the different methods 
 	 * to detect the maxima and correct them. 
@@ -182,17 +158,6 @@ public class FindMaxima{
 		this.removeMaximaCloseToZero(isObserved);
 	}
 	
-	/**
-	 * detect the maxima for the comparison method, to detect the maxima and correct them.
-	 */
-	private void runForComparison(){
-		ImagePlus temp = m_imgFilter.duplicate();
-		ImageProcessor ip = temp.getProcessor();
-		MaximumFinder mf = new MaximumFinder(); 
-		ByteProcessor bp = mf.findMaxima(ip, m_noiseTolerance, MaximumFinder.SINGLE_POINTS, true);
-		m_imgResu.setProcessor(bp);
-		this.removedCloseMaxima();
-	}
 	
 	/**
 	 * Save the image 

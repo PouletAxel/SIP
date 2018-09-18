@@ -68,37 +68,7 @@ public class PeakAnalysisScore {
 		}
 	}
 	
-	/**
-	 * Method to compute the score of each loop. on a 11*11 square, the average of the corner (3*3) are computed. then the ration between the loops value and this avg is computed.
-	 * For the regional value, the avg of the n_8 value of the loops are done, then a ratio is computed with the avg value of the corner,
-	 * This method is used for compare method. in theis method the white strips are ignored.
-	 */
-	public void computeScoreCompareMethod(){
-		Set<String> key = m_data.keySet();
-		Iterator<String> it = key.iterator();
-		while (it.hasNext()){
-			String cle = it.next();
-			Loop loop = m_data.get(cle);
-			int x = loop.getX();
-			int y = loop.getY();
-			double corner = 0;
-			double cornerAvg = 0;
-			double center = m_ipRaw.getPixel(x, y);
-			double squareCenterAvg = process3By3SquareAvg(x,y);
-			int nbCorner = 0;
-			if(x >= 5 && y >= 5 && x < m_imgRaw.getWidth()-5 && y < m_imgRaw.getHeight()-5){
-				cornerAvg += process3By3SquareAvg(x-4,y-4); 
-				++nbCorner;
-			}
-			if(nbCorner > 0){
-				corner = corner/nbCorner;
-				cornerAvg = cornerAvg/nbCorner;
-				loop.setPaScoreAvg(center/cornerAvg);
-				loop.setRegionalPaScoreAvg(squareCenterAvg/cornerAvg);	
-			}
-		}	
-	}	
-	
+
 	
 	/**
 	 * compute the avg of3*3 square

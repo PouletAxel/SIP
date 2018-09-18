@@ -26,9 +26,6 @@ public class TestGui {
 			String m_chrSizeFile = gui.getChrSizeFile();
 			String m_output = gui.getOutputDir();
 			String m_input = gui.getRawDataDir();
-			String m_input2 = gui.getRawDataDir2();
-			String m_bedfile1 = gui.getLoopFile1();
-			String m_bedfile2 = gui.getLoopFile2();
 			int m_matrixSize = gui.getMatrixSize();
 			int m_diagSize = gui.getDiagSize();
 			int m_resolution = gui.getResolution();
@@ -43,7 +40,6 @@ public class TestGui {
 			boolean m_isObserved = gui.isObserved();
 			boolean m_isHic  = gui.isHic();
 			boolean m_isProcessed = gui.isProcessed();
-			boolean m_isCompare = gui.isCompare();
 			String m_juiceBoxTools = gui.getJuiceBox();
 			String m_juiceBoXNormalisation = "KR";
 			if(gui.isNONE()) m_juiceBoXNormalisation = "NONE";
@@ -53,9 +49,6 @@ public class TestGui {
 			
 			System.out.println("hic mode:\ninput: "+m_input
 					+ "\noutput: "+m_output
-					+"\nbed1: "+m_bedfile1
-					+ "\nbed2: "+m_bedfile2
-					+ "\ninput2: "+m_input2
 					+ "\nChr size file: "+m_chrSizeFile
 					+ "\njuiceBox: "+m_juiceBoxTools
 					+"\nnorm: "+ m_juiceBoXNormalisation
@@ -70,7 +63,6 @@ public class TestGui {
 					+"\nisObserved: "+m_isObserved
 					+"\nisHic: "+m_isHic
 					+"\nisProcessed: "+m_isProcessed
-					+"\nisCompare: "+m_isCompare
 					+"\n number of zero:"+m_nbZero
 					+"\n factor "+ m_factor+"\n");
 

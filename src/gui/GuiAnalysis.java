@@ -41,12 +41,6 @@ public class GuiAnalysis extends JFrame
 	/** */
 	private JButton m_jbRawData = new JButton("Raw data");
 	/** */
-	private JButton m_jbRawData2 = new JButton("Raw data 2");
-	/** */
-	private JButton m_jbBedFile1 = new JButton("loop file 1");
-	/** */
-	private JButton m_jbBedFile2 = new JButton("loop file 2");
-	/** */
 	private JButton m_jbChrSize = new JButton("Chr size file");
 	/** */
 	private JTextField m_jtfChrSize  =  new JTextField();
@@ -54,13 +48,7 @@ public class GuiAnalysis extends JFrame
 	private JTextField m_jtfWorkDir  =  new JTextField();
 	/** */
 	private JTextField m_jtfRawData = new JTextField();
-	/** */
-	private JTextField m_jtfRawData2 = new JTextField();
-	/** */
-	private JTextField m_jtfBedFile1 = new JTextField();
-	/** */
-	private JTextField m_jtfBedFile2 = new JTextField();
-	/** */
+	/***/
 	private JButton m_jbStart = new JButton("Start");
 	/** */
 	private JButton m_jbQuit = new JButton("Quit");
@@ -72,8 +60,6 @@ public class GuiAnalysis extends JFrame
 	private JRadioButton m_jrbHic = new JRadioButton("hic");
 	/** */
 	private JRadioButton m_jrbProcessed = new JRadioButton("processed");
-	/** */
-	private JRadioButton m_jrbCompare = new JRadioButton("compare");
 	/** */
     private String m_juiceBoxTools;
     /** */
@@ -193,11 +179,9 @@ public class GuiAnalysis extends JFrame
 	   	
 	   	m_bGroupInputType.add(m_jrbProcessed);
 	 	m_bGroupInputType.add(m_jrbHic);
-	 	m_bGroupInputType.add(m_jrbCompare);
 	 	
 		m_jrbHic.setFont(new java.awt.Font("arial",2,11));
 		m_jrbProcessed.setFont(new java.awt.Font("arial",2,11));
-		m_jrbCompare.setFont(new java.awt.Font("arial",2,11));
 		m_container.add(m_jrbHic,new GridBagConstraints
 				(
 						0, 1, 0, 0, 0.0, 0.0, GridBagConstraints.NORTHWEST,
@@ -210,12 +194,7 @@ public class GuiAnalysis extends JFrame
 						GridBagConstraints.NONE,new Insets(20, 100, 0, 0), 0, 0
 				)
 		);
-		m_container.add(m_jrbCompare,new GridBagConstraints
-				(
-						0, 1, 0, 0,  0.0, 0.0, GridBagConstraints.NORTHWEST,
-						GridBagConstraints.NONE,new Insets(20, 200, 0, 0), 0, 0
-				)
-		);
+		
 		m_jrbHic.setSelected(true);
 
 		
@@ -332,61 +311,6 @@ public class GuiAnalysis extends JFrame
 				(
 						0, 1, 0, 0, 0.0, 0.0, GridBagConstraints.NORTHWEST,
 						GridBagConstraints.NONE, new Insets(240, 160, 0, 0),0, 0
-				)
-		);
-		
-		m_jbBedFile1.setPreferredSize(new java.awt.Dimension(120, 21));
-		m_jbBedFile1.setFont(new java.awt.Font("arial",2,10));
-	   	m_container.add ( m_jbBedFile1, new GridBagConstraints
-	   			(
-	   					0, 1, 0, 0, 0.0, 0.0, GridBagConstraints.NORTHWEST, 
-	   					GridBagConstraints.NONE, new Insets(270, 10, 0, 0), 0, 0
-	   			)
-	   	);
-	   	
-	   	m_jtfBedFile1.setPreferredSize(new java.awt.Dimension(280, 21));
-	   	m_jtfBedFile1.setFont(new java.awt.Font("arial",2,10));
-		m_container.add(m_jtfBedFile1, new GridBagConstraints
-				(
-						0, 1, 0, 0, 0.0, 0.0, GridBagConstraints.NORTHWEST,
-						GridBagConstraints.NONE, new Insets(270, 160, 0, 0),0, 0
-				)
-		);
-		
-		
-		m_jbRawData2.setPreferredSize(new java.awt.Dimension(120, 21));
-		m_jbRawData2.setFont(new java.awt.Font("arial",2,10));
-	   	m_container.add(m_jbRawData2, new GridBagConstraints
-	   			(
-	   					0, 1, 0, 0, 0.0, 0.0,GridBagConstraints.NORTHWEST,
-	   					GridBagConstraints.NONE, new Insets(300, 10, 0, 0), 0, 0
-	   			)
-	   	);
-	  
-	   	m_jtfRawData2.setPreferredSize(new java.awt.Dimension(280, 21));
-	   	m_jtfRawData2.setFont(new java.awt.Font("arial",2,10));	
-		m_container.add( m_jtfRawData2, new GridBagConstraints
-				(
-						0, 1, 0, 0, 0.0, 0.0, GridBagConstraints.NORTHWEST,
-						GridBagConstraints.NONE, new Insets(300, 160, 0, 0), 0, 0
-				)
-		);
-		
-		m_jbBedFile2.setPreferredSize(new java.awt.Dimension(120, 21));
-		m_jbBedFile2.setFont(new java.awt.Font("arial",2,10));
-	   	m_container.add(m_jbBedFile2, new GridBagConstraints
-	   			(
-	   					0, 1, 0, 0, 0.0, 0.0,GridBagConstraints.NORTHWEST,
-	   					GridBagConstraints.NONE, new Insets(330, 10, 0, 0), 0, 0
-	   			)
-	   	);
-	  
-	   	m_jtfBedFile2.setPreferredSize(new java.awt.Dimension(280, 21));
-	   	m_jtfBedFile2.setFont(new java.awt.Font("arial",2,10));	
-		m_container.add( m_jtfBedFile2, new GridBagConstraints
-				(
-						0, 1, 0, 0, 0.0, 0.0, GridBagConstraints.NORTHWEST,
-						GridBagConstraints.NONE, new Insets(330, 160, 0, 0), 0, 0
 				)
 		);
 		
@@ -724,34 +648,21 @@ public class GuiAnalysis extends JFrame
 			)
 		);
 		
-		m_jbRawData2.setEnabled(false);
-    	m_jtfRawData2.setEnabled(false);
-    	m_jbBedFile1.setEnabled(false);
-    	m_jtfBedFile1.setEnabled(false);
-    	m_jbBedFile2.setEnabled(false);
-    	m_jtfBedFile2.setEnabled(false);
-    	
+	
 	  	RBObservedListener rbl = new RBObservedListener(this);
 	  	this.m_jrbObserved.addActionListener(rbl);
 	  	this.m_jrbObservedMExpected.addActionListener(rbl);
 	  	RBHicListener hic = new RBHicListener(this);
 	  	this.m_jrbHic.addActionListener(hic);
 	  	this.m_jrbProcessed.addActionListener(hic);
-	  	this.m_jrbCompare.addActionListener(hic);
 	  	WorkDirectoryListener wdListener = new WorkDirectoryListener();
 	  	m_jbWorkDir.addActionListener(wdListener);
 		FileListener chr = new FileListener(m_jtfChrSize);
 	  	m_jbChrSize.addActionListener(chr);
-	  	FileListener bedFile1 = new FileListener(m_jtfBedFile1);
-	  	m_jbBedFile1.addActionListener(bedFile1);
-	  	FileListener bedFile2 = new FileListener(m_jtfBedFile2);
-	  	m_jbBedFile2.addActionListener(bedFile2);
 	  	JuiceBoxListener juice = new JuiceBoxListener();
 	  	m_jbBoxTools.addActionListener(juice);
 	  	RawDataDirectoryListener ddListener = new RawDataDirectoryListener(this,m_jtfRawData);
 	  	m_jbRawData.addActionListener(ddListener);
-	  	RawDataDirectoryListener ddListener2 = new RawDataDirectoryListener(this,m_jtfRawData2);
-	  	m_jbRawData2.addActionListener(ddListener2);
 	  	QuitListener quitListener = new QuitListener(this);
 	   	m_jbQuit.addActionListener(quitListener);
 	   	StartListener startListener = new StartListener(this);
@@ -857,29 +768,6 @@ public class GuiAnalysis extends JFrame
 		return m_jtfWorkDir.getText();
 	}
 	
-	/**
-	 * 
-	 * @return
-	 */
-	public String getRawDataDir2(){
-		return m_jtfRawData2.getText();
-	}
-	
-	/**
-	 * 
-	 * @return
-	 */
-	public String getLoopFile1(){
-		return m_jtfBedFile1.getText();
-	}
-	
-	/**
-	 * 
-	 * @return
-	 */
-	public String getLoopFile2(){
-		return m_jtfBedFile2.getText();
-	}
 	
 	/**
 	 * 
@@ -936,14 +824,7 @@ public class GuiAnalysis extends JFrame
 		return m_jrbHic.isSelected();
 	}
 	
-	/**
-	 * 
-	 * @return
-	 */
-	public boolean isCompare(){
-		return m_jrbCompare.isSelected();
-	}
-	
+		
 	/**
 	 * 
 	 * @return
@@ -1053,13 +934,7 @@ public class GuiAnalysis extends JFrame
 		 * 
 		 */
 		public void actionPerformed(ActionEvent actionEvent){
-			m_jbRawData2.setEnabled(false);
-        	m_jtfRawData2.setEnabled(false);
-        	m_jbBedFile1.setEnabled(false);
-        	m_jtfBedFile1.setEnabled(false);
-        	m_jbBedFile2.setEnabled(false);
-        	m_jtfBedFile2.setEnabled(false);
-        	m_gui.m_jrbObserved.setEnabled(true);
+			m_gui.m_jrbObserved.setEnabled(true);
 	        m_gui.m_jrbObservedMExpected.setEnabled(true);
 	        if (m_gui.isHic()) {
 	        	m_gui.m_jrbVC_sqrt.setEnabled(true);
@@ -1122,31 +997,6 @@ public class GuiAnalysis extends JFrame
 	        		m_gui.m_enhanceContrast.setEditable(true);
 	        	}		
 	        }
-	        else if(m_gui.isCompare()){
-	        	m_gui.m_jrbVC_sqrt.setEnabled(false);
-	        	m_gui.m_jrbVC.setEnabled(false);
-	        	m_gui.m_jrbNone.setEnabled(false);
-	        	m_gui.m_jrbKR.setEnabled(false);
-	        	m_gui.m_jtfBoxTools.setEnabled(false);
-	        	m_jbBoxTools.setEnabled(false);
-	        	m_gui.m_jrbObserved.setEnabled(false);
-	        	m_gui.m_jrbObservedMExpected.setEnabled(false);
-	        	m_gui.m_max.setEditable(false);
-	        	m_gui.m_enhanceContrast.setEditable(false);
-	        	m_gui.m_jlNbZero.setEnabled(false);
-	        	m_gui.m_min.setEditable(true);
-	        	m_jbRawData2.setEnabled(true);
-	        	m_jtfRawData2.setEnabled(true);
-	        	m_jbBedFile1.setEnabled(true);
-	        	m_jtfBedFile1.setEnabled(true);
-	        	m_jbBedFile2.setEnabled(true);
-	        	m_jtfBedFile2.setEnabled(true);
-	        	m_gaussian.setText("0.5");
-	        	m_enhanceContrast.setText("0");
-	        	m_min.setText("1");
-	        	m_max.setText("0");
-	        	m_noiseTolerance.setText("3");
-	        }
 	    }
 	}
 	
@@ -1178,14 +1028,6 @@ public class GuiAnalysis extends JFrame
 					"Error",
 					JOptionPane.ERROR_MESSAGE
 				); 
-			else if(m_gui.isCompare() && (m_gui.m_jtfBedFile1.getText().isEmpty() || m_gui.m_jtfBedFile2.getText().isEmpty() || m_gui.m_jtfRawData2.getText().isEmpty()))
-				JOptionPane.showMessageDialog
-				(
-					null,
-					"You did not choose a loops file 1 or 2 or raw data 2",
-					"Error",
-					JOptionPane.ERROR_MESSAGE
-				);
 			else if(m_gui.isHic() && (m_gui.m_jtfBoxTools.getText().isEmpty() ))
 				JOptionPane.showMessageDialog
 				(

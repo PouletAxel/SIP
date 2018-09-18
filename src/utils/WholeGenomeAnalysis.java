@@ -183,7 +183,7 @@ public class WholeGenomeAnalysis {
 				// make and save image at two differents resolution (m_resolution and m_resolution*2)
 				String[] tfile = fileList[i].toString().split("_");
 				int numImage = Integer.parseInt(tfile[tfile.length-2])/(m_step*m_resolution);
-				//System.out.println(numImage+" mon cul");
+				System.out.println(numImage+" "+fileList[i]);
 				TupleFileToImage readFile = new TupleFileToImage(fileList[i].toString(),m_matrixSize,m_resolution);
 				String imageName = fileList[i].toString().replaceAll(".txt", ".tif");
 				ImagePlus imgRaw = readFile.readTupleFile();
@@ -195,7 +195,7 @@ public class WholeGenomeAnalysis {
 				NonZeroCorrection nzc =new NonZeroCorrection(imgRaw);
 				ArrayList<Integer> countNonZero = nzc.getNonZeroList();
 				ImagePlus imgFilter = imgRaw.duplicate();
-				readFile.correctImage(imgFilter);
+				//readFile.correctImage(imgFilter);
 				
 				/// call the loops first in the smaller resolution 
 				// then making image with bigger resolution and fill no Zero list

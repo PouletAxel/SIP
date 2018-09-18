@@ -20,19 +20,21 @@ public class TestCallLoopsProcessedFile {
 	 * @throws InterruptedException 
 	 */
 	public static void main(String[] args) throws IOException, InterruptedException {
-		//String input = "/home/plop/Bureau/DataSetImageHiC/GM12878/subsample/50mil/";
-		//String output= "/home/plop/Bureau/DataSetImageHiC/GM12878/subsample/50mil_test/";
+		//String input = "/home/plop/Bureau/DataSetImageHiC/GM12878/subsample/GM12878_100mil/";
+		//String output= "/home/plop/Bureau/DataSetImageHiC/GM12878/subsample/100mil_test/";
 		//String output= "/home/plop/Bureau/DataSetImageHiC/Hichip_H3k4me1_test";
 		//String input= "/home/plop/Bureau/DataSetImageHiC/Hichip_H3k4me1_test";
 		///home/plop/Bureau/DataSetImageHiC/Hichip_H3k4me1_test
-		String output= "/home/plop/Bureau/DataSetImageHiC/GM12878/test_wholeGenome_3500";
-		String input = "/home/plop/Bureau/DataSetImageHiC/GM12878/3000_1_125_125_005_30q/";
+		//String output= "/home/plop/Bureau/DataSetImageHiC/GM12878/chr2_fullData";
+		//String input = "/home/plop/Bureau/DataSetImageHiC/GM12878/subsample/GM12878_full/";
+		String input = "/home/plop/Bureau/test/";
+		String output = "/home/plop/Bureau/test/";
 		int matrixSize = 2000;
 		int resolution = 5000;
 		int diagSize = 6;
 		double gauss = 1;
 		int thresholdMax = 3250;
-		boolean isObserved = false;
+		boolean isObserved = true;
 		int nbZero = 6;
 		double min =1.5;
 		double max =1.5;
@@ -58,7 +60,7 @@ public class TestCallLoopsProcessedFile {
 			file.mkdir();
 		///home/plop/Documents/Genome/HumanGenomeHg19/hg19_withoutChr.sizes
 		///home/plop/Documents/Genome/hg38.chr2.sizes
-		WholeGenomeAnalysis wga = new WholeGenomeAnalysis(output, readChrSizeFile("/home/plop/Documents/Genome/HumanGenomeHg19/hg19_withoutChr.sizes"), gauss, min, max, 
+		WholeGenomeAnalysis wga = new WholeGenomeAnalysis(output, readChrSizeFile("/home/plop/Documents/Genome/HumanGenomeHg19/chr20.size"), gauss, min, max, 
 				resolution, saturatedPixel, thresholdMax, diagSize, matrixSize,nbZero, factor);
 
 		if(isObserved) wga.run("o",input);
