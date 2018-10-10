@@ -24,7 +24,8 @@ public class HicFileProcessing {
 	private DumpData m_dumpData;
 	/** */
 	private HashMap<String,Integer> m_chrSize = new HashMap<String,Integer>();
-	
+	/** */
+	private String m_norm="";
 	/**
 	 * 
 	 * @param hicFile
@@ -38,6 +39,7 @@ public class HicFileProcessing {
 		m_key = chrSize.keySet().iterator();
 		m_chrSize = chrSize;
 		m_dumpData = new DumpData(juiceBoxTools,hicFile,normJuiceBox, wga.getResolution());
+		m_norm = normJuiceBox;
 		System.out.println(hicFile+"\n");
 	}
 	
@@ -49,7 +51,7 @@ public class HicFileProcessing {
 	 * @throws IOException
 	 * @throws InterruptedException 
 	 */
-	public void run(boolean isObserved) throws IOException, InterruptedException{
+	public void run() throws IOException, InterruptedException{
 		boolean juicerTools;
 		while(m_key.hasNext()){
 			String expected ="";
@@ -61,23 +63,23 @@ public class HicFileProcessing {
 			int step = m_wga.getStep()*m_wga.getResolution();
 			int j = m_wga.getMatrixSize()*m_wga.getResolution();
 			System.out.println(chrsize+" "+step+" "+j);
-			if(isObserved == false){	
-				String test = chr+":0:"+j;
-				String name = outdir+chr+"_0_"+j+".txt";
-				m_dumpData.getExpected(test,name);
-			}
+			String test = chr+":0:"+j;
+			String name = outdir+chr+"_0_"+j+".txt";
+			m_dumpData.getExpected(test,name);
+			String normOutput = m_wga.getOutputDir()+File.separator+"normVector";
+			file = new File(normOutput);
+			if (file.exists()==false){file.mkdir();}
+			m_dumpData.getNormVector(chr,normOutput+File.separator+chr+".norm");
+			System.out.println(normOutput+File.separator+chr+".norm");
 			System.out.println("start dump "+chr+" size "+chrsize);
 			for(int i = 0 ; j < chrsize; i+=step,j+=step){
 				int end =j-1;
 				String dump = chr+":"+i+":"+end;
-				String name = outdir+chr+"_"+i+"_"+end+".txt";
+				name = outdir+chr+"_"+i+"_"+end+".txt";
 				System.out.println("\tstart dump "+chr+" size "+chrsize+" dump "+dump);
-				if(isObserved) 
-					juicerTools = m_dumpData.dumpObserved(dump,name);
-				else{
-					System.out.println(expected);
-					juicerTools = m_dumpData.dumpObservedMExpected(dump,name);
-				}
+				System.out.println(expected);
+				juicerTools = m_dumpData.dumpObservedMExpected(dump,name);
+				
 				m_log = m_log+"\n"+m_dumpData.getLog();
 				if (juicerTools == false){
 					System.out.print(dump+" "+"\n"+juicerTools+"\n"+m_log);
@@ -89,7 +91,8 @@ public class HicFileProcessing {
 					dump = chr+":"+i+":"+j;
 					name = outdir+chr+"_"+i+"_"+j+".txt";
 					System.out.println("\tstart dump "+chr+" size "+chrsize+" dump "+dump);
-					juicerTools = m_dumpData.dumpObserved(dump,name);
+					System.out.println(expected);
+					juicerTools = m_dumpData.dumpObservedMExpected(dump,name);
 					m_log = m_dumpData.getLog();
 					if (juicerTools == false){
 						System.out.print(dump+" "+"\n"+juicerTools+"\n"+m_log);
@@ -100,8 +103,7 @@ public class HicFileProcessing {
 			
 			System.out.println("end dump "+chr);
 		}
-		if (isObserved) m_wga.run("o");
-		else m_wga.run("oMe");
+		m_wga.run();
 	}
 	
 	/**

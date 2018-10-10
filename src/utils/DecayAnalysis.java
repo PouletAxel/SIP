@@ -47,7 +47,15 @@ public class DecayAnalysis {
 	public double getNeighbourhood2(){
 		return computeDiff(2);
 	}
+
 	
+	/**
+	 * getter computing the average difference beetwen the loop value and the neighbourhood 24 values (exclude the values of the 8 neighbourhood)
+	 * @return double stocking the average differential value of the neighbourhood 24.
+	 */
+	public double getNeighbourhood3(){
+		return computeDiff(3);
+	}
 	/**
 	 * Private method computing the average difference between the loop value and the chosen neighbourhood. 
 	 * @param c int; stock the choice: 1 = neighbourhood 8; 2 = neighbourhood 24
@@ -60,9 +68,12 @@ public class DecayAnalysis {
 		for(int i = m_x-c; i <= m_x+c; ++i){
 			for(int j = m_y-c ; j <= m_y+c; ++j)
 				if((i != m_x || j != m_y)  && (i-m_x == -c || j-m_y == -c || i-m_x == c || j-m_y == c)){
-					double a =  ip.getPixel(m_x, m_y)- ip.getPixel(i, j);
-					sum+= a;
-					++nb;
+					if(i >=0 && j>= 0){
+						//System.out.println(m_x+" "+i+" "+m_y+" "+j);
+						double a =  ip.get(m_x, m_y)- ip.get(i, j);
+						sum+= a;
+						++nb;
+					}
 				}
 		}
 		sum = sum/nb;

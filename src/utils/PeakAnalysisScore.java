@@ -5,6 +5,7 @@ import java.util.Iterator;
 import java.util.Set;
 import ij.ImagePlus;
 import ij.process.ImageProcessor;
+import java.util.Arrays;
 
 /**
  * Peak analysis score. 
@@ -53,9 +54,17 @@ public class PeakAnalysisScore {
 			int nbCorner = 0;
 			if(x >= 5 && y >= 5 && x < m_imgRaw.getWidth()-5 && y < m_imgRaw.getHeight()-5){
 				cornerAvg += process3By3SquareAvg(x-4,y-4); 
+				corner += process3By3SquareMed(x-4,y-4);
+	
 				cornerAvg += process3By3SquareAvg(x-4,y+4);
+				corner += process3By3SquareMed(x-4,y+4);
+	
 				cornerAvg += process3By3SquareAvg(x+4,y-4);
+				corner += process3By3SquareMed(x+4,y-4);
+	
 				cornerAvg += process3By3SquareAvg(x+4,y+4);
+				corner += process3By3SquareMed(x+4,y+4);
+	
 				nbCorner = 4;
 			}
 		
@@ -64,6 +73,8 @@ public class PeakAnalysisScore {
 				cornerAvg = cornerAvg/nbCorner;
 				loop.setPaScoreAvg(center/cornerAvg);
 				loop.setRegionalPaScoreAvg(squareCenterAvg/cornerAvg);	
+				loop.setPaScoreMed(center/corner);
+				loop.setRegionalPaScoreMed(squareCenterAvg/corner);	
 			}
 		}
 	}
@@ -77,12 +88,55 @@ public class PeakAnalysisScore {
 	 * @return
 	 */
 	private double process3By3SquareAvg(int x, int y){
-		int sum = 0;
+		double sum = 0;
+		int nb = 0;
 		for(int i = x-1; i <= x+1; ++i){
 			for(int j = y-1; j <= y+1; ++j){
-				sum += this.m_ipRaw.getPixel(i,j);
+				if(i < m_ipRaw.getWidth() && i>0 && j < m_ipRaw.getWidth() && j > 0){
+					sum += this.m_ipRaw.getf(i,j);
+					nb++;
+				}
 			}
 		}
-		return sum/9;
+		if(nb == 0)
+			return 0;
+		return sum/nb;
+	}
+	
+	
+	
+	/**
+	 * 
+	 * @param x
+	 * @param y
+	 * @return
+	 */
+	private double process3By3SquareMed(int x, int y){
+		int []value = new int [9];
+		int cmp = 0;
+		for(int i = x-1; i <= x+1; ++i){
+			for(int j = y-1; j <= y+1; ++j){
+				if(i < m_ipRaw.getWidth() && i>0 && j < m_ipRaw.getWidth() && j > 0){
+					value[cmp] = this.m_ipRaw.getPixel(i, j);
+					++cmp;
+				}
+			}
+		}
+		return median(value);
+	}
+	
+	/**
+	 * 
+	 * @param value
+	 * @return
+	 */
+	private double median (int[] value ){
+		Arrays.sort(value);
+		double median;
+		if (value.length % 2 == 0)
+			median = ((double)value[value.length/2] + (double)value[value.length/2 - 1])/2;
+		else
+			median = (double) value[value.length/2];
+		return median;
 	}
 }

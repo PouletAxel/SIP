@@ -2,8 +2,6 @@ package utils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Set;
 
 import ij.ImagePlus;
 import ij.io.FileSaver;
@@ -21,7 +19,7 @@ import ij.process.ImageProcessor;
  */
 public class FindMaxima{
 	/**	 raw image*/
-	private ImagePlus m_img;
+	private ImagePlus m_imgNorm;
 	/**	 name of the chromosome*/
 	private String m_chr;
 	/**	 Image fileterred with min, max and gaussian filter*/
@@ -38,8 +36,6 @@ public class FindMaxima{
 	private HashMap<String,Loop> m_data = new HashMap<String,Loop>();
 	/** arrayList of int each occurence is a x coordinate of the image, the value of this arrayList is an integer if = 0 it is a whithe strip*/
 	ArrayList<Integer> m_countNonZero = new ArrayList<Integer>(); 
-	/**	Nunber of zero allowed around the loop n_24*/
-	private int m_nbOfZero =-1;
 	/** */
 	HashMap <String,Loop> m_tmp = new HashMap <String,Loop>(); 
 	
@@ -53,7 +49,7 @@ public class FindMaxima{
 	 * @param resolution int size of the pixel in base
 	 */
 	public FindMaxima(ImagePlus img, ImagePlus imgFilter, String chr, double noiseTolerance, int diag, int resolution){
-		m_img = img;
+		m_imgNorm =  img;
 		m_imgFilter = imgFilter;
 		m_noiseTolerance = noiseTolerance;
 		m_chr = chr;
@@ -71,26 +67,24 @@ public class FindMaxima{
 	 * @param resolution int  the size of the diagonal
 	 * @param countNonZero ArrayList<Integer> array list locate the whit strip in the original matrix
 	 */
-	public FindMaxima(ImagePlus img, ImagePlus imgFilter, String chr, double noiseTolerance, int diag, int resolution,int nbZero, ArrayList<Integer> countNonZero){
-		m_img = img;
+	public FindMaxima(ImagePlus img, ImagePlus imgFilter, String chr, double noiseTolerance, int diag, int resolution, ArrayList<Integer> countNonZero){
+		m_imgNorm =  img;
 		m_imgFilter = imgFilter;
 		m_noiseTolerance = noiseTolerance;
 		m_chr = chr;
 		m_diagSize = diag;
 		m_resolution = resolution;
 		m_countNonZero= countNonZero;
-		m_nbOfZero = nbZero;
 	}
 	
-	public FindMaxima(ImagePlus img, ImagePlus imgFilter, String chr, int noiseTolerance,int diag, int resolution, int nbZero, ArrayList<Integer> countNonZero, HashMap<String, Loop> temp) {
-		m_img = img;
+	public FindMaxima(ImagePlus img, ImagePlus imgFilter, String chr, int noiseTolerance,int diag, int resolution, ArrayList<Integer> countNonZero, HashMap<String, Loop> temp) {
+		m_imgNorm =  img;
 		m_imgFilter = imgFilter;
 		m_noiseTolerance = noiseTolerance;
 		m_chr = chr;
 		m_diagSize = diag;
 		m_resolution = resolution;
 		m_countNonZero= countNonZero;
-		m_nbOfZero = nbZero;
 		m_tmp = temp;
 	}
 
@@ -99,10 +93,10 @@ public class FindMaxima{
 	 * @param isObserved
 	 * @return HashMap<String,Loop>
 	 */
-	public HashMap<String,Loop> findloop(boolean isObserved, int numImage){
-		run(isObserved);
+	public HashMap<String,Loop> findloop(int numImage, int nbZero, ImagePlus raw, int val){
+		run(nbZero, raw, val);
 		ArrayList<String> temp = getMaxima();
-		ImageProcessor ip = m_img.getProcessor();
+		ImageProcessor ipN = m_imgNorm.getProcessor();
 		for(int j = 0; j < temp.size();++j){
 			String[] parts = temp.get(j).split("\\t");
 			int x = Integer.parseInt(parts[0]);
@@ -110,32 +104,31 @@ public class FindMaxima{
 			String name= m_chr+"\t"+temp.get(j)+"\t"+numImage;
 			double avg = average(x,y);
 			double std =standardDeviation(x,y,avg);
-			DecayAnalysis da = new DecayAnalysis(m_img,x,y);
-			if(m_resolution <= 10000 && da.getNeighbourhood1()>1 && da.getNeighbourhood2() > 1 && da.getNeighbourhood2()-da.getNeighbourhood1()>0.5){
-					//&& (testStripNeighbour(x)==true && testStripNeighbour(y)==true)){
-				Loop maxima = new Loop(temp.get(j),x,y,m_chr,avg,std,ip.getPixelValue(x, y));
+			DecayAnalysis da = new DecayAnalysis(this.m_imgNorm,x,y);
+			//if( 
+			//		da.getNeighbourhood1()< da.getNeighbourhood3() && da.getNeighbourhood2()<= da.getNeighbourhood3()&& da.getNeighbourhood2()>=0.125
+			if(da.getNeighbourhood1() <= da.getNeighbourhood2() && da.getNeighbourhood1()>= 0.125 && da.getNeighbourhood2() >= 0.125 && da.getNeighbourhood3()>=0.125 && (testStripNeighbour(x)==true && testStripNeighbour(y)==true)){
+				Loop maxima = new Loop(temp.get(j),x,y,m_chr,avg,std,ipN.getf(x, y));
 				maxima.setNeigbhoord1(da.getNeighbourhood1());
 				maxima.setNeigbhoord2(da.getNeighbourhood2());
-				maxima.setPercentageOfZero(PercentOfneihgboordEqual0(x,y));
+				maxima.setNeigbhoord3(da.getNeighbourhood3());
 				maxima.setResolution(m_resolution);
 				maxima.setDiagSize(m_diagSize);
-				maxima.setMatrixSize(m_img.getWidth());
+				maxima.setMatrixSize(m_imgNorm.getWidth());
 				m_data.put(name, maxima);
-				//System.out.println(name);
 			}
-			else{
-				if(da.getNeighbourhood1() >= 1 ){
-					//&& (testStripNeighbour(x)==true && testStripNeighbour(y)==true)){
-					Loop maxima = new Loop(temp.get(j),x,y,m_chr,avg,std,ip.getPixelValue(x, y));
+			/*else if (m_resolution>10000){
+				if(da.getNeighbourhood1() >= 0.5 || da.getNeighbourhood2() >= 0.5 || da.getNeighbourhood1() <= da.getNeighbourhood2()
+					&& (testStripNeighbour(x)==true && testStripNeighbour(y)==true)){
+					Loop maxima = new Loop(temp.get(j),x,y,m_chr,avg,std,ipN.getf(x, y));
 					maxima.setNeigbhoord1(da.getNeighbourhood1());
 					maxima.setNeigbhoord2(da.getNeighbourhood2());
-					maxima.setPercentageOfZero(PercentOfneihgboordEqual0(x,y));
 					maxima.setResolution(m_resolution);
 					maxima.setDiagSize(m_diagSize);
-					maxima.setMatrixSize(m_img.getWidth());
+					maxima.setMatrixSize(m_imgNorm.getWidth());
 					m_data.put(name, maxima);
 				}
-			}
+			}*/
 		}
 		return m_data;
 	}
@@ -147,7 +140,7 @@ public class FindMaxima{
 	 * to detect the maxima and correct them. 
 	 * @param isObserved, if true =>obersved method, else oMe
 	 */
-	private void run(boolean isObserved){
+	private void run(int nbZero, ImagePlus rawImage, int val){
 		ImagePlus temp = m_imgFilter.duplicate();
 		ImageProcessor ip = temp.getProcessor();
 		MaximumFinder mf = new MaximumFinder(); 
@@ -155,7 +148,7 @@ public class FindMaxima{
 		m_imgResu.setProcessor(bp);
 		this.removedCloseMaxima();
 		this.correctMaxima();
-		this.removeMaximaCloseToZero(isObserved);
+		this.removeMaximaCloseToZero(nbZero,rawImage, val);
 	}
 	
 	
@@ -176,24 +169,23 @@ public class FindMaxima{
 	 * 
 	 */
 	private void correctMaxima(){
-		ImageProcessor rawIp  = m_img.getProcessor();
-		int w = rawIp.getWidth();
-		int h = rawIp.getHeight();
+		ImageProcessor rawIpNorm  = this.m_imgNorm.getProcessor();
+		int w = rawIpNorm.getWidth();
+		int h = rawIpNorm.getHeight();
 		ImageProcessor ipMaxima = m_imgResu.getProcessor();
 		for(int i = 2; i< w-2; ++i){
 			for(int j=2; j< h-2; ++j){		
 				if (ipMaxima.getPixel(i,j) > 0){
-					int max = rawIp.get(i,j);
+					double max = rawIpNorm.getf(i,j);
 					int imax = i;
 					int jmax =j;
 					if(Math.abs(i-j) <= m_diagSize*2){
 						for(int ii=i-1; ii<=i+1; ++ii){
 							for(int jj = j-1; jj <= j+1; ++jj){
-								if(max < rawIp.get(ii, jj) && Math.abs(ii-jj) >= Math.abs(i-j)){
+								if(max < rawIpNorm.getf(ii, jj) && Math.abs(ii-jj) >= Math.abs(i-j)){
 									imax = ii;
 									jmax = jj;
-									max = rawIp.get(ii, jj);
-									if(i==126 && j == 138){System.out.println(ii+" plopi"+jj);}
+									max = rawIpNorm.get(ii, jj);
 								}
 							}
 						}
@@ -201,19 +193,17 @@ public class FindMaxima{
 					else{
 						for(int ii=i-2; ii<=i+2; ++ii){
 							for(int jj = j-2; jj <= j+2; ++jj){
-								if(max < rawIp.get(ii, jj)){
+								if(max < rawIpNorm.get(ii, jj)){
 									imax = ii;
 									jmax = jj;
-									max = rawIp.get(ii, jj);
-									if(i==126 && j == 138){System.out.println(ii+" plopi"+jj);}
+									max = rawIpNorm.getf(ii, jj);
 								}
 							}
 						}
 					}
-					if (max > rawIp.get(i,j)){
+					if (max > rawIpNorm.get(i,j)){
 						ipMaxima.set(i,j,0);
 						ipMaxima.set(imax,jmax,255);
-						if(i==126 && j == 138){System.out.println(imax+" plopi"+jmax);}
 					}
 				}			
 			}
@@ -226,18 +216,18 @@ public class FindMaxima{
 	 * Test a 48 neighbourhood region
 	 */
 	private void removedCloseMaxima(){
-		ImageProcessor rawIp  = m_img.getProcessor();
-		int w = rawIp.getWidth();
-		int h = rawIp.getHeight();
+		ImageProcessor rawIpNorm  = m_imgNorm.getProcessor();
+		int w = rawIpNorm.getWidth();
+		int h = rawIpNorm.getHeight();
 		ImageProcessor ipMaxima = m_imgResu.getProcessor();
 		for(int i = 1; i < w-1; ++i){
 			for(int j= 1; j < h-1; ++j){		
 				if (ipMaxima.getPixel(i,j) > 0){
-					for(int ii = i-3; ii <= i+3; ++ii){
-						for(int jj = j-3; jj <= j+3; ++jj){	
+					for(int ii = i-2; ii <= i+2; ++ii){
+						for(int jj = j-2; jj <= j+2; ++jj){	
 							if(ipMaxima.getPixel(ii,jj) > 0){
 								if(i != ii || j != jj){
-									if(rawIp.get(ii, jj) > rawIp.get(i,j))	ipMaxima.set(i,j,0);
+									if(rawIpNorm.getf(ii, jj) > rawIpNorm.getf(i,j))	ipMaxima.set(i,j,0);
 									else ipMaxima.set(ii,jj,0);							
 								}
 							}
@@ -261,9 +251,8 @@ public class FindMaxima{
 		ArrayList<String> listMaxima = new ArrayList<String>();
 		for(int i = 0; i < w; ++i){
 			for(int j = 0; j < h; ++j){
-				if (ipResu.getPixel(i,j) > 0 && i-j > 0){
+				if (ipResu.getf(i,j) > 0 && i-j > 0)
 					listMaxima.add(i+"\t"+j);
-				}
 			}
 		}
 		return listMaxima;
@@ -281,35 +270,18 @@ public class FindMaxima{
 	private double average(int x, int y){
 		double sum = 0;
 		int nb=0;
-		ImageProcessor ip = m_img.getProcessor();
+		ImageProcessor ip = m_imgNorm.getProcessor();
 		for(int i = x-1; i <= x+1; ++i){
-			for(int j = y-1; j <= y+1; ++j){		
-				sum +=ip.getPixel(i, j);
-				++nb;
+			for(int j = y-1; j <= y+1; ++j){
+				if(i < ip.getWidth() && i>0 && j < ip.getWidth() && j > 0){
+					sum +=ip.getf(i, j);
+					++nb;
+				}
 			}
 		}
 		return sum/nb;
 	}
-	
-	/**
-	 * Compute the percentage of the zero around the loop on the 24 neighbourhood and return the value 
-	 * @param x: int x coordinate's of the loop
-	 * @param y: int y coordinate's of the loop
-	 * @return double: percenatge of 0 around the loop
-	 */
-	private double PercentOfneihgboordEqual0(int x, int y){
-		double sum = 0;
-		int nb=0;
-		ImageProcessor ip = m_img.getProcessor();
-		for(int i = x-2; i <= x+2; ++i){
-			for(int j = y-2; j <= y+2; ++j){
-				if((i != x || j != y) && ip.getPixel(i, j)<=0) ++sum;
-				++nb;
-			}
-		}
-		return 100*(sum/nb);
-	}
-	
+		
 	/**
 	 * Compute standard deviation of the loop region at the neighbourhood 8.
 	 * 
@@ -320,13 +292,17 @@ public class FindMaxima{
 	 */
 	private double standardDeviation(int x, int y, double avg){
 		double semc = 0;
-		ImageProcessor ip = m_img.getProcessor();
+		int nb = 0;
+		ImageProcessor ip = m_imgNorm.getProcessor();
 		for(int i = x-1; i <= x+1; ++i){
 			for(int j = y-1; j <= y+1; ++j){
-				semc += (ip.getPixel(i, j)-avg)*(ip.getPixel(i, j)-avg);
+				if(i < ip.getWidth() && i>0 && j < ip.getWidth() && j > 0){
+					semc += (ip.getf(i, j)-avg)*(ip.getf(i, j)-avg);
+					++nb;
+				}
 			}	
 		}	
-		semc = semc/(double)9;
+		semc = semc/(double)nb;
 		return Math.sqrt(semc);
 	}
 	
@@ -337,26 +313,23 @@ public class FindMaxima{
 	 * ig the loops is closed too the diagonal the test is less stringent 7 for oMe methods and 4 for observed method. 
 	 * @param isObserved: boolean to know which methods is used allow to manage. if true it is the observed methode else the oMe method.
 	 */
-	private void removeMaximaCloseToZero(boolean isObserved){ 
+	private void removeMaximaCloseToZero(int nbZero,ImagePlus rawImage, int val){ 
 		int w = m_imgResu.getWidth();
 		int h = m_imgResu.getHeight();
 		ImageProcessor ipResu = m_imgResu.getProcessor();
-		ImageProcessor ip = m_img.getProcessor();
-		for(int i =0; i< w; ++i){
-			for(int j=0;j< h;++j){
-				if(ipResu.getPixel(i, j) > 0){
-					int thresh = this.m_nbOfZero;//nbOfZero; //6;
-					if (j-i <= m_diagSize+2){
+		ImageProcessor ip = rawImage.getProcessor();
+		for(int i = 2; i< w-2; ++i){
+			for(int j= 2;j< h-2;++j){
+				if(ipResu.getPixel(i, j) > val){
+					int thresh = nbZero;
+					if (j-i <= m_diagSize+2)
 						thresh = thresh+1;
-						//if (isObserved)	thresh = 4;
-					}
-					//else if(isObserved){ thresh = 3;}
-					int nb =0;
+					int nb = 0;
 					for(int ii = i-2; ii <= i+2; ++ii){
 						for(int jj = j-2; jj <= j+2; ++jj){
-							if (ip.getPixel(ii, jj)<=0)	nb++;
+							if (ip.get(ii, jj)<=0)	nb++;
 						}
-						if(nb > thresh){
+						if(nb >= thresh){
 							ipResu.set(i,j,0);
 							break;
 						}
@@ -364,6 +337,7 @@ public class FindMaxima{
 				}
 			}
 		}
+		m_imgResu.setProcessor(ipResu);
 	}
 	
 	
@@ -392,80 +366,4 @@ public class FindMaxima{
 	public void setNoiseTolerance( int n){
 		this.m_noiseTolerance = n;
 	}
-	
-	/*private void findOtherMaxima(){
-		ImagePlus img = m_img.duplicate();
-		ProcessMethod pm = new ProcessMethod(img,1.25);
-		pm.runGaussian();
-		ImageProcessor rawIp = img.getProcessor();
-		int w = rawIp.getWidth();
-		int h = rawIp.getHeight();
-		ImageProcessor ipMaxima = m_imgResu.getProcessor();
-		for(int i = 12; i< w-12; ++i){
-			for(int j=12; j< h-12; ++j){		
-				if (ipMaxima.getPixel(i,j) == 255){ 
-					double avg = average(i,j,rawIp);
-					double var =variance(i, j, rawIp, avg);
-					double std = Math.sqrt(var);
-					double up = rawIp.get(i, j)+std*4;
-					double down = rawIp.get(i, j)-std*4;
-					if(down <= 0 ){
-						down = avg-std;
-						if(down <= 0 ){down = avg;}
-					}
-					if(var <= rawIp.get(i, j)){
-						for(int ii=i-10; ii<=i+10; ++ii){
-							for(int jj = j-10; jj <= j+10; ++jj){
-								if( rawIp.get(ii, jj) >= down && rawIp.get(ii, jj) <= up && 
-									((ii <= i-2 ||ii >= i+2) && (jj <= j-2 || jj >= j+2))){
-									if(testMaxima(img, ii, jj, avg, Math.sqrt(var))){
-										double avgTest = average(ii,jj,rawIp);
-										double varTest = variance(ii, jj, rawIp, avgTest);		
-										if(varTest <= rawIp.get(ii, jj) && varTest <= var && avgTest >= avg-std*2 && avgTest <= avg+std*2){
-											ipMaxima.set(ii,jj,125);
-											//System.out.println(rawIp.get(i, j)+"\t"+i+"\t"+j+"\t"+avgDiff+"\t"+std+"\t"+var+"\t"+ii+"\t"+jj+"\t"+avgDiffTest+"\t"+avgTest+"\t"+stdTest);
-										}
-									}
-								}
-							}
-						}
-					}
-				}			
-			}
-		}
-		this.m_imgResu.setProcessor(ipMaxima);
-	}
-	
-	private boolean testMaxima(ImagePlus img, int i, int j, double avg, double std){
-		ImageProcessor rawIp  = img.getProcessor();
-		boolean test = true;
-		int nb = 0;
-		double up = rawIp.get(i, j)+std*4;
-		double down = avg-std*4;
-	
-		if (down <= 0 ){
-			down = avg-std*2;
-			//System.out.println(down);
-		}
-	
-		for(int ii = i-2; ii <= i+2; ++ii){
-			for(int jj = j-2; jj <= j+2; ++jj){
-				if(ii != i && jj != j){
-					if(rawIp.get(ii, jj) >= rawIp.get(i, j)){
-						test = false;
-						break;
-					}
-					else if(rawIp.get(ii, jj) <=  down || rawIp.get(ii, jj) >= up){
-						nb++;
-						if(nb++ > 8){
-							test = false;
-							break;
-						}
-					}
-				}
-			}
-			if(test ==false) break;
-		}
-		return test;
-	}*/
 }

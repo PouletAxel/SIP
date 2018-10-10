@@ -37,7 +37,6 @@ public class TestGui {
 			double m_saturatedPixel = gui.getEnhanceSignal();
 			int m_thresholdMax = gui.getNoiseTolerance();
 			int m_factor = gui.getFactorChoice();
-			boolean m_isObserved = gui.isObserved();
 			boolean m_isHic  = gui.isHic();
 			boolean m_isProcessed = gui.isProcessed();
 			String m_juiceBoxTools = gui.getJuiceBox();
@@ -60,7 +59,6 @@ public class TestGui {
 					+"\nresolution: "+m_resolution
 					+"\nsaturated pixel: "+m_saturatedPixel
 					+"\nthreshold: "+m_thresholdMax
-					+"\nisObserved: "+m_isObserved
 					+"\nisHic: "+m_isHic
 					+"\nisProcessed: "+m_isProcessed
 					+"\n number of zero:"+m_nbZero

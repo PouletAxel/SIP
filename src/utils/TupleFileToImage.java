@@ -18,6 +18,8 @@ public class TupleFileToImage {
 	
 	/** Image results */
 	private ImagePlus m_img = new ImagePlus();
+	/** Image results */
+	private ImagePlus m_imgNorm = new ImagePlus();
 	/** Path of the tuple file*/
 	private String m_file = "";
 	/** Size of the matrix*/
@@ -27,10 +29,10 @@ public class TupleFileToImage {
 	/** Step to process the whole chromosme*/
 	private int m_step ;
 	/** Image value average*/
-	private double m_avg = 0;
+	public static double m_avg = 0;
 	/** Image standard deviation */
-	private double m_std = 0;
-	
+	public static double m_std = 0;
+	static int m_noZeroPixel = 0;
 	/**
 	 * TupleFileToImage constructor
 	 * @param fileMatrix tuple file path 
@@ -50,40 +52,50 @@ public class TupleFileToImage {
 	 *  
 	 * @return ImagePlus results
 	 */
-	public ImagePlus readTupleFile(){
+	public void readTupleFile(){
 		BufferedReader br;
-		ShortProcessor p = new ShortProcessor(m_size,m_size);
+		ShortProcessor pRaw = new ShortProcessor(m_size,m_size);
+		ShortProcessor pNorm = new ShortProcessor(m_size,m_size);
 		String[] tfile = m_file.split("_");
 		int numImage = Integer.parseInt(tfile[tfile.length-2])/(m_step*m_resolution);
 		try {
-			p.abs();
+			pRaw.abs();
 			br = new BufferedReader(new FileReader(m_file));
 			StringBuilder sb = new StringBuilder();
 			String line = br.readLine();
 			while (line != null){
 				sb.append(line);
 				String[] parts = line.split("\\t");
-				float a = 0;
+				float raw = 0;
+				float norm = 0;
 				
 				if(!(parts[2].equals("NAN"))){
-					a =Float.parseFloat(parts[2]);
-					if (a < 0){ a = 0;}
+					raw =Float.parseFloat(parts[2]);
+					if (raw < 0){ raw = 0;}
 				}
+				
+				if(!(parts[3].equals("NAN"))){
+					norm =Float.parseFloat(parts[3]);
+					if (norm < 0){ norm = 0;}
+				}
+				
 				int correction = numImage*m_step*m_resolution;
 				int i = (Integer.parseInt(parts[0]) - correction)/m_resolution; 
 				int j = (Integer.parseInt(parts[1]) - correction)/m_resolution;
 				//System.out.println(i+" "+j+" "+a+" "+correction);
 				if(i < m_size && j< m_size){
-					p.setf(i, j, a);
-					p.setf(j, i, a);
+					pRaw.setf(i, j, raw);
+					pRaw.setf(j, i, raw);
+					pNorm.setf(i, j, norm);
+					pNorm.setf(j, i, norm);
 				}
 				sb.append(System.lineSeparator());
 				line = br.readLine();
 			}
 			br.close();
 		} catch (IOException e) { e.printStackTrace();}
-		m_img.setProcessor(p);
-		return m_img;
+		m_img.setProcessor(pRaw);
+		m_imgNorm.setProcessor(pNorm);
 	}
 	
 	/**
@@ -91,21 +103,21 @@ public class TupleFileToImage {
 	 * the dection of the structure of interest
 	 * @param img ImagePlus to correct
 	 */
-	public void correctImage(ImagePlus img){
+	public static void correctImage(ImagePlus img){
 		ImageProcessor ip = img.getProcessor();
-		int noZeroPixel = 0;
+		m_noZeroPixel = 0;
 		int sum = 0;
 		for(int i = 0; i < ip.getWidth(); ++i){
 			for(int j = 0; j < ip.getWidth(); ++j){
 				if(ip.getPixel(i, j) > 0){
-					++noZeroPixel;
+					++m_noZeroPixel;
 					sum += ip.getPixel(i, j);
 				}
 			}
 		}
-		m_avg = (double)sum/(double)noZeroPixel;
-		m_std = std(m_avg);
-		System.out.println(img.getTitle()+"avg: "+m_avg+"\tstd: "+m_std);
+		m_avg = (double)sum/(double)m_noZeroPixel;
+		m_std = std(m_avg,img);
+		//System.out.println(img.getTitle()+"avg: "+m_avg+"\tstd: "+m_std);
 		for(int i = 0; i < ip.getWidth(); ++i){
 			for(int j = 0; j < ip.getWidth(); ++j){
 				int a = ip.getPixel(i, j);
@@ -121,9 +133,9 @@ public class TupleFileToImage {
 	 * @param mean average value in m_img
 	 * @return double satndard deivation
 	 */
-	private double std(double mean){
+	private static double std(double mean,ImagePlus img){
 		double semc = 0;
-		ImageProcessor ip = m_img.getProcessor();
+		ImageProcessor ip = img.getProcessor();
 		int noZeroPixel = 0;
 		for(int i = 0; i < ip.getWidth(); ++i){
 			for(int j = 0; j < ip.getWidth(); ++j){
@@ -136,4 +148,9 @@ public class TupleFileToImage {
 		semc = Math.sqrt(semc/(double)noZeroPixel);
 		return semc;
 	}
+	
+	public ImagePlus getRawImage(){return this.m_img;}
+	public ImagePlus getNormImage(){return this.m_imgNorm;}
+	public void setRawImage(ImagePlus img){this.m_img = img;}
+	public void setNormImage(ImagePlus img){this.m_imgNorm = img;}
 }

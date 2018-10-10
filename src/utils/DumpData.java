@@ -63,31 +63,6 @@ public class DumpData {
 	}
 	
 	/**
-	 * 
-	 * Dump the observed matrix.
-	 * Only call the juicerToolsbox command line with all the paramaters.
-	 * 
-	 * @param chr: String for the chromosome to dump
-	 * @param output: String for the output file with the dumped data
-	 * @return: boolean
-	 * @throws IOException
-	 */
-	public boolean dumpObserved(String chr, String output) throws IOException{
-		int exitValue=1;
-		Runtime runtime = Runtime.getRuntime();
-		try {
-			Process process = runtime.exec("java"+" -jar "+m_juiceBoxTools+" dump observed "+
-											m_normalisation+" "+m_hicFile+" "+chr+" "+chr+" BP "+m_resolution+" "+output);
-			new ReturnFlux(process.getInputStream()).start();
-			new ReturnFlux(process.getErrorStream()).start();
-			exitValue=process.waitFor();
-		}
-		catch (IOException e) {	e.printStackTrace();}
-		catch (InterruptedException e) {e.printStackTrace();}
-		return exitValue==0;
-	}
-	
-	/**
 	 * Method to dump the oMe matrix
 	 * 
 	 * @param chr: String for the name of teh chromosome
@@ -134,8 +109,10 @@ public class DumpData {
 			String [] tline = line.split("\t");
 			int dist = Math.abs((Integer.parseInt(tline[0])-Integer.parseInt(tline[1]))/m_resolution);
 			if(!tline[2].equals("NaN")){
+				//Test (obs-expected)/expected
+				double normalizedValue = 1+(((Double.parseDouble(tline[2])+1)-(m_lExpected.get(dist)+1))/(m_lExpected.get(dist)+1));
 				double oMe = Double.parseDouble(tline[2])-m_lExpected.get(dist);
-				writer.write(tline[0]+"\t"+tline[1]+"\t"+oMe+"\n");
+				writer.write(tline[0]+"\t"+tline[1]+"\t"+oMe+"\t"+normalizedValue+"\n");
 			}
 		}
 		
@@ -189,6 +166,29 @@ public class DumpData {
 		return exitValue==0;
 	}
 	
+	/**
+	 * getter of the expected matrix. 
+	 * 
+	 * @param chr: String name of the chromosme
+	 * @param output: path to the output
+	 * @return 
+	 * @throws IOException
+	 * @throws InterruptedException
+	 */
+	public boolean getNormVector(String chr,String output) throws IOException, InterruptedException{
+		int exitValue=1;
+		Runtime runtime = Runtime.getRuntime();
+		String cmd = "java"+" -jar "+m_juiceBoxTools+" dump norm "+m_normalisation+" "+m_hicFile+" "+chr+" BP "+m_resolution+" "+output;
+		m_log = m_log+"\n"+output+"\t"+cmd;
+		Process process = runtime.exec(cmd);
+		
+		new ReturnFlux(process.getInputStream()).start();
+		new ReturnFlux(process.getErrorStream()).start();
+		exitValue=process.waitFor();
+		
+		
+		return exitValue==0;
+	}
 	
 	/**
 	 * Class to run command line in java

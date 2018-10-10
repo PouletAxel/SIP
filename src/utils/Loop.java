@@ -27,16 +27,21 @@ public class Loop {
 	private int m_xEnd;
 	/** y coordinate+resolution.*/
 	private int m_yEnd;
+	
 	/** value of the avg of the diff  between loops value and the neighbourhood 8.*/
 	private double m_neigbhoord1 = -1;
 	/** value of the peak analysis value inspirate from Rao&Huntley et al., 2014, but the score is compute foreach loop and not for a set of loops.*/
 	private double m_paScoreAvg = -1;
+	/** value of the peak analysis value inspirate from Rao&Huntley et al., 2014, but the score is compute foreach loop and not for a set of loops.*/
+	private double m_paScoreMed = -1;
 	/** value of the avg of the differential between loops value and the neighbourhood 24.*/
 	private double m_neigbhoord2 = -1;
+	/** value of the avg of the differential between loops value and the neighbourhood 24.*/
+	private double m_neigbhoord3 = -1;
+	/**  value of the peak analysis value inspirate from Rao&Huntley et al., 2014, but the score is compute foreach loop and not for a set of loops.*/
+	private double m_RpaScoreMed = -1;
 	/**  value of the peak analysis value inspirate from Rao&Huntley et al., 2014, but the score is compute foreach loop and not for a set of loops.*/
 	private double m_RpaScoreAvg = -1;
-	/** percentage of pixel of 0 in the neighbourhood 24.*/
-	private double m_percentageZero = -1;
 	/** Average value of the neighbourhood 9.*/
 	private double m_avg = -1;
 	/** Value of the loop*/
@@ -231,6 +236,21 @@ public class Loop {
 		this.m_neigbhoord2 = neigbhoord2;
 	}
 	/**
+	 * Getter of avg differential n 24 
+	 * @return double differential avg
+	 */
+	public double getNeigbhoord3(){
+		return m_neigbhoord3; 
+	}
+	
+	/**
+	 * Setter of avg differential n 24 
+	 * @param neigbhoord2 double differential avg
+	 */
+	public void setNeigbhoord3(double neigbhoord3){
+		this.m_neigbhoord3 = neigbhoord3;
+	}
+	/**
 	 * Getter of the peak analysis loop 
 	 * @return double PA score
 	 */
@@ -244,6 +264,22 @@ public class Loop {
 	 */
 	public void setPaScoreAvg(double paScore){
 		this.m_paScoreAvg = paScore;
+	}
+	
+	/**
+	 * Getter of the peak analysis loop 
+	 * @return double PA score
+	 */
+	public double getPaScoreMed(){
+		return m_paScoreMed;
+	}
+	
+	/**
+	 *	Setter  of the peak analysis loop score
+	 * @param m_paScore double PA score
+	 */
+	public void setPaScoreMed(double paScore){
+		this.m_paScoreMed = paScore;
 	}
 	
 	/**
@@ -273,14 +309,14 @@ public class Loop {
 		return listCoord;
 	}
 	
-	/*
+	
 	public double getRegionalPaScoreMed(){
 		return m_RpaScoreMed;
 	}
 
 	public void setRegionalPaScoreMed(double m_RpaScore){
 		this.m_RpaScoreMed = m_RpaScore;
-	}*/
+	}
 
 	/**
 	 * Getter of regional peak analysis score 
@@ -305,23 +341,6 @@ public class Loop {
 	public String getChr(){
 		return m_chr;
 	}
-		
-	/**
-	 * Setter of the % of the on the n 24
-	 * @param i double percentage 
-	 */
-	public void setPercentageOfZero(double i){
-		m_percentageZero = i;
-	}
-	
-	/**
-	 * Getter of % of 0 in the n 24 
-	 * @return double %
-	 */
-	public double getPercentageOfZero(){
-		return m_percentageZero;
-	}
-
 
 	/**
 	 * Setter of the avg of th n 8 

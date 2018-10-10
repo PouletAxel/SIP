@@ -27,22 +27,23 @@ public class TestCallLoopsProcessedFile {
 		///home/plop/Bureau/DataSetImageHiC/Hichip_H3k4me1_test
 		//String output= "/home/plop/Bureau/DataSetImageHiC/GM12878/chr2_fullData";
 		//String input = "/home/plop/Bureau/DataSetImageHiC/GM12878/subsample/GM12878_full/";
-		String input = "/home/plop/Bureau/test/";
-		String output = "/home/plop/Bureau/test/";
+		String input = "/home/plop/Bureau/DataSetImageHiC/GM12878/new/";
+		String output = "/home/plop/Bureau/DataSetImageHiC/GM12878/chr2";
 		int matrixSize = 2000;
 		int resolution = 5000;
-		int diagSize = 6;
-		double gauss = 1;
-		int thresholdMax = 3250;
-		boolean isObserved = true;
-		int nbZero = 6;
-		double min =1.5;
-		double max =1.5;
-		double saturatedPixel =0.05;
+		int diagSize = 5;
+		double gauss = 1.5;
+		int thresholdMax = 2100;//1800
+		int nbZero = 5;
+		double min = 2;
+		double max = 2;
+		double saturatedPixel =0.005;
+		boolean keepTif = false;
 		ArrayList<Integer> factor = new ArrayList<Integer>();
 		factor.add(1);
 		factor.add(2);
-		factor.add(5);
+		//factor.add(5);
+		
 		System.out.println("input "+input+"\n"
 			+ "output "+output+"\n"
 			+ "gauss "+gauss+"\n"
@@ -52,20 +53,23 @@ public class TestCallLoopsProcessedFile {
 			+ "diag size "+diagSize+"\n"
 			+ "resolution "+resolution+"\n"
 			+ "saturated pixel "+saturatedPixel+"\n"
-			+ "threshold "+thresholdMax+"\n"
-			+ "isObserved "+isObserved+"\n");
+			+ "threshold "+thresholdMax+"\n");
 	
 		File file = new File(output);
 		if (file.exists()==false) 
 			file.mkdir();
-		///home/plop/Documents/Genome/HumanGenomeHg19/hg19_withoutChr.sizes
+		//
 		///home/plop/Documents/Genome/hg38.chr2.sizes
-		WholeGenomeAnalysis wga = new WholeGenomeAnalysis(output, readChrSizeFile("/home/plop/Documents/Genome/HumanGenomeHg19/chr20.size"), gauss, min, max, 
+		///home/plop/Documents/Genome/mm9/mm9_sizes_noY_1.txt
+		WholeGenomeAnalysis wga = new WholeGenomeAnalysis(output, readChrSizeFile("/home/plop/Documents/Genome/HumanGenomeHg19/w_hg19.sizes"), gauss, min, max, 
 				resolution, saturatedPixel, thresholdMax, diagSize, matrixSize,nbZero, factor);
 
-		if(isObserved) wga.run("o",input);
-		else wga.run("oMe",input);
+		wga.run(input);
 						
+		if(keepTif == false){
+			for(int i = 0; i< wga.m_tifList.size();++i)
+				wga.m_tifList.get(i).delete();
+		}
 		System.out.println("End");
 	}
 			

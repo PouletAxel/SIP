@@ -37,8 +37,9 @@ public class ChangeImageRes{
 			for(int j = 0; j <= m_img.getWidth()-1; j+=m_factor){
 				float sum = 0;
 				for(int ii = i; ii <= i+m_factor-1; ++ii)
-					for(int jj = j ; jj <= j+m_factor-1; ++jj)
+					for(int jj = j ; jj <= j+m_factor-1; ++jj){
 						sum+= ip.getPixel(ii, jj);
+					}
 				//System.out.println(m_factor+"\t"+i/m_factor+"\t"+j/m_factor+"\t"+sum);
 				p.setf(i/m_factor,j/m_factor,sum);
 			}

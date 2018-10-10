@@ -112,4 +112,9 @@ public class ProcessMethod{
 		GaussianBlur gb = new GaussianBlur();
 		gb.blurGaussian(m_ip, this.m_gaussianFilterRadius);
 	}
+
+	public void runMax(double m_min) {
+		m_rF.rank(m_ip, m_min, RankFilters.MAX);// TODO Auto-generated method stub
+		
+	}
 }
