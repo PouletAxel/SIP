@@ -248,7 +248,7 @@ public class WholeGenomeAnalysis {
 				double plop = 100*TupleFileToImage.m_noZeroPixel/(this.m_matrixSize*this.m_matrixSize);
 				if(plop <= 5)
 					thresh =  m_thresholdMaxima/10;
-				//System.out.println("debut loop\n");
+				
 				FindMaxima findLoop = new FindMaxima(imgNorm, imgFilter, chr, thresh, m_diagSize, m_resolution,countNonZero);
 				HashMap<String,Loop> temp = findLoop.findloop(numImage, m_nbZero,imgRaw, 1);
 				PeakAnalysisScore pas = new PeakAnalysisScore(imgNorm,temp);
