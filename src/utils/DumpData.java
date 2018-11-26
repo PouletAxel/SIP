@@ -109,7 +109,6 @@ public class DumpData {
 			String [] tline = line.split("\t");
 			int dist = Math.abs((Integer.parseInt(tline[0])-Integer.parseInt(tline[1]))/m_resolution);
 			if(!tline[2].equals("NaN")){
-				//Test (obs-expected)/expected
 				double normalizedValue = 1+(((Double.parseDouble(tline[2])+1)-(m_lExpected.get(dist)+1))/(m_lExpected.get(dist)+1));
 				double oMe = Double.parseDouble(tline[2])-m_lExpected.get(dist);
 				writer.write(tline[0]+"\t"+tline[1]+"\t"+oMe+"\t"+normalizedValue+"\n");
@@ -127,13 +126,17 @@ public class DumpData {
 	 * 
 	 * @return return the String with the error
 	 */
-	public String getLogError(){return this.m_logError;}
+	public String getLogError(){
+		return this.m_logError;
+	}
 	
 	/**
 	 * getter of the lof info if necessary 
 	 * @return return a String with the log info
 	 */
-	public String getLog(){return this.m_log;}
+	public String getLog(){
+		return this.m_log;
+	}
 	
 	/**
 	 * getter of the expected matrix. 

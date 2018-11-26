@@ -67,13 +67,11 @@ public class CoordinatesCorrection {
 						if(m_data.get(newName).getResolution() > resolution){
 							loop.setCoordinates(a, a_end, b, b_end);
 							loop.setName(newName);
-							//System.out.println(resolution+" "+m_data.get(newName).getResolution());
 							m_data.put(newName, loop);
 						}
 						else if(loop.getPaScoreAvg()> m_data.get(newName).getPaScoreAvg()){
 							loop.setCoordinates(a, a_end, b, b_end);
 							loop.setName(newName);
-							//System.out.println(resolution+" "+m_data.get(newName).getResolution());
 							m_data.put(newName, loop);
 						}
 					}

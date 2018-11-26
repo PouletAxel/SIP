@@ -105,30 +105,17 @@ public class FindMaxima{
 			double avg = average(x,y);
 			double std =standardDeviation(x,y,avg);
 			DecayAnalysis da = new DecayAnalysis(this.m_imgNorm,x,y);
-			//if( 
-			//		da.getNeighbourhood1()< da.getNeighbourhood3() && da.getNeighbourhood2()<= da.getNeighbourhood3()&& da.getNeighbourhood2()>=0.125
-			if(da.getNeighbourhood1() <= da.getNeighbourhood2() && da.getNeighbourhood1()>= 0.125 && da.getNeighbourhood2() >= 0.125 && da.getNeighbourhood3()>=0.125 && (testStripNeighbour(x)==true && testStripNeighbour(y)==true)){
+			double n1 =da.getNeighbourhood1();
+			double n2 =da.getNeighbourhood2();
+			if(n1<=n2 && n1 >= 0.125 && n2 >= 0.125 && (testStripNeighbour(x)==true && testStripNeighbour(y)==true)){
 				Loop maxima = new Loop(temp.get(j),x,y,m_chr,avg,std,ipN.getf(x, y));
-				maxima.setNeigbhoord1(da.getNeighbourhood1());
-				maxima.setNeigbhoord2(da.getNeighbourhood2());
-				maxima.setNeigbhoord3(da.getNeighbourhood3());
+				maxima.setNeigbhoord1(n1);
+				maxima.setNeigbhoord2(n2);
 				maxima.setResolution(m_resolution);
 				maxima.setDiagSize(m_diagSize);
 				maxima.setMatrixSize(m_imgNorm.getWidth());
 				m_data.put(name, maxima);
 			}
-			/*else if (m_resolution>10000){
-				if(da.getNeighbourhood1() >= 0.5 || da.getNeighbourhood2() >= 0.5 || da.getNeighbourhood1() <= da.getNeighbourhood2()
-					&& (testStripNeighbour(x)==true && testStripNeighbour(y)==true)){
-					Loop maxima = new Loop(temp.get(j),x,y,m_chr,avg,std,ipN.getf(x, y));
-					maxima.setNeigbhoord1(da.getNeighbourhood1());
-					maxima.setNeigbhoord2(da.getNeighbourhood2());
-					maxima.setResolution(m_resolution);
-					maxima.setDiagSize(m_diagSize);
-					maxima.setMatrixSize(m_imgNorm.getWidth());
-					m_data.put(name, maxima);
-				}
-			}*/
 		}
 		return m_data;
 	}
@@ -173,31 +160,18 @@ public class FindMaxima{
 		int w = rawIpNorm.getWidth();
 		int h = rawIpNorm.getHeight();
 		ImageProcessor ipMaxima = m_imgResu.getProcessor();
-		for(int i = 2; i< w-2; ++i){
+		for(int i = 1; i< w-1; ++i){
 			for(int j=2; j< h-2; ++j){		
 				if (ipMaxima.getPixel(i,j) > 0){
 					double max = rawIpNorm.getf(i,j);
 					int imax = i;
 					int jmax =j;
-					if(Math.abs(i-j) <= m_diagSize*2){
-						for(int ii=i-1; ii<=i+1; ++ii){
-							for(int jj = j-1; jj <= j+1; ++jj){
-								if(max < rawIpNorm.getf(ii, jj) && Math.abs(ii-jj) >= Math.abs(i-j)){
-									imax = ii;
-									jmax = jj;
-									max = rawIpNorm.get(ii, jj);
-								}
-							}
-						}
-					}
-					else{
-						for(int ii=i-2; ii<=i+2; ++ii){
-							for(int jj = j-2; jj <= j+2; ++jj){
-								if(max < rawIpNorm.get(ii, jj)){
-									imax = ii;
-									jmax = jj;
-									max = rawIpNorm.getf(ii, jj);
-								}
+					for(int ii=i-1; ii<=i+1; ++ii){
+						for(int jj = j-1; jj <= j+1; ++jj){
+							if(max < rawIpNorm.getf(ii, jj) && Math.abs(ii-jj) >= Math.abs(i-j)){
+								imax = ii;
+								jmax = jj;
+								max = rawIpNorm.get(ii, jj);
 							}
 						}
 					}
@@ -257,10 +231,7 @@ public class FindMaxima{
 		}
 		return listMaxima;
 	}	
-	
 
-	
-	
 	/**
 	 * Compute the average on the neighbourhood 9
 	 * @param x  int x coordinate's of the loop

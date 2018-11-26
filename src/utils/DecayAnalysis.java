@@ -69,7 +69,6 @@ public class DecayAnalysis {
 			for(int j = m_y-c ; j <= m_y+c; ++j)
 				if((i != m_x || j != m_y)  && (i-m_x == -c || j-m_y == -c || i-m_x == c || j-m_y == c)){
 					if(i >=0 && j>= 0){
-						//System.out.println(m_x+" "+i+" "+m_y+" "+j);
 						double a =  ip.get(m_x, m_y)- ip.get(i, j);
 						sum+= a;
 						++nb;

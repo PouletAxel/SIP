@@ -48,9 +48,8 @@ public class NonZeroCorrection {
 		}
 		double avg = avg();
 		double std = std(avg);
-		double up = avg+4*std;
-		double down = avg-4*std;
-		//System.out.println(down+"\t"+up);
+		double up = avg+5*std;
+		double down = avg-5*std;
 		for(int i = 0; i < m_countNonZero.size(); ++i){
 			if(m_countNonZero.get(i) < down || m_countNonZero.get(i) > up){
 				m_countNonZero.set(i, 0);

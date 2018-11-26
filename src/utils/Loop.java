@@ -36,8 +36,6 @@ public class Loop {
 	private double m_paScoreMed = -1;
 	/** value of the avg of the differential between loops value and the neighbourhood 24.*/
 	private double m_neigbhoord2 = -1;
-	/** value of the avg of the differential between loops value and the neighbourhood 24.*/
-	private double m_neigbhoord3 = -1;
 	/**  value of the peak analysis value inspirate from Rao&Huntley et al., 2014, but the score is compute foreach loop and not for a set of loops.*/
 	private double m_RpaScoreMed = -1;
 	/**  value of the peak analysis value inspirate from Rao&Huntley et al., 2014, but the score is compute foreach loop and not for a set of loops.*/
@@ -235,21 +233,7 @@ public class Loop {
 	public void setNeigbhoord2(double neigbhoord2){
 		this.m_neigbhoord2 = neigbhoord2;
 	}
-	/**
-	 * Getter of avg differential n 24 
-	 * @return double differential avg
-	 */
-	public double getNeigbhoord3(){
-		return m_neigbhoord3; 
-	}
-	
-	/**
-	 * Setter of avg differential n 24 
-	 * @param neigbhoord2 double differential avg
-	 */
-	public void setNeigbhoord3(double neigbhoord3){
-		this.m_neigbhoord3 = neigbhoord3;
-	}
+
 	/**
 	 * Getter of the peak analysis loop 
 	 * @return double PA score

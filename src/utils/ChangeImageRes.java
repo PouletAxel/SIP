@@ -15,6 +15,7 @@ public class ChangeImageRes{
 	private ImagePlus m_img;
 	/** int factor to re scale the image */
 	private int m_factor; 
+	
 	/**
 	 * 
 	 * @param img
@@ -40,7 +41,6 @@ public class ChangeImageRes{
 					for(int jj = j ; jj <= j+m_factor-1; ++jj){
 						sum+= ip.getPixel(ii, jj);
 					}
-				//System.out.println(m_factor+"\t"+i/m_factor+"\t"+j/m_factor+"\t"+sum);
 				p.setf(i/m_factor,j/m_factor,sum);
 			}
 		}

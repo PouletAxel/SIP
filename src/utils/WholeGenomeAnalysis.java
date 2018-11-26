@@ -58,9 +58,7 @@ public class WholeGenomeAnalysis {
 	static HashMap<Integer,String> m_normVector = new HashMap<Integer,String>();
 	/** */
 	ArrayList<Integer> m_listFactor = new ArrayList<Integer>();
-	/**
-	 * 
-	 */
+	/**	 */
 	Strel m_strel = Strel.Shape.SQUARE.fromRadius(40);
 	
 	/**
@@ -170,7 +168,7 @@ public class WholeGenomeAnalysis {
 		
 		else{
 			writer = new BufferedWriter(new FileWriter(new File(pathFile)));
-			writer.write("chromosome1\tx1\tx2\tchromosome2\ty1\ty2\tcolor\tAPScoreAvg\tRegAPScoreAvg\tAPScoreMed\tRegAPScoreMed\tAvg_diffMaxNeihgboor_1\tAvg_diffMaxNeihgboor_2\tAvg_diffMaxNeihgboor_3\tavg\tstd\tvalue\n");
+			writer.write("chromosome1\tx1\tx2\tchromosome2\ty1\ty2\tcolor\tAPScoreAvg\tRegAPScoreAvg\tAPScoreMed\tRegAPScoreMed\tAvg_diffMaxNeihgboor_1\tAvg_diffMaxNeihgboor_2\tavg\tstd\tvalue\n");
 		}
 		
 		Set<String> key = m_data.keySet();
@@ -185,7 +183,7 @@ public class WholeGenomeAnalysis {
 				if(loop.getAvg() >= 1.2 && loop.getValue()>=2){
 					writer.write(loop.getChr()+"\t"+coord.get(2)+"\t"+coord.get(3)+"\t"+loop.getChr()+"\t"+coord.get(0)+"\t"+coord.get(1)+"\t0,0,0"
 						+"\t"+loop.getPaScoreAvg()+"\t"+loop.getRegionalPaScoreAvg()+"\t"+loop.getPaScoreMed()+"\t"+loop.getRegionalPaScoreMed()
-						+"\t"+loop.getNeigbhoord1()+"\t"+loop.getNeigbhoord2()+"\t"+loop.getNeigbhoord3()+"\t"+loop.getAvg()+"\t"+loop.getStd()+"\t"+loop.getValue()+"\n");
+						+"\t"+loop.getNeigbhoord1()+"\t"+loop.getNeigbhoord2()+"\t"+loop.getAvg()+"\t"+loop.getStd()+"\t"+loop.getValue()+"\n");
 				}
 			}
 		}
@@ -246,9 +244,10 @@ public class WholeGenomeAnalysis {
 				ImagePlus imgNorm = IJ.openImage(imgRaw.getTitle().replaceAll(".tif", "_N.tif"));
 				int thresh = m_thresholdMaxima;
 				double plop = 100*TupleFileToImage.m_noZeroPixel/(this.m_matrixSize*this.m_matrixSize);
-				if(plop <= 5)
+				// if there is a lot pixel at zero in the images adapt the threshold for the maxima detection
+				if(plop <= 5){
 					thresh =  m_thresholdMaxima/10;
-				
+				}
 				FindMaxima findLoop = new FindMaxima(imgNorm, imgFilter, chr, thresh, m_diagSize, m_resolution,countNonZero);
 				HashMap<String,Loop> temp = findLoop.findloop(numImage, m_nbZero,imgRaw, 1);
 				PeakAnalysisScore pas = new PeakAnalysisScore(imgNorm,temp);
@@ -281,11 +280,9 @@ public class WholeGenomeAnalysis {
 						pas.computeScore();
 						temp.putAll(tempBiggerRes);
 					}
-					
 				}
 				coord.setData(hLoop);
 				hLoop = coord.imageToGenomeCoordinate(temp, numImage);
-				
 			}
 		}
 		System.out.println("before "+ hLoop.size());
@@ -300,7 +297,7 @@ public class WholeGenomeAnalysis {
 	 * @param input
 	 * @return
 	 */
-	private boolean removedVectoNorm(Loop loop) {
+	private boolean removedVectoNorm(Loop loop){
 		boolean test = false;
 		int x = loop.getCoordinates().get(0);
 		int y = loop.getCoordinates().get(2);
@@ -377,7 +374,7 @@ public class WholeGenomeAnalysis {
 													testBreak =true;
 													break;
 												}
-												else removed.add(test);
+												else	removed.add(test);
 											}
 										}
 									}
@@ -391,7 +388,6 @@ public class WholeGenomeAnalysis {
 				}
 			}
 		}
-		//System.out.println("PROUT  "+removed.size());
 		for (int i = 0; i< removed.size(); ++i){
 			input.remove(removed.get(i));
 		}
@@ -630,21 +626,19 @@ public class WholeGenomeAnalysis {
 		BufferedReader br;
 		int lineNumber = 0;
 		try {
-		br = new BufferedReader(new FileReader(normFile));
-		StringBuilder sb = new StringBuilder();
-		String line = br.readLine();
-		while (line != null){
-			sb.append(line);
-			if((line.equals("NaN")|| line.equals("NAN") || line.equals("nan") || line.equals("na")  || Double.parseDouble(line) < 0.30)){ // tester les autre vecteur...
-				m_normVector.put(lineNumber*m_resolution, "plop");
+			br = new BufferedReader(new FileReader(normFile));
+			StringBuilder sb = new StringBuilder();
+			String line = br.readLine();
+			while (line != null){
+				sb.append(line);
+				if((line.equals("NaN")|| line.equals("NAN") || line.equals("nan") || line.equals("na")  || Double.parseDouble(line) < 0.30)){ // tester les autre vecteur...
+					m_normVector.put(lineNumber*m_resolution, "plop");
+				}
+				++lineNumber;
+				sb.append(System.lineSeparator());
+				line = br.readLine();
 			}
-			++lineNumber;
-			sb.append(System.lineSeparator());
-			line = br.readLine();
-		}
-		br.close();
-	} catch (IOException e) { e.printStackTrace();}
-}
-	
-	
+			br.close();
+		} catch (IOException e) { e.printStackTrace();}
+	}
 }
