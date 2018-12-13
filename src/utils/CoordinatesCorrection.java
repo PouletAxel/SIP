@@ -10,26 +10,21 @@ import java.util.Set;
  * 
  * Loops detected with white strips are removed. Furthermore the corner of the images are not take account. We test also the proximal loops to avoid overlaping loops.
  * 
- * @author axel poulet
+ * @author Axel Poulet
  *
  */
 public class CoordinatesCorrection {
 
 	/** HashMap of the loops with new coordinates*/
 	private HashMap<String,Loop> m_data = new HashMap<String,Loop>();
-	/** integer for the image resolution in base*/
 	
 	/**
-	 * Constructor of CoordinatesCorrection, take an interger in input for the resolution.
 	 * 
-	 * @param resolution integer
 	 */
-	public CoordinatesCorrection(){
-	
-	}	
+	public CoordinatesCorrection(){	}	
 	
 	/**
-	 * Method to change the image coordinates in genomes coordinates,
+	 * change loop image coordinates in loop genomes coordinates,
 	 *  
 	 * @param temp: HashMap of loops with the image coordinates
 	 * @param index: index of the image
@@ -39,10 +34,8 @@ public class CoordinatesCorrection {
 	public HashMap<String,Loop> imageToGenomeCoordinate(HashMap<String,Loop> temp, int index){
 		int x;
 		int y;
-		
 		Set<String> key = temp.keySet();
 		Iterator<String> it = key.iterator();
-		
 		while (it.hasNext()){
 			Loop loop = temp.get(it.next());
 			x = loop.getX();

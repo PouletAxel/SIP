@@ -4,8 +4,9 @@ import java.io.IOException;
 import gui.GuiAnalysis;
 
 /**
+ * test of the GUI
  * 
- * @author plop
+ * @author Axel Poulet
  *
  */
 public class TestGui {
@@ -22,7 +23,7 @@ public class TestGui {
 			catch (InterruptedException e) {e.printStackTrace();}
 	    }	
 		if (gui.isStart()){
-			System.out.println("Prout");
+			System.out.println("test");
 			String m_chrSizeFile = gui.getChrSizeFile();
 			String m_output = gui.getOutputDir();
 			String m_input = gui.getRawDataDir();

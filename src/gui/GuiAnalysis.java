@@ -61,6 +61,13 @@ public class GuiAnalysis extends JFrame
 	/** */
 	private JRadioButton m_jrbProcessed = new JRadioButton("processed");
 	/** */
+	private ButtonGroup m_bGroupInputData = new ButtonGroup();
+	/** */
+	private JRadioButton m_jrbHiCData = new JRadioButton("hic");
+	/** */
+	private JRadioButton m_jrbHichipData = new JRadioButton("HiChIP");
+	
+	/** */
     private String m_juiceBoxTools;
     /** */
     private JTextField m_jtfBoxTools = new JTextField();
@@ -191,7 +198,39 @@ public class GuiAnalysis extends JFrame
 		);
 		
 		m_jrbHic.setSelected(true);
-
+		
+/////////////////////////////////////
+		m_jlInputFileType = new JLabel();
+		m_jlInputFileType.setFont(new java.awt.Font("arial",1,12));
+	   	m_jlInputFileType.setText("Data type:");
+	   	m_container.add(m_jlInputFileType, new GridBagConstraints
+	   			(
+	   					0, 1, 0, 0, 0.0, 0.0, GridBagConstraints.NORTHWEST,
+	   					GridBagConstraints.NONE, new Insets(0, 250, 0, 0), 0, 0
+	   		    )
+	   	);
+	   	
+	   	this.m_bGroupInputData.add(this.m_jrbHiCData);
+	 	m_bGroupInputType.add(this.m_jrbHichipData);
+	 	
+	 	m_jrbHiCData.setFont(new java.awt.Font("arial",2,11));
+	 	m_jrbHichipData.setFont(new java.awt.Font("arial",2,11));
+		m_container.add(m_jrbHiCData,new GridBagConstraints
+				(
+						0, 1, 0, 0, 0.0, 0.0, GridBagConstraints.NORTHWEST,
+						GridBagConstraints.NONE, new Insets(20, 280, 0, 0), 0, 0
+				)
+		);
+		m_container.add(m_jrbHichipData,new GridBagConstraints
+				(
+						0, 1, 0, 0,  0.0, 0.0, GridBagConstraints.NORTHWEST,
+						GridBagConstraints.NONE,new Insets(20, 380, 0, 0), 0, 0
+				)
+		);
+		
+		m_jrbHiCData.setSelected(true);
+//////////////////////////////////////////////
+		
 		
 		m_jbBoxTools.setPreferredSize(new java.awt.Dimension(120, 21));
 		m_jbBoxTools.setFont(new java.awt.Font("Albertus",2,10));
@@ -775,6 +814,20 @@ public class GuiAnalysis extends JFrame
 	 * 
 	 * @return
 	 */
+	public boolean isHiChIP(){
+		return this.m_jrbHichipData.isSelected();
+	}
+	/**
+	 * 
+	 * @return
+	 */
+	public boolean isHiCData(){
+		return this.m_jrbHiCData.isSelected();
+	}
+	/**
+	 * 
+	 * @return
+	 */
 	public boolean isHic(){
 		return m_jrbHic.isSelected();
 	}
@@ -845,39 +898,61 @@ public class GuiAnalysis extends JFrame
 		 */
 		public void actionPerformed(ActionEvent actionEvent){
 			if (m_gui.isHic()){
+				m_gui.m_jrbHiCData.setEnabled(true);
+				m_gui.m_jrbHichipData.setEnabled(true);
 	        	m_gui.m_jrbVC_sqrt.setEnabled(true);
 	        	m_gui.m_jrbVC.setEnabled(true);
 	        	m_gui.m_jrbNone.setEnabled(true);
 	        	m_gui.m_jrbKR.setEnabled(true);
 	        	m_gui.m_jtfBoxTools.setEnabled(true);
 	        	m_jbBoxTools.setEnabled(true);
-        		m_gaussian.setText("1.5");
-        		m_enhanceContrast.setText("0.005");
-        		m_min.setText("2");
-        		m_max.setText("2");
-        		m_nbZero.setText("6");
-        		m_noiseTolerance.setText("2100");
-        		m_gui.m_max.setEditable(true);
+	        	m_gui.m_max.setEditable(true);
         		m_gui.m_min.setEditable(true);
         		m_gui.m_enhanceContrast.setEditable(true);
+	        	if(m_gui.isHiCData()){
+	        		m_gaussian.setText("1.5");
+	        		m_enhanceContrast.setText("0.005");
+	        		m_min.setText("1.5");
+	        		m_max.setText("1.5");
+	        		m_nbZero.setText("6");
+	        		m_noiseTolerance.setText("2800");
+	        	}else{
+	        		m_gaussian.setText("1.5");
+	        		m_enhanceContrast.setText("0.5");
+	        		m_min.setText("1.5");
+	        		m_max.setText("1.5");
+	        		m_nbZero.setText("25");
+	        		m_noiseTolerance.setText("1");	
+	        	}
 	        }
 	        else if(m_gui.isProcessed()){
+	        	m_gui.m_jrbHiCData.setEnabled(true);
+				m_gui.m_jrbHichipData.setEnabled(true);
 	        	m_gui.m_jrbVC_sqrt.setEnabled(false);
 	        	m_gui.m_jrbVC.setEnabled(false);
 	        	m_gui.m_jrbNone.setEnabled(false);
 	        	m_gui.m_jrbKR.setEnabled(false);
 	        	m_gui.m_jtfBoxTools.setEnabled(false);
 	        	m_jbBoxTools.setEnabled(false);
-	        	m_gaussian.setText("1.5");
-	        	m_enhanceContrast.setText("0.005");
-	        	m_min.setText("2");
-	        	m_max.setText("2");
-	        	m_nbZero.setText("6");
-	        	m_noiseTolerance.setText("2100");
 	        	m_gui.m_max.setEditable(true);
 	        	m_gui.m_jlNbZero.setEnabled(true);
 	        	m_gui.m_min.setEditable(true);
-	        	m_gui.m_enhanceContrast.setEditable(true);		
+	        	m_gui.m_enhanceContrast.setEditable(true);
+	        	if(m_gui.isHiCData()){
+	        		m_gaussian.setText("1.5");
+	        		m_enhanceContrast.setText("0.005");
+	        		m_min.setText("1.5");
+	        		m_max.setText("1.5");
+	        		m_nbZero.setText("6");
+	        		m_noiseTolerance.setText("2800");
+	        	}else{
+	        		m_gaussian.setText("1.5");
+	        		m_enhanceContrast.setText("0.5");
+	        		m_min.setText("1.5");
+	        		m_max.setText("1.5");
+	        		m_nbZero.setText("25");
+	        		m_noiseTolerance.setText("1");	
+	        	}
 	        }
 	    }
 	}

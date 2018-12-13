@@ -5,9 +5,10 @@ import ij.process.ImageProcessor;
 import ij.process.ShortProcessor;
 
 /**
- * Class to make the image with 2 fold bigger resolution than the original image.
+ * Change th eimage resolution on function of a specific factor, the new value of the pixel is the sum of the original pixel value merged 
+ * to create the new image.
  * 
- * @author axel poulet
+ * @author Axel Poulet
  *
  */
 public class ChangeImageRes{
@@ -17,8 +18,9 @@ public class ChangeImageRes{
 	private int m_factor; 
 	
 	/**
-	 * 
-	 * @param img
+	 * Constructor 
+	 * @param img ImagePlus raw image
+	 * @param factor int factor of the change
 	 */
 	public ChangeImageRes(ImagePlus img, int factor){
 		m_img = img;
@@ -26,10 +28,10 @@ public class ChangeImageRes{
 	}
 	
 	/**
-	 * Sum the value of neighborhood of 4 pixels to make the image with bigger resolution.
+	 * Sum the value of neighborhood (eg:4 pixels for factor 2) to make the image with bigger resolution.
 	 * eg: pixel(0,0) on the new image is the snew value = pixel(0,0)+pixel(0,1)+pixel(1,0)+pixel(1,1).
 	 * 
-	 * @return ImagePlus
+	 * @return ImagePlus ImagePlus results 
 	 */
 	public ImagePlus run(){
 		ShortProcessor p = new ShortProcessor(m_img.getWidth()/m_factor,m_img.getWidth()/m_factor);

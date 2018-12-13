@@ -7,7 +7,7 @@ import ij.process.ImageProcessor;
  * Class for the loop decay analysis. Take in input the raw imagePlus, and the loop coordiantes.
  * Compute the average between the loop and the neighbourhood 8 or 24.
  *  
- * @author axel poulet
+ * @author Axel Poulet
  *
  */
 public class DecayAnalysis {

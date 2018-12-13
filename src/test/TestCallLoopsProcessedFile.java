@@ -5,15 +5,17 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import utils.WholeGenomeAnalysis;
+import utils.HiCExperimentAnalysis;
 
+/**
+ * Test of calling loops on processed files
+ * 
+ * @author Axel Poulet
+ *
+ */
 public class TestCallLoopsProcessedFile {
 
 	/**	
-	 * Main function to run all the process, can be run with gui or in command line.
-	 * With command line with 1 or less than 5 parameter => run only the help
-	 * With zero parameter only java -jar noname.jar  => gui
-	 * With more than 5 paramter => command line mode
 	 * 
 	 * @param args
 	 * @throws IOException 
@@ -27,23 +29,22 @@ public class TestCallLoopsProcessedFile {
 		///home/plop/Bureau/DataSetImageHiC/Hichip_H3k4me1_test
 		//String output= "/home/plop/Bureau/DataSetImageHiC/GM12878/chr2_fullData";
 		//String input = "/home/plop/Bureau/DataSetImageHiC/GM12878/subsample/GM12878_full/";
-		String input = "/home/plop/Bureau/DataSetImageHiC/GM12878/new/";
-		String output = "/home/plop/Bureau/DataSetImageHiC/GM12878/chr2";
+		String input = "/home/plop/Bureau/DataSetImageHiC/GM12878/test";///home/plop/Bureau/DataSetImageHiC/HiChip/H9_Hichip_rad21/test/";
+		String output = "/home/plop/Bureau/DataSetImageHiC/GM12878/test";
 		int matrixSize = 2000;
 		int resolution = 5000;
 		int diagSize = 5;
 		double gauss = 1.5;
-		int thresholdMax = 2100;//1800
-		int nbZero = 5;
-		double min = 2;
-		double max = 2;
+		int thresholdMax = 2800;//1800
+		int nbZero = 6;
+		double min = 1.5;
+		double max = 1.5;
 		double saturatedPixel =0.005;
 		boolean keepTif = false;
 		ArrayList<Integer> factor = new ArrayList<Integer>();
 		factor.add(1);
 		factor.add(2);
 		//factor.add(5);
-		
 		System.out.println("input "+input+"\n"
 			+ "output "+output+"\n"
 			+ "gauss "+gauss+"\n"
@@ -61,9 +62,11 @@ public class TestCallLoopsProcessedFile {
 		//
 		///home/plop/Documents/Genome/hg38.chr2.sizes
 		///home/plop/Documents/Genome/mm9/mm9_sizes_noY_1.txt
-		WholeGenomeAnalysis wga = new WholeGenomeAnalysis(output, readChrSizeFile("/home/plop/Documents/Genome/HumanGenomeHg19/w_hg19.sizes"), gauss, min, max, 
+		HiCExperimentAnalysis wga = new HiCExperimentAnalysis(output, readChrSizeFile("/home/plop/Documents/Genome/mammals/HumanGenomeHg19/chr2.size"), gauss, min, max, 
 				resolution, saturatedPixel, thresholdMax, diagSize, matrixSize,nbZero, factor);
-
+		
+		wga.setIsHichip(false);
+		
 		wga.run(input);
 						
 		if(keepTif == false){

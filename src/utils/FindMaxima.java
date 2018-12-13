@@ -10,11 +10,10 @@ import ij.process.ByteProcessor;
 import ij.process.ImageProcessor;
 
 /**
- * Class to detect the Maxima in image. Return the HashMap<String,Loop>, the loop can be corrected.
+ * Detectin of regional maxima in image. Return the HashMap<String,Loop>, the loop can be corrected. 
+ * the class uses is the imageJ class to detect the maxima.
  * 
- * the class use the imageJ class to detect the maxima.
- * 
- * @author axel poulet
+ * @author Axel Poulet
  *
  */
 public class FindMaxima{
@@ -34,10 +33,7 @@ public class FindMaxima{
 	private int m_resolution = -1;
 	/**	 HashMap<String,Loop>  collection of Object loop initialised in this class.*/
 	private HashMap<String,Loop> m_data = new HashMap<String,Loop>();
-	/** arrayList of int each occurence is a x coordinate of the image, the value of this arrayList is an integer if = 0 it is a whithe strip*/
-	ArrayList<Integer> m_countNonZero = new ArrayList<Integer>(); 
-	/** */
-	HashMap <String,Loop> m_tmp = new HashMap <String,Loop>(); 
+
 	
 	/**
 	 * Constructor of FindMaxima
@@ -57,43 +53,17 @@ public class FindMaxima{
 		m_resolution = resolution;
 	}
 	
-	/**
-	 * Constructor of FindMaxima
-	 * @param img ImagePlus raw image
-	 * @param imgFilter ImagePlus filtered image
-	 * @param chr String chromosome
-	 * @param noiseTolerance double threshold to detect maxima
-	 * @param diag	int the size of the diagonal
-	 * @param resolution int  the size of the diagonal
-	 * @param countNonZero ArrayList<Integer> array list locate the whit strip in the original matrix
-	 */
-	public FindMaxima(ImagePlus img, ImagePlus imgFilter, String chr, double noiseTolerance, int diag, int resolution, ArrayList<Integer> countNonZero){
-		m_imgNorm =  img;
-		m_imgFilter = imgFilter;
-		m_noiseTolerance = noiseTolerance;
-		m_chr = chr;
-		m_diagSize = diag;
-		m_resolution = resolution;
-		m_countNonZero= countNonZero;
-	}
 	
-	public FindMaxima(ImagePlus img, ImagePlus imgFilter, String chr, int noiseTolerance,int diag, int resolution, ArrayList<Integer> countNonZero, HashMap<String, Loop> temp) {
-		m_imgNorm =  img;
-		m_imgFilter = imgFilter;
-		m_noiseTolerance = noiseTolerance;
-		m_chr = chr;
-		m_diagSize = diag;
-		m_resolution = resolution;
-		m_countNonZero= countNonZero;
-		m_tmp = temp;
-	}
-
 	/**
 	 * Method to find loops in the image for observed and oMe, and fill the loop collection. This method also initiate the object loop,
-	 * @param isObserved
-	 * @return HashMap<String,Loop>
+	 * 
+	 * @param numImage
+	 * @param nbZero
+	 * @param raw
+	 * @param val
+	 * @return
 	 */
-	public HashMap<String,Loop> findloop(int numImage, int nbZero, ImagePlus raw, int val){
+	public HashMap<String,Loop> findloop(boolean hichip, int numImage, int nbZero, ImagePlus raw, int val){
 		run(nbZero, raw, val);
 		ArrayList<String> temp = getMaxima();
 		ImageProcessor ipN = m_imgNorm.getProcessor();
@@ -101,20 +71,33 @@ public class FindMaxima{
 			String[] parts = temp.get(j).split("\\t");
 			int x = Integer.parseInt(parts[0]);
 			int y = Integer.parseInt(parts[1]);
-			String name= m_chr+"\t"+temp.get(j)+"\t"+numImage;
+			String name= m_chr+"\t"+temp.get(j)+"\t"+numImage+"\t"+m_resolution;
 			double avg = average(x,y);
 			double std =standardDeviation(x,y,avg);
 			DecayAnalysis da = new DecayAnalysis(this.m_imgNorm,x,y);
 			double n1 =da.getNeighbourhood1();
 			double n2 =da.getNeighbourhood2();
-			if(n1<=n2 && n1 >= 0.125 && n2 >= 0.125 && (testStripNeighbour(x)==true && testStripNeighbour(y)==true)){
-				Loop maxima = new Loop(temp.get(j),x,y,m_chr,avg,std,ipN.getf(x, y));
-				maxima.setNeigbhoord1(n1);
-				maxima.setNeigbhoord2(n2);
-				maxima.setResolution(m_resolution);
-				maxima.setDiagSize(m_diagSize);
-				maxima.setMatrixSize(m_imgNorm.getWidth());
-				m_data.put(name, maxima);
+			if(hichip){
+				if(n1 > 2 && n2>2){
+					Loop maxima = new Loop(temp.get(j),x,y,m_chr,avg,std,ipN.getf(x, y));
+					maxima.setNeigbhoord1(n1);
+					maxima.setNeigbhoord2(n2);
+					maxima.setResolution(m_resolution);
+					maxima.setDiagSize(m_diagSize);
+					maxima.setMatrixSize(m_imgNorm.getWidth());
+					m_data.put(name, maxima);
+				}
+			}
+			else{
+				if(n1<=n2 && n1 >= 0.125 && n2 >= 0.125){
+					Loop maxima = new Loop(temp.get(j),x,y,m_chr,avg,std,ipN.getf(x, y));
+					maxima.setNeigbhoord1(n1);
+					maxima.setNeigbhoord2(n2);
+					maxima.setResolution(m_resolution);
+					maxima.setDiagSize(m_diagSize);
+					maxima.setMatrixSize(m_imgNorm.getWidth());
+					m_data.put(name, maxima);
+				}
 			}
 		}
 		return m_data;
@@ -127,7 +110,7 @@ public class FindMaxima{
 	 * to detect the maxima and correct them. 
 	 * @param isObserved, if true =>obersved method, else oMe
 	 */
-	private void run(int nbZero, ImagePlus rawImage, int val){
+	private void run(int nbZero, ImagePlus rawImage, int backGroundValue){
 		ImagePlus temp = m_imgFilter.duplicate();
 		ImageProcessor ip = temp.getProcessor();
 		MaximumFinder mf = new MaximumFinder(); 
@@ -135,7 +118,7 @@ public class FindMaxima{
 		m_imgResu.setProcessor(bp);
 		this.removedCloseMaxima();
 		this.correctMaxima();
-		this.removeMaximaCloseToZero(nbZero,rawImage, val);
+		this.removeMaximaCloseToZero(nbZero,rawImage, backGroundValue);
 	}
 	
 	
@@ -312,21 +295,7 @@ public class FindMaxima{
 	}
 	
 	
-	/**
-	 * Method testing the presence of white strip in the neighboorhood 
-	 * 
-	 * @param i coordinates to test
-	 * @return boolean if true no white stripes detected else false 
-	 */
-	private boolean testStripNeighbour(int i){
-		if(i+1 >=  m_countNonZero.size() ||	i-1 < 0)
-			return false;
-		else{
-			if(m_countNonZero.get(i) > 0 && m_countNonZero.get(i+1) > 0 && m_countNonZero.get(i-1) > 0 )
-				return true;
-			else return false;
-		}
-	}
+
 	
 	
 	

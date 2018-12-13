@@ -10,11 +10,35 @@ import java.util.HashMap;
 
 import core.HicFileProcessing;
 import gui.GuiAnalysis;
-import utils.WholeGenomeAnalysis;
+import utils.HiCExperimentAnalysis;
 
 /**
  * 
- * @author axel poulet
+ * SIP Version 1 run with java 8
+ * Usage:
+ * hic <hicFile> <chrSizeFile> <Output> <juicerToolsPath> [options]
+ * tprocessed <Directory with porocessed data> <chrSizeFile> <Output> [options]
+ * chrSizeFile: path to the chr file size, with the same name of the chr than in the hic file
+ * -res: resolution in bases (default 5000 bases)
+ * -mat: matrix size in bins (default 2000 bins)
+ * -d: diagonal size in bins, allow to removed the maxima found at this size (eg: a size of 2 at 5000 bases resolution removed all the maxima
+ * with a distances inferior or equal to 10kb) (default 6 bins)
+ * -g: Gaussian filter: smooth the image to reduce the noise (default 1)
+ * -factor: Multiple resolutions can be specified using: 
+ * -factor 1: run only for the input res
+ * -factor 2: res and res*2
+ * -factor 3: res and res*5
+ * -factor 4: res, res*2 and res*5 (default 2)
+ * -max: Maximum filter: increase the region of high intensity (default 1.5)
+ * -min: Minimum filter: removed the isolated high value (default 1.5)
+ * -sat: % of staturated pixel: enhance the contrast in the image (default 0.02)
+ * -t Threshold for loops detection (default 1800)
+ * -nbZero: number of zero: number of pixel equal at zero allowed in the 24 neighboorhood of the detected maxima, parameter for hic and processed method (default parameter 6)
+ * -norm: <NONE/VC/VC_SQRT/KR> only for hic option (default KR)
+ * -del: true or false, delete tif files used for loop detection (default true)
+ * -h, --help print help
+ * 
+ * @author Axel Poulet
  *
  */
 public class Hic_main {
@@ -42,21 +66,25 @@ public class Hic_main {
 	private static double m_saturatedPixel = 0.02;
 	/** Threshold to accepet a maxima in the images as a loop*/
 	private static int m_thresholdMax = 1800;// or 100
-	/***/
+	/**number of pixel = 0 allowed around the loop*/
 	private static int m_nbZero = 6;
 	/** boolean if true run all the process (dump data + image +image processing*/
 	private static boolean m_isHic = true;
-	/** */
+	/** factor(s) used to nalyse the matrix*/
 	private static ArrayList<Integer> m_factor = new ArrayList<Integer>();
 	private static String m_factOption = "2";
 	/** if true run only image Processing step*/
 	private static boolean m_isProcessed = false;
+	/** */
+	private static boolean m_isHiChip = false;
 	/** hash map stocking in key the name of the chr and in value the size*/
 	private static HashMap<String,Integer> m_chrSize =  new HashMap<String,Integer>();
+	/** path to the chromosome size file */
 	private static String m_chrSizeFile;
-	/**the doc of the prog*/
+	/**boolean is true supress all the image created*/
 	private static boolean m_delImages = true;
-	private static String m_doc = ("No Name Version 0.0.1 run with java 8\n"
+	/**Strin for the documentation*/
+	private static String m_doc = ("SIP Version 1 run with java 8\n"
 			+"Usage:\n"
 			+"\thic <hicFile> <chrSizeFile> <Output> <juicerToolsPath> [options]\n"
 			+"\tprocessed <Directory with porocessed data> <chrSizeFile> <Output> [options]\n"
@@ -66,6 +94,7 @@ public class Hic_main {
 			+"-d: diagonal size in bins, allow to removed the maxima found at this size (eg: a size of 2 at 5000 bases resolution removed all the maxima"
 			+"with a distances inferior or equal to 10kb) (default 6 bins)\n"
 			+"-g: Gaussian filter: smooth the image to reduce the noise (default 1)\n"
+			+"-hichip: true or false (default false), use true if you are analysing HiChIP data\n"
 			+"-factor: Multiple resolutions can be specified using: "
 			+ "\t-factor 1: run only for the input res\n"
 			+ "\t-factor 2: res and res*2\n"
@@ -73,9 +102,9 @@ public class Hic_main {
 			+ "\t-factor 4: res, res*2 and res*5 (default 2)\n"
 			+"-max: Maximum filter: increase the region of high intensity (default 1.5)\n"
 			+"-min: Minimum filter: removed the isolated high value (default 1.5)\n"
-			+"-sat: % of staturated pixel: enhance the contrast in the image (default 0.02)\n"
-			+"-t Threshold for loops detection (default 1800)\n"
-			+ "-nbZero: number of zero: number of pixel equal at zero allowed in the 24 neighboorhood of the detected maxima, parameter for hic and processed method (default parameter 6)\n"
+			+"-sat: % of staturated pixel: enhance the contrast in the image (default 0.005 for hic and 0.5 for hichip)\n"
+			+"-t Threshold for loops detection (default 1800 for hic and 1 for hichip)\n"
+			+ "-nbZero: number of zero: number of pixel equal at zero allowed in the 24 neighboorhood of the detected maxima, parameter for hic and processed method (default parameter 6 for hic and 25 for hichip)\n"
 			+ "-norm: <NONE/VC/VC_SQRT/KR> only for hic option (default KR)\n"
 			+ "-del: true or false, delete tif files used for loop detection (default true)\n"
 			+"-h, --help print help\n");
@@ -141,6 +170,7 @@ public class Hic_main {
 				m_gauss = gui.getGaussian();
 				m_max = gui.getMax();
 				m_min = gui.getMin();
+				m_isHiChip= gui.isHiChIP();
 				m_nbZero = gui.getNbZero();
 				m_saturatedPixel = gui.getEnhanceSignal();
 				m_thresholdMax = gui.getNoiseTolerance();
@@ -177,7 +207,8 @@ public class Hic_main {
 		File file = new File(m_output);
 		if (file.exists()==false){file.mkdir();}
 		BufferedWriter writer = new BufferedWriter(new FileWriter(new File(m_output+File.separator+"parameters.txt")));
-		WholeGenomeAnalysis wga = new WholeGenomeAnalysis(m_output, m_chrSize, m_gauss, m_min, m_max, m_resolution, m_saturatedPixel, m_thresholdMax, m_diagSize, m_matrixSize, m_nbZero,m_factor);
+		HiCExperimentAnalysis wga = new HiCExperimentAnalysis(m_output, m_chrSize, m_gauss, m_min, m_max, m_resolution, m_saturatedPixel, m_thresholdMax, m_diagSize, m_matrixSize, m_nbZero,m_factor);
+		wga.setIsHichip(m_isHiChip);
 		if(m_isHic){
 			System.out.println("hic mode:\ninput: "+m_input+"\noutput: "+m_output+"\njuiceBox: "+m_juiceBoxTools+"\nnorm: "+ m_juiceBoXNormalisation+"\ngauss: "+m_gauss+"\n"
 					+ "min: "+m_min+"\nmax: "+m_max+"\nmatrix size: "+m_matrixSize+"\ndiag size: "+m_diagSize+"\nresolution: "+m_resolution+"\nsaturated pixel: "+m_saturatedPixel
@@ -206,9 +237,9 @@ public class Hic_main {
 	}
 	
 	/**
-	 * 
-	 * @param chrSizeFile
-	 * @throws IOException
+	 * Run the input file and stock the info of name chr and their size in hashmap
+	 * @param chrSizeFile path chr size file
+	 * @throws IOException if file does't exist
 	 */
 	private static void readChrSizeFile( String chrSizeFile) throws IOException{
 		BufferedReader br = new BufferedReader(new FileReader(chrSizeFile));
@@ -236,9 +267,11 @@ public class Hic_main {
 	 * -sat: % of staturated pixel: enhance the contrast in the image (default 0.05)
 	 * -t Threshold for loops detection (default 3000)
 	 * -norm: <NONE/VC/VC_SQRT/KR> only for hic option (default KR)
-	 * -nbZero: "
-	 * @param m_chrSizeFile
-	 * @throws IOException
+	 * -nbZero: 
+	 * 
+	 * @param args table of String stocking the arguments for the program
+	 * @param index table index where start to read the arguments
+	 * @throws IOException if some parameters don't exist
 	 */
 	private static void readOption(String args[], int index) throws IOException{
 		if(index < args.length){
@@ -325,6 +358,17 @@ public class Hic_main {
 						System.exit(0);
 					}
 				}
+				else if(args[i].equals("-hichip")){
+					if(args[i+1].equals("true") || args[i+1].equals("T") || args[i+1].equals("TRUE"))
+						m_isHiChip = true;
+					else if(args[i+1].equals("false") || args[i+1].equals("F") || args[i+1].equals("False"))
+						m_isHiChip = false;
+					else{
+						System.out.println("-hichip = "+args[i+1]+", not defined\n");
+						System.out.println(m_doc);
+						System.exit(0);
+					}
+				}
 				else{
 					System.out.println(args[i]+" doesn't existed\n");
 					System.out.println(m_doc);
@@ -334,11 +378,13 @@ public class Hic_main {
 		}
 	}
 	
+	
 	/**
+	 * Return specifci error on function of thearugnent problems 
 	 * 
-	 * @param param
-	 * @param value
-	 * @param type
+	 * @param param String name of the arugment
+	 * @param value	String value of the argument
+	 * @param type Strint type of the argument
 	 */
 	private static void returnError(String param, String value, String type){
 		System.out.println(param+" has to be an integer "+value+" can't be convert in "+type+"\n");

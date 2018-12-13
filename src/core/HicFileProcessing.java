@@ -4,58 +4,63 @@ import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Iterator;
-
 import utils.DumpData;
-import utils.WholeGenomeAnalysis;
+import utils.HiCExperimentAnalysis;
 
 /**
  * 
- * @author plop
+ * 
+ * @author Axel Poulet
  *
  */
 public class HicFileProcessing {
-	/** */
+	/** Stock in String problem detected in juicerToolsBox*/
 	private String m_log = "";
-	/** */
-	private WholeGenomeAnalysis m_wga;
-	/** */
-	private Iterator<String> m_key;
-	/** */
+	/** WholeGenomeAnalysis object with all the information to creat intermidiary files and loops detection*/
+	private HiCExperimentAnalysis m_wga;
+	/** Name of the chromosome do create the file and dump the data*/
+	private Iterator<String> m_chrName;
+	/** DumpData object*/
 	private DumpData m_dumpData;
-	/** */
+	/** hashmap for the size and nome chromosome information*/
 	private HashMap<String,Integer> m_chrSize = new HashMap<String,Integer>();
-	/** */
-	private String m_norm="";
+	
+	
 	/**
-	 * 
-	 * @param hicFile
-	 * @param wga
-	 * @param chrSize
-	 * @param juiceBoxTools
-	 * @param normJuiceBox
+	 * Constructor of HicFileProcessing class
+	 * @param hicFile String of the .hic file
+	 * @param wga WholeGenomeAnalysis object which contain the info of the processing
+	 * @param chrSize hashmap containing the chromosomes information name and size
+	 * @param juiceBoxTools path to juicerTools.jar
+	 * @param normJuiceBox Normalization (NONE, KR, VC_SQRT or SQRT) used to dump the data
 	 */
-	public HicFileProcessing(String hicFile, WholeGenomeAnalysis wga, HashMap<String,Integer> chrSize, String juiceBoxTools, String normJuiceBox){
+	public HicFileProcessing(String hicFile, HiCExperimentAnalysis wga, HashMap<String,Integer> chrSize, String juiceBoxTools, String normJuiceBox){
 		m_wga = wga;
-		m_key = chrSize.keySet().iterator();
+		m_chrName = chrSize.keySet().iterator();
 		m_chrSize = chrSize;
 		m_dumpData = new DumpData(juiceBoxTools,hicFile,normJuiceBox, wga.getResolution());
-		m_norm = normJuiceBox;
 		System.out.println(hicFile+"\n");
 	}
 	
 	
 	
 	/**
+	 * Run the method to dump the data on function of the different parameter,
+	 * resolution
+	 * size of the image => allow to run the chromosome by step
+	 * create the file used then for the loops detection.
+	 * 
 	 * dump observed KR https://hicfiles.s3.amazonaws.com/hiseq/gm12878/in-situ/combined.hic 1:20480000:40960000 1:20480000:40960000 BP 10000 combined_10Kb.txt
 	 * 
-	 * @throws IOException
-	 * @throws InterruptedException 
+	 * @throws IOException catch exception if file problem
+	 * @throws InterruptedException catch exception of program pb 
 	 */
+	
 	public void run() throws IOException, InterruptedException{
 		boolean juicerTools;
-		while(m_key.hasNext()){
+		while(m_chrName.hasNext()){
 			String expected ="";
-			String chr = m_key.next();
+			String chr = m_chrName.next();
 			String outdir = m_wga.getOutputDir()+File.separator+chr+File.separator;
 			File file = new File(outdir);
 			if (file.exists()==false){file.mkdir();}
@@ -99,16 +104,16 @@ public class HicFileProcessing {
 						System.exit(0);
 					}
 				}
-			}
-			
+			}	
 			System.out.println("end dump "+chr);
 		}
 		m_wga.run();
 	}
 	
 	/**
+	 * Getter m_log stocking the juicertoolBox problems
+	 * @return String m_log
 	 * 
-	 * @return
 	 */
 	public String getLog(){
 		return m_log;

@@ -225,10 +225,6 @@ public class DumpData {
 			catch (IOException ioe){
 				ioe.printStackTrace();
 			}
-		}
-		
+		}		
 	} 
-
-
-
 }
