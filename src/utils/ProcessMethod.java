@@ -15,17 +15,17 @@ import ij.process.ImageProcessor;
  */
 public class ProcessMethod{
 	/** Raw image*/
-	ImagePlus m_img;
+	ImagePlus _img;
 	/** ImageProcessor of the raw image*/
-	ImageProcessor m_ip;
+	ImageProcessor _ip;
 	/** value for the min filter strength*/
-	double m_minFilterRadius = 0;
+	double _minFilterRadius = 0;
 	/** max filter strength*/
-	double m_maxFilterRadius = 0;
+	double _maxFilterRadius = 0;
 	/** gaussian filter strength*/
-	double m_gaussianFilterRadius = 0;
+	double _gaussianFilterRadius = 0;
 	/** ImageJ object to run the different filters*/
-	RankFilters m_rF = new RankFilters();
+	RankFilters _rF = new RankFilters();
 
 	/**
 	 * Constructor of ProcessMethod
@@ -35,11 +35,11 @@ public class ProcessMethod{
 	 * @param gaussianFilterRad double, value of the gaussian strength filter
 	 */
 	public ProcessMethod(ImagePlus img, double minFilterRad, double maxFilterRad, double gaussianFilterRad){
-		m_img = img;
-		m_ip = m_img.getProcessor();
-		m_gaussianFilterRadius = gaussianFilterRad;
-		m_maxFilterRadius = maxFilterRad;
-		m_minFilterRadius = minFilterRad;		
+		this._img = img;
+		this._ip = this._img.getProcessor();
+		this._gaussianFilterRadius = gaussianFilterRad;
+		this._maxFilterRadius = maxFilterRad;
+		this._minFilterRadius = minFilterRad;		
 	}
 	
 	/**
@@ -48,9 +48,9 @@ public class ProcessMethod{
 	 * @param gaussianFilterRad double, value of the gaussian strength filter
 	 */
 	public ProcessMethod(ImagePlus img, double gaussianFilterRad){
-		m_img = img;
-		m_ip = m_img.getProcessor();
-		m_gaussianFilterRadius = gaussianFilterRad;		
+		this._img = img;
+		this._ip = this._img.getProcessor();
+		this._gaussianFilterRadius = gaussianFilterRad;		
 	}
 	
 	/**
@@ -61,7 +61,7 @@ public class ProcessMethod{
 	public void enhanceContrast(double saturatedPixel){
 		ContrastEnhancer enh = new ContrastEnhancer();
 		enh.setNormalize(true);
-		enh.stretchHistogram(m_img, saturatedPixel);
+		enh.stretchHistogram(this._img, saturatedPixel);
 		
 	}
 	
@@ -70,7 +70,7 @@ public class ProcessMethod{
 	 * @param min double strength of the min filter
 	 */
 	public void runMin(double min){	
-		m_rF.rank(m_ip, min, RankFilters.MIN);
+		this._rF.rank(this._ip, min, RankFilters.MIN);
 	}
 	
 		
@@ -80,28 +80,24 @@ public class ProcessMethod{
 	 */
 	public void topHat(){
 		GaussianBlur gb = new GaussianBlur();
-		gb.blurGaussian(m_ip, this.m_gaussianFilterRadius);
-		m_rF.rank(m_ip, this.m_minFilterRadius, RankFilters.MIN);
-		m_rF.rank(m_ip, this.m_maxFilterRadius, RankFilters.MAX);
-		m_rF.rank(m_ip, this.m_maxFilterRadius, RankFilters.MAX);
-		m_rF.rank(m_ip, this.m_minFilterRadius, RankFilters.MIN);
+		gb.blurGaussian(this._ip, this._gaussianFilterRadius);
+		this._rF.rank(this._ip, this._minFilterRadius, RankFilters.MIN);
+		this._rF.rank(this._ip, this._maxFilterRadius, RankFilters.MAX);
+		this._rF.rank(this._ip, this._maxFilterRadius, RankFilters.MAX);
+		this._rF.rank(this._ip, this._minFilterRadius, RankFilters.MIN);
 	}
 	
 	/**
 	 * Getter of the image filtered
 	 * @return ImagePlus image filtered
 	 */
-	public ImagePlus getImg(){
-		return m_img;
-	}
+	public ImagePlus getImg(){ return _img;}
 	
 	/**
 	 * Setter of the raw image
-	 * @param m_img raw Image
+	 * @param _img raw Image
 	 */
-	public void setImg(ImagePlus img){
-		this.m_img = img;
-	}
+	public void setImg(ImagePlus img){ this._img = img;}
 	
 
 	/**
@@ -110,11 +106,15 @@ public class ProcessMethod{
 	 */
 	public void runGaussian() {
 		GaussianBlur gb = new GaussianBlur();
-		gb.blurGaussian(m_ip, this.m_gaussianFilterRadius);
+		gb.blurGaussian(_ip, this._gaussianFilterRadius);
 	}
 
+	/**
+	 * 
+	 * @param m_min
+	 */
 	public void runMax(double m_min) {
-		m_rF.rank(m_ip, m_min, RankFilters.MAX);// TODO Auto-generated method stub
+		_rF.rank(_ip, m_min, RankFilters.MAX);// TODO Auto-generated method stub
 		
 	}
 }

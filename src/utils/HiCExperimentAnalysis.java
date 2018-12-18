@@ -11,6 +11,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Set;
 
+import gui.Progress;
 import ij.IJ;
 import ij.ImagePlus;
 import ij.io.FileSaver;
@@ -21,50 +22,56 @@ import inra.ijpb.morphology.Strel;
  * Analyse and detect a whole genome HiC with .hic file or already processed data.
  * The class is used for the observed and oMe method.
  * 
+ * MorpholibJ method used
+ * 
+ * Collection of mathematical morphology methods and plugins for ImageJ, created at the INRA-IJPB Modeling and Digital Imaging lab.
+ * David Legland, Ignacio Arganda-Carreras, Philippe Andrey; MorphoLibJ: integrated library and plugins for mathematical morphology with ImageJ.
+ * Bioinformatics 2016; 32 (22): 3532-3534. doi: 10.1093/bioinformatics/btw413
+ * 
  * @author axel poulet
  *
  */
 public class HiCExperimentAnalysis {
 	/** String path of the input data*/
-	private String m_input;
+	private String _input;
 	/** Path of the output file*/
-	private String m_output;
+	private String _output;
 	/** Strength of the gaussian filter*/
-	private double m_gauss;
+	private double _gauss;
 	/** Strength of the min filter*/
-	private double m_min;
+	private double _min;
 	/** Strength of the max filter*/
-	private double m_max;
+	private double _max;
 	/** % of staurated pixel after enhance contrast*/
-	private double m_saturatedPixel;
+	private double _saturatedPixel;
 	/** Image size*/
-	private int m_matrixSize = 0;
+	private int _matrixSize = 0;
 	/** Resolution of the bin dump in base*/
-	private int m_resolution;
+	private int _resolution;
 	/** Threshold for the maxima detection*/
-	private int m_thresholdMaxima;
+	private int _thresholdMaxima;
 	/** HashMap of the chr size, the key = chr name, value = size of chr*/
-	HashMap<String,Integer> m_chrSize =  new HashMap<String,Integer>();
+	private HashMap<String,Integer> _chrSize =  new HashMap<String,Integer>();
 	/** Diage size to removed maxima close to diagonal*/
-	private int m_diagSize;
+	private int _diagSize;
 	/** Size of the step to process each chr (step = matrixSize/2)*/
-	private int m_step;
-	/** */
-	private int m_nbZero = -1;
-	/** */
-	public ArrayList<File> m_tifList = new ArrayList<File>();
+	private int _step;
+	/** Number of pixel = 0 allowed around the loop*/
+	private int _nbZero = -1;
+	/** List of file containing the path of the image*/
+	public ArrayList<File> _tifList = new ArrayList<File>();
 	/** loop coolection*/
-	static HashMap<String,Loop> m_data = new HashMap<String,Loop>();
-	/** loop coolection*/
-	static HashMap<Integer,String> m_normVector = new HashMap<Integer,String>();
-	/** */
-	ArrayList<Integer> m_listFactor = new ArrayList<Integer>();
-	/**	 */
-	Strel m_strel = Strel.Shape.SQUARE.fromRadius(40);
-	/**	 */
-	boolean m_hichip = false;
-	/**	 */
-	int m_backgroudValue = 1;
+	private static HashMap<String,Loop> m_data = new HashMap<String,Loop>();
+	/** raw or line with biais value in the hic matrix*/
+	private static HashMap<Integer,String> _normVector = new HashMap<Integer,String>();
+	/** list of the image resolution to find loop*/
+	private ArrayList<Integer> _listFactor = new ArrayList<Integer>();
+	/**	 struturing element for the MM method used (MorpholibJ)*/
+	private Strel m_strel = Strel.Shape.SQUARE.fromRadius(40);
+	/**	boolean if true hichip data if false hic */
+	private boolean m_hichip = false;
+	/**	 image background value*/
+	private int _backgroudValue = 1;
 	
 	
 	/**
@@ -82,41 +89,39 @@ public class HiCExperimentAnalysis {
 	 * @param matrixSize: size of the image to analyse
 	 */
 	 
-	
 	public HiCExperimentAnalysis(String output, HashMap<String, Integer> chrSize, double gauss, double min,
 			double max, int resolution, double saturatedPixel, int thresholdMax,
 			int diagSize, int matrixSize, int nbZero,ArrayList<Integer> listFactor) {
-		m_output = output;
-		m_input = output;
-		m_chrSize = chrSize;
-		m_gauss = gauss;
-		m_min = min;
-		m_max = max;
-		m_matrixSize = matrixSize;
-		m_resolution = resolution;
-		m_saturatedPixel = saturatedPixel;
-		m_thresholdMaxima = thresholdMax;
-		m_diagSize = diagSize;
-		m_step = matrixSize/2;
-		m_nbZero = nbZero;
-		m_listFactor = listFactor;
+		this._output = output;
+		this._input = output;
+		this._chrSize = chrSize;
+		this._gauss = gauss;
+		this._min = min;
+		this._max = max;
+		this._matrixSize = matrixSize;
+		this._resolution = resolution;
+		this._saturatedPixel = saturatedPixel;
+		this._thresholdMaxima = thresholdMax;
+		this._diagSize = diagSize;
+		this._step = matrixSize/2;
+		this._nbZero = nbZero;
+		this._listFactor = listFactor;
 	}
 
 	/**
 	 * run the whole genome analysis to detect the maxima
-	 * @param choice isObserved or oMe
 	 * @throws IOException
 	 */
 	public void run() throws IOException{
-		Iterator<String> key = m_chrSize.keySet().iterator();
-		String resuFile = m_output+File.separator+"loops.bed";
+		Iterator<String> key = this._chrSize.keySet().iterator();
+		String resuFile = this._output+File.separator+"loops.bedpe";
 		int nb = 0;
 		while(key.hasNext()){
 			String chr = key.next();
-			String dir = m_output+File.separator+chr+File.separator;
+			String dir = this._output+File.separator+chr+File.separator;
 			File[] listOfFiles = fillList(dir);
 			System.out.println(listOfFiles.length);
-			this.testNormaVectorValue(m_output+File.separator+"normVector"+File.separator+chr+".norm");
+			this.testNormaVectorValue(this._output+File.separator+"normVector"+File.separator+chr+".norm");
 			System.out.println("normVector end loading file: "+chr+".norm");
 			if (listOfFiles.length == 0)
 				System.out.println("dumped directory of chromosome"+chr+"empty");
@@ -128,17 +133,45 @@ public class HiCExperimentAnalysis {
 			++nb;
 		}
 	}
+	
+	/**
+	 * run the whole genome analysis to detect the maxima with the GUI
+	 * 
+	 * @throws IOException
+	 */
+	public void runGUI() throws IOException{
+		Iterator<String> key = this._chrSize.keySet().iterator();
+		String resuFile = this._output+File.separator+"loops.bedpe";
+		int nb = 0;
+		Progress p = new Progress("Loops detection",_chrSize.size());
+		p.bar.setValue(nb);
+		while(key.hasNext()){
+			String chr = key.next();
+			String dir = this._output+File.separator+chr+File.separator;
+			File[] listOfFiles = fillList(dir);
+			this.testNormaVectorValue(this._output+File.separator+"normVector"+File.separator+chr+".norm");
+			System.out.println("normVector end loading file: "+chr+".norm");
+			if (listOfFiles.length == 0)
+				System.out.println("dumped directory of chromosome"+chr+"empty");
+			else{
+				detectLoops(listOfFiles,chr);
+				if(nb == 0)		saveFile(resuFile, false);
+				else saveFile(resuFile, true);
+			}
+			++nb;
+			p.bar.setValue(nb);
+		}
+	}
 
 	/**
-	 * run the whole genome analysis to detect the maxima
+	 * run the whole genome analysis to detect the maxima with processed data set
 	 * 
-	 * @param choice choice isObserved or oMe
 	 * @param input path of the input file
 	 * @throws IOException
 	 */
 	public void run(String input) throws IOException{
-		Iterator<String> key = m_chrSize.keySet().iterator();
-		String resuFile = m_output+File.separator+"loops.bed";
+		Iterator<String> key = this._chrSize.keySet().iterator();
+		String resuFile = this._output+File.separator+"loops.bedpe";
 		int nb = 0;
 		while(key.hasNext()){
 			String chr = key.next();
@@ -156,16 +189,47 @@ public class HiCExperimentAnalysis {
 			}
 			++nb;
 		}
-		
+	}
+	
+	/**
+	 * run the whole genome analysis to detect the maxima in processed dat
+	 * run prog with teh GUI
+	 * 
+	 * @param input path of the input file
+	 * @throws IOException
+	 */
+	public void runGUI(String input) throws IOException{
+		Iterator<String> key = this._chrSize.keySet().iterator();
+		String resuFile = this._output+File.separator+"loops.bedpe";
+		int nb = 0;
+		Progress p = new Progress("Loops detection",_chrSize.size());
+		p.bar.setValue(nb);
+		while(key.hasNext()){
+			String chr = key.next();
+			String dir = input+File.separator+chr+File.separator;
+			File[] listOfFiles =fillList(dir);
+			System.out.println(dir);
+			this.testNormaVectorValue(input+File.separator+"normVector"+File.separator+chr+".norm");
+			System.out.println("normVector end loading file: "+chr+".norm");
+			if (listOfFiles.length == 0)
+				System.out.println("dumped directory of chromosome"+chr+"empty");
+			else{
+				detectLoops(listOfFiles,chr);
+				if (nb == 0) saveFile(resuFile,false);
+				else saveFile(resuFile,true);
+			}
+			++nb;
+			p.bar.setValue(nb);
+		}		
 	}
 	
 	/**
 	 * Save the result file in tabulated file
 	 * 
-	 * @param pathFile path of output file
+	 * @param pathFile String path for the results file
+	 * @param first boolean to know idf it is teh first chromo
 	 * @throws IOException
 	 */
-	
 	private void saveFile(String pathFile, boolean first) throws IOException{
 		BufferedWriter writer;
 		if(first)
@@ -176,7 +240,6 @@ public class HiCExperimentAnalysis {
 		}
 		Set<String> key = m_data.keySet();
 		Iterator<String> it = key.iterator();
-		//HashMap<String,Strip> hStrip = new HashMap<String,Strip>();
 		while (it.hasNext()){
 			String cle = it.next();
 			Loop loop = m_data.get(cle);
@@ -184,73 +247,19 @@ public class HiCExperimentAnalysis {
 			writer.write(loop.getChr()+"\t"+coord.get(2)+"\t"+coord.get(3)+"\t"+loop.getChr()+"\t"+coord.get(0)+"\t"+coord.get(1)+"\t0,0,0"
 					+"\t"+loop.getPaScoreAvg()+"\t"+loop.getRegionalPaScoreAvg()+"\t"+loop.getPaScoreMed()+"\t"+loop.getRegionalPaScoreMed()
 					+"\t"+loop.getNeigbhoord1()+"\t"+loop.getNeigbhoord2()+"\t"+loop.getAvg()+"\t"+loop.getStd()+"\t"+loop.getValue()+"\n");
-			
-			/*Strip stripYTest = loop.getStripY();
-			if(stripYTest!=null){
-				String[]tName = stripYTest.getName().split("_");
-				int y = Integer.parseInt(tName[1]);
-				boolean test = false;
-				String nameTest = stripYTest.getName();
-				if(hStrip.containsKey(nameTest)){
-					 test = true;
-				}else{
-					for (int i = y-25000; i<=y+25000; i+=5000){
-						nameTest = "Y_"+i;
-						if(hStrip.containsKey(nameTest)){
-							test = true;
-							break;
-						}
-					}
-				}
-				if(test){
-					Strip strip = hStrip.get(nameTest);
-					if(stripYTest.getSize() > strip.getSize()){
-						hStrip.put(stripYTest.getName(), stripYTest);
-						hStrip.remove(nameTest);
-					}
-				}else{
-					hStrip.put(stripYTest.getName(), stripYTest);
-				}
-			}*/
 		}
 		writer.close();
-		//saveStripFile(hStrip);
 	}
 	
+	
 	/**
+	 * Make Image 
 	 * 
-	 * @param hStrip
-	 * @throws IOException
-	 */
-	private void saveStripFile(HashMap<String,Strip> hStrip) throws IOException{
-		Set<String> key = hStrip.keySet();
-		Iterator<String> it = key.iterator();
-		while (it.hasNext()){
-			String name= it.next();
-			Strip strip = hStrip.get(name);
-			if(name.contains("Y")){
-				double avg = (strip.getLeftNeigStrip()+strip.getRightNeigStrip())/2;
-				if(avg<0.9){
-					String line = strip.getChr()+"\t"+strip.getX()+"\t"+strip.getXEnd()+"\t"+strip.getChr()+"\t"+strip.getY()
-					+"\t"+strip.getYEnd()+"\t0,0,0\t"+strip.getStripValue()+"\t"+strip.getStripStd()+"\t"+strip.getLeftNeigStrip()+"\t"+strip.getRightNeigStrip()+"\t"+avg;
-				
-			/*if(name.contains("X")){
-				avg = loop.getStripX()/size;
-				line = loop.getChr()+"\t"+coord.get(2)+"\t"+coord.get(3)+"\t"+loop.getChr()+"\t"+coord.get(1)+"\t"+coord.get(1)+"\t"+avg;
-			}*/
-					System.out.println(line);
-				}
-			}
-		}
-	}
-
-	/**
-	 * 
-	 * @param file
-	 * @return
+	 * @param file path 
+	 * @return ImagePlus with oMe  value
 	 */
 	private ImagePlus doImage(String file){	
-		TupleFileToImage readFile = new TupleFileToImage(file,m_matrixSize,m_resolution);
+		TupleFileToImage readFile = new TupleFileToImage(file,this._matrixSize,this._resolution);
 		readFile.readTupleFile();
 		saveFile(readFile.getNormImage(),file.replaceAll(".txt", "_N.tif"));
 		ImagePlus imageOutput = readFile.getRawImage();
@@ -263,11 +272,11 @@ public class HiCExperimentAnalysis {
 	/**
 	 * Detect loops methods
 	 * detect the loops at two different resolution, initial resolution + 2 fold bigger
-	 * /// call the loops first in the smaller resolution 
-	 * / then making image with bigger resolution and fill no Zero list
-	 * 	// faire un gros for deguelasse por passer les faceteur de grossissement seulement si listDefacteur > 1.
-	 * // make and save image at two differents resolution (m_resolution and m_resolution*2)
-	 * // if there is a lot pixel at zero in the images adapt the threshold for the maxima detection
+	 * call the loops first in the smaller resolution 
+	 * then making image with bigger resolution and fill no Zero list
+	 * faire un gros for deguelasse por passer les faceteur de grossissement seulement si listDefacteur > 1.
+	 * make and save image at two differents resolution (m_resolution and m_resolution*2)
+	 * if there is a lot pixel at zero in the images adapt the threshold for the maxima detection
 	 * @param fileList list fo the tuple file
 	 * @param chr name of the chr
 	 * @throws IOException
@@ -277,56 +286,55 @@ public class HiCExperimentAnalysis {
 		HashMap<String,Loop> hLoop= new HashMap<String,Loop>();
 		for(int i = 0; i < fileList.length; ++i){
 			if(fileList[i].toString().contains(".txt")){
-				m_backgroudValue = 1; 
+				this._backgroudValue = 1; 
 				String[] tfile = fileList[i].toString().split("_");
-				int numImage = Integer.parseInt(tfile[tfile.length-2])/(m_step*m_resolution);
+				int numImage = Integer.parseInt(tfile[tfile.length-2])/(this._step*this._resolution);
 				System.out.println(numImage+" "+fileList[i]);
 				ImagePlus imgRaw = doImage(fileList[i].toString());
-				
 				ImagePlus imgFilter = imgRaw.duplicate();
 				TupleFileToImage.correctImage(imgFilter);
 				ImagePlus imgCorrect = imgFilter.duplicate();
-				ProcessMethod m = new ProcessMethod(imgFilter,m_min,m_max,m_gauss);
+				ProcessMethod m = new ProcessMethod(imgFilter,this._min,this._max,this._gauss);
 				imageProcessing(imgFilter,fileList[i].toString(), m);
-				m_tifList.add(new File(imgRaw.getTitle()));
+				this._tifList.add(new File(imgRaw.getTitle()));
 				imgRaw.getTitle().replaceAll(".tif", "_N.tif");
-				m_tifList.add(new File(imgRaw.getTitle().replaceAll(".tif", "_N.tif")));
+				this._tifList.add(new File(imgRaw.getTitle().replaceAll(".tif", "_N.tif")));
 				ImagePlus imgNorm = IJ.openImage(imgRaw.getTitle().replaceAll(".tif", "_N.tif"));
 				
-				int thresh = m_thresholdMaxima;
-				double pixelPercent = 100*TupleFileToImage.m_noZeroPixel/(this.m_matrixSize*this.m_matrixSize);
-				if(pixelPercent <= 5)
-					thresh =  m_thresholdMaxima/10;
+				int thresh = this._thresholdMaxima;
+				double pixelPercent = 100*TupleFileToImage._noZeroPixel/(this._matrixSize*this._matrixSize);
+				if(pixelPercent <= 5) 
+					thresh =  _thresholdMaxima/10;
 				
-				FindMaxima findLoop = new FindMaxima(imgNorm, imgFilter, chr, thresh, m_diagSize, m_resolution);
-				HashMap<String,Loop> temp = findLoop.findloop(m_hichip,numImage, m_nbZero,imgRaw, m_backgroudValue);
+				FindMaxima findLoop = new FindMaxima(imgNorm, imgFilter, chr, thresh, this._diagSize, this._resolution);
+				HashMap<String,Loop> temp = findLoop.findloop(this.m_hichip,numImage, this._nbZero,imgRaw, this._backgroudValue);
 				PeakAnalysisScore pas = new PeakAnalysisScore(imgNorm,temp);
 				pas.computeScore();
 				
-				if (m_listFactor.size() > 1){
-					for (int j = 1; j < m_listFactor.size(); ++j ){
-						m_backgroudValue = m_listFactor.get(j)*3;
-						ChangeImageRes test =  new ChangeImageRes(imgCorrect,  m_listFactor.get(j));
+				if (this._listFactor.size() > 1){
+					for (int j = 1; j < this._listFactor.size(); ++j ){
+						this._backgroudValue = this._listFactor.get(j)*3;
+						ChangeImageRes test =  new ChangeImageRes(imgCorrect, this._listFactor.get(j));
 						ImagePlus imgRawBiggerRes = test.run();
 						
-						test =  new ChangeImageRes(imgNorm,  m_listFactor.get(j));
+						test =  new ChangeImageRes(imgNorm,  this._listFactor.get(j));
 						ImagePlus imgRawBiggerResNorm = test.run();
 						
-						saveFile(imgRawBiggerRes,fileList[i].toString().replaceAll(".txt", "_"+m_listFactor.get(j)+".tif")); 
-						saveFile(imgRawBiggerResNorm,fileList[i].toString().replaceAll(".txt", "_"+m_listFactor.get(j)+"_N.tif"));
-						m_tifList.add(new File(fileList[i].toString().replaceAll(".txt", "_"+m_listFactor.get(j)+".tif")));
-						m_tifList.add(new File(fileList[i].toString().replaceAll(".txt", "_"+m_listFactor.get(j)+"_N.tif")));
+						saveFile(imgRawBiggerRes,fileList[i].toString().replaceAll(".txt", "_"+this._listFactor.get(j)+".tif")); 
+						saveFile(imgRawBiggerResNorm,fileList[i].toString().replaceAll(".txt", "_"+this._listFactor.get(j)+"_N.tif"));
+						this._tifList.add(new File(fileList[i].toString().replaceAll(".txt", "_"+this._listFactor.get(j)+".tif")));
+						this._tifList.add(new File(fileList[i].toString().replaceAll(".txt", "_"+this._listFactor.get(j)+"_N.tif")));
 											
 						ImagePlus imgFilterBiggerRes = imgRawBiggerRes.duplicate();
-						m = new ProcessMethod(imgFilterBiggerRes,m_min/m_listFactor.get(j),m_max/m_listFactor.get(j),m_gauss);
-						imageProcessing(imgFilterBiggerRes, fileList[i].toString().replaceAll(".txt", "_"+m_listFactor.get(j)+".tif"), m);
+						m = new ProcessMethod(imgFilterBiggerRes,this._min/this._listFactor.get(j),this._max/this._listFactor.get(j),this._gauss);
+						imageProcessing(imgFilterBiggerRes, fileList[i].toString().replaceAll(".txt", "_"+this._listFactor.get(j)+".tif"), m);
 			
-						int diag = m_diagSize/m_listFactor.get(j);
-						int res = m_resolution*m_listFactor.get(j);
+						int diag = this._diagSize/this._listFactor.get(j);
+						int res = _resolution*_listFactor.get(j);
 						if (diag < 2)
 							diag = 2 ;
 						findLoop = new FindMaxima(imgRawBiggerResNorm, imgFilterBiggerRes, chr,thresh, diag, res);
-						HashMap<String,Loop>tempBiggerRes = findLoop.findloop(m_hichip,numImage,(int)m_nbZero/m_listFactor.get(j)-1,imgRawBiggerRes,m_backgroudValue);
+						HashMap<String,Loop>tempBiggerRes = findLoop.findloop(this.m_hichip,numImage,(int)this._nbZero/this._listFactor.get(j)-1,imgRawBiggerRes,this._backgroudValue);
 						pas = new PeakAnalysisScore(imgRawBiggerResNorm,tempBiggerRes);
 						pas.computeScore();
 						temp.putAll(tempBiggerRes);
@@ -337,15 +345,15 @@ public class HiCExperimentAnalysis {
 				hLoop = coord.imageToGenomeCoordinate(temp, numImage);
 			}
 		}
-		
 		m_data = removedLoopCloseToWhiteStrip(hLoop);
 		System.out.println("chr "+ chr +"\t"+m_data.size());
 	}
 	
 	/**
+	 * Removed loop close to white  strip
 	 * 
-	 * @param hLoop
-	 * @return
+	 * @param hLoop loop collection before correction of the loops
+	 * @return loop collection sfter correction of the loops
 	 */
 	private HashMap<String,Loop> removedLoopCloseToWhiteStrip(HashMap<String,Loop> hLoop){
 		Set<String> key = hLoop.keySet();
@@ -362,8 +370,8 @@ public class HiCExperimentAnalysis {
 				String [] tname = name.split("\t");
 				int x = Integer.parseInt(tname[1]);
 				int y = Integer.parseInt(tname[2]);
-				for(int i = x-5*m_resolution; i <= x+5*m_resolution; i+=m_resolution){
-					for(int j = y-5*m_resolution; j <= y+5*m_resolution; j+=m_resolution){
+				for(int i = x-5*this._resolution; i <= x+5*this._resolution; i+=this._resolution){
+					for(int j = y-5*this._resolution; j <= y+5*this._resolution; j+=this._resolution){
 						String test = tname[0]+"\t"+i+"\t"+j;
 						if(!test.equals(name)){
 							if(hLoop.containsKey(test)){
@@ -372,7 +380,7 @@ public class HiCExperimentAnalysis {
 									testBreak =true;
 									break;
 								}else if(hLoop.get(test).getResolution() == hLoop.get(name).getResolution()){
-									if((Math.abs(x-hLoop.get(test).getX()) < m_resolution*3 || Math.abs(y-hLoop.get(test).getY()) < m_resolution*3)){
+									if((Math.abs(x-hLoop.get(test).getX()) < this._resolution*3 || Math.abs(y-hLoop.get(test).getY()) < this._resolution*3)){
 										if(hLoop.get(test).getAvg() > hLoop.get(name).getAvg()){
 											removed.add(name);
 											testBreak =true;
@@ -384,17 +392,14 @@ public class HiCExperimentAnalysis {
 												removed.add(name);
 												testBreak =true;
 												break;
-											}else
-												removed.add(test);
+											}else removed.add(test);
 										}
 									}
-								}else
-									removed.add(test);
+								}else removed.add(test);
 							}
 						}
 					}
-					if(testBreak)
-						break;
+					if(testBreak) break;
 				}
 			}
 		}
@@ -406,30 +411,30 @@ public class HiCExperimentAnalysis {
 	
 	
 	/**
-	 * 
-	 * @param input
-	 * @return
+	 * Removed loops close to biased HiC signal
+	 * @param loop Loop to test
+	 * @return boolean true if loop have to be removed else false
 	 */
 	private boolean removedVectoNorm(Loop loop){
 		boolean test = false;
 		int x = loop.getCoordinates().get(0);
 		int y = loop.getCoordinates().get(2);
-		if(loop.getResolution() == m_resolution){
-			if(m_normVector.containsKey(x) || m_normVector.containsKey(y))
+		if(loop.getResolution() == this._resolution){
+			if(_normVector.containsKey(x) || _normVector.containsKey(y))
 				test = true;
 		}
-		else if(loop.getResolution() == m_resolution*2){
-			if(m_normVector.containsKey(x) || m_normVector.containsKey(y) || m_normVector.containsKey(x+m_resolution) || m_normVector.containsKey(y+m_resolution))
+		else if(loop.getResolution() == this._resolution*2){
+			if(_normVector.containsKey(x) || _normVector.containsKey(y) || _normVector.containsKey(x+_resolution) || _normVector.containsKey(y+_resolution))
 				test = true;
 		}
-		else if(loop.getResolution() == m_resolution*5){
-			for(int i = x; i <= x+5*m_resolution; i+=m_resolution)
-				if(m_normVector.containsKey(i))
+		else if(loop.getResolution() == this._resolution*5){
+			for(int i = x; i <= x+5*this._resolution; i+=this._resolution)
+				if(_normVector.containsKey(i))
 					test = true;
 				
 			if(test == false){
-				for(int i = y; i <= y+5*m_resolution; y+=m_resolution)
-					if(m_normVector.containsKey(y))
+				for(int i = y; i <= y+5*this._resolution; y+=this._resolution)
+					if(_normVector.containsKey(y))
 						test = true;
 			}
 		}
@@ -437,12 +442,10 @@ public class HiCExperimentAnalysis {
 	}
 
 	/**
-	 * Compare loops between the two resolution, if at the same location the are one loops call at bigger resolution and snmaller resolution,
-	 * keep the smaller one 
+	 * Remove loops which doesn't respect the rule
 	 * 
-	 * @param input collection of the loop call at small resolution
-	 * @param tempBiggerRes collection of the loop call at smaller resolution
-	 * @return HashMap<String, Loop> the sorted HashMap
+	 * @param input loop collection before correction
+	 * @return loop collection after correction
 	 */
 	private HashMap<String, Loop>  removedBadLoops(HashMap<String, Loop> input){
 		Set<String> key = input.keySet();
@@ -460,16 +463,15 @@ public class HiCExperimentAnalysis {
 		}
 		for (int i = 0; i< removed.size(); ++i)
 			input.remove(removed.get(i));
-		
 		return input;
 	}
 	
 	/**
-	 * 
-	 * @param loop
-	 * @param input
-	 * @param removed
-	 * @return
+	 * Remove overlapping loops
+	 * @param loop loop to test
+	 * @param input loop collection
+	 * @param removed arrayList of loop
+	 * @return removed arrayList of loop 
 	 */
 	private ArrayList<String> removeOverlappingLoops(Loop loop, HashMap<String, Loop> input, ArrayList<String> removed){
 		Set<String> key = input.keySet();
@@ -495,28 +497,27 @@ public class HiCExperimentAnalysis {
 	}
 
 	/**
-	 * method to process the image with oMe
-	 * 
-	 * @param imgFilter image filtered
-	 * @param fileName input file
+	 * Image processing method
+	 * @param imgFilter ImagePlus to correct
+	 * @param fileName Strin file name
+	 * @param pm ProcessMethod object
 	 */
 	private void imageProcessing(ImagePlus imgFilter, String fileName, ProcessMethod pm){ 
-		pm.enhanceContrast(this.m_saturatedPixel);
+		pm.enhanceContrast(this._saturatedPixel);
 		pm.runGaussian();
-		
-		imgFilter.setProcessor(Morphology.whiteTopHat(imgFilter.getProcessor(), m_strel));
+		imgFilter.setProcessor(Morphology.whiteTopHat(imgFilter.getProcessor(), this.m_strel));
 		pm.setImg(imgFilter);
 		pm.runGaussian();
-		pm.runMin(m_min);
-		pm.runMax(m_min);
-		pm.runMax(m_min);
-		pm.runMin(m_min);
+		pm.runMin(this._min);
+		pm.runMax(this._max);
+		pm.runMax(this._max);
+		pm.runMin(this._min);
 		if(fileName.contains(".tif")){
-			m_tifList.add(new File(fileName.replaceAll(".tif", "_processed.tif")));
+			this._tifList.add(new File(fileName.replaceAll(".tif", "_processed.tif")));
 			saveFile(imgFilter, fileName.replaceAll(".tif", "_processed.tif"));
 		}
 		else{
-			m_tifList.add(new File(fileName.replaceAll(".txt", "_processed.tif")));
+			this._tifList.add(new File(fileName.replaceAll(".txt", "_processed.tif")));
 			saveFile(imgFilter, fileName.replaceAll(".txt", "_processed.tif"));
 		}
 	}
@@ -532,176 +533,7 @@ public class HiCExperimentAnalysis {
 		FileSaver fileSaver = new FileSaver(imagePlusInput);
 	    fileSaver.saveAsTiff(pathFile);
 	}
-
-	/**
-	 * Getter of the input dir
-	 * @return path of the input dir
-	 */
-	public String getinputDir(){
-		return m_input;
-	}
 	
-	/**
-	 * Getter of the matrix size
-	 * 
-	 * @return the size of the image
-	 */
-	public int getMatrixSize(){
-		return this.m_matrixSize;
-	}
-
-	
-	/**
-	 * Getter of step 
-	 * @return the step
-	 */
-	public int getStep(){
-		return this.m_step;
-	}
-	
-	/**
-	 * Setter of the path of the input directory
-	 * @param inputDir String of the input directory
-	 */
-	public void setInputDir(String inputDir){
-		this.m_input = inputDir;
-	}
-
-	/**
-	 * Getter of the path of the output directory
-	 * @return path 
-	 */
-	public String getOutputDir(){
-		return m_output;
-	}
-
-	/**
-	 * Setter of the path of the output directory
-	 * @param outputDir
-	 */
-	public void setOutputDir(String outputDir){
-		this.m_output = outputDir;
-	}
-
-	/**
-	 * Getter of the gaussian blur strength
-	 * @return double gaussian 
-	 */
-	public double getGauss(){
-		return m_gauss;
-	}
-	
-	/**
-	 * Setter of the gaussian blur strength
-	 * @param gauss double
-	 */
-	public void setGauss(double gauss){
-		this.m_gauss = gauss;
-	}
-	
-	/**
-	 * Setter of the diagonal size
-	 * @param diagSize int of the size of the diagonal
-	 */
-	public void setDiagSize(int diagSize){
-		this.m_diagSize = diagSize;
-	}
-	
-	/**
-	 * Getter of the min filter strength
-	 * @return double strength of the min filter
-	 */
-	public double getMin(){
-		return m_min;
-	}
-
-	/**
-	 * Setter of the min filter strength
-	 * @param min
-	 */
-	public void setMin(double min){
-		this.m_min = min;
-	}
-
-	/**
-	 * Getter of the max filter strength
-	 * @return double max filter
-	 */
-	public double getMax(){
-		return m_max;
-	}
-	
-	/**
-	 * Setter of the min filter strength
-	 * @param max
-	 */
-	public void setMax(double max){
-		this.m_max = max;
-	}
-
-	/**
-	 * Getter % of saturated pixel for the contrast enhancement
-	 * @return double percentage of saturated
-	 */
-	public double getSaturatedPixel(){
-		return m_saturatedPixel;
-	}
-
-	/**
-	 * Setter % of saturated pixel for the contrast enhancement
-	 * @param saturatedPixel
-	 */
-	public void setSaturatedPixel(double saturatedPixel){
-		this.m_saturatedPixel = saturatedPixel;
-	}
-
-	/**
-	 * Getter of resolution of the bin 
-	 * @return
-	 */
-	public int getResolution(){
-		return m_resolution;
-	}
-	
-	/**
-	 * Setter of resolution of the bin 
-	 * @param resolution
-	 */
-	public void setResolution(int resolution){
-		this.m_resolution = resolution;
-	}
-
-	/**
-	 * Setter of size of the matrix 
-	 * @param size
-	 */
-	public void setMatrixSize(int size){
-		this.m_matrixSize = size;
-	}
-	
-	/**
-	 * c 
-	 * @param step
-	 */
-	public void setStep(int step){
-		this.m_step = step;
-	}
-	
-	/**
-	 * Getter of threshold for the detction of the maxima 
-	 * @return
-	 */
-	public int getThresholdMaxima(){
-		return m_thresholdMaxima;
-	}
-
-	/**
-	 * Setter of threshold for the detection of the maxima
-	 * @param thresholdMaxima
-	 */
-	public void setThresholdMaxima(int thresholdMaxima) {
-		this.m_thresholdMaxima = thresholdMaxima;
-	}
 
 	/**
 	 * Full the list with file in directory
@@ -717,11 +549,11 @@ public class HiCExperimentAnalysis {
 	
 
 	/**
-	 * 
+	 * Test the normalized vector by chromosme
 	 * @param normFile
 	 */
 	private void testNormaVectorValue(String normFile){
-		m_normVector = new HashMap<Integer,String>();
+		_normVector = new HashMap<Integer,String>();
 		BufferedReader br;
 		int lineNumber = 0;
 		try {
@@ -731,7 +563,7 @@ public class HiCExperimentAnalysis {
 			while (line != null){
 				sb.append(line);
 				if((line.equals("NaN")|| line.equals("NAN") || line.equals("nan") || line.equals("na")  || Double.parseDouble(line) < 0.30)){ // tester les autre vecteur...
-					m_normVector.put(lineNumber*m_resolution, "plop");
+					_normVector.put(lineNumber*_resolution, "plop");
 				}
 				++lineNumber;
 				sb.append(System.lineSeparator());
@@ -740,6 +572,135 @@ public class HiCExperimentAnalysis {
 			br.close();
 		} catch (IOException e) { e.printStackTrace();}
 	}
+
+	/**
+	 * Getter of the input dir
+	 * @return path of the input dir
+	 */
+	public String getinputDir(){ return this._input; }
+	
+	/**
+	 * Getter of the matrix size
+	 * 
+	 * @return the size of the image
+	 */
+	public int getMatrixSize(){ return this._matrixSize; }
+
+	
+	/**
+	 * Getter of step 
+	 * @return the step
+	 */
+	public int getStep(){ return this._step;}
+	
+	/**
+	 * Setter of the path of the input directory
+	 * @param inputDir String of the input directory
+	 */
+	public void setInputDir(String inputDir){ this._input = inputDir; }
+
+	/**
+	 * Getter of the path of the output directory
+	 * @return path 
+	 */
+	public String getOutputDir(){ return this._output; }
+
+	/**
+	 * Setter of the path of the output directory
+	 * @param outputDir
+	 */
+	public void setOutputDir(String outputDir){	this._output = outputDir;}
+
+	/**
+	 * Getter of the gaussian blur strength
+	 * @return double gaussian 
+	 */
+	public double getGauss(){ return this._gauss; }
+	
+	/**
+	 * Setter of the gaussian blur strength
+	 * @param gauss double
+	 */
+	public void setGauss(double gauss){ this._gauss = gauss; }
+	
+	/**
+	 * Setter of the diagonal size
+	 * @param diagSize int of the size of the diagonal
+	 */
+	public void setDiagSize(int diagSize){ 	this._diagSize = diagSize; }
+	
+	/**
+	 * Getter of the min filter strength
+	 * @return double strength of the min filter
+	 */
+	public double getMin(){ return this._min;}
+
+	/**
+	 * Setter of the min filter strength
+	 * @param min
+	 */
+	public void setMin(double min){ this._min = min;}
+
+	/**
+	 * Getter of the max filter strength
+	 * @return double max filter
+	 */
+	public double getMax(){	return this._max; }
+	
+	/**
+	 * Setter of the min filter strength
+	 * @param max
+	 */
+	public void setMax(double max){	this._max = max;}
+
+	/**
+	 * Getter % of saturated pixel for the contrast enhancement
+	 * @return double percentage of saturated
+	 */
+	public double getSaturatedPixel(){ return this._saturatedPixel; }
+
+	/**
+	 * Setter % of saturated pixel for the contrast enhancement
+	 * @param saturatedPixel
+	 */
+	public void setSaturatedPixel(double saturatedPixel){ this._saturatedPixel = saturatedPixel; }
+
+	/**
+	 * Getter of resolution of the bin 
+	 * @return
+	 */
+	public int getResolution(){	return this._resolution;}
+	
+	/**
+	 * Setter of resolution of the bin 
+	 * @param resolution
+	 */
+	public void setResolution(int resolution){	this._resolution = resolution;}
+
+	/**
+	 * Setter of size of the matrix 
+	 * @param size
+	 */
+	public void setMatrixSize(int size){ this._matrixSize = size; }
+	
+	/**
+	 * setter step between image 
+	 * @param step int step
+	 */
+	public void setStep(int step){ this._step = step;}
+	
+	/**
+	 * Getter of threshold for the detction of the maxima 
+	 * @return
+	 */
+	public int getThresholdMaxima(){ return _thresholdMaxima;}
+
+	/**
+	 * Setter of threshold for the detection of the maxima
+	 * @param thresholdMaxima
+	 */
+	public void setThresholdMaxima(int thresholdMaxima) { this._thresholdMaxima = thresholdMaxima;}
+
 	
 	/**
 	 * Setter of hichip,
@@ -747,7 +708,5 @@ public class HiCExperimentAnalysis {
 	 * true rune with hichip parameter 
 	 * @param hichip boolean
 	 */
-	public void setIsHichip(boolean hichip){
-		this.m_hichip = hichip;
-	}
+	public void setIsHichip(boolean hichip){	this.m_hichip = hichip;}
 }

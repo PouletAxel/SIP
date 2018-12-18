@@ -1,80 +1,82 @@
-package core;
+package utils;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Iterator;
-import utils.DumpData;
-import utils.HiCExperimentAnalysis;
+
+import gui.Progress;
 
 /**
- * 
- * 
+ * Object for the hic or hichip, dump the data then find the loop
+ * Use juicer tools box.jar
+ * Neva C. Durand, Muhammad S. Shamim, Ido Machol, Suhas S. P. Rao, Miriam H. Huntley, Eric S. Lander, and Erez Lieberman Aiden.
+ *  "Juicer provides a one-click system for analyzing loop-resolution Hi-C experiments." Cell Systems 3(1), 2016.
  * @author Axel Poulet
  *
  */
 public class HicFileProcessing {
 	/** Stock in String problem detected in juicerToolsBox*/
-	private String m_log = "";
+	private String _log = "";
 	/** WholeGenomeAnalysis object with all the information to creat intermidiary files and loops detection*/
-	private HiCExperimentAnalysis m_wga;
+	private HiCExperimentAnalysis _hicExp;
 	/** Name of the chromosome do create the file and dump the data*/
-	private Iterator<String> m_chrName;
+	private Iterator<String> _chrName;
 	/** DumpData object*/
-	private DumpData m_dumpData;
+	private DumpData _dumpData;
 	/** hashmap for the size and nome chromosome information*/
-	private HashMap<String,Integer> m_chrSize = new HashMap<String,Integer>();
+	private HashMap<String,Integer> _chrSize = new HashMap<String,Integer>();
 	
 	
 	/**
 	 * Constructor of HicFileProcessing class
 	 * @param hicFile String of the .hic file
-	 * @param wga WholeGenomeAnalysis object which contain the info of the processing
+	 * @param hicExp WholeGenomeAnalysis object which contain the info of the processing
 	 * @param chrSize hashmap containing the chromosomes information name and size
 	 * @param juiceBoxTools path to juicerTools.jar
 	 * @param normJuiceBox Normalization (NONE, KR, VC_SQRT or SQRT) used to dump the data
 	 */
-	public HicFileProcessing(String hicFile, HiCExperimentAnalysis wga, HashMap<String,Integer> chrSize, String juiceBoxTools, String normJuiceBox){
-		m_wga = wga;
-		m_chrName = chrSize.keySet().iterator();
-		m_chrSize = chrSize;
-		m_dumpData = new DumpData(juiceBoxTools,hicFile,normJuiceBox, wga.getResolution());
+	public HicFileProcessing(String hicFile, HiCExperimentAnalysis hicExp, HashMap<String,Integer> chrSize, String juiceBoxTools, String normJuiceBox){
+		this._hicExp = hicExp;
+		this._chrName = chrSize.keySet().iterator();
+		this._chrSize = chrSize;
+		this._dumpData = new DumpData(juiceBoxTools,hicFile,normJuiceBox, hicExp.getResolution());
 		System.out.println(hicFile+"\n");
 	}
-	
-	
 	
 	/**
 	 * Run the method to dump the data on function of the different parameter,
 	 * resolution
 	 * size of the image => allow to run the chromosome by step
 	 * create the file used then for the loops detection.
-	 * 
 	 * dump observed KR https://hicfiles.s3.amazonaws.com/hiseq/gm12878/in-situ/combined.hic 1:20480000:40960000 1:20480000:40960000 BP 10000 combined_10Kb.txt
 	 * 
-	 * @throws IOException catch exception if file problem
-	 * @throws InterruptedException catch exception of program pb 
+	 * @param gui true => run with gui else command line
+	 * @throws IOException
+	 * @throws InterruptedException
 	 */
-	
-	public void run() throws IOException, InterruptedException{
+	public void run(boolean gui) throws IOException, InterruptedException{
 		boolean juicerTools;
-		while(m_chrName.hasNext()){
+		Progress p = new Progress("Dump data step",_chrSize.size());
+		int nb = 0;
+		p.bar.setValue(nb);
+		while(this._chrName.hasNext()){
 			String expected ="";
-			String chr = m_chrName.next();
-			String outdir = m_wga.getOutputDir()+File.separator+chr+File.separator;
+			String chr = this._chrName.next();
+			String outdir = this._hicExp.getOutputDir()+File.separator+chr+File.separator;
 			File file = new File(outdir);
 			if (file.exists()==false){file.mkdir();}
-			int chrsize = m_chrSize.get(chr);
-			int step = m_wga.getStep()*m_wga.getResolution();
-			int j = m_wga.getMatrixSize()*m_wga.getResolution();
+			int chrsize = this._chrSize.get(chr);
+			int step = this._hicExp.getStep()*this._hicExp.getResolution();
+			int j = this._hicExp.getMatrixSize()*this._hicExp.getResolution();
 			System.out.println(chrsize+" "+step+" "+j);
 			String test = chr+":0:"+j;
 			String name = outdir+chr+"_0_"+j+".txt";
-			m_dumpData.getExpected(test,name);
-			String normOutput = m_wga.getOutputDir()+File.separator+"normVector";
+			this._dumpData.getExpected(test,name);
+			String normOutput = this._hicExp.getOutputDir()+File.separator+"normVector";
 			file = new File(normOutput);
 			if (file.exists()==false){file.mkdir();}
-			m_dumpData.getNormVector(chr,normOutput+File.separator+chr+".norm");
+			this._dumpData.getNormVector(chr,normOutput+File.separator+chr+".norm");
 			System.out.println(normOutput+File.separator+chr+".norm");
 			System.out.println("start dump "+chr+" size "+chrsize);
 			for(int i = 0 ; j < chrsize; i+=step,j+=step){
@@ -83,11 +85,11 @@ public class HicFileProcessing {
 				name = outdir+chr+"_"+i+"_"+end+".txt";
 				System.out.println("\tstart dump "+chr+" size "+chrsize+" dump "+dump);
 				System.out.println(expected);
-				juicerTools = m_dumpData.dumpObservedMExpected(dump,name);
+				juicerTools = this._dumpData.dumpObservedMExpected(dump,name);
 				
-				m_log = m_log+"\n"+m_dumpData.getLog();
+				_log = _log+"\n"+_dumpData.getLog();
 				if (juicerTools == false){
-					System.out.print(dump+" "+"\n"+juicerTools+"\n"+m_log);
+					System.out.print(dump+" "+"\n"+juicerTools+"\n"+_log);
 					System.exit(0);
 				}
 				if(j+step > chrsize){
@@ -97,17 +99,20 @@ public class HicFileProcessing {
 					name = outdir+chr+"_"+i+"_"+j+".txt";
 					System.out.println("\tstart dump "+chr+" size "+chrsize+" dump "+dump);
 					System.out.println(expected);
-					juicerTools = m_dumpData.dumpObservedMExpected(dump,name);
-					m_log = m_dumpData.getLog();
+					juicerTools = this._dumpData.dumpObservedMExpected(dump,name);
+					this._log = this._dumpData.getLog();
 					if (juicerTools == false){
-						System.out.print(dump+" "+"\n"+juicerTools+"\n"+m_log);
+						System.out.print(dump+" "+"\n"+juicerTools+"\n"+_log);
 						System.exit(0);
 					}
 				}
-			}	
+			}
+			++nb;
+			p.bar.setValue(nb);
 			System.out.println("end dump "+chr);
 		}
-		m_wga.run();
+		if (gui) this._hicExp.runGUI();
+		else this._hicExp.run();
 	}
 	
 	/**
@@ -115,7 +120,5 @@ public class HicFileProcessing {
 	 * @return String m_log
 	 * 
 	 */
-	public String getLog(){
-		return m_log;
-	}
+	public String getLog(){	return this._log;}
 }

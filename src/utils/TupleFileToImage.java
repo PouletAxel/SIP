@@ -17,22 +17,24 @@ import ij.process.ShortProcessor;
 public class TupleFileToImage {
 	
 	/** Image results */
-	private ImagePlus m_img = new ImagePlus();
+	private ImagePlus _img = new ImagePlus();
 	/** Image results */
-	private ImagePlus m_imgNorm = new ImagePlus();
+	private ImagePlus _imgNorm = new ImagePlus();
 	/** Path of the tuple file*/
-	private String m_file = "";
+	private String _file = "";
 	/** Size of the matrix*/
-	private int m_size = 0 ;
+	private int _size = 0 ;
 	/**	 Resolution of the image in base*/
-	private int m_resolution = 0 ;
+	private int _resolution = 0 ;
 	/** Step to process the whole chromosme*/
-	private int m_step ;
+	private int _step ;
 	/** Image value average*/
-	public static double m_avg = 0;
+	private static double _avg = 0;
 	/** Image standard deviation */
-	public static double m_std = 0;
-	static int m_noZeroPixel = 0;
+	private static double _std = 0;
+	/** */
+	public static int _noZeroPixel = 0;
+	
 	/**
 	 * TupleFileToImage constructor
 	 * @param fileMatrix tuple file path 
@@ -40,10 +42,10 @@ public class TupleFileToImage {
 	 * @param resolution int size of the bin
 	 */
 	public TupleFileToImage(String fileMatrix, int size, int resolution){
-		m_file = fileMatrix;
-		m_size = size;
-		m_resolution = resolution;
-		m_step = size/2;
+		this._file = fileMatrix;
+		this._size = size;
+		this._resolution = resolution;
+		this._step = size/2;
 	}
 	
 	
@@ -54,13 +56,13 @@ public class TupleFileToImage {
 	 */
 	public void readTupleFile(){
 		BufferedReader br;
-		ShortProcessor pRaw = new ShortProcessor(m_size,m_size);
-		ShortProcessor pNorm = new ShortProcessor(m_size,m_size);
-		String[] tfile = m_file.split("_");
-		int numImage = Integer.parseInt(tfile[tfile.length-2])/(m_step*m_resolution);
+		ShortProcessor pRaw = new ShortProcessor(this._size,this._size);
+		ShortProcessor pNorm = new ShortProcessor(this._size,this._size);
+		String[] tfile = this._file.split("_");
+		int numImage = Integer.parseInt(tfile[tfile.length-2])/(this._step*this._resolution);
 		try {
 			pRaw.abs();
-			br = new BufferedReader(new FileReader(m_file));
+			br = new BufferedReader(new FileReader(this._file));
 			StringBuilder sb = new StringBuilder();
 			String line = br.readLine();
 			while (line != null){
@@ -71,19 +73,18 @@ public class TupleFileToImage {
 				
 				if(!(parts[2].equals("NAN"))){
 					raw =Float.parseFloat(parts[2]);
-					if (raw < 0){ raw = 0;}
+					if (raw < 0) raw = 0;
 				}
 				
 				if(!(parts[3].equals("NAN"))){
 					norm =Float.parseFloat(parts[3]);
-					if (norm < 0){ norm = 0;}
+					if (norm < 0) norm = 0;
 				}
 				
-				int correction = numImage*m_step*m_resolution;
-				int i = (Integer.parseInt(parts[0]) - correction)/m_resolution; 
-				int j = (Integer.parseInt(parts[1]) - correction)/m_resolution;
-				//System.out.println(i+" "+j+" "+a+" "+correction);
-				if(i < m_size && j< m_size){
+				int correction = numImage*this._step*this._resolution;
+				int i = (Integer.parseInt(parts[0]) - correction)/this._resolution; 
+				int j = (Integer.parseInt(parts[1]) - correction)/this._resolution;
+				if(i < this._size && j< this._size){
 					pRaw.setf(i, j, raw);
 					pRaw.setf(j, i, raw);
 					pNorm.setf(i, j, norm);
@@ -94,8 +95,8 @@ public class TupleFileToImage {
 			}
 			br.close();
 		} catch (IOException e) { e.printStackTrace();}
-		m_img.setProcessor(pRaw);
-		m_imgNorm.setProcessor(pNorm);
+		this._img.setProcessor(pRaw);
+		this._imgNorm.setProcessor(pNorm);
 	}
 	
 	/**
@@ -105,24 +106,23 @@ public class TupleFileToImage {
 	 */
 	public static void correctImage(ImagePlus img){
 		ImageProcessor ip = img.getProcessor();
-		m_noZeroPixel = 0;
+		_noZeroPixel = 0;
 		int sum = 0;
 		for(int i = 0; i < ip.getWidth(); ++i){
 			for(int j = 0; j < ip.getWidth(); ++j){
 				if(ip.getPixel(i, j) > 0){
-					++m_noZeroPixel;
+					++_noZeroPixel;
 					sum += ip.getPixel(i, j);
 				}
 			}
 		}
-		m_avg = (double)sum/(double)m_noZeroPixel;
-		m_std = std(m_avg,img);
-		//System.out.println(img.getTitle()+"avg: "+m_avg+"\tstd: "+m_std);
+		_avg = (double)sum/(double)_noZeroPixel;
+		_std = std(_avg,img);
 		for(int i = 0; i < ip.getWidth(); ++i){
 			for(int j = 0; j < ip.getWidth(); ++j){
 				int a = ip.getPixel(i, j);
-				if (Math.abs(j-i) <= 2 && a >= m_avg+m_std*2)
-					ip.set(i,j,(int)m_avg);
+				if (Math.abs(j-i) <= 2 && a >= _avg+_std*2)
+					ip.set(i,j,(int)_avg);
 			}
 		}
 		img.setProcessor(ip);
@@ -131,6 +131,7 @@ public class TupleFileToImage {
 	/**
 	 * Compute the standard deviation of the pixel non zero values of m_img 
 	 * @param mean average value in m_img
+	 * @param img ImagePlus
 	 * @return double satndard deivation
 	 */
 	private static double std(double mean,ImagePlus img){
@@ -149,8 +150,8 @@ public class TupleFileToImage {
 		return semc;
 	}
 	
-	public ImagePlus getRawImage(){return this.m_img;}
-	public ImagePlus getNormImage(){return this.m_imgNorm;}
-	public void setRawImage(ImagePlus img){this.m_img = img;}
-	public void setNormImage(ImagePlus img){this.m_imgNorm = img;}
+	public ImagePlus getRawImage(){return this._img;}
+	public ImagePlus getNormImage(){return this._imgNorm;}
+	public void setRawImage(ImagePlus img){this._img = img;}
+	public void setNormImage(ImagePlus img){this._imgNorm = img;}
 }

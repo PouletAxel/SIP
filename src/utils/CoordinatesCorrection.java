@@ -16,7 +16,7 @@ import java.util.Set;
 public class CoordinatesCorrection {
 
 	/** HashMap of the loops with new coordinates*/
-	private HashMap<String,Loop> m_data = new HashMap<String,Loop>();
+	private HashMap<String,Loop> _data = new HashMap<String,Loop>();
 	
 	/**
 	 * 
@@ -51,52 +51,51 @@ public class CoordinatesCorrection {
 			String newName = loop.getChr()+"\t"+a+"\t"+b;
 			if(a!=b && Math.abs(a-b) > diagSize){
 				if (x > 1 && y > 1 && y < imageSize-2 && x < imageSize-2){
-					if(m_data.containsKey(newName) == false){
+					if(this._data.containsKey(newName) == false){
 						loop.setCoordinates(a, a_end, b, b_end);
 						loop.setName(newName);
-						/*Strip stripY = loop.getStripY();
-						
-						if(stripY != null){
-							stripY.setName("Y_"+a);
-							stripY.setX((stripY.getX()+(index*step))*resolution);
-							stripY.setXEnd((stripY.getXEnd()+(index*step))*resolution);					
-							stripY.setYEnd((stripY.getYEnd()+(index*step))*resolution);
-							stripY.setY((stripY.getY()+(index*step))*resolution);
-						}*/
-						m_data.put(newName, loop);
-					}
-					else{
-						if(m_data.get(newName).getResolution() > resolution){
+						this._data.put(newName, loop);
+					}else{
+						if(this._data.get(newName).getResolution() > resolution){
 							loop.setCoordinates(a, a_end, b, b_end);
 							loop.setName(newName);
-							m_data.put(newName, loop);
-						}
-						else if(loop.getPaScoreAvg()> m_data.get(newName).getPaScoreAvg()){
+							this._data.put(newName, loop);
+						}else if(loop.getPaScoreAvg()> this._data.get(newName).getPaScoreAvg()){
 							loop.setCoordinates(a, a_end, b, b_end);
 							loop.setName(newName);
-							m_data.put(newName, loop);
+							this._data.put(newName, loop);
 						}
 					}
 				}
 			}	 
 		}
-		return m_data;
+		return this._data;
 	}
-	
 
 	/**
 	 * getter of m_data
 	 * @return HashMap of loops
 	 */
-	public HashMap<String,Loop> getData(){
-		return this.m_data;
-	}
+	public HashMap<String,Loop> getData(){ return this._data;}
 	
 	/**
 	 * setter of m_data
 	 * @param data 
 	 */
-	public void setData(HashMap<String,Loop> data){
-		this.m_data = data;
-	}
+	public void setData(HashMap<String,Loop> data){ this._data = data;}
+	
+	
+	
+	/*
+	 * Strip idea
+	 * 
+	 * Strip stripY = loop.getStripY();
+	
+	if(stripY != null){
+		stripY.setName("Y_"+a);
+		stripY.setX((stripY.getX()+(index*step))*resolution);
+		stripY.setXEnd((stripY.getXEnd()+(index*step))*resolution);					
+		stripY.setYEnd((stripY.getYEnd()+(index*step))*resolution);
+		stripY.setY((stripY.getY()+(index*step))*resolution);
+	}*/
 }

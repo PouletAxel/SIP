@@ -32,19 +32,19 @@ import java.util.ArrayList;
  */
 public class DumpData {
 	/** String to stock the error if need of juicerbox_tools*/
-	private String m_logError = "";
+	private String _logError = "";
 	/** String for the log*/
-	private String m_log = "";
+	private String _log = "";
 	/** String => normalisation to dump the data (NONE, KR, VC, VC_SQRT or NONE)*/
-	private String m_normalisation= "";
+	private String _normalisation= "";
 	/** path to the hic file or url link*/
-	private String m_hicFile = "";
+	private String _hicFile = "";
 	/** int in base for the bin resolution (5000,10000, etc)*/
-	private int m_resolution;
+	private int _resolution;
 	/** path to juicer_toolsbox.jars*/
-	private static String m_juiceBoxTools = "";
+	private String _juiceBoxTools = "";
 	/** List of doucle to stock the expected vector*/
-	private ArrayList<Double> m_lExpected =  new ArrayList<Double>();
+	private ArrayList<Double> _lExpected =  new ArrayList<Double>();
 	
 	
 	/**
@@ -56,10 +56,10 @@ public class DumpData {
 	 * @param resolution: int: resolution of the bins 
 	 */
 	public DumpData(String juiceboxTools,String hicFile, String norm, int resolution){
-		m_juiceBoxTools = juiceboxTools;
-		m_normalisation = norm;
-		m_resolution = resolution;
-		m_hicFile = hicFile;
+		this._juiceBoxTools = juiceboxTools;
+		this._normalisation = norm;
+		this._resolution = resolution;
+		this._hicFile = hicFile;
 	}
 	
 	/**
@@ -74,15 +74,13 @@ public class DumpData {
 		int exitValue=1;
 		Runtime runtime = Runtime.getRuntime();
 		String obs = output.replaceAll(".txt", "_obs.txt");
-		
 		try {
-			String line = "java"+" -jar "+m_juiceBoxTools+" dump observed "+m_normalisation+" "+m_hicFile+" "+chr+" "+chr+" BP "+m_resolution+" "+obs;
-			m_log = m_log+"\n"+obs+"\t"+line;
+			String line = "java"+" -jar "+this._juiceBoxTools+" dump observed "+this._normalisation+" "+this._hicFile+" "+chr+" "+chr+" BP "+this._resolution+" "+obs;
+			this._log = this._log+"\n"+obs+"\t"+line;
 			Process process = runtime.exec(line);
 			new ReturnFlux(process.getInputStream()).start();
 			new ReturnFlux(process.getErrorStream()).start();
-			exitValue=process.waitFor();
-			
+			exitValue=process.waitFor();		
 		}
 		catch (IOException e) {	e.printStackTrace();}
 		catch (InterruptedException e) {e.printStackTrace();}
@@ -90,12 +88,10 @@ public class DumpData {
 		return exitValue==0;
 	}
 	
-	
-	
-	
 	/**
-	 * Compute the value observed-expected, and write the output file the tuple: x y value.
-	 * this methode are only for the intra chromosomal interaction.
+	 * Compute the value observed-expected, the norm vector and also the distance normalized value
+	 *  and write the output file the "tuple": x y oMe DistanceNormalized.
+	 * this method are only for the intra chromosomal interaction.
 	 * 
 	 * @param obs: String path with the file of the observed value
 	 * @param chr: name of the chr
@@ -107,14 +103,13 @@ public class DumpData {
 		BufferedWriter 	writer = new BufferedWriter(new FileWriter(new File(chr)));
 		for (String line = null; (line = br.readLine()) != null;){
 			String [] tline = line.split("\t");
-			int dist = Math.abs((Integer.parseInt(tline[0])-Integer.parseInt(tline[1]))/m_resolution);
+			int dist = Math.abs((Integer.parseInt(tline[0])-Integer.parseInt(tline[1]))/this._resolution);
 			if(!tline[2].equals("NaN")){
-				double normalizedValue = 1+(((Double.parseDouble(tline[2])+1)-(m_lExpected.get(dist)+1))/(m_lExpected.get(dist)+1));
-				double oMe = Double.parseDouble(tline[2])-m_lExpected.get(dist);
+				double normalizedValue = 1+(((Double.parseDouble(tline[2])+1)-(this._lExpected.get(dist)+1))/(this._lExpected.get(dist)+1));
+				double oMe = Double.parseDouble(tline[2])-this._lExpected.get(dist);
 				writer.write(tline[0]+"\t"+tline[1]+"\t"+oMe+"\t"+normalizedValue+"\n");
 			}
 		}
-		
 		File file = new File(obs);
 		file.delete();
 		writer.close();
@@ -126,17 +121,13 @@ public class DumpData {
 	 * 
 	 * @return return the String with the error
 	 */
-	public String getLogError(){
-		return this.m_logError;
-	}
+	public String getLogError(){ return this._logError;}
 	
 	/**
-	 * getter of the lof info if necessary 
+	 * getter of the log info if necessary 
 	 * @return return a String with the log info
 	 */
-	public String getLog(){
-		return this.m_log;
-	}
+	public String getLog(){	return this._log;}
 	
 	/**
 	 * getter of the expected matrix. 
@@ -151,8 +142,8 @@ public class DumpData {
 		int exitValue=1;
 		Runtime runtime = Runtime.getRuntime();
 		String expected = output.replaceAll(".txt", "_expected.txt");
-		String cmd = "java"+" -jar "+m_juiceBoxTools+" dump expected "+m_normalisation+" "+m_hicFile+" "+chr+" BP "+m_resolution+" "+expected;
-		m_log = m_log+"\n"+expected+"\t"+cmd;
+		String cmd = "java"+" -jar "+this._juiceBoxTools+" dump expected "+this._normalisation+" "+this._hicFile+" "+chr+" BP "+this._resolution+" "+expected;
+		this._log = this._log+"\n"+expected+"\t"+cmd;
 		Process process = runtime.exec(cmd);
 		
 		new ReturnFlux(process.getInputStream()).start();
@@ -161,9 +152,8 @@ public class DumpData {
 		
 		BufferedReader br = Files.newBufferedReader(Paths.get(expected), StandardCharsets.UTF_8);
 		for (String line = null; (line = br.readLine()) != null;)
-			m_lExpected.add(Double.parseDouble(line));
+			this._lExpected.add(Double.parseDouble(line));
 		br.close();
-		
 		File file =  new File(expected);
 		file.delete();
 		return exitValue==0;
@@ -181,15 +171,12 @@ public class DumpData {
 	public boolean getNormVector(String chr,String output) throws IOException, InterruptedException{
 		int exitValue=1;
 		Runtime runtime = Runtime.getRuntime();
-		String cmd = "java"+" -jar "+m_juiceBoxTools+" dump norm "+m_normalisation+" "+m_hicFile+" "+chr+" BP "+m_resolution+" "+output;
-		m_log = m_log+"\n"+output+"\t"+cmd;
+		String cmd = "java"+" -jar "+this._juiceBoxTools+" dump norm "+this._normalisation+" "+this._hicFile+" "+chr+" BP "+this._resolution+" "+output;
+		this._log = this._log+"\n"+output+"\t"+cmd;
 		Process process = runtime.exec(cmd);
-		
 		new ReturnFlux(process.getInputStream()).start();
 		new ReturnFlux(process.getErrorStream()).start();
 		exitValue=process.waitFor();
-		
-		
 		return exitValue==0;
 	}
 	
@@ -220,7 +207,7 @@ public class DumpData {
 				InputStreamReader reader = new InputStreamReader(flux);
 				BufferedReader br = new BufferedReader(reader);
 				String line=null;
-				while ( (line = br.readLine()) != null) m_logError = m_logError+line+"\n";
+				while ( (line = br.readLine()) != null) _logError = _logError+line+"\n";
 			}
 			catch (IOException ioe){
 				ioe.printStackTrace();

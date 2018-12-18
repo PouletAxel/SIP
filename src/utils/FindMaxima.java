@@ -10,7 +10,7 @@ import ij.process.ByteProcessor;
 import ij.process.ImageProcessor;
 
 /**
- * Detectin of regional maxima in image. Return the HashMap<String,Loop>, the loop can be corrected. 
+ * Detection of regional maxima in image. Return the HashMap<String,Loop>, the loop can be corrected. 
  * the class uses is the imageJ class to detect the maxima.
  * 
  * @author Axel Poulet
@@ -57,13 +57,13 @@ public class FindMaxima{
 	/**
 	 * Method to find loops in the image for observed and oMe, and fill the loop collection. This method also initiate the object loop,
 	 * 
-	 * @param numImage
-	 * @param nbZero
-	 * @param raw
-	 * @param val
-	 * @return
+	 * @param index int index of the image
+	 * @param nbZero int nb zero allowed around the loop
+	 * @param raw ImagePlus raw image
+	 * @param val int background value of the image
+	 * @return HashMap of loop
 	 */
-	public HashMap<String,Loop> findloop(boolean hichip, int numImage, int nbZero, ImagePlus raw, int val){
+	public HashMap<String,Loop> findloop(boolean hichip, int index, int nbZero, ImagePlus raw, int val){
 		run(nbZero, raw, val);
 		ArrayList<String> temp = getMaxima();
 		ImageProcessor ipN = this._imgNorm.getProcessor();
@@ -71,7 +71,7 @@ public class FindMaxima{
 			String[] parts = temp.get(j).split("\\t");
 			int x = Integer.parseInt(parts[0]);
 			int y = Integer.parseInt(parts[1]);
-			String name= this._chr+"\t"+temp.get(j)+"\t"+numImage;
+			String name= this._chr+"\t"+temp.get(j)+"\t"+index;
 			double avg = average(x,y);
 			double std =standardDeviation(x,y,avg);
 			if(avg >= 1.2 && ipN.getf(x, y) >= 2){
@@ -85,8 +85,6 @@ public class FindMaxima{
 						maxima.setNeigbhoord2(n2);
 						maxima.setResolution(this._resolution);
 						maxima.setDiagSize(this._diagSize);
-						//maxima.setStripX(stripX(x,y));
-						//maxima.setStripY(stripY(x,y));
 						maxima.setMatrixSize(this._imgNorm.getWidth());
 						this._data.put(name, maxima);
 					}
@@ -98,8 +96,6 @@ public class FindMaxima{
 						maxima.setResolution(this._resolution);
 						maxima.setDiagSize(this._diagSize);
 						maxima.setMatrixSize(this._imgNorm.getWidth());
-						//maxima.setStripX(stripX(x,y));
-						//maxima.setStripY(stripY(x,y));
 						this._data.put(name, maxima);
 					}
 				}
@@ -113,7 +109,9 @@ public class FindMaxima{
 	/**
 	 * Detect maxima with the oMe or observed methods, call the different methods 
 	 * to detect the maxima and correct them. 
-	 * @param isObserved, if true =>obersved method, else oMe
+	 * @param nbZero nb zero allowed around the loops
+	 * @param rawImage	ImagePlus raw image
+	 * @param backGroundValue background value of the image
 	 */
 	private void run(int nbZero, ImagePlus rawImage, int backGroundValue){
 		ImagePlus temp = this._imgFilter.duplicate();
@@ -140,8 +138,6 @@ public class FindMaxima{
 	/**
 	 * Correction of the maxima. Search around the detected maxima on the raw image,
 	 * To correct the shift of maxima due to the gaussian, min and max filter.
-	 *   
-	 * 
 	 */
 	private void correctMaxima(){
 		ImageProcessor rawIpNorm  = this._imgNorm.getProcessor();
@@ -243,10 +239,10 @@ public class FindMaxima{
 	
 	
 	/**
-	 * Compute the average on the neighbourhood 9
+	 * 
 	 * @param x  int x coordinate's of the loop
 	 * @param y  int y coordinate's of the loop
-	 * @return double avg around the loop on the neighbourhood
+	 * @return Strip
 	 */
 	private Strip stripX(int x, int y){
 		Strip strip = null;
@@ -289,10 +285,10 @@ public class FindMaxima{
 	}
 	
 	/**
-	 * Compute the average on the neighbourhood 9
+	 * 
 	 * @param x  int x coordinate's of the loop
 	 * @param y  int y coordinate's of the loop
-	 * @return double avg around the loop on the neighbourhood
+	 * @return Strip
 	 */
 	private Strip stripY(int x, int y){
 		Strip strip = null;
@@ -354,11 +350,14 @@ public class FindMaxima{
 	}
 	
 	/**
-	 *	Removed maxima surrounded by several pixel with the 0 value. 
-	 *The method search the pixel with value 0 in the 24 neighbourhood around the initial maxima.
+	 * Removed maxima surrounded by several pixel with the 0 value. 
+	 * The method search the pixel with value 0 in the 24 neighbourhood around the initial maxima.
 	 * for the oMe method if the loops is suurounded by more than 6 0 the loops will be removed. For observed the thsreshold is smaller, 3.
 	 * ig the loops is closed too the diagonal the test is less stringent 7 for oMe methods and 4 for observed method. 
-	 * @param isObserved: boolean to know which methods is used allow to manage. if true it is the observed methode else the oMe method.
+	 *  
+	 * @param nbZero nb zero allowed around the loops
+	 * @param rawImage	ImagePlus raw image
+	 * @param val background value of the image
 	 */
 	private void removeMaximaCloseToZero(int nbZero,ImagePlus rawImage, int val){ 
 		int w = this._imgResu.getWidth();

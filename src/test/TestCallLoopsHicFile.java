@@ -5,8 +5,9 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import core.HicFileProcessing;
+
 import utils.HiCExperimentAnalysis;
+import utils.HicFileProcessing;
 
 /**
  * Test loops calling on Hic file
@@ -66,11 +67,11 @@ public class TestCallLoopsHicFile{
 			HicFileProcessing hfp =  new HicFileProcessing(input, wga, chrsize, juiceBoxTools, juiceBoXNormalisation);
 			wga.setIsHichip(true);
 			
-			hfp.run();
+			hfp.run(false);
 				
 			if(keepTif == false){
-				for(int i = 0; i< wga.m_tifList.size();++i)
-					wga.m_tifList.get(i).delete();
+				for(int i = 0; i< wga._tifList.size();++i)
+					wga._tifList.get(i).delete();
 			}
 			System.out.println("End");
 			

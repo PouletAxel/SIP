@@ -15,11 +15,11 @@ import java.util.Arrays;
  */
 public class PeakAnalysisScore {
 	/** Raw image of the matrix*/
-	private ImagePlus m_imgRaw = new ImagePlus();
+	private ImagePlus _imgRaw = new ImagePlus();
 	/** HashMap of object loops*/
-	private HashMap<String,Loop> m_data = new HashMap<String,Loop>();
+	private HashMap<String,Loop> _data = new HashMap<String,Loop>();
 	/** ImageProcessor of the raw ImagePlus*/
-	private ImageProcessor m_ipRaw;
+	private ImageProcessor _ipRaw;
 		
 	/**
 	 * Constructor of PeakAnalysisScore
@@ -27,9 +27,9 @@ public class PeakAnalysisScore {
 	 * @param data HashMap of loops
 	 */
 	public PeakAnalysisScore(ImagePlus imgRaw, HashMap<String,Loop> data){
-		this.m_imgRaw = imgRaw;
-		this.m_data = data;
-		this.m_ipRaw = m_imgRaw.getProcessor();
+		this._imgRaw = imgRaw;
+		this._data = data;
+		this._ipRaw = _imgRaw.getProcessor();
 	}
 		
 	
@@ -40,19 +40,19 @@ public class PeakAnalysisScore {
 	 * 
 	 */
 	public void computeScore(){
-		Set<String> key = m_data.keySet();
+		Set<String> key = this._data.keySet();
 		Iterator<String> it = key.iterator();
 		while (it.hasNext()){
 			String cle = it.next();
-			Loop loop = m_data.get(cle);
+			Loop loop = this._data.get(cle);
 			int x = loop.getX();
 			int y = loop.getY();
 			double corner = 0;
 			double cornerAvg = 0;
-			double center = m_ipRaw.getPixel(x, y);
+			double center = this._ipRaw.getPixel(x, y);
 			double squareCenterAvg = process3By3SquareAvg(x,y);
 			int nbCorner = 0;
-			if(x >= 5 && y >= 5 && x < m_imgRaw.getWidth()-5 && y < m_imgRaw.getHeight()-5){
+			if(x >= 5 && y >= 5 && x < this._imgRaw.getWidth()-5 && y < this._imgRaw.getHeight()-5){
 				cornerAvg += process3By3SquareAvg(x-4,y-4); 
 				corner += process3By3SquareMed(x-4,y-4);
 	
@@ -85,15 +85,15 @@ public class PeakAnalysisScore {
 	 * compute the avg of3*3 square
 	 * @param x int coordinate of the pixel center
 	 * @param y int coordinat of the pixel center
-	 * @return
+	 * @return double average
 	 */
 	private double process3By3SquareAvg(int x, int y){
 		double sum = 0;
 		int nb = 0;
 		for(int i = x-1; i <= x+1; ++i){
 			for(int j = y-1; j <= y+1; ++j){
-				if(i < m_ipRaw.getWidth() && i>0 && j < m_ipRaw.getWidth() && j > 0){
-					sum += this.m_ipRaw.getf(i,j);
+				if(i < this._ipRaw.getWidth() && i>0 && j < this._ipRaw.getWidth() && j > 0){
+					sum += this._ipRaw.getf(i,j);
 					nb++;
 				}
 			}
@@ -106,18 +106,18 @@ public class PeakAnalysisScore {
 	
 	
 	/**
-	 * 
-	 * @param x
-	 * @param y
-	 * @return
+	 * compute the median on 8 neighbourhood
+	 * @param x int x coordinate
+	 * @param y int y coordinate
+	 * @return mediane value
 	 */
 	private double process3By3SquareMed(int x, int y){
 		int []value = new int [9];
 		int cmp = 0;
 		for(int i = x-1; i <= x+1; ++i){
 			for(int j = y-1; j <= y+1; ++j){
-				if(i < m_ipRaw.getWidth() && i>0 && j < m_ipRaw.getWidth() && j > 0){
-					value[cmp] = this.m_ipRaw.getPixel(i, j);
+				if(i < this._ipRaw.getWidth() && i>0 && j < this._ipRaw.getWidth() && j > 0){
+					value[cmp] = this._ipRaw.getPixel(i, j);
 					++cmp;
 				}
 			}
@@ -126,9 +126,9 @@ public class PeakAnalysisScore {
 	}
 	
 	/**
-	 * 
-	 * @param value
-	 * @return
+	 * Compute median in int input table
+	 * @param value [] int
+	 * @return median value
 	 */
 	private double median (int[] value ){
 		Arrays.sort(value);

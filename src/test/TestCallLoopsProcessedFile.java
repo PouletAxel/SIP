@@ -72,8 +72,8 @@ public class TestCallLoopsProcessedFile {
 		wga.run(input);
 						
 		if(keepTif == false){
-			for(int i = 0; i< wga.m_tifList.size();++i)
-				wga.m_tifList.get(i).delete();
+			for(int i = 0; i< wga._tifList.size();++i)
+				wga._tifList.get(i).delete();
 		}
 		System.out.println("End");
 	}

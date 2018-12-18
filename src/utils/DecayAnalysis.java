@@ -12,11 +12,11 @@ import ij.process.ImageProcessor;
  */
 public class DecayAnalysis {
 	/**raw imagePlus */
-	private ImagePlus m_img;
+	private ImagePlus _img;
 	/** x coordinate's of the loop of interest*/
-	private int m_x;
+	private int _x;
 	/** y coordinate's of the loop of interest*/
-	private int m_y;
+	private int _y;
 	
 	/**
 	 * DecayAnalysis constructor.
@@ -26,9 +26,9 @@ public class DecayAnalysis {
 	 * @param y: int for the y coordinat's of the loop
 	 */
 	public DecayAnalysis(ImagePlus img, int x, int y){
-		m_x = x;
-		m_y = y;
-		m_img = img;
+		this._x = x;
+		this._y = y;
+		this._img = img;
 	}
 	
 	
@@ -36,26 +36,21 @@ public class DecayAnalysis {
 	 * getter computing the average difference beetwen the loop value and the neighbourhood 8 values
 	 * @return double stocking the average differential value of the neighbourhood 8.
 	 */
-	public double getNeighbourhood1(){
-		return computeDiff(1);
-	}
+	public double getNeighbourhood1(){return computeDiff(1);}
 	
 	/**
 	 * getter computing the average difference beetwen the loop value and the neighbourhood 24 values (exclude the values of the 8 neighbourhood)
 	 * @return double stocking the average differential value of the neighbourhood 24.
 	 */
-	public double getNeighbourhood2(){
-		return computeDiff(2);
-	}
+	public double getNeighbourhood2(){return computeDiff(2);}
 
 	
 	/**
 	 * getter computing the average difference beetwen the loop value and the neighbourhood 24 values (exclude the values of the 8 neighbourhood)
 	 * @return double stocking the average differential value of the neighbourhood 24.
 	 */
-	public double getNeighbourhood3(){
-		return computeDiff(3);
-	}
+	public double getNeighbourhood3(){return computeDiff(3);}
+	
 	/**
 	 * Private method computing the average difference between the loop value and the chosen neighbourhood. 
 	 * @param c int; stock the choice: 1 = neighbourhood 8; 2 = neighbourhood 24
@@ -63,17 +58,18 @@ public class DecayAnalysis {
 	 */
 	private double computeDiff (int c ){
 		double sum = 0;
-		ImageProcessor ip = m_img.getProcessor();
+		ImageProcessor ip = this._img.getProcessor();
 		int nb = 0; 
-		for(int i = m_x-c; i <= m_x+c; ++i){
-			for(int j = m_y-c ; j <= m_y+c; ++j)
-				if((i != m_x || j != m_y)  && (i-m_x == -c || j-m_y == -c || i-m_x == c || j-m_y == c)){
+		for(int i = this._x-c; i <= this._x+c; ++i){
+			for(int j = this._y-c ; j <= this._y+c; ++j){
+				if((i != this._x || j != this._y)  && (i-this._x == -c || j-this._y == -c || i-this._x == c || j-this._y == c)){
 					if(i >=0 && j>= 0){
-						double a =  ip.get(m_x, m_y)- ip.get(i, j);
+						double a =  ip.get(this._x, this._y)- ip.get(i, j);
 						sum+= a;
 						++nb;
 					}
 				}
+			}
 		}
 		sum = sum/nb;
 		return sum;
