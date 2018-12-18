@@ -22,7 +22,7 @@ public class TestCallLoopsHicFile{
 	 * @throws InterruptedException 
 	 */
 	public static void main(String[] args) throws IOException, InterruptedException {
-		String output= "/home/plop/Bureau/DataSetImageHiC/HiChip/ring1b/test5kb";
+		String output= "/home/plop/Bureau/DataSetImageHiC/HiChip/ring1b/test";
 		String input = "/home/plop/Bureau/DataSetImageHiC/HiChip/ring1b/rep1_allValidPairs.hic"; //"https://hicfiles.s3.amazonaws.com/hiseq/gm12878/in-situ/combined_30.hic"; //";
 		//String output= "/home/plop/Bureau/DataSetImageHiC/Hichip_H3k4me1";
 		//String input= "/home/plop/Bureau/DataSetImageHiC/Hichip_H3k4me1/NT_H3K4me1_2Reps.cis18797450.allValidPairs.hic";
@@ -31,7 +31,7 @@ public class TestCallLoopsHicFile{
 		///home/plop/Documents/Genome/HumanGenomeHg19/hg19_withoutChr.sizes
 		String juiceBoxTools = "/home/plop/Tools/juicer_tools.1.8.9_jcuda.0.8.jar";
 		int matrixSize = 3000;
-		int resolution = 5000;
+		int resolution = 10000;
 		int diagSize = 5;
 		double gauss = 1;
 		double min = 1;
@@ -44,7 +44,7 @@ public class TestCallLoopsHicFile{
 		factor.add(1);
 		boolean keepTif = false;
 		factor.add(2);
-		//factor.add(5);
+		factor.add(5);
 		
 		System.out.println("input "+input+"\n"
 				+ "output "+output+"\n"
@@ -64,6 +64,8 @@ public class TestCallLoopsHicFile{
 			
 			HiCExperimentAnalysis wga = new HiCExperimentAnalysis(output, chrsize, gauss, min, max, resolution, saturatedPixel, thresholdMax, diagSize, matrixSize, nbZero,factor);
 			HicFileProcessing hfp =  new HicFileProcessing(input, wga, chrsize, juiceBoxTools, juiceBoXNormalisation);
+			wga.setIsHichip(true);
+			
 			hfp.run();
 				
 			if(keepTif == false){

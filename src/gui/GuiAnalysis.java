@@ -28,8 +28,7 @@ import javax.swing.JTextPane;
  *
  */
 
-public class GuiAnalysis extends JFrame
-{
+public class GuiAnalysis extends JFrame{
 	/** */
 	private static final long serialVersionUID = 1L;
 	/** */
@@ -66,7 +65,6 @@ public class GuiAnalysis extends JFrame
 	private JRadioButton m_jrbHiCData = new JRadioButton("hic");
 	/** */
 	private JRadioButton m_jrbHichipData = new JRadioButton("HiChIP");
-	
 	/** */
     private String m_juiceBoxTools;
     /** */
@@ -211,7 +209,7 @@ public class GuiAnalysis extends JFrame
 	   	);
 	   	
 	   	this.m_bGroupInputData.add(this.m_jrbHiCData);
-	 	m_bGroupInputType.add(this.m_jrbHichipData);
+	   	m_bGroupInputData.add(this.m_jrbHichipData);
 	 	
 	 	m_jrbHiCData.setFont(new java.awt.Font("arial",2,11));
 	 	m_jrbHichipData.setFont(new java.awt.Font("arial",2,11));
@@ -251,7 +249,7 @@ public class GuiAnalysis extends JFrame
 		);
 		
 		m_jlNorm = new JLabel();
-		m_jlNorm.setText("Nomalisation to dump data:");
+		m_jlNorm.setText("Normalisation to dump data:");
 		m_jlNorm.setFont(new java.awt.Font("arial",2,11));
 	   	m_container.add(m_jlNorm, new GridBagConstraints
 	   			(
@@ -315,8 +313,7 @@ public class GuiAnalysis extends JFrame
 	   			+ "<strong><br/>OR</strong>"
 	   			+ "<br/>hic file"
 	   			+ "<strong><br/>OR</strong>"
-	   			+ "<br/>data processed by SIP hic" 
-	   			+ "<br/>Option <strong>compare</strong> program need processed data</center></font></html>");
+	   			+ "<br/>data processed by SIP hic" );
 	   	jTextPane.setEditable(false);
 	   	
 
@@ -537,7 +534,7 @@ public class GuiAnalysis extends JFrame
 				)
 			);
 			
-		this.m_noiseTolerance.setText("2100");
+		this.m_noiseTolerance.setText("2800");
 		m_noiseTolerance.setPreferredSize(new java.awt.Dimension(60, 21));
 		m_noiseTolerance.setFont(new java.awt.Font("arial",2,11));
 		m_container.add( m_noiseTolerance, new GridBagConstraints
@@ -655,6 +652,8 @@ public class GuiAnalysis extends JFrame
 		
 		RBHicListener hic = new RBHicListener(this);
 	  	this.m_jrbHic.addActionListener(hic);
+	  	this.m_jrbHiCData.addActionListener(hic);
+	  	this.m_jrbHichipData.addActionListener(hic);
 	  	this.m_jrbProcessed.addActionListener(hic);
 	  	WorkDirectoryListener wdListener = new WorkDirectoryListener();
 	  	m_jbWorkDir.addActionListener(wdListener);
@@ -897,6 +896,23 @@ public class GuiAnalysis extends JFrame
 		 * 
 		 */
 		public void actionPerformed(ActionEvent actionEvent){
+			if(m_gui.isHiChIP()){
+        		m_gaussian.setText("1.5");
+        		m_enhanceContrast.setText("0.5");
+        		m_min.setText("1");
+        		m_max.setText("1");
+        		m_nbZero.setText("25");
+        		m_noiseTolerance.setText("1");
+        		m_gui.m_jrbNone.setSelected(true);
+        	}else if(m_gui.isHiCData()){
+        		m_gaussian.setText("1.5");
+        		m_enhanceContrast.setText("0.005");
+        		m_min.setText("2.0");
+        		m_max.setText("2.0");
+        		m_nbZero.setText("6");
+        		m_noiseTolerance.setText("2800");
+        		m_gui.m_jrbKR.setSelected(true);
+        	}
 			if (m_gui.isHic()){
 				m_gui.m_jrbHiCData.setEnabled(true);
 				m_gui.m_jrbHichipData.setEnabled(true);
@@ -909,21 +925,6 @@ public class GuiAnalysis extends JFrame
 	        	m_gui.m_max.setEditable(true);
         		m_gui.m_min.setEditable(true);
         		m_gui.m_enhanceContrast.setEditable(true);
-	        	if(m_gui.isHiCData()){
-	        		m_gaussian.setText("1.5");
-	        		m_enhanceContrast.setText("0.005");
-	        		m_min.setText("1.5");
-	        		m_max.setText("1.5");
-	        		m_nbZero.setText("6");
-	        		m_noiseTolerance.setText("2800");
-	        	}else{
-	        		m_gaussian.setText("1.5");
-	        		m_enhanceContrast.setText("0.5");
-	        		m_min.setText("1.5");
-	        		m_max.setText("1.5");
-	        		m_nbZero.setText("25");
-	        		m_noiseTolerance.setText("1");	
-	        	}
 	        }
 	        else if(m_gui.isProcessed()){
 	        	m_gui.m_jrbHiCData.setEnabled(true);
@@ -938,21 +939,6 @@ public class GuiAnalysis extends JFrame
 	        	m_gui.m_jlNbZero.setEnabled(true);
 	        	m_gui.m_min.setEditable(true);
 	        	m_gui.m_enhanceContrast.setEditable(true);
-	        	if(m_gui.isHiCData()){
-	        		m_gaussian.setText("1.5");
-	        		m_enhanceContrast.setText("0.005");
-	        		m_min.setText("1.5");
-	        		m_max.setText("1.5");
-	        		m_nbZero.setText("6");
-	        		m_noiseTolerance.setText("2800");
-	        	}else{
-	        		m_gaussian.setText("1.5");
-	        		m_enhanceContrast.setText("0.5");
-	        		m_min.setText("1.5");
-	        		m_max.setText("1.5");
-	        		m_nbZero.setText("25");
-	        		m_noiseTolerance.setText("1");	
-	        	}
 	        }
 	    }
 	}

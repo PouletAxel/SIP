@@ -54,6 +54,15 @@ public class CoordinatesCorrection {
 					if(m_data.containsKey(newName) == false){
 						loop.setCoordinates(a, a_end, b, b_end);
 						loop.setName(newName);
+						/*Strip stripY = loop.getStripY();
+						
+						if(stripY != null){
+							stripY.setName("Y_"+a);
+							stripY.setX((stripY.getX()+(index*step))*resolution);
+							stripY.setXEnd((stripY.getXEnd()+(index*step))*resolution);					
+							stripY.setYEnd((stripY.getYEnd()+(index*step))*resolution);
+							stripY.setY((stripY.getY()+(index*step))*resolution);
+						}*/
 						m_data.put(newName, loop);
 					}
 					else{

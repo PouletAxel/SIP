@@ -166,7 +166,7 @@ public class HiCExperimentAnalysis {
 	 * @throws IOException
 	 */
 	
-	public void saveFile(String pathFile, boolean first) throws IOException{
+	private void saveFile(String pathFile, boolean first) throws IOException{
 		BufferedWriter writer;
 		if(first)
 			writer = new BufferedWriter(new FileWriter(new File(pathFile), true));
@@ -176,6 +176,7 @@ public class HiCExperimentAnalysis {
 		}
 		Set<String> key = m_data.keySet();
 		Iterator<String> it = key.iterator();
+		//HashMap<String,Strip> hStrip = new HashMap<String,Strip>();
 		while (it.hasNext()){
 			String cle = it.next();
 			Loop loop = m_data.get(cle);
@@ -183,10 +184,65 @@ public class HiCExperimentAnalysis {
 			writer.write(loop.getChr()+"\t"+coord.get(2)+"\t"+coord.get(3)+"\t"+loop.getChr()+"\t"+coord.get(0)+"\t"+coord.get(1)+"\t0,0,0"
 					+"\t"+loop.getPaScoreAvg()+"\t"+loop.getRegionalPaScoreAvg()+"\t"+loop.getPaScoreMed()+"\t"+loop.getRegionalPaScoreMed()
 					+"\t"+loop.getNeigbhoord1()+"\t"+loop.getNeigbhoord2()+"\t"+loop.getAvg()+"\t"+loop.getStd()+"\t"+loop.getValue()+"\n");
+			
+			/*Strip stripYTest = loop.getStripY();
+			if(stripYTest!=null){
+				String[]tName = stripYTest.getName().split("_");
+				int y = Integer.parseInt(tName[1]);
+				boolean test = false;
+				String nameTest = stripYTest.getName();
+				if(hStrip.containsKey(nameTest)){
+					 test = true;
+				}else{
+					for (int i = y-25000; i<=y+25000; i+=5000){
+						nameTest = "Y_"+i;
+						if(hStrip.containsKey(nameTest)){
+							test = true;
+							break;
+						}
+					}
+				}
+				if(test){
+					Strip strip = hStrip.get(nameTest);
+					if(stripYTest.getSize() > strip.getSize()){
+						hStrip.put(stripYTest.getName(), stripYTest);
+						hStrip.remove(nameTest);
+					}
+				}else{
+					hStrip.put(stripYTest.getName(), stripYTest);
+				}
+			}*/
 		}
 		writer.close();
+		//saveStripFile(hStrip);
 	}
 	
+	/**
+	 * 
+	 * @param hStrip
+	 * @throws IOException
+	 */
+	private void saveStripFile(HashMap<String,Strip> hStrip) throws IOException{
+		Set<String> key = hStrip.keySet();
+		Iterator<String> it = key.iterator();
+		while (it.hasNext()){
+			String name= it.next();
+			Strip strip = hStrip.get(name);
+			if(name.contains("Y")){
+				double avg = (strip.getLeftNeigStrip()+strip.getRightNeigStrip())/2;
+				if(avg<0.9){
+					String line = strip.getChr()+"\t"+strip.getX()+"\t"+strip.getXEnd()+"\t"+strip.getChr()+"\t"+strip.getY()
+					+"\t"+strip.getYEnd()+"\t0,0,0\t"+strip.getStripValue()+"\t"+strip.getStripStd()+"\t"+strip.getLeftNeigStrip()+"\t"+strip.getRightNeigStrip()+"\t"+avg;
+				
+			/*if(name.contains("X")){
+				avg = loop.getStripX()/size;
+				line = loop.getChr()+"\t"+coord.get(2)+"\t"+coord.get(3)+"\t"+loop.getChr()+"\t"+coord.get(1)+"\t"+coord.get(1)+"\t"+avg;
+			}*/
+					System.out.println(line);
+				}
+			}
+		}
+	}
 
 	/**
 	 * 
@@ -233,6 +289,7 @@ public class HiCExperimentAnalysis {
 				ProcessMethod m = new ProcessMethod(imgFilter,m_min,m_max,m_gauss);
 				imageProcessing(imgFilter,fileList[i].toString(), m);
 				m_tifList.add(new File(imgRaw.getTitle()));
+				imgRaw.getTitle().replaceAll(".tif", "_N.tif");
 				m_tifList.add(new File(imgRaw.getTitle().replaceAll(".tif", "_N.tif")));
 				ImagePlus imgNorm = IJ.openImage(imgRaw.getTitle().replaceAll(".tif", "_N.tif"));
 				
@@ -285,7 +342,11 @@ public class HiCExperimentAnalysis {
 		System.out.println("chr "+ chr +"\t"+m_data.size());
 	}
 	
-	
+	/**
+	 * 
+	 * @param hLoop
+	 * @return
+	 */
 	private HashMap<String,Loop> removedLoopCloseToWhiteStrip(HashMap<String,Loop> hLoop){
 		Set<String> key = hLoop.keySet();
 		Iterator<String> it = key.iterator();
@@ -310,28 +371,24 @@ public class HiCExperimentAnalysis {
 									removed.add(name);
 									testBreak =true;
 									break;
-								}	
-								else if(hLoop.get(test).getResolution() == hLoop.get(name).getResolution()){
+								}else if(hLoop.get(test).getResolution() == hLoop.get(name).getResolution()){
 									if((Math.abs(x-hLoop.get(test).getX()) < m_resolution*3 || Math.abs(y-hLoop.get(test).getY()) < m_resolution*3)){
 										if(hLoop.get(test).getAvg() > hLoop.get(name).getAvg()){
 											removed.add(name);
 											testBreak =true;
 											break;
-										}
-										else if(hLoop.get(test).getAvg() < hLoop.get(name).getAvg())
+										}else if(hLoop.get(test).getAvg() < hLoop.get(name).getAvg())
 											removed.add(test);
 										else{
 											if(hLoop.get(test).getPaScoreAvg() > hLoop.get(name).getPaScoreAvg()){
 												removed.add(name);
 												testBreak =true;
 												break;
-											}
-											else
+											}else
 												removed.add(test);
 										}
 									}
-								}
-								else
+								}else
 									removed.add(test);
 							}
 						}
@@ -341,9 +398,8 @@ public class HiCExperimentAnalysis {
 				}
 			}
 		}
-		for (int i = 0; i< removed.size(); ++i){
+		for (int i = 0; i< removed.size(); ++i)
 			hLoop.remove(removed.get(i));
-		}
 		return hLoop;
 	}
 	
@@ -396,15 +452,12 @@ public class HiCExperimentAnalysis {
 			String name = it.next();
 			Loop loop = input.get(name);
 			if(!(removed.contains(name))){
-				if(loop.getPaScoreAvg() < 1.2 && loop.getRegionalPaScoreAvg() < 1 
-						&& loop.getAvg() < 1.2 && loop.getValue()<2){
+				if(loop.getPaScoreAvg() < 1.2 || loop.getRegionalPaScoreAvg() < 1 )
 					removed.add(name);
-				}
 				else
 					removed = removeOverlappingLoops(loop,input,removed);
 			}
 		}
-		
 		for (int i = 0; i< removed.size(); ++i)
 			input.remove(removed.get(i));
 		

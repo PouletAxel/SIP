@@ -23,19 +23,20 @@ import utils.HiCExperimentAnalysis;
  * -mat: matrix size in bins (default 2000 bins)
  * -d: diagonal size in bins, allow to removed the maxima found at this size (eg: a size of 2 at 5000 bases resolution removed all the maxima
  * with a distances inferior or equal to 10kb) (default 6 bins)
- * -g: Gaussian filter: smooth the image to reduce the noise (default 1)
+ * -g: Gaussian filter: smooth the image to reduce the noise (default 1.5 for hic and 1 for hichip)
  * -factor: Multiple resolutions can be specified using: 
  * -factor 1: run only for the input res
  * -factor 2: res and res*2
  * -factor 3: res and res*5
  * -factor 4: res, res*2 and res*5 (default 2)
- * -max: Maximum filter: increase the region of high intensity (default 1.5)
- * -min: Minimum filter: removed the isolated high value (default 1.5)
- * -sat: % of staturated pixel: enhance the contrast in the image (default 0.02)
- * -t Threshold for loops detection (default 1800)
+ * -max: Maximum filter: increase the region of high intensity (default 2 for hic 1 for hichip)
+ * -min: Minimum filter: removed the isolated high value (default 2)
+ * -sat: % of staturated pixel: enhance the contrast in the image (default 0.005 for hic and 0.5 for hichip)
+ * -t Threshold for loops detection (default 2800 for hic and 1 for hichip)
  * -nbZero: number of zero: number of pixel equal at zero allowed in the 24 neighboorhood of the detected maxima, parameter for hic and processed method (default parameter 6)
  * -norm: <NONE/VC/VC_SQRT/KR> only for hic option (default KR)
  * -del: true or false, delete tif files used for loop detection (default true)
+ * -hichip: true or false (default false), use true if you are analysing HiChIP data
  * -h, --help print help
  * 
  * @author Axel Poulet
@@ -51,21 +52,21 @@ public class Hic_main {
 	/**Normalisation method to dump the the data with hic method (KR,NONE.VC,VC_SQRT)*/
 	private static String m_juiceBoXNormalisation = "KR";
 	/**Size of the core for the gaussian blur filter allow to smooth the signal*/
-	private static double m_gauss = 1;
+	private static double m_gauss = 1.5;
 	/**Size of the core for the Minimum filter*/
-	private static double m_min = 1.5;
+	private static double m_min = 2.0;
 	/**Size of the core for the Maximum filter*/
-	private static double m_max = 1.5;
+	private static double m_max = 2.0;
 	/**Matrix size: size in bins of the final image and defined the zone of interest in the hic map*/
 	private static int m_matrixSize = 2000;
 	/**Distance to the diagonal where the loops are ignored*/
-	private static int m_diagSize = 6;
+	private static int m_diagSize = 5;
 	/**Resolution of the matric in bases*/
 	private static int m_resolution = 5000;
 	/** % of saturated pixel in the image, allow the enhancement of the contrast in the image*/
-	private static double m_saturatedPixel = 0.02;
+	private static double m_saturatedPixel = 0.005;
 	/** Threshold to accepet a maxima in the images as a loop*/
-	private static int m_thresholdMax = 1800;// or 100
+	private static int m_thresholdMax = 2800;
 	/**number of pixel = 0 allowed around the loop*/
 	private static int m_nbZero = 6;
 	/** boolean if true run all the process (dump data + image +image processing*/
@@ -75,7 +76,7 @@ public class Hic_main {
 	private static String m_factOption = "2";
 	/** if true run only image Processing step*/
 	private static boolean m_isProcessed = false;
-	/** */
+	/**boolean true: hichip data if fals hic data */
 	private static boolean m_isHiChip = false;
 	/** hash map stocking in key the name of the chr and in value the size*/
 	private static HashMap<String,Integer> m_chrSize =  new HashMap<String,Integer>();
@@ -93,17 +94,17 @@ public class Hic_main {
 			+"-mat: matrix size in bins (default 2000 bins)\n"
 			+"-d: diagonal size in bins, allow to removed the maxima found at this size (eg: a size of 2 at 5000 bases resolution removed all the maxima"
 			+"with a distances inferior or equal to 10kb) (default 6 bins)\n"
-			+"-g: Gaussian filter: smooth the image to reduce the noise (default 1)\n"
+			+"-g: Gaussian filter: smooth the image to reduce the noise (default 1.5 for hic and 1 for hichip)\n"
 			+"-hichip: true or false (default false), use true if you are analysing HiChIP data\n"
 			+"-factor: Multiple resolutions can be specified using: "
 			+ "\t-factor 1: run only for the input res\n"
 			+ "\t-factor 2: res and res*2\n"
 			+ "\t-factor 3: res and res*5\n"
 			+ "\t-factor 4: res, res*2 and res*5 (default 2)\n"
-			+"-max: Maximum filter: increase the region of high intensity (default 1.5)\n"
-			+"-min: Minimum filter: removed the isolated high value (default 1.5)\n"
+			+"-max: Maximum filter: increase the region of high intensity (default 2 for hic and 1 hichip)\n"
+			+"-min: Minimum filter: removed the isolated high value (default 2 for hic and 1 hichip)\n"
 			+"-sat: % of staturated pixel: enhance the contrast in the image (default 0.005 for hic and 0.5 for hichip)\n"
-			+"-t Threshold for loops detection (default 1800 for hic and 1 for hichip)\n"
+			+"-t Threshold for loops detection (default 2800 for hic and 1 for hichip)\n"
 			+ "-nbZero: number of zero: number of pixel equal at zero allowed in the 24 neighboorhood of the detected maxima, parameter for hic and processed method (default parameter 6 for hic and 25 for hichip)\n"
 			+ "-norm: <NONE/VC/VC_SQRT/KR> only for hic option (default KR)\n"
 			+ "-del: true or false, delete tif files used for loop detection (default true)\n"
@@ -189,7 +190,6 @@ public class Hic_main {
 					m_factor.add(1);
 					m_factor.add(5);
 				}
-				
 				m_isHic  = gui.isHic();
 				m_isProcessed = gui.isProcessed();
 				m_juiceBoxTools = gui.getJuiceBox();
@@ -203,6 +203,7 @@ public class Hic_main {
 				System.exit(0);
 			}
 		}
+		
 		
 		File file = new File(m_output);
 		if (file.exists()==false){file.mkdir();}
@@ -275,6 +276,13 @@ public class Hic_main {
 	 */
 	private static void readOption(String args[], int index) throws IOException{
 		if(index < args.length){
+			boolean tresh = false;
+			boolean norm = false;
+			boolean  nbZero = false;
+			boolean  gauss = false;
+			boolean  min = false;
+			boolean  max = false;
+			boolean sat =false;
 			for(int i = index; i < args.length;i+=2){
 				if(args[i].equals("-res")){
 					try{m_resolution =Integer.parseInt(args[i+1]);}
@@ -312,31 +320,38 @@ public class Hic_main {
 					catch(NumberFormatException e){ returnError("-d",args[i+1],"int");} 
 				}
 				else if(args[i].equals("-nbZero")){
+					nbZero = true;
 					try{m_nbZero =Integer.parseInt(args[i+1]);}
 					catch(NumberFormatException e){ returnError("-d",args[i+1],"int");} 
 				}
 				else if(args[i].equals("-g")){
+					gauss = true;
 					try{m_gauss =Double.parseDouble(args[i+1]);}
 					catch(NumberFormatException e){ returnError("-g",args[i+1],"double");}
 				}
 				else if(args[i].equals("-max")){
+					max = true;
 					try{m_max = Double.parseDouble(args[i+1]);}
 					catch(NumberFormatException e){ returnError("-max",args[i+1],"double");}
 					
 				}
 				else if(args[i].equals("-min")){
+					min =  true;
 					try{m_min = Double.parseDouble(args[i+1]);}
 					catch(NumberFormatException e){ returnError("-min",args[i+1],"double");}
 				}
 				else if(args[i].equals("-sat")){
+					sat = true;
 					try{m_saturatedPixel = Double.parseDouble(args[i+1]);}
 					catch(NumberFormatException e){ returnError("-sat",args[i+1],"double");}
 				}
 				else if(args[i].equals("-t")){
+					tresh = true;
 					try{m_thresholdMax =Integer.parseInt(args[i+1]);}
 					catch(NumberFormatException e){ returnError("-t",args[i+1],"int");}
 				}
 				else if(args[i].equals("-norm")){
+					norm = true;
 					if(args[i+1].equals("NONE") || args[i+1].equals("VC") 
 							|| args[i+1].equals("VC_SQRT") || args[i+1].equals("KR")){
 						m_juiceBoXNormalisation = args[i+1];
@@ -374,6 +389,16 @@ public class Hic_main {
 					System.out.println(m_doc);
 					System.exit(0);
 				}
+			}
+			if(m_isHiChip){
+				if(sat == false) m_saturatedPixel = 0.5;
+				if(norm == false) m_juiceBoXNormalisation = "NONE";
+				if(gauss == false) m_gauss = 1.5;
+				if(max == false) m_max = 1;
+				if(min == false) m_min = 1;
+				if(tresh == false) m_thresholdMax = 1;
+				if(nbZero == false ) m_nbZero = 25;			
+				
 			}
 		}
 	}
