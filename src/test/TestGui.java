@@ -73,14 +73,15 @@ public class TestGui {
 			ArrayList<Integer> factor = new ArrayList<Integer>();
 			factor.add(1);
 			factor.add(2);
-			HashMap<String,Integer> m_chrSize = readChrSizeFile(gui.getChrSizeFile());
-			HiCExperimentAnalysis hicExp = new HiCExperimentAnalysis(output, m_chrSize,
+			factor.add(5);
+			//HashMap<String,Integer> m_chrSize = readChrSizeFile(gui.getChrSizeFile());
+			/*HiCExperimentAnalysis hicExp = new HiCExperimentAnalysis(output, m_chrSize,
 					gauss, min, max, resolution,
 					saturatedPixel, thresholdMax, diagSize, matrixSize, nbZero
 					,factor);
 			hicExp.setIsHichip(gui.isHiChIP());
 			HicFileProcessing hfp =  new HicFileProcessing(input, hicExp, m_chrSize, juiceBoxTools, juiceBoXNormalisation);
-			hfp.run(true);
+			hfp.run(true);*/
 			//hicExp.runGUI();
 		}
 		else {

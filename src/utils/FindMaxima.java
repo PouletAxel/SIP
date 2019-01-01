@@ -74,7 +74,7 @@ public class FindMaxima{
 			String name= this._chr+"\t"+temp.get(j)+"\t"+index;
 			double avg = average(x,y);
 			double std =standardDeviation(x,y,avg);
-			if(avg >= 1.2 && ipN.getf(x, y) >= 2){
+			if(avg > 1.5 && ipN.getf(x, y) >= 2){
 				DecayAnalysis da = new DecayAnalysis(this._imgNorm,x,y);
 				double n1 =da.getNeighbourhood1();
 				double n2 =da.getNeighbourhood2();
@@ -89,7 +89,7 @@ public class FindMaxima{
 						this._data.put(name, maxima);
 					}
 				}else{
-					if(n1<=n2 && n1 >= 0.125 && n2 >= 0.125){
+					if(n1 < n2 && n1 >= 0.125 && n2 >= 0.125){
 						Loop maxima = new Loop(temp.get(j),x,y,this._chr,avg,std,ipN.getf(x, y));
 						maxima.setNeigbhoord1(n1);
 						maxima.setNeigbhoord2(n2);

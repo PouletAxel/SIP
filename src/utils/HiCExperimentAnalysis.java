@@ -313,7 +313,7 @@ public class HiCExperimentAnalysis {
 				
 				if (this._listFactor.size() > 1){
 					for (int j = 1; j < this._listFactor.size(); ++j ){
-						this._backgroudValue = this._listFactor.get(j)*3;
+						//this._backgroudValue = this._listFactor.get(j);
 						ChangeImageRes test =  new ChangeImageRes(imgCorrect, this._listFactor.get(j));
 						ImagePlus imgRawBiggerRes = test.run();
 						
@@ -428,14 +428,17 @@ public class HiCExperimentAnalysis {
 				test = true;
 		}
 		else if(loop.getResolution() == this._resolution*5){
-			for(int i = x; i <= x+5*this._resolution; i+=this._resolution)
-				if(_normVector.containsKey(i))
+			for(int i = x; i <= x+5*this._resolution; i+=this._resolution){
+				if(_normVector.containsKey(i)){
 					test = true;
-				
-			if(test == false){
-				for(int i = y; i <= y+5*this._resolution; y+=this._resolution)
-					if(_normVector.containsKey(y))
+					break;
+				}
+				for(int j = y; j <= y+5*this._resolution; j+=this._resolution){
+					if(_normVector.containsKey(j)){
 						test = true;
+						break;
+					}
+				}		
 			}
 		}
 		return test;

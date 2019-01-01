@@ -533,7 +533,7 @@ public class GuiAnalysis extends JFrame{
 				)
 			);
 			
-		this._noiseTolerance.setText("2800");
+		this._noiseTolerance.setText("2500");
 		_noiseTolerance.setPreferredSize(new java.awt.Dimension(60, 21));
 		_noiseTolerance.setFont(new java.awt.Font("arial",2,11));
 		_container.add( _noiseTolerance, new GridBagConstraints
@@ -909,7 +909,7 @@ public class GuiAnalysis extends JFrame{
         		_min.setText("2.0");
         		_max.setText("2.0");
         		_nbZero.setText("6");
-        		_noiseTolerance.setText("2800");
+        		_noiseTolerance.setText("2500");
         		m_gui._jrbKR.setSelected(true);
         	}
 			if (m_gui.isHic()){
