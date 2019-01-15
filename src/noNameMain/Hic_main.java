@@ -126,10 +126,13 @@ public class Hic_main {
 	public static void main(String[] args) throws IOException, InterruptedException {
 		_factor.add(1);
 		_factor.add(2);
-		if (args.length > 0 && args.length < 4){
+		if (args[0].equals("-h")||args[0].equals("-help")||args[0].equals("--help")||args[0].equals("-h")){
 			System.out.println(_doc);
 			System.exit(0);
-		}else if(args.length >= 5){
+		}else if (args.length > 0 && args.length < 4){
+			System.out.println(_doc);
+			System.exit(0);
+		}else if(args.length >= 4){
 			if (args[0].equals("hic") || args[0].equals("processed")){
 				_input = args[1];
 				_output = args[3];
@@ -222,10 +225,10 @@ public class Hic_main {
 						+" -t "+_thresholdMax+" -min "+_min+" -max "+_max+" -sat "+_saturatedPixel+" -nbZero "+_nbZero+" -factor "+ _factOption+" -del "+_delImages+"\n");
 				if(_gui) wga.runGUI(_input);
 				else wga.run(_input);
-				wga.run(_input);
 		}
 		writer.close();		
 		if(_delImages){
+			System.out.println("Deleting image file");
 			for(int i = 0; i< wga._tifList.size();++i)
 				wga._tifList.get(i).delete();
 		}

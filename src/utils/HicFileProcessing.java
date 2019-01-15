@@ -26,7 +26,8 @@ public class HicFileProcessing {
 	private DumpData _dumpData;
 	/** hashmap for the size and nome chromosome information*/
 	private HashMap<String,Integer> _chrSize = new HashMap<String,Integer>();
-	
+	/** */
+	private Progress _p;
 	
 	/**
 	 * Constructor of HicFileProcessing class
@@ -57,9 +58,12 @@ public class HicFileProcessing {
 	 */
 	public void run(boolean gui) throws IOException, InterruptedException{
 		boolean juicerTools;
-		Progress p = new Progress("Dump data step",_chrSize.size());
+		
 		int nb = 0;
-		p.bar.setValue(nb);
+		if(gui){
+			_p = new Progress("Dump data step",_chrSize.size());
+			_p.bar.setValue(nb);
+		}
 		while(this._chrName.hasNext()){
 			String expected ="";
 			String chr = this._chrName.next();
@@ -108,7 +112,7 @@ public class HicFileProcessing {
 				}
 			}
 			++nb;
-			p.bar.setValue(nb);
+			if (gui) _p.bar.setValue(nb);
 			System.out.println("end dump "+chr);
 		}
 		if (gui) this._hicExp.runGUI();

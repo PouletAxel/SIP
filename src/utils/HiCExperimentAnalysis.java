@@ -303,9 +303,9 @@ public class HiCExperimentAnalysis {
 				
 				int thresh = this._thresholdMaxima;
 				double pixelPercent = 100*TupleFileToImage._noZeroPixel/(this._matrixSize*this._matrixSize);
-				if(pixelPercent <= 5) 
-					thresh =  _thresholdMaxima/10;
-				
+				if(pixelPercent < 7) 
+					thresh =  _thresholdMaxima/5;
+				//System.out.println(thresh+" "+pixelPercent);
 				FindMaxima findLoop = new FindMaxima(imgNorm, imgFilter, chr, thresh, this._diagSize, this._resolution);
 				HashMap<String,Loop> temp = findLoop.findloop(this.m_hichip,numImage, this._nbZero,imgRaw, this._backgroudValue);
 				PeakAnalysisScore pas = new PeakAnalysisScore(imgNorm,temp);
