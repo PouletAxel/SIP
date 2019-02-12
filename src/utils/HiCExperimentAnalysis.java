@@ -71,7 +71,7 @@ public class HiCExperimentAnalysis {
 	/**	boolean if true hichip data if false hic */
 	private boolean m_hichip = false;
 	/**	 image background value*/
-	private int _backgroudValue = 1;
+	private float _backgroudValue = (float) 0.25;
 	
 	
 	/**
@@ -236,7 +236,7 @@ public class HiCExperimentAnalysis {
 			writer = new BufferedWriter(new FileWriter(new File(pathFile), true));
 		else{
 			writer = new BufferedWriter(new FileWriter(new File(pathFile)));
-			writer.write("chromosome1\tx1\tx2\tchromosome2\ty1\ty2\tcolor\tAPScoreAvg\tRegAPScoreAvg\tAPScoreMed\tRegAPScoreMed\tAvg_diffMaxNeihgboor_1\tAvg_diffMaxNeihgboor_2\tavg\tstd\tvalue\n");
+			writer.write("chromosome1\tx1\tx2\tchromosome2\ty1\ty2\tcolor\tAPScoreAvg\tRegAPScoreAvg\tAvg_diffMaxNeihgboor_1\tAvg_diffMaxNeihgboor_2\tavg\tstd\tvalue\n");
 		}
 		Set<String> key = m_data.keySet();
 		Iterator<String> it = key.iterator();
@@ -245,8 +245,7 @@ public class HiCExperimentAnalysis {
 			Loop loop = m_data.get(cle);
 			ArrayList<Integer> coord = loop.getCoordinates();
 			writer.write(loop.getChr()+"\t"+coord.get(2)+"\t"+coord.get(3)+"\t"+loop.getChr()+"\t"+coord.get(0)+"\t"+coord.get(1)+"\t0,0,0"
-					+"\t"+loop.getPaScoreAvg()+"\t"+loop.getRegionalPaScoreAvg()+"\t"+loop.getPaScoreMed()+"\t"+loop.getRegionalPaScoreMed()
-					+"\t"+loop.getNeigbhoord1()+"\t"+loop.getNeigbhoord2()+"\t"+loop.getAvg()+"\t"+loop.getStd()+"\t"+loop.getValue()+"\n");
+					+"\t"+loop.getPaScoreAvg()+"\t"+loop.getRegionalPaScoreAvg()+"\t"+loop.getNeigbhoord1()+"\t"+loop.getNeigbhoord2()+"\t"+loop.getAvg()+"\t"+loop.getStd()+"\t"+loop.getValue()+"\n");
 		}
 		writer.close();
 	}
@@ -286,7 +285,6 @@ public class HiCExperimentAnalysis {
 		HashMap<String,Loop> hLoop= new HashMap<String,Loop>();
 		for(int i = 0; i < fileList.length; ++i){
 			if(fileList[i].toString().contains(".txt")){
-				this._backgroudValue = 1; 
 				String[] tfile = fileList[i].toString().split("_");
 				int numImage = Integer.parseInt(tfile[tfile.length-2])/(this._step*this._resolution);
 				System.out.println(numImage+" "+fileList[i]);
@@ -305,20 +303,18 @@ public class HiCExperimentAnalysis {
 				double pixelPercent = 100*TupleFileToImage._noZeroPixel/(this._matrixSize*this._matrixSize);
 				if(pixelPercent < 7) 
 					thresh =  _thresholdMaxima/5;
-				//System.out.println(thresh+" "+pixelPercent);
 				FindMaxima findLoop = new FindMaxima(imgNorm, imgFilter, chr, thresh, this._diagSize, this._resolution);
-				HashMap<String,Loop> temp = findLoop.findloop(this.m_hichip,numImage, this._nbZero,imgRaw, this._backgroudValue);
+				HashMap<String,Loop> temp = findLoop.findloop(this.m_hichip,numImage, this._nbZero,imgRaw, this._backgroudValue,1);
 				PeakAnalysisScore pas = new PeakAnalysisScore(imgNorm,temp);
 				pas.computeScore();
 				
 				if (this._listFactor.size() > 1){
 					for (int j = 1; j < this._listFactor.size(); ++j ){
-						//this._backgroudValue = this._listFactor.get(j);
+											
 						ChangeImageRes test =  new ChangeImageRes(imgCorrect, this._listFactor.get(j));
 						ImagePlus imgRawBiggerRes = test.run();
-						
 						test =  new ChangeImageRes(imgNorm,  this._listFactor.get(j));
-						ImagePlus imgRawBiggerResNorm = test.run();
+						ImagePlus imgRawBiggerResNorm = test.runNormalized();
 						
 						saveFile(imgRawBiggerRes,fileList[i].toString().replaceAll(".txt", "_"+this._listFactor.get(j)+".tif")); 
 						saveFile(imgRawBiggerResNorm,fileList[i].toString().replaceAll(".txt", "_"+this._listFactor.get(j)+"_N.tif"));
@@ -326,15 +322,16 @@ public class HiCExperimentAnalysis {
 						this._tifList.add(new File(fileList[i].toString().replaceAll(".txt", "_"+this._listFactor.get(j)+"_N.tif")));
 											
 						ImagePlus imgFilterBiggerRes = imgRawBiggerRes.duplicate();
-						m = new ProcessMethod(imgFilterBiggerRes,this._min/this._listFactor.get(j),this._max/this._listFactor.get(j),this._gauss);
-						imageProcessing(imgFilterBiggerRes, fileList[i].toString().replaceAll(".txt", "_"+this._listFactor.get(j)+".tif"), m);
+						m = new ProcessMethod(imgFilter,this._min,this._max,this._gauss);
+						imageProcessing(imgFilterBiggerRes, fileList[i].toString().replaceAll(".txt", "_"+this._listFactor.get(j)+".tif"),m);
 			
 						int diag = this._diagSize/this._listFactor.get(j);
 						int res = _resolution*_listFactor.get(j);
 						if (diag < 2)
 							diag = 2 ;
+						thresh = this._thresholdMaxima/100;
 						findLoop = new FindMaxima(imgRawBiggerResNorm, imgFilterBiggerRes, chr,thresh, diag, res);
-						HashMap<String,Loop>tempBiggerRes = findLoop.findloop(this.m_hichip,numImage,(int)this._nbZero/this._listFactor.get(j)-1,imgRawBiggerRes,this._backgroudValue);
+						HashMap<String,Loop>tempBiggerRes = findLoop.findloop(this.m_hichip,numImage,this._nbZero,imgRawBiggerRes,this._backgroudValue,this._listFactor.get(j));
 						pas = new PeakAnalysisScore(imgRawBiggerResNorm,tempBiggerRes);
 						pas.computeScore();
 						temp.putAll(tempBiggerRes);

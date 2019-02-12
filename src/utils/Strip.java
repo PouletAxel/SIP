@@ -9,10 +9,10 @@ public class Strip {
 	private int _y;
 	private int _yEnd;
 	private int _size;
-	private double _stripValue;
-	private double _stripStd;
-	private double _leftNeigStrip;
-	private double _rightNeigStrip;
+	private float _stripValue;
+	private float _stripStd;
+	private float _leftNeigStrip;
+	private float _rightNeigStrip;
 	
 	/**
 	 * 
@@ -110,15 +110,15 @@ public class Strip {
 	 */
 	public void setYEnd(int yEnd){ this._yEnd = yEnd; }
 	
-	public double getStripValue() {return this._stripValue;}
-	public void setStripValue( double value){ this._stripValue = value;} 
+	public float getStripValue() {return this._stripValue;}
+	public void setStripValue( float value){ this._stripValue = value;} 
 	
-	public double getStripStd() {return this._stripStd;}
-	public void setStripStd( double value){ this._stripStd = value;} 
+	public float getStripStd() {return this._stripStd;}
+	public void setStripStd( float value){ this._stripStd = value;} 
 	
-	public double getLeftNeigStrip() {return this._leftNeigStrip;}
-	public void setLeftNeigStrip(double value){ this._leftNeigStrip = value;}
+	public float getLeftNeigStrip() {return this._leftNeigStrip;}
+	public void setLeftNeigStrip(float value){ this._leftNeigStrip = value;}
 	
-	public double getRightNeigStrip() {return this._rightNeigStrip;}
-	public void setRightNeigStrip(double value){ this._rightNeigStrip = value;}
+	public float getRightNeigStrip() {return this._rightNeigStrip;}
+	public void setRightNeigStrip(float value){ this._rightNeigStrip = value;}
 }

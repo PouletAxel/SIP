@@ -31,8 +31,8 @@ import utils.HicFileProcessing;
  * -factor 4: res, res*2 and res*5 (default 2)
  * -max: Maximum filter: increase the region of high intensity (default 2 for hic 1 for hichip)
  * -min: Minimum filter: removed the isolated high value (default 2)
- * -sat: % of staturated pixel: enhance the contrast in the image (default 0.005 for hic and 0.5 for hichip)
- * -t Threshold for loops detection (default 2600 for hic and 1 for hichip)
+ * -sat: % of staturated pixel: enhance the contrast in the image (default 0.01 for hic and 0.5 for hichip)
+ * -t Threshold for loops detection (default 2800 for hic and 1 for hichip)
  * -nbZero: number of zero: number of pixel equal at zero allowed in the 24 neighboorhood of the detected maxima, parameter for hic and processed method (default parameter 6)
  * -norm: <NONE/VC/VC_SQRT/KR> only for hic option (default KR)
  * -del: true or false, delete tif files used for loop detection (default true)
@@ -64,9 +64,9 @@ public class Hic_main {
 	/**Resolution of the matric in bases*/
 	private static int _resolution = 5000;
 	/** % of saturated pixel in the image, allow the enhancement of the contrast in the image*/
-	private static double _saturatedPixel = 0.005;
+	private static double _saturatedPixel = 0.01;
 	/** Threshold to accepet a maxima in the images as a loop*/
-	private static int _thresholdMax = 2500;
+	private static int _thresholdMax = 2800;
 	/**number of pixel = 0 allowed around the loop*/
 	private static int _nbZero = 6;
 	/** boolean if true run all the process (dump data + image +image processing*/
@@ -97,7 +97,7 @@ public class Hic_main {
 			+"-mat: matrix size in bins (default 2000 bins)\n"
 			+"-d: diagonal size in bins, allow to removed the maxima found at this size (eg: a size of 2 at 5000 bases resolution removed all the maxima"
 			+"with a distances inferior or equal to 10kb) (default 6 bins)\n"
-			+"-g: Gaussian filter: smooth the image to reduce the noise (default 1.5 for hic and 1 for hichip)\n"
+			+"-g: Gaussian filter: smooth the image to reduce the noise (default 2 for hic and 1 for hichip)\n"
 			+"-hichip: true or false (default false), use true if you are analysing HiChIP data\n"
 			+"-factor: Multiple resolutions can be specified using: "
 			+ "\t-factor 1: run only for the input res\n"
@@ -106,8 +106,8 @@ public class Hic_main {
 			+ "\t-factor 4: res, res*2 and res*5 (default 2)\n"
 			+"-max: Maximum filter: increase the region of high intensity (default 2 for hic and 1 hichip)\n"
 			+"-min: Minimum filter: removed the isolated high value (default 2 for hic and 1 hichip)\n"
-			+"-sat: % of staturated pixel: enhance the contrast in the image (default 0.005 for hic and 0.5 for hichip)\n"
-			+"-t Threshold for loops detection (default 2500 for hic and 1 for hichip)\n"
+			+"-sat: % of staturated pixel: enhance the contrast in the image (default 0.01 for hic and 0.5 for hichip)\n"
+			+"-t Threshold for loops detection (default 2800 for hic and 1 for hichip)\n"
 			+ "-nbZero: number of zero: number of pixel equal at zero allowed in the 24 neighboorhood of the detected maxima, parameter for hic and processed method (default parameter 6 for hic and 25 for hichip)\n"
 			+ "-norm: <NONE/VC/VC_SQRT/KR> only for hic option (default KR)\n"
 			+ "-del: true or false, delete tif files used for loop detection (default true)\n"

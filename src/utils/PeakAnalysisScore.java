@@ -47,34 +47,31 @@ public class PeakAnalysisScore {
 			Loop loop = this._data.get(cle);
 			int x = loop.getX();
 			int y = loop.getY();
-			double corner = 0;
-			double cornerAvg = 0;
-			double center = this._ipRaw.getPixel(x, y);
-			double squareCenterAvg = process3By3SquareAvg(x,y);
+			//float corner = 0;
+			float cornerAvg = 0;
+			float center = this._ipRaw.getf(x, y);
+			float squareCenterAvg = process3By3SquareAvg(x,y);
 			int nbCorner = 0;
 			if(x >= 5 && y >= 5 && x < this._imgRaw.getWidth()-5 && y < this._imgRaw.getHeight()-5){
 				cornerAvg += process3By3SquareAvg(x-4,y-4); 
-				corner += process3By3SquareMed(x-4,y-4);
-	
+				//corner += process3By3SquareMed(x-4,y-4);
 				cornerAvg += process3By3SquareAvg(x-4,y+4);
-				corner += process3By3SquareMed(x-4,y+4);
-	
+				//corner += process3By3SquareMed(x-4,y+4);
 				cornerAvg += process3By3SquareAvg(x+4,y-4);
-				corner += process3By3SquareMed(x+4,y-4);
-	
+				//corner += process3By3SquareMed(x+4,y-4);
 				cornerAvg += process3By3SquareAvg(x+4,y+4);
-				corner += process3By3SquareMed(x+4,y+4);
+				//corner += process3By3SquareMed(x+4,y+4);
 	
 				nbCorner = 4;
 			}
 		
 			if(nbCorner > 0){
-				corner = corner/nbCorner;
+				//corner = corner/nbCorner;
 				cornerAvg = cornerAvg/nbCorner;
 				loop.setPaScoreAvg(center/cornerAvg);
 				loop.setRegionalPaScoreAvg(squareCenterAvg/cornerAvg);	
-				loop.setPaScoreMed(center/corner);
-				loop.setRegionalPaScoreMed(squareCenterAvg/corner);	
+				//loop.setPaScoreMed(center/corner);
+				//loop.setRegionalPaScoreMed(squareCenterAvg/corner);	
 			}
 		}
 	}
@@ -85,10 +82,10 @@ public class PeakAnalysisScore {
 	 * compute the avg of3*3 square
 	 * @param x int coordinate of the pixel center
 	 * @param y int coordinat of the pixel center
-	 * @return double average
+	 * @return float average
 	 */
-	private double process3By3SquareAvg(int x, int y){
-		double sum = 0;
+	private float process3By3SquareAvg(int x, int y){
+		float sum = 0;
 		int nb = 0;
 		for(int i = x-1; i <= x+1; ++i){
 			for(int j = y-1; j <= y+1; ++j){
@@ -109,8 +106,9 @@ public class PeakAnalysisScore {
 	 * compute the median on 8 neighbourhood
 	 * @param x int x coordinate
 	 * @param y int y coordinate
-	 * @return mediane value
+	 * @return float mediane value
 	 */
+	@SuppressWarnings("unused")
 	private double process3By3SquareMed(int x, int y){
 		int []value = new int [9];
 		int cmp = 0;

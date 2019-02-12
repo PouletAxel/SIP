@@ -63,7 +63,7 @@ public class FindMaxima{
 	 * @param val int background value of the image
 	 * @return HashMap of loop
 	 */
-	public HashMap<String,Loop> findloop(boolean hichip, int index, int nbZero, ImagePlus raw, int val){
+	public HashMap<String,Loop> findloop(boolean hichip, int index, int nbZero, ImagePlus raw, float val, int factor){
 		run(nbZero, raw, val);
 		ArrayList<String> temp = getMaxima();
 		ImageProcessor ipN = this._imgNorm.getProcessor();
@@ -72,12 +72,12 @@ public class FindMaxima{
 			int x = Integer.parseInt(parts[0]);
 			int y = Integer.parseInt(parts[1]);
 			String name= this._chr+"\t"+temp.get(j)+"\t"+index;
-			double avg = average(x,y);
-			double std =standardDeviation(x,y,avg);
-			if(avg > 1.5 && ipN.getf(x, y) >= 2){
+			float avg = average(x,y);
+			float std =standardDeviation(x,y,avg);
+			if(avg > 1.45*factor*factor && ipN.getf(x, y) >= 1.85*factor*factor){
 				DecayAnalysis da = new DecayAnalysis(this._imgNorm,x,y);
-				double n1 =da.getNeighbourhood1();
-				double n2 =da.getNeighbourhood2();
+				float n1 =da.getNeighbourhood1();
+				float n2 =da.getNeighbourhood2();
 				if(hichip){
 					if(n1 > 2 && n2 > 2){
 						Loop maxima = new Loop(temp.get(j),x,y,this._chr,avg,std,ipN.getf(x, y));
@@ -89,7 +89,7 @@ public class FindMaxima{
 						this._data.put(name, maxima);
 					}
 				}else{
-					if(n1 < n2 && n1 >= 0.125 && n2 >= 0.125){
+					if(n1 < n2 && n1 >= 0.15 && n2 >= 0.25){
 						Loop maxima = new Loop(temp.get(j),x,y,this._chr,avg,std,ipN.getf(x, y));
 						maxima.setNeigbhoord1(n1);
 						maxima.setNeigbhoord2(n2);
@@ -103,17 +103,15 @@ public class FindMaxima{
 		}
 		return this._data;
 	}
-	
-	
 		
 	/**
 	 * Detect maxima with the oMe or observed methods, call the different methods 
 	 * to detect the maxima and correct them. 
 	 * @param nbZero nb zero allowed around the loops
 	 * @param rawImage	ImagePlus raw image
-	 * @param backGroundValue background value of the image
+	 * @param backgroundValue background value of the image
 	 */
-	private void run(int nbZero, ImagePlus rawImage, int backGroundValue){
+	private void run(int nbZero, ImagePlus rawImage, float backgroundValue){
 		ImagePlus temp = this._imgFilter.duplicate();
 		ImageProcessor ip = temp.getProcessor();
 		MaximumFinder mf = new MaximumFinder(); 
@@ -121,7 +119,7 @@ public class FindMaxima{
 		this._imgResu.setProcessor(bp);
 		this.removedCloseMaxima();
 		this.correctMaxima();
-		this.removeMaximaCloseToZero(nbZero,rawImage, backGroundValue);
+		this.removeMaximaCloseToZero(nbZero,rawImage, backgroundValue);
 	}
 	
 	
@@ -155,11 +153,11 @@ public class FindMaxima{
 							if(max < rawIpNorm.getf(ii, jj) && Math.abs(ii-jj) >= Math.abs(i-j)){
 								imax = ii;
 								jmax = jj;
-								max = rawIpNorm.get(ii, jj);
+								max = rawIpNorm.getf(ii, jj);
 							}
 						}
 					}
-					if (max > rawIpNorm.get(i,j)){
+					if (max > rawIpNorm.getf(i,j)){
 						ipMaxima.set(i,j,0);
 						ipMaxima.set(imax,jmax,255);
 					}
@@ -209,7 +207,7 @@ public class FindMaxima{
 		ArrayList<String> listMaxima = new ArrayList<String>();
 		for(int i = 0; i < w; ++i){
 			for(int j = 0; j < h; ++j){
-				if (ipResu.getf(i,j) > 0 && i-j > 0)
+				if (ipResu.getf(i,j) > 0 && i-j >0)
 					listMaxima.add(i+"\t"+j);
 			}
 		}
@@ -222,8 +220,8 @@ public class FindMaxima{
 	 * @param y  int y coordinate's of the loop
 	 * @return double avg around the loop on the neighbourhood
 	 */
-	private double average(int x, int y){
-		double sum = 0;
+	private float average(int x, int y){
+		float sum = 0;
 		int nb=0;
 		ImageProcessor ip = this._imgNorm.getProcessor();
 		for(int i = x-1; i <= x+1; ++i){
@@ -244,13 +242,14 @@ public class FindMaxima{
 	 * @param y  int y coordinate's of the loop
 	 * @return Strip
 	 */
+	@SuppressWarnings("unused")
 	private Strip stripX(int x, int y){
 		Strip strip = null;
-		double sum = 0;
-		double sumLeft = 0;
-		double sumRight = 0;
+		float sum = 0;
+		float sumLeft = 0;
+		float sumRight = 0;
 		int nb = 0;
-		ArrayList<Double> list = new ArrayList<Double>();
+		ArrayList<Float> list = new ArrayList<Float>();
 		ImageProcessor ip = this._imgNorm.getProcessor();
 		for(int i = x; i >= y; --i){
 			sum +=ip.getf(i, y)+ip.getf(x-1, y)+ip.getf(x+1, y);
@@ -258,21 +257,19 @@ public class FindMaxima{
 			sumRight +=ip.getf(i, y+2)+ip.getf(i, y+3)+ip.getf(i, y+4);
 			sum +=ip.getf(i, y)+ip.getf(i, y-1)+ip.getf(i, y+1);
 			nb+=3;
-			list.add((double) ip.getf(i,y-1));
-			list.add((double)ip.getf(i,y));
-			list.add((double)ip.getf(i,y+1));
+			list.add( ip.getf(i,y-1));
+			list.add(ip.getf(i,y));
+			list.add(ip.getf(i,y+1));
 		}
-		sumLeft = (short)(sumLeft/nb);
-		sumRight = (short)(sumRight/nb);
-		double semc = 0;
+		sumLeft = sumLeft/nb;
+		sumRight = sumRight/nb;
+		float semc = 0;
 		for(int i = 0; i < list.size();++i){
 			semc += (list.get(i)-sum)*(list.get(i)-sum);
 		}
-		semc = (short)Math.sqrt(semc);
+		semc = (float)Math.sqrt(semc);
 		//System.out.println("avg "+sum+" std "+semc);
 		if(sum > sumLeft && sum > sumRight){
-			// X	x
-			// coord.get(2)+"\t"+coord.get(3)+"\t"+loop.getChr()+"\t"+coord.get(2)+"\t"+coord.get(0)
 			String name = "X\t"+x;
 			strip = new Strip(name,this._chr, x-1,y-1,x-1,x+1);
 			strip.setLeftNeigStrip(sumLeft);
@@ -290,30 +287,31 @@ public class FindMaxima{
 	 * @param y  int y coordinate's of the loop
 	 * @return Strip
 	 */
+	@SuppressWarnings("unused")
 	private Strip stripY(int x, int y){
 		Strip strip = null;
-		double sum = 0;
-		double sumLeft = 0;
-		double sumRight = 0;
+		float sum = 0;
+		float sumLeft = 0;
+		float sumRight = 0;
 		int nb = 0;
-		ArrayList<Double> list = new ArrayList<Double>();
+		ArrayList<Float> list = new ArrayList<Float>();
 		ImageProcessor ip = this._imgNorm.getProcessor();
 		for(int j = y; j <= x; ++j){
 			sum +=ip.getf(x, j)+ip.getf(x-1, j)+ip.getf(x+1, j);
 			sumLeft = sumLeft+ip.getf(x-2, j)+ip.getf(x-3, j)+ip.getf(x-4, j);
 			sumRight = sumRight+ip.getf(x+2, j)+ip.getf(x+3, j)+ip.getf(x+4, j);
 			nb+=3;
-			list.add((double) ip.getf(x-1,j));
-			list.add((double)ip.getf(x,j));
-			list.add((double)ip.getf(x+1,j));
+			list.add(ip.getf(x-1,j));
+			list.add(ip.getf(x,j));
+			list.add(ip.getf(x+1,j));
 		}
 		sum = sum/nb;
 		sumLeft = sumLeft/nb;
 		sumRight = sumRight/nb;
-		double semc = 0;
+		float semc = 0;
 		for(int i = 0; i < list.size();++i)
 			semc += (list.get(i)-sum)*(list.get(i)-sum);
-		semc = (short)Math.sqrt(semc);
+		semc = (float)Math.sqrt(semc);
 		if((sumLeft/sum) < 0.9 || sumRight/sum < 0.9){
 			String name = "Y_"+y;
 			strip = new Strip(name,this._chr,y+1,x+1,x-1,x+1);
@@ -333,8 +331,8 @@ public class FindMaxima{
 	 * @param avg: double average of the same region
 	 * @return double: teh standard deviation
 	 */
-	private double standardDeviation(int x, int y, double avg){
-		double semc = 0;
+	private float standardDeviation(int x, int y, double avg){
+		float semc = 0;
 		int nb = 0;
 		ImageProcessor ip = this._imgNorm.getProcessor();
 		for(int i = x-1; i <= x+1; ++i){
@@ -345,8 +343,8 @@ public class FindMaxima{
 				}
 			}	
 		}	
-		semc = semc/(double)nb;
-		return Math.sqrt(semc);
+		semc = semc/nb;
+		return (float)Math.sqrt(semc);
 	}
 	
 	/**
@@ -359,21 +357,21 @@ public class FindMaxima{
 	 * @param rawImage	ImagePlus raw image
 	 * @param val background value of the image
 	 */
-	private void removeMaximaCloseToZero(int nbZero,ImagePlus rawImage, int val){ 
+	private void removeMaximaCloseToZero(int nbZero,ImagePlus rawImage, float val){ 
 		int w = this._imgResu.getWidth();
 		int h = this._imgResu.getHeight();
 		ImageProcessor ipResu = this._imgResu.getProcessor();
 		ImageProcessor ip = rawImage.getProcessor();
 		for(int i = 2; i< w-2; ++i){
 			for(int j= 2;j< h-2;++j){
-				if(ipResu.getPixel(i, j) > val){
+				if(ipResu.getPixel(i, j) > 0){
 					int thresh = nbZero;
 					if (j-i <= this._diagSize+2)
 						thresh = thresh+1;
 					int nb = 0;
 					for(int ii = i-2; ii <= i+2; ++ii){
 						for(int jj = j-2; jj <= j+2; ++jj){
-							if (ip.get(ii, jj)<=0)	nb++;
+							if (ip.getf(ii, jj)<= val)	nb++;
 						}
 						if(nb >= thresh){
 							ipResu.set(i,j,0);

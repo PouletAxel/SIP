@@ -4,8 +4,10 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import ij.ImagePlus;
+import ij.process.FloatProcessor;
 import ij.process.ImageProcessor;
 import ij.process.ShortProcessor;
+
 
 /**
  * Make an image with a tuple file (x y value). Take in entrees the resolution the matrix size and the other parameters of the tuple
@@ -29,9 +31,9 @@ public class TupleFileToImage {
 	/** Step to process the whole chromosme*/
 	private int _step ;
 	/** Image value average*/
-	private static double _avg = 0;
+	private static float _avg = 0;
 	/** Image standard deviation */
-	private static double _std = 0;
+	private static float _std = 0;
 	/** */
 	public static int _noZeroPixel = 0;
 	
@@ -57,7 +59,7 @@ public class TupleFileToImage {
 	public void readTupleFile(){
 		BufferedReader br;
 		ShortProcessor pRaw = new ShortProcessor(this._size,this._size);
-		ShortProcessor pNorm = new ShortProcessor(this._size,this._size);
+		FloatProcessor pNorm = new FloatProcessor(this._size,this._size);
 		String[] tfile = this._file.split("_");
 		int numImage = Integer.parseInt(tfile[tfile.length-2])/(this._step*this._resolution);
 		try {
@@ -85,8 +87,8 @@ public class TupleFileToImage {
 				int i = (Integer.parseInt(parts[0]) - correction)/this._resolution; 
 				int j = (Integer.parseInt(parts[1]) - correction)/this._resolution;
 				if(i < this._size && j< this._size){
-					pRaw.setf(i, j, raw);
-					pRaw.setf(j, i, raw);
+					pRaw.set(i, j,(int)raw);
+					pRaw.set(j, i, (int)raw);
 					pNorm.setf(i, j, norm);
 					pNorm.setf(j, i, norm);
 				}
@@ -107,22 +109,22 @@ public class TupleFileToImage {
 	public static void correctImage(ImagePlus img){
 		ImageProcessor ip = img.getProcessor();
 		_noZeroPixel = 0;
-		int sum = 0;
+		float sum = 0;
 		for(int i = 0; i < ip.getWidth(); ++i){
 			for(int j = 0; j < ip.getWidth(); ++j){
-				if(ip.getPixel(i, j) > 0){
+				if(ip.getf(i, j) > 0){
 					++_noZeroPixel;
-					sum += ip.getPixel(i, j);
+					sum += ip.getf(i, j);
 				}
 			}
 		}
-		_avg = (double)sum/(double)_noZeroPixel;
+		_avg = sum/_noZeroPixel;
 		_std = std(_avg,img);
 		for(int i = 0; i < ip.getWidth(); ++i){
 			for(int j = 0; j < ip.getWidth(); ++j){
-				int a = ip.getPixel(i, j);
+				float a = ip.getf(i, j);
 				if (Math.abs(j-i) <= 2 && a >= _avg+_std*2)
-					ip.set(i,j,(int)_avg);
+					ip.setf(i,j,_avg);
 			}
 		}
 		img.setProcessor(ip);
@@ -134,19 +136,19 @@ public class TupleFileToImage {
 	 * @param img ImagePlus
 	 * @return double satndard deivation
 	 */
-	private static double std(double mean,ImagePlus img){
-		double semc = 0;
+	private static float std(float mean,ImagePlus img){
+		float semc = 0;
 		ImageProcessor ip = img.getProcessor();
 		int noZeroPixel = 0;
 		for(int i = 0; i < ip.getWidth(); ++i){
 			for(int j = 0; j < ip.getWidth(); ++j){
 				if(ip.getPixel(i, j) > 0){
 					++noZeroPixel;
-					semc += (ip.getPixel(i, j)-mean)*(ip.getPixel(i, j)-mean);
+					semc += (ip.getf(i, j)-mean)*(ip.getf(i, j)-mean);
 				}
 			}
 		}
-		semc = Math.sqrt(semc/(double)noZeroPixel);
+		semc = (float) Math.sqrt(semc/noZeroPixel);
 		return semc;
 	}
 	

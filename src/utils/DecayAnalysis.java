@@ -36,35 +36,35 @@ public class DecayAnalysis {
 	 * getter computing the average difference beetwen the loop value and the neighbourhood 8 values
 	 * @return double stocking the average differential value of the neighbourhood 8.
 	 */
-	public double getNeighbourhood1(){return computeDiff(1);}
+	public float getNeighbourhood1(){return computeDiff(1);}
 	
 	/**
 	 * getter computing the average difference beetwen the loop value and the neighbourhood 24 values (exclude the values of the 8 neighbourhood)
 	 * @return double stocking the average differential value of the neighbourhood 24.
 	 */
-	public double getNeighbourhood2(){return computeDiff(2);}
+	public float getNeighbourhood2(){return computeDiff(2);}
 
 	
 	/**
 	 * getter computing the average difference beetwen the loop value and the neighbourhood 24 values (exclude the values of the 8 neighbourhood)
 	 * @return double stocking the average differential value of the neighbourhood 24.
 	 */
-	public double getNeighbourhood3(){return computeDiff(3);}
+	public float getNeighbourhood3(){return computeDiff(3);}
 	
 	/**
 	 * Private method computing the average difference between the loop value and the chosen neighbourhood. 
 	 * @param c int; stock the choice: 1 = neighbourhood 8; 2 = neighbourhood 24
 	 * @return double differentila average
 	 */
-	private double computeDiff (int c ){
-		double sum = 0;
+	private float computeDiff (int c ){
+		float sum = 0;
 		ImageProcessor ip = this._img.getProcessor();
 		int nb = 0; 
 		for(int i = this._x-c; i <= this._x+c; ++i){
 			for(int j = this._y-c ; j <= this._y+c; ++j){
 				if((i != this._x || j != this._y)  && (i-this._x == -c || j-this._y == -c || i-this._x == c || j-this._y == c)){
 					if(i >=0 && j>= 0){
-						double a =  ip.get(this._x, this._y)- ip.get(i, j);
+						double a =  ip.getf(this._x, this._y)- ip.getf(i, j);
 						sum+= a;
 						++nb;
 					}

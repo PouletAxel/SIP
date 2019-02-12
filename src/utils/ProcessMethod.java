@@ -52,6 +52,7 @@ public class ProcessMethod{
 		this._ip = this._img.getProcessor();
 		this._gaussianFilterRadius = gaussianFilterRad;		
 	}
+
 	
 	/**
 	 * ImageJ method to enhance the image contrats, and enhance the structures of interest
@@ -73,7 +74,7 @@ public class ProcessMethod{
 		this._rF.rank(this._ip, min, RankFilters.MIN);
 	}
 	
-		
+	
 	/**
 	 * White "tophat" method to enhance the light structure
 	 * 
@@ -113,8 +114,8 @@ public class ProcessMethod{
 	 * 
 	 * @param m_min
 	 */
-	public void runMax(double m_min) {
-		_rF.rank(_ip, m_min, RankFilters.MAX);// TODO Auto-generated method stub
+	public void runMax(double m_max) {
+		_rF.rank(_ip, m_max, RankFilters.MAX);// TODO Auto-generated method stub
 		
 	}
 }
