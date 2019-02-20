@@ -5,7 +5,6 @@ import java.util.Iterator;
 import java.util.Set;
 import ij.ImagePlus;
 import ij.process.ImageProcessor;
-import java.util.Arrays;
 
 /**
  * Peak analysis score. 
@@ -47,31 +46,23 @@ public class PeakAnalysisScore {
 			Loop loop = this._data.get(cle);
 			int x = loop.getX();
 			int y = loop.getY();
-			//float corner = 0;
-			float cornerAvg = 0;
+			float corner = 0;
 			float center = this._ipRaw.getf(x, y);
 			float squareCenterAvg = process3By3SquareAvg(x,y);
 			int nbCorner = 0;
 			if(x >= 5 && y >= 5 && x < this._imgRaw.getWidth()-5 && y < this._imgRaw.getHeight()-5){
-				cornerAvg += process3By3SquareAvg(x-4,y-4); 
-				//corner += process3By3SquareMed(x-4,y-4);
-				cornerAvg += process3By3SquareAvg(x-4,y+4);
-				//corner += process3By3SquareMed(x-4,y+4);
-				cornerAvg += process3By3SquareAvg(x+4,y-4);
-				//corner += process3By3SquareMed(x+4,y-4);
-				cornerAvg += process3By3SquareAvg(x+4,y+4);
-				//corner += process3By3SquareMed(x+4,y+4);
-	
+				corner += process3By3SquareAvg(x-4,y-4); 
+				corner += process3By3SquareAvg(x-4,y+4);
+				corner += process3By3SquareAvg(x+4,y-4);
+				corner += process3By3SquareAvg(x+4,y+4);
+					
 				nbCorner = 4;
 			}
 		
 			if(nbCorner > 0){
-				//corner = corner/nbCorner;
-				cornerAvg = cornerAvg/nbCorner;
-				loop.setPaScoreAvg(center/cornerAvg);
-				loop.setRegionalPaScoreAvg(squareCenterAvg/cornerAvg);	
-				//loop.setPaScoreMed(center/corner);
-				//loop.setRegionalPaScoreMed(squareCenterAvg/corner);	
+				corner = corner/nbCorner;
+				loop.setPaScoreAvg(center/corner);
+				loop.setRegionalPaScoreAvg(squareCenterAvg/corner);	
 			}
 		}
 	}
@@ -98,43 +89,5 @@ public class PeakAnalysisScore {
 		if(nb == 0)
 			return 0;
 		return sum/nb;
-	}
-	
-	
-	
-	/**
-	 * compute the median on 8 neighbourhood
-	 * @param x int x coordinate
-	 * @param y int y coordinate
-	 * @return float mediane value
-	 */
-	@SuppressWarnings("unused")
-	private double process3By3SquareMed(int x, int y){
-		int []value = new int [9];
-		int cmp = 0;
-		for(int i = x-1; i <= x+1; ++i){
-			for(int j = y-1; j <= y+1; ++j){
-				if(i < this._ipRaw.getWidth() && i>0 && j < this._ipRaw.getWidth() && j > 0){
-					value[cmp] = this._ipRaw.getPixel(i, j);
-					++cmp;
-				}
-			}
-		}
-		return median(value);
-	}
-	
-	/**
-	 * Compute median in int input table
-	 * @param value [] int
-	 * @return median value
-	 */
-	private double median (int[] value ){
-		Arrays.sort(value);
-		double median;
-		if (value.length % 2 == 0)
-			median = ((double)value[value.length/2] + (double)value[value.length/2 - 1])/2;
-		else
-			median = (double) value[value.length/2];
-		return median;
 	}
 }

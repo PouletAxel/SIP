@@ -155,8 +155,10 @@ public class HiCExperimentAnalysis {
 				System.out.println("dumped directory of chromosome"+chr+"empty");
 			else{
 				detectLoops(listOfFiles,chr);
-				if(nb == 0)		saveFile(resuFile, false);
-				else saveFile(resuFile, true);
+				if(nb == 0)
+					saveFile(resuFile, false);
+				else
+					saveFile(resuFile, true);
 			}
 			++nb;
 			p.bar.setValue(nb);
@@ -184,8 +186,10 @@ public class HiCExperimentAnalysis {
 				System.out.println("dumped directory of chromosome"+chr+"empty");
 			else{
 				detectLoops(listOfFiles,chr);
-				if (nb == 0) saveFile(resuFile,false);
-				else saveFile(resuFile,true);
+				if (nb == 0)
+					saveFile(resuFile,false);
+				else
+					saveFile(resuFile,true);
 			}
 			++nb;
 		}
@@ -215,8 +219,10 @@ public class HiCExperimentAnalysis {
 				System.out.println("dumped directory of chromosome"+chr+"empty");
 			else{
 				detectLoops(listOfFiles,chr);
-				if (nb == 0) saveFile(resuFile,false);
-				else saveFile(resuFile,true);
+				if (nb == 0)
+					saveFile(resuFile,false);
+				else
+					saveFile(resuFile,true);
 			}
 			++nb;
 			p.bar.setValue(nb);
@@ -389,14 +395,17 @@ public class HiCExperimentAnalysis {
 												removed.add(name);
 												testBreak =true;
 												break;
-											}else removed.add(test);
+											}else
+												removed.add(test);
 										}
 									}
-								}else removed.add(test);
+								}else
+									removed.add(test);
 							}
 						}
 					}
-					if(testBreak) break;
+					if(testBreak)
+						break;
 				}
 			}
 		}
@@ -481,7 +490,6 @@ public class HiCExperimentAnalysis {
 			Loop looptest = input.get(name);
 			if(!(removed.contains(name)) && loop.getResolution() < looptest.getResolution()){
 				int factor = looptest.getResolution()/loop.getResolution();
-				//System.out.println(factor);
 				int xtest = loop.getX()/factor;
 				int ytest = loop.getY()/factor;
 				for(int i = xtest-1; i <= xtest+1; ++i ){

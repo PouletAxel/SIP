@@ -126,10 +126,7 @@ public class Hic_main {
 	public static void main(String[] args) throws IOException, InterruptedException {
 		_factor.add(1);
 		_factor.add(2);
-		if (args[0].equals("-h")||args[0].equals("-help")||args[0].equals("--help")||args[0].equals("-h")){
-			System.out.println(_doc);
-			System.exit(0);
-		}else if (args.length > 0 && args.length < 4){
+		if (args.length >= 1 && args.length < 4){
 			System.out.println(_doc);
 			System.exit(0);
 		}else if(args.length >= 4){

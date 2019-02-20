@@ -183,8 +183,10 @@ public class FindMaxima{
 						for(int jj = j-2; jj <= j+2; ++jj){	
 							if(ipMaxima.getPixel(ii,jj) > 0){
 								if(i != ii || j != jj){
-									if(rawIpNorm.getf(ii, jj) > rawIpNorm.getf(i,j))	ipMaxima.set(i,j,0);
-									else ipMaxima.set(ii,jj,0);							
+									if(rawIpNorm.getf(ii, jj) > rawIpNorm.getf(i,j))
+										ipMaxima.set(i,j,0);
+									else
+										ipMaxima.set(ii,jj,0);							
 								}
 							}
 						}
@@ -371,7 +373,8 @@ public class FindMaxima{
 					int nb = 0;
 					for(int ii = i-2; ii <= i+2; ++ii){
 						for(int jj = j-2; jj <= j+2; ++jj){
-							if (ip.getf(ii, jj)<= val)	nb++;
+							if (ip.getf(ii, jj)<= val)
+								nb++;
 						}
 						if(nb >= thresh){
 							ipResu.set(i,j,0);

@@ -195,9 +195,7 @@ public class DumpData {
 		 * @param flux
 		 *  flux to redirect
 		 */
-		public ReturnFlux(InputStream flux){
-			this.flux = flux;
-		}
+		public ReturnFlux(InputStream flux){	this.flux = flux; }
 		
 		/**
 		 * 

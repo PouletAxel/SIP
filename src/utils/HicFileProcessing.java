@@ -112,11 +112,14 @@ public class HicFileProcessing {
 				}
 			}
 			++nb;
-			if (gui) _p.bar.setValue(nb);
+			if(gui)
+				_p.bar.setValue(nb);
 			System.out.println("end dump "+chr);
 		}
-		if (gui) this._hicExp.runGUI();
-		else this._hicExp.run();
+		if(gui) 
+			this._hicExp.runGUI();
+		else
+			this._hicExp.run();
 	}
 	
 	/**

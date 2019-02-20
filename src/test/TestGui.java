@@ -73,16 +73,26 @@ public class TestGui {
 			ArrayList<Integer> factor = new ArrayList<Integer>();
 			factor.add(1);
 			factor.add(2);
-			factor.add(5);
-			//HashMap<String,Integer> m_chrSize = readChrSizeFile(gui.getChrSizeFile());
-			/*HiCExperimentAnalysis hicExp = new HiCExperimentAnalysis(output, m_chrSize,
+			HashMap<String,Integer> chrSize = readChrSizeFile(gui.getChrSizeFile());
+			
+			HiCExperimentAnalysis hicExp = new HiCExperimentAnalysis(output, chrSize,
 					gauss, min, max, resolution,
 					saturatedPixel, thresholdMax, diagSize, matrixSize, nbZero
 					,factor);
 			hicExp.setIsHichip(gui.isHiChIP());
-			HicFileProcessing hfp =  new HicFileProcessing(input, hicExp, m_chrSize, juiceBoxTools, juiceBoXNormalisation);
-			hfp.run(true);*/
-			//hicExp.runGUI();
+			if(isHic){
+				System.out.println("hic mode:\ninput: "+input+"\noutput: "+output+"\njuiceBox: "+juiceBoxTools+"\nnorm: "+ juiceBoXNormalisation+"\ngauss: "+gauss+"\n"
+						+ "min: "+min+"\nmax: "+max+"\nmatrix size: "+matrixSize+"\ndiag size: "+diagSize+"\nresolution: "+resolution+"\nsaturated pixel: "+saturatedPixel
+						+"\nthreshold: "+thresholdMax+"\n number of zero:"+nbZero+"\n ");
+				HicFileProcessing hfp =  new HicFileProcessing(input, hicExp, chrSize, juiceBoxTools, juiceBoXNormalisation);
+				hfp.run(true);
+			}else if (isProcessed){
+				System.out.println("processed mode:\ninput: "+input+"\noutput: "+output+"\njuiceBox: "+juiceBoxTools+"\nnorm: "+ juiceBoXNormalisation+"\ngauss: "+gauss
+						+"\nmin: "+min+"\nmax: "+max+"\nmatrix size: "+matrixSize+"\ndiag size: "+diagSize+"\nresolution: "+resolution+"\nsaturated pixel: "+saturatedPixel
+						+"\nthreshold: "+thresholdMax+"\nisHic: "+isHic+"\nisProcessed: "+isProcessed+"\n number of zero:"
+						+nbZero+"\n");
+				hicExp.runGUI(input);
+			}
 		}
 		else {
 			System.out.println("program NO Name closed: if you want the help: -h");
