@@ -909,7 +909,7 @@ public class GuiAnalysis extends JFrame{
         		_min.setText("2.0");
         		_max.setText("2.0");
         		_nbZero.setText("6");
-        		_noiseTolerance.setText("2500");
+        		_noiseTolerance.setText("2800");
         		m_gui._jrbKR.setSelected(true);
         	}
 			if (m_gui.isHic()){
