@@ -1,4 +1,4 @@
-package noNameMain;
+package sipMain;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -117,7 +117,7 @@ public class Hic_main {
 	/**
 	 * Main function to run all the process, can be run with gui or in command line.
 	 * With command line with 1 or less than 5 parameter => run only the help
-	 * With zero parameter only java -jar noname.jar  => gui
+	 * With zero parameter only java -jar SIP.jar  => gui
 	 * With more than 5 paramter => command line mode
 	 * 
 	 * @param args
@@ -211,7 +211,7 @@ public class Hic_main {
 					+ "min: "+_min+"\nmax: "+_max+"\nmatrix size: "+_matrixSize+"\ndiag size: "+_diagSize+"\nresolution: "+_resolution+"\nsaturated pixel: "+_saturatedPixel
 					+"\nthreshold: "+_thresholdMax+"\n number of zero:"+_nbZero+"\n factor "+ _factOption+"\n");
 			HicFileProcessing hfp =  new HicFileProcessing(_input, wga, _chrSize, _juiceBoxTools, _juiceBoXNormalisation);
-				writer.write("java -jar noName hic "+_input+" "+_chrSizeFile+" "+_output+" "+_juiceBoxTools+" -norm "+ _juiceBoXNormalisation+" -g "+_gauss+
+				writer.write("java -jar sip.jar hic "+_input+" "+_chrSizeFile+" "+_output+" "+_juiceBoxTools+" -norm "+ _juiceBoXNormalisation+" -g "+_gauss+
 						" -min "+_min+" -max "+_max+" -mat "+_matrixSize+" -d "+_diagSize+" -res "+_resolution+" -sat "+_saturatedPixel+" -t "+_thresholdMax+" -nbZero "
 						+_nbZero+" -factor "+ _factOption+" -del "+_delImages+"\n");
 			hfp.run(_gui);
@@ -220,7 +220,7 @@ public class Hic_main {
 					+"\nmin: "+_min+"\nmax: "+_max+"\nmatrix size: "+_matrixSize+"\ndiag size: "+_diagSize+"\nresolution: "+_resolution+"\nsaturated pixel: "+_saturatedPixel
 					+"\nthreshold: "+_thresholdMax+"\nisHic: "+_isHic+"\nisProcessed: "+_isProcessed+"\n number of zero:"
 					+_nbZero+"\n factor "+ _factOption+"\n");
-				writer.write("java -jar noName processed "+_input+" "+_chrSizeFile+" "+_output+" "+_gauss+" -mat "+_matrixSize+" -d "+_diagSize+" -res "+_resolution
+				writer.write("java -jar sip.jar processed "+_input+" "+_chrSizeFile+" "+_output+" "+_gauss+" -mat "+_matrixSize+" -d "+_diagSize+" -res "+_resolution
 						+" -t "+_thresholdMax+" -min "+_min+" -max "+_max+" -sat "+_saturatedPixel+" -nbZero "+_nbZero+" -factor "+ _factOption+" -del "+_delImages+"\n");
 				if(_gui) wga.runGUI(_input);
 				else wga.run(_input);

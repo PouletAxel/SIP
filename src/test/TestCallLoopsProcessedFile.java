@@ -28,7 +28,7 @@ public class TestCallLoopsProcessedFile {
 		//String input= "/home/plop/Bureau/DataSetImageHiC/Hichip_H3k4me1_test";
 		///home/plop/Bureau/DataSetImageHiC/Hichip_H3k4me1_test
 		String input = "/home/plop/Bureau/DataSetImageHiC/GM12878/GM12878_hic";
-		String output= "/home/plop/Bureau/DataSetImageHiC/GM12878/monCul_wg";
+		String output= "/home/plop/Bureau/DataSetImageHiC/GM12878/plopi";
 		//String input = "/home/plop/Bureau/DataSetImageHiC/GM12878/subsample/GM12878_full/";
 		//String input = "/home/plop/Bureau/DataSetImageHiC/HiChip/ring1b/test/";//"/home/plop/Bureau/DataSetImageHiC/GM12878/test";
 		//String output = "/home/plop/Bureau/DataSetImageHiC/HiChip/ring1b/testTer/";//"/home/plop/Bureau/DataSetImageHiC/GM12878/test";
