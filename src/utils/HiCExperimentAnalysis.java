@@ -70,6 +70,8 @@ public class HiCExperimentAnalysis {
 	private Strel m_strel = Strel.Shape.SQUARE.fromRadius(40);
 	/**	boolean if true hichip data if false hic */
 	private boolean m_hichip = false;
+	/** */
+	private boolean m_FDRFilter = true;
 	/**	 image background value*/
 	private float _backgroudValue = (float) 0.25;
 	
@@ -91,7 +93,7 @@ public class HiCExperimentAnalysis {
 	 
 	public HiCExperimentAnalysis(String output, HashMap<String, Integer> chrSize, double gauss, double min,
 			double max, int resolution, double saturatedPixel, int thresholdMax,
-			int diagSize, int matrixSize, int nbZero,ArrayList<Integer> listFactor) {
+			int diagSize, int matrixSize, int nbZero,ArrayList<Integer> listFactor, boolean fdr) {
 		this._output = output;
 		this._input = output;
 		this._chrSize = chrSize;
@@ -106,6 +108,7 @@ public class HiCExperimentAnalysis {
 		this._step = matrixSize/2;
 		this._nbZero = nbZero;
 		this._listFactor = listFactor;
+		this.m_FDRFilter = fdr;
 	}
 
 	/**
@@ -114,7 +117,7 @@ public class HiCExperimentAnalysis {
 	 */
 	public void run() throws IOException{
 		Iterator<String> key = this._chrSize.keySet().iterator();
-		String resuFile = this._output+File.separator+"loops.bedpe";
+		String resuFile = this._output+File.separator+"loops.txt";
 		int nb = 0;
 		while(key.hasNext()){
 			String chr = key.next();
@@ -141,7 +144,7 @@ public class HiCExperimentAnalysis {
 	 */
 	public void runGUI() throws IOException{
 		Iterator<String> key = this._chrSize.keySet().iterator();
-		String resuFile = this._output+File.separator+"loops.bedpe";
+		String resuFile = this._output+File.separator+"loops.txt";
 		int nb = 0;
 		Progress p = new Progress("Loops detection",_chrSize.size());
 		p.bar.setValue(nb);
@@ -173,7 +176,7 @@ public class HiCExperimentAnalysis {
 	 */
 	public void run(String input) throws IOException{
 		Iterator<String> key = this._chrSize.keySet().iterator();
-		String resuFile = this._output+File.separator+"loops.bedpe";
+		String resuFile = this._output+File.separator+"loops.txt";
 		int nb = 0;
 		while(key.hasNext()){
 			String chr = key.next();
@@ -204,7 +207,7 @@ public class HiCExperimentAnalysis {
 	 */
 	public void runGUI(String input) throws IOException{
 		Iterator<String> key = this._chrSize.keySet().iterator();
-		String resuFile = this._output+File.separator+"loops.bedpe";
+		String resuFile = this._output+File.separator+"loops.txt";
 		int nb = 0;
 		Progress p = new Progress("Loops detection",_chrSize.size());
 		p.bar.setValue(nb);
@@ -242,20 +245,33 @@ public class HiCExperimentAnalysis {
 			writer = new BufferedWriter(new FileWriter(new File(pathFile), true));
 		else{
 			writer = new BufferedWriter(new FileWriter(new File(pathFile)));
-			writer.write("chromosome1\tx1\tx2\tchromosome2\ty1\ty2\tcolor\tAPScoreAvg\tRegAPScoreAvg\tAvg_diffMaxNeihgboor_1\tAvg_diffMaxNeihgboor_2\tavg\tstd\tvalue\n");
+			writer.write("chromosome1\tx1\tx2\tchromosome2\ty1\ty2\tcolor\tAPScoreAvg\tRegAPScoreAvg\tAvg_diffMaxNeihgboor_1\tAvg_diffMaxNeihgboor_2\tavg\tstd\tvalue\tApScoreFDR\tRegAPscoreFDR\n");
 		}
 		Set<String> key = m_data.keySet();
 		Iterator<String> it = key.iterator();
 		while (it.hasNext()){
-			String cle = it.next();
-			Loop loop = m_data.get(cle);
+			String name = it.next();
+			Loop loop = m_data.get(name);
 			ArrayList<Integer> coord = loop.getCoordinates();
-			writer.write(loop.getChr()+"\t"+coord.get(2)+"\t"+coord.get(3)+"\t"+loop.getChr()+"\t"+coord.get(0)+"\t"+coord.get(1)+"\t0,0,0"
-					+"\t"+loop.getPaScoreAvg()+"\t"+loop.getRegionalPaScoreAvg()+"\t"+loop.getNeigbhoord1()+"\t"+loop.getNeigbhoord2()+"\t"+loop.getAvg()+"\t"+loop.getStd()+"\t"+loop.getValue()+"\n");
+			if(this.m_FDRFilter){
+				if(loop.getPaScoreAvg()> loop.getPaScoreAvgFDR() && loop.getPaScoreAvg() > loop.getPaScoreAvgFDR()){
+					writer.write(loop.getChr()+"\t"+coord.get(2)+"\t"+coord.get(3)+"\t"+loop.getChr()+"\t"+coord.get(0)+"\t"+coord.get(1)+"\t0,0,0"
+							+"\t"+loop.getPaScoreAvg()+"\t"+loop.getRegionalPaScoreAvg()+"\t"
+							+loop.getNeigbhoord1()+"\t"+loop.getNeigbhoord2()+"\t"+loop.getAvg()+"\t"
+							+loop.getStd()+"\t"+loop.getValue()+loop.getPaScoreAvgFDR()+"\t"
+							+loop.getRegionalPaScoreAvgFDR()+"\n");
+				}
+			}
+			else{
+				writer.write(loop.getChr()+"\t"+coord.get(2)+"\t"+coord.get(3)+"\t"+loop.getChr()+"\t"+coord.get(0)+"\t"+coord.get(1)+"\t0,0,0"
+						+"\t"+loop.getPaScoreAvg()+"\t"+loop.getRegionalPaScoreAvg()+"\t"
+						+loop.getNeigbhoord1()+"\t"+loop.getNeigbhoord2()+"\t"+loop.getAvg()+"\t"
+						+loop.getStd()+"\t"+loop.getValue()+loop.getPaScoreAvgFDR()+"\t"
+						+loop.getRegionalPaScoreAvgFDR()+"\n");
+			}
 		}
 		writer.close();
 	}
-	
 	
 	/**
 	 * Make Image 
@@ -464,6 +480,7 @@ public class HiCExperimentAnalysis {
 			String name = it.next();
 			Loop loop = input.get(name);
 			if(!(removed.contains(name))){
+				// filter on APA score and APA regional score
 				if(loop.getPaScoreAvg() < 1.2 || loop.getRegionalPaScoreAvg() < 1 )
 					removed.add(name);
 				else
@@ -570,7 +587,7 @@ public class HiCExperimentAnalysis {
 			String line = br.readLine();
 			while (line != null){
 				sb.append(line);
-				if((line.equals("NaN")|| line.equals("NAN") || line.equals("nan") || line.equals("na")  || Double.parseDouble(line) < 0.30)){ // tester les autre vecteur...
+				if((line.equals("NaN")|| line.equals("NAN") || line.equals("nan") || line.equals("na")  || Double.parseDouble(line) < 0.30)){
 					_normVector.put(lineNumber*_resolution, "plop");
 				}
 				++lineNumber;

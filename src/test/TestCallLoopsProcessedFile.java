@@ -47,7 +47,7 @@ public class TestCallLoopsProcessedFile {
 		factor.add(2);
 		//factor.add(5);
 		HiCExperimentAnalysis wga = new HiCExperimentAnalysis(output, readChrSizeFile("/home/plop/Documents/Genome/mammals/HumanGenomeHg19/w_hg19.sizes"), gauss, min, max, 
-				resolution, saturatedPixel, thresholdMax, diagSize, matrixSize,nbZero, factor);
+				resolution, saturatedPixel, thresholdMax, diagSize, matrixSize,nbZero, factor,true);
 		
 		wga.setIsHichip(false);
 		System.out.println("input "+input+"\n"

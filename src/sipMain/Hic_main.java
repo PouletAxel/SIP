@@ -87,6 +87,7 @@ public class Hic_main {
 	private static String _chrSizeFile;
 	/**boolean is true supress all the image created*/
 	private static boolean _delImages = true;
+	private static boolean _fdr = true;
 	/**boolean is true supress all the image created*/
 	private static boolean _gui = false;
 	/**Strin for the documentation*/
@@ -113,6 +114,7 @@ public class Hic_main {
 			+ "-nbZero: number of zero: number of pixel equal at zero allowed in the 24 neighboorhood of the detected maxima (default parameter 6 for hic and 25 for hichip)\n"
 			+ "-norm: <NONE/VC/VC_SQRT/KR> only for hic option (default KR)\n"
 			+ "-del: true or false, delete tif files used for loop detection (default true)\n"
+			+ "-fdr: true or false, filter on the fdr or not (default true)\n"
 			+"-h, --help print help\n");
 	/**
 	 * Main function to run all the process, can be run with gui or in command line.
@@ -175,6 +177,7 @@ public class Hic_main {
 				_nbZero = gui.getNbZero();
 				_saturatedPixel = gui.getEnhanceSignal();
 				_thresholdMax = gui.getNoiseTolerance();
+				_fdr = gui.isFdrFiltering();
 				if(gui.getFactorChoice() == 1){
 					_factor = new ArrayList<Integer>();
 					_factor.add(1);
@@ -204,7 +207,7 @@ public class Hic_main {
 		File file = new File(_output);
 		if (file.exists()==false) file.mkdir();
 		BufferedWriter writer = new BufferedWriter(new FileWriter(new File(_output+File.separator+"parameters.txt")));
-		HiCExperimentAnalysis wga = new HiCExperimentAnalysis(_output, _chrSize, _gauss, _min, _max, _resolution, _saturatedPixel, _thresholdMax, _diagSize, _matrixSize, _nbZero,_factor);
+		HiCExperimentAnalysis wga = new HiCExperimentAnalysis(_output, _chrSize, _gauss, _min, _max, _resolution, _saturatedPixel, _thresholdMax, _diagSize, _matrixSize, _nbZero,_factor, _fdr);
 		wga.setIsHichip(_isHiChip);
 		if(_isHic){
 			System.out.println("hic mode:\ninput: "+_input+"\noutput: "+_output+"\njuiceBox: "+_juiceBoxTools+"\nnorm: "+ _juiceBoXNormalisation+"\ngauss: "+_gauss+"\n"
@@ -354,6 +357,16 @@ public class Hic_main {
 						_delImages = false;
 					else{
 						System.out.println("-del = "+args[i+1]+", not defined\n");
+						System.out.println(_doc);
+						System.exit(0);
+					}
+				}else if(args[i].equals("-fdr")){
+					if(args[i+1].equals("true") || args[i+1].equals("T") || args[i+1].equals("TRUE"))
+						_fdr = true;
+					else if(args[i+1].equals("false") || args[i+1].equals("F") || args[i+1].equals("False"))
+						_fdr = false;
+					else{
+						System.out.println("-fdr = "+args[i+1]+", not defined\n");
 						System.out.println(_doc);
 						System.exit(0);
 					}

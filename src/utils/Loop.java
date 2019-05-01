@@ -50,6 +50,10 @@ public class Loop {
 	/** Standard deviation value of the neighbourhood 9.*/
 	private float _std = -1;
 	
+	/** value of the peak analysis value inspirate from Rao&Huntley et al., 2014, but the score is compute foreach loop and not for a set of loops.*/
+	private float _paScoreFDR = -1;
+	/**  value of the peak analysis value inspirate from Rao&Huntley et al., 2014, but the score is compute foreach loop and not for a set of loops.*/
+	private float _regPaScoreFDR = -1;
 	
 	/**
 	 * Loop constructor
@@ -232,7 +236,7 @@ public class Loop {
 	 * Getter of avg differential n 24 
 	 * @return double differential avg
 	 */
-	public double getNeigbhoord2(){	return _neigbhoord2; }
+	public float getNeigbhoord2(){	return _neigbhoord2; }
 	
 	/**
 	 * Setter of avg differential n 24 
@@ -244,7 +248,7 @@ public class Loop {
 	 * Getter of the peak analysis loop 
 	 * @return double PA score
 	 */
-	public double getPaScoreAvg(){	return this._paScoreAvg; }
+	public float getPaScoreAvg(){	return this._paScoreAvg; }
 	
 	/**
 	 *	Setter  of the peak analysis loop score
@@ -326,5 +330,27 @@ public class Loop {
 	 * @param avg double 
 	 */
 	public void setAvg(float avg) { this._avg=avg; }
+
+	/**
+	 * 
+	 * @return
+	 */
+	public float getRegionalPaScoreAvgFDR(){ return this._regPaScoreFDR; }
+	
+	/**
+	 * 
+	 * @param rpaScoreFDR
+	 */
+	public void setRegionalPaScoreAvgFDR(float rpaScoreFDR){ this._regPaScoreFDR = rpaScoreFDR; }
+	/**
+	 * 
+	 * @return
+	 */
+	public float getPaScoreAvgFDR(){	return this._paScoreFDR; }
+	/**
+	 * 
+	 * @param paScoreFDR
+	 */
+	public void setPaScoreAvgFDR(float paScoreFDR){ this._paScoreFDR = paScoreFDR; }
 	
 }

@@ -49,20 +49,31 @@ public class PeakAnalysisScore {
 			float corner = 0;
 			float center = this._ipRaw.getf(x, y);
 			float squareCenterAvg = process3By3SquareAvg(x,y);
-			int nbCorner = 0;
+
 			if(x >= 5 && y >= 5 && x < this._imgRaw.getWidth()-5 && y < this._imgRaw.getHeight()-5){
 				corner += process3By3SquareAvg(x-4,y-4); 
 				corner += process3By3SquareAvg(x-4,y+4);
 				corner += process3By3SquareAvg(x+4,y-4);
 				corner += process3By3SquareAvg(x+4,y+4);
-					
-				nbCorner = 4;
-			}
-		
-			if(nbCorner > 0){
-				corner = corner/nbCorner;
+				corner = corner/4;
 				loop.setPaScoreAvg(center/corner);
 				loop.setRegionalPaScoreAvg(squareCenterAvg/corner);	
+				int xFDR = x+10;
+				int yFDR = y+10;
+				if(xFDR > this._imgRaw.getWidth()-5 && yFDR > this._imgRaw.getHeight()-5){
+					xFDR = x-10;
+					yFDR = y-10;
+				}
+				float cornerFDR = 0;
+				float centerFDR = this._ipRaw.getf(xFDR,yFDR);
+				float squareCenterAvgFDR = process3By3SquareAvg(xFDR,yFDR);	
+				cornerFDR += process3By3SquareAvg(xFDR-4,yFDR-4); 
+				cornerFDR += process3By3SquareAvg(xFDR-4,yFDR+4);
+				cornerFDR += process3By3SquareAvg(xFDR+4,yFDR-4);
+				cornerFDR += process3By3SquareAvg(xFDR+4,yFDR+4);
+				cornerFDR = cornerFDR/4;
+				loop.setPaScoreAvgFDR(centerFDR/cornerFDR);
+				loop.setRegionalPaScoreAvgFDR(squareCenterAvgFDR/cornerFDR);
 			}
 		}
 	}

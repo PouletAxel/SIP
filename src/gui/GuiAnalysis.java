@@ -132,6 +132,8 @@ public class GuiAnalysis extends JFrame{
     private JCheckBox _checkbox5 = new JCheckBox("resolution*5",false);
    
     private JCheckBox _checkboxDeleteTif = new JCheckBox("Delete tif files",true);
+    /** */
+    private JCheckBox _checkboxFDR = new JCheckBox("Filter on FDR",true);
    
 	/**
 	 * 
@@ -631,6 +633,14 @@ public class GuiAnalysis extends JFrame{
 						GridBagConstraints.NONE,new Insets(345, 20, 0, 0), 0, 0
 				)
 		);
+		
+		_checkboxFDR.setFont(new java.awt.Font("arial",2,12));
+		_container.add(_checkboxFDR,new GridBagConstraints
+				(
+						0, 2, 0, 0,  0.0, 0.0, GridBagConstraints.NORTHWEST,
+						GridBagConstraints.NONE,new Insets(345, 300, 0, 0), 0, 0
+				)
+		);
 	   	
 		_jbStart.setPreferredSize(new java.awt.Dimension(120, 21));
 	   	_container.add(_jbStart, new GridBagConstraints
@@ -831,6 +841,10 @@ public class GuiAnalysis extends JFrame{
 	}
 	public boolean isDeletTif(){
 		return _checkboxDeleteTif.isSelected();
+	}
+	
+	public boolean isFdrFiltering(){
+		return _checkboxFDR.isSelected();
 	}
 	/**
 	 * 
