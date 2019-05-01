@@ -171,7 +171,7 @@ public class DumpData {
 	public boolean getNormVector(String chr,String output) throws IOException, InterruptedException{
 		int exitValue=1;
 		Runtime runtime = Runtime.getRuntime();
-		String cmd = "java"+" -jar "+this._juiceBoxTools+" dump norm "+this._normalisation+" "+this._hicFile+" "+chr+" BP "+this._resolution+" "+output;
+		String cmd = "java"+" -jar "+this._juiceBoxTools+" dump norm VC "+this._hicFile+" "+chr+" BP "+this._resolution+" "+output;
 		this._log = this._log+"\n"+output+"\t"+cmd;
 		Process process = runtime.exec(cmd);
 		new ReturnFlux(process.getInputStream()).start();
