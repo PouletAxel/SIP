@@ -32,7 +32,7 @@ import utils.HicFileProcessing;
  * -min: Minimum filter: removed the isolated high value (default 2 for hic and 1 hichip)
  * -sat: % of saturated pixel: enhance the contrast in the image (default 0.01 for hic and 0.5 for hichip)
  * -t: Threshold for loops detection (default 2800 for hic and 1 for hichip)
- * -nbZero: number of zero: number of pixel equal at zero allowed in the 24 neighborhood of the detected maxima (default parameter 6 for hic and 25 for hichip)
+ * -nbZero: number of zeros: number of pixels equal at zero that are allowed in the 24 pixels surrounding the detected maxima (default parameter 6 for hic and 25 for hichip)
  * -norm: <NONE/VC/VC_SQRT/KR> only for hic option (default KR)
  * -del: true or false, delete tif files used for loops detection (default true)
  * -h, --help print help.
@@ -87,7 +87,8 @@ public class Hic_main {
 	private static String _chrSizeFile;
 	/**boolean is true supress all the image created*/
 	private static boolean _delImages = true;
-	private static boolean _fdr = true;
+	private static double _fdr = .1;
+	//private static boolean _fdr = true;
 	/**boolean is true supress all the image created*/
 	private static boolean _gui = false;
 	/**Strin for the documentation*/
@@ -95,13 +96,13 @@ public class Hic_main {
 			+"Usage:\n"
 			+"\thic <hicFile> <chrSizeFile> <Output> <juicerToolsPath> [options]\n"
 			+"\tprocessed <Directory with processed data> <chrSizeFile> <Output> [options]\n"
-			+"chrSizeFile: path to the chr file size, with the same name of the chr than in the hic file\n"
+			+"chrSizeFile: path to the chr size file, with the same name of the chr as in the hic file\n"
 			+"-res: resolution in bases (default 5000 bases)\n"
-			+"-mat: matrix size in bins (default 2000 bins)\n"
-			+" -d: diagonal size in bins, remove the maxima found at this size (eg: a size of 2 at 5000 bases resolution "
+			+"-mat: matrix size to use for each chunk of the chromosome (default 2000 bins)\n"
+			+"-d: diagonal size in bins, remove the maxima found at this size (eg: a size of 2 at 5000 bases resolution "
 			+ "removed all maxima detected at a distance inferior or equal to 10kb) (default 6 bins).\n"
-			+"-g: Gaussian filter: smooth the image to reduce the noise (default 2 for hic and 1 for hichip)\n"
-			+"-hichip: true or false (default false), use true if you are analysing HiChIP data\n"
+			+"-g: Gaussian filter: smoothing factor reduce noise during primary maxima detection (default 2 for hic and 1 for hichip)\n"
+			+"-hichip: true fo HiChIP or false for Hi-C (default false)\n"
 			+"-factor: Multiple resolutions can be specified using: "
 			+ "\t-factor 1: run only for the input res\n"
 			+ "\t-factor 2: res and res*2\n"
@@ -111,10 +112,10 @@ public class Hic_main {
 			+"-min: Minimum filter: removed the isolated high value (default 2 for hic and 1 hichip)\n"
 			+"-sat: % of staturated pixel: enhance the contrast in the image (default 0.01 for hic and 0.5 for hichip)\n"
 			+"-t Threshold for loops detection (default 2800 for hic and 1 for hichip)\n"
-			+ "-nbZero: number of zero: number of pixel equal at zero allowed in the 24 neighboorhood of the detected maxima (default parameter 6 for hic and 25 for hichip)\n"
+			+ "-nbZero: number of zeros: number of pixels equal to zero that are allowed in the 24 pixels sourrounding the detected maxima (default parameter 6 for hic and 25 for hichip)\n"
 			+ "-norm: <NONE/VC/VC_SQRT/KR> only for hic option (default KR)\n"
 			+ "-del: true or false, delete tif files used for loop detection (default true)\n"
-			+ "-fdr: true or false, filter on the fdr or not (default true)\n"
+			+ "-fdr: FDR value for filtering (default 0.1)\n"
 			+"-h, --help print help\n");
 	/**
 	 * Main function to run all the process, can be run with gui or in command line.
@@ -177,7 +178,7 @@ public class Hic_main {
 				_nbZero = gui.getNbZero();
 				_saturatedPixel = gui.getEnhanceSignal();
 				_thresholdMax = gui.getNoiseTolerance();
-				_fdr = gui.isFdrFiltering();
+				_fdr = gui.getFDR();
 				if(gui.getFactorChoice() == 1){
 					_factor = new ArrayList<Integer>();
 					_factor.add(1);
@@ -212,19 +213,19 @@ public class Hic_main {
 		if(_isHic){
 			System.out.println("hic mode:\ninput: "+_input+"\noutput: "+_output+"\njuiceBox: "+_juiceBoxTools+"\nnorm: "+ _juiceBoXNormalisation+"\ngauss: "+_gauss+"\n"
 					+ "min: "+_min+"\nmax: "+_max+"\nmatrix size: "+_matrixSize+"\ndiag size: "+_diagSize+"\nresolution: "+_resolution+"\nsaturated pixel: "+_saturatedPixel
-					+"\nthreshold: "+_thresholdMax+"\n number of zero:"+_nbZero+"\n factor "+ _factOption+"\n");
+					+"\nthreshold: "+_thresholdMax+"\n number of zero:"+_nbZero+"\n factor "+ _factOption+"\n fdr "+_fdr+"\n");
 			HicFileProcessing hfp =  new HicFileProcessing(_input, wga, _chrSize, _juiceBoxTools, _juiceBoXNormalisation);
 				writer.write("java -jar sip.jar hic "+_input+" "+_chrSizeFile+" "+_output+" "+_juiceBoxTools+" -norm "+ _juiceBoXNormalisation+" -g "+_gauss+
 						" -min "+_min+" -max "+_max+" -mat "+_matrixSize+" -d "+_diagSize+" -res "+_resolution+" -sat "+_saturatedPixel+" -t "+_thresholdMax+" -nbZero "
-						+_nbZero+" -factor "+ _factOption+" -del "+_delImages+"\n");
+						+_nbZero+" -factor "+ _factOption+ " -fdr "+_fdr+" -del "+_delImages+"\n");
 			hfp.run(_gui);
 		}else if (_isProcessed){
 			System.out.println("processed mode:\ninput: "+_input+"\noutput: "+_output+"\njuiceBox: "+_juiceBoxTools+"\nnorm: "+ _juiceBoXNormalisation+"\ngauss: "+_gauss
 					+"\nmin: "+_min+"\nmax: "+_max+"\nmatrix size: "+_matrixSize+"\ndiag size: "+_diagSize+"\nresolution: "+_resolution+"\nsaturated pixel: "+_saturatedPixel
 					+"\nthreshold: "+_thresholdMax+"\nisHic: "+_isHic+"\nisProcessed: "+_isProcessed+"\n number of zero:"
-					+_nbZero+"\n factor "+ _factOption+"\n");
+					+_nbZero+"\n factor "+ _factOption+"\n fdr "+_fdr+"\n");
 				writer.write("java -jar sip.jar processed "+_input+" "+_chrSizeFile+" "+_output+" "+_gauss+" -mat "+_matrixSize+" -d "+_diagSize+" -res "+_resolution
-						+" -t "+_thresholdMax+" -min "+_min+" -max "+_max+" -sat "+_saturatedPixel+" -nbZero "+_nbZero+" -factor "+ _factOption+" -del "+_delImages+"\n");
+						+" -t "+_thresholdMax+" -min "+_min+" -max "+_max+" -sat "+_saturatedPixel+" -nbZero "+_nbZero+" -factor "+ _factOption+" -fdr "+_fdr+" -del "+_delImages+"\n");
 				if(_gui) wga.runGUI(_input);
 				else wga.run(_input);
 		}
@@ -283,6 +284,7 @@ public class Hic_main {
 			boolean  min = false;
 			boolean  max = false;
 			boolean sat =false;
+			boolean fdr =false;
 			for(int i = index; i < args.length;i+=2){
 				if(args[i].equals("-res")){
 					try{_resolution =Integer.parseInt(args[i+1]);}
@@ -319,7 +321,10 @@ public class Hic_main {
 					gauss = true;
 					try{_gauss =Double.parseDouble(args[i+1]);}
 					catch(NumberFormatException e){ returnError("-g",args[i+1],"double");}
-				
+				}else if(args[i].equals("-fdr")){
+					fdr = true;
+					try{_fdr =Double.parseDouble(args[i+1]);}
+					catch(NumberFormatException e){ returnError("-fdr",args[i+1],"double");}				
 				}else if(args[i].equals("-max")){
 					max = true;
 					try{_max = Double.parseDouble(args[i+1]);}
@@ -360,16 +365,19 @@ public class Hic_main {
 						System.out.println(_doc);
 						System.exit(0);
 					}
-				}else if(args[i].equals("-fdr")){
-					if(args[i+1].equals("true") || args[i+1].equals("T") || args[i+1].equals("TRUE"))
-						_fdr = true;
-					else if(args[i+1].equals("false") || args[i+1].equals("F") || args[i+1].equals("False"))
-						_fdr = false;
-					else{
-						System.out.println("-fdr = "+args[i+1]+", not defined\n");
-						System.out.println(_doc);
-						System.exit(0);
-					}
+				//}else if(args[i].equals("-fdr")){
+				//	fdr = true;
+				//	try {_fdr = Double.parseDouble(args[i+1]);}
+				//	catch(NumberFormatException e) { returnError("-fdr",args[i+1]; "double");}
+				//	//if(args[i+1].equals("true") || args[i+1].equals("T") || args[i+1].equals("TRUE"))
+				//	//	_fdr = true;
+				//	//else if(args[i+1].equals("false") || args[i+1].equals("F") || args[i+1].equals("False"))
+				//	//	_fdr = false;
+				//	//else{
+				//	//	System.out.println("-fdr = "+args[i+1]+", not defined\n");
+				//	//	System.out.println(_doc);
+				//	//	System.exit(0);
+				//	//}
 				}else if(args[i].equals("-hichip")){
 					if(args[i+1].equals("true") || args[i+1].equals("T") || args[i+1].equals("TRUE"))
 						_isHiChip = true;
@@ -393,7 +401,8 @@ public class Hic_main {
 				if(max == false) _max = 1;
 				if(min == false) _min = 1;
 				if(tresh == false) _thresholdMax = 1;
-				if(nbZero == false ) _nbZero = 25;			
+				if(nbZero == false ) _nbZero = 25;
+				if(fdr == false ) _fdr = .1;
 			}
 		}
 	}

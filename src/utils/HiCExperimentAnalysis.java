@@ -1,6 +1,7 @@
 package utils;
 
 import java.io.BufferedReader;
+import java.util.Collections;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileReader;
@@ -9,6 +10,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 
 import gui.Progress;
@@ -71,7 +73,8 @@ public class HiCExperimentAnalysis {
 	/**	boolean if true hichip data if false hic */
 	private boolean m_hichip = false;
 	/** */
-	private boolean m_FDRFilter = true;
+	private double _fdr;
+	//private boolean m_FDRFilter = true;
 	/**	 image background value*/
 	private float _backgroudValue = (float) 0.25;
 	
@@ -93,7 +96,7 @@ public class HiCExperimentAnalysis {
 	 
 	public HiCExperimentAnalysis(String output, HashMap<String, Integer> chrSize, double gauss, double min,
 			double max, int resolution, double saturatedPixel, int thresholdMax,
-			int diagSize, int matrixSize, int nbZero,ArrayList<Integer> listFactor, boolean fdr) {
+			int diagSize, int matrixSize, int nbZero,ArrayList<Integer> listFactor, double fdr) {
 		this._output = output;
 		this._input = output;
 		this._chrSize = chrSize;
@@ -108,7 +111,7 @@ public class HiCExperimentAnalysis {
 		this._step = matrixSize/2;
 		this._nbZero = nbZero;
 		this._listFactor = listFactor;
-		this.m_FDRFilter = fdr;
+		this._fdr = fdr;
 	}
 
 	/**
@@ -240,12 +243,39 @@ public class HiCExperimentAnalysis {
 	 * @throws IOException
 	 */
 	private void saveFile(String pathFile, boolean first) throws IOException{
+		Set<String> key2 = m_data.keySet();
+		Iterator<String> it2 = key2.iterator();
+		List<Float> myFDRvals = new ArrayList<Float>();
+		while (it2.hasNext()) {
+			String FDRcalc = it2.next();
+			Loop FDRloopy = m_data.get(FDRcalc);
+					
+			double dubFDR = FDRloopy.getPaScoreAvgFDR();
+			//System.out.println("FDR "+dubFDR+"\n");
+			
+			float FDRval = (float)dubFDR;
+			if(FDRval > 0) {
+				myFDRvals.add(FDRval);
+			}
+			else
+			{
+				
+			}
+			
+			
+		}
+		Collections.sort(myFDRvals);
+		Double topFDRs = myFDRvals.size()*this._fdr;
+		Integer topFDRposition = topFDRs.intValue();
+		List<Float> topFDRlist = new ArrayList<Float>(myFDRvals.subList(myFDRvals.size() -topFDRposition,  myFDRvals.size() -(topFDRposition-1)));
+		float FDRcutoff = topFDRlist.get(0);
+		System.out.println("FDR filtering value at "+this._fdr+" FDR is "+FDRcutoff+"\n");
 		BufferedWriter writer;
 		if(first)
 			writer = new BufferedWriter(new FileWriter(new File(pathFile), true));
 		else{
 			writer = new BufferedWriter(new FileWriter(new File(pathFile)));
-			writer.write("chromosome1\tx1\tx2\tchromosome2\ty1\ty2\tcolor\tAPScoreAvg\tRegAPScoreAvg\tAvg_diffMaxNeihgboor_1\tAvg_diffMaxNeihgboor_2\tavg\tstd\tvalue\tApScoreFDR\tRegAPscoreFDR\n");
+			writer.write("chromosome1\tx1\tx2\tchromosome2\ty1\ty2\tcolor\tAPScoreAvg\tRegAPScoreAvg\tAvg_diffMaxNeihgboor_1\tAvg_diffMaxNeihgboor_2\tavg\tstd\tvalue\n");
 		}
 		Set<String> key = m_data.keySet();
 		Iterator<String> it = key.iterator();
@@ -253,21 +283,16 @@ public class HiCExperimentAnalysis {
 			String name = it.next();
 			Loop loop = m_data.get(name);
 			ArrayList<Integer> coord = loop.getCoordinates();
-			if(this.m_FDRFilter){
-				if(loop.getPaScoreAvg()> loop.getPaScoreAvgFDR() && loop.getPaScoreAvg() > loop.getPaScoreAvgFDR()){
-					writer.write(loop.getChr()+"\t"+coord.get(2)+"\t"+coord.get(3)+"\t"+loop.getChr()+"\t"+coord.get(0)+"\t"+coord.get(1)+"\t0,0,0"
-							+"\t"+loop.getPaScoreAvg()+"\t"+loop.getRegionalPaScoreAvg()+"\t"
-							+loop.getNeigbhoord1()+"\t"+loop.getNeigbhoord2()+"\t"+loop.getAvg()+"\t"
-							+loop.getStd()+"\t"+loop.getValue()+loop.getPaScoreAvgFDR()+"\t"
-							+loop.getRegionalPaScoreAvgFDR()+"\n");
-				}
-			}
-			else{
+			//if(this.m_FDRFilter){
+			if(loop.getPaScoreAvg()> 1.2 && loop.getPaScoreAvg() > 1 && loop.getPaScoreAvg() > FDRcutoff){
 				writer.write(loop.getChr()+"\t"+coord.get(2)+"\t"+coord.get(3)+"\t"+loop.getChr()+"\t"+coord.get(0)+"\t"+coord.get(1)+"\t0,0,0"
 						+"\t"+loop.getPaScoreAvg()+"\t"+loop.getRegionalPaScoreAvg()+"\t"
 						+loop.getNeigbhoord1()+"\t"+loop.getNeigbhoord2()+"\t"+loop.getAvg()+"\t"
-						+loop.getStd()+"\t"+loop.getValue()+loop.getPaScoreAvgFDR()+"\t"
-						+loop.getRegionalPaScoreAvgFDR()+"\n");
+						+loop.getStd()+"\t"+loop.getValue()+"\n");
+				
+			}
+			else{
+			
 			}
 		}
 		writer.close();

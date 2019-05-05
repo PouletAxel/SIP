@@ -38,7 +38,7 @@ public class GuiAnalysis extends JFrame{
 	/** */
 	private JButton _jbWorkDir = new JButton("Output directory");
 	/** */
-	private JButton _jbRawData = new JButton("Raw data");
+	private JButton _jbRawData = new JButton("Data (.hic or SIP)");
 	/** */
 	private JButton _jbChrSize = new JButton("Chr size file");
 	/** */
@@ -122,6 +122,8 @@ public class GuiAnalysis extends JFrame{
     /** */
     private JLabel _jlNT;
     /** */
+    private JLabel _jlFDR;
+    /** */
     private boolean _start = false;
  
    
@@ -133,8 +135,8 @@ public class GuiAnalysis extends JFrame{
    
     private JCheckBox _checkboxDeleteTif = new JCheckBox("Delete tif files",true);
     /** */
-    private JCheckBox _checkboxFDR = new JCheckBox("Filter on FDR",true);
-   
+    //private JCheckBox _checkboxFDR = new JCheckBox("Filter on FDR",true);
+    private JFormattedTextField _fdr =  new JFormattedTextField(Number.class);
 	/**
 	 * 
 	 * @param args
@@ -250,7 +252,7 @@ public class GuiAnalysis extends JFrame{
 		);
 		
 		_jlNorm = new JLabel();
-		_jlNorm.setText("Normalisation to dump data:");
+		_jlNorm.setText("Normalization scheme (prefers KR):");
 		_jlNorm.setFont(new java.awt.Font("arial",2,11));
 	   	_container.add(_jlNorm, new GridBagConstraints
 	   			(
@@ -296,7 +298,7 @@ public class GuiAnalysis extends JFrame{
 		_jrbKR.setSelected(true);
 		
 	   	_jlWorkDir = new JLabel();
-		_jlWorkDir.setText("Work directory and data directory choice : ");
+		_jlWorkDir.setText("Data and Output directories : ");
 		_jlWorkDir.setFont(new java.awt.Font("arial",1,12));
 	   	_container.add( _jlWorkDir, new GridBagConstraints
 	   		(
@@ -311,10 +313,10 @@ public class GuiAnalysis extends JFrame{
 	   	jTextPane.setBackground(Color.LIGHT_GRAY);
 	   	jTextPane.setText(
 	   			"<html> <font face=arial><font size=-1><center> The data directory must contain:"
+	   			
+	   			+ "<br/>.hic file"
 	   			+ "<strong><br/>OR</strong>"
-	   			+ "<br/>hic file"
-	   			+ "<strong><br/>OR</strong>"
-	   			+ "<br/>data processed by SIP hic" );
+	   			+ "<br/>data processed by SIP" );
 	   	jTextPane.setEditable(false);
 	   	
 
@@ -438,7 +440,25 @@ public class GuiAnalysis extends JFrame{
 			)
 		);
 		
+		_jlFDR = new JLabel();
+		_jlFDR.setText("FDR:");
+		_jlFDR.setFont(new java.awt.Font("arial",2,11));
+		_container.add( _jlFDR, new GridBagConstraints
+			(
+				0, 2, 0, 0, 0.0, 0.0, GridBagConstraints.NORTHWEST,
+				GridBagConstraints.NONE, new Insets(345, 250, 0, 0), 0, 0
+			)
+		);
 		
+		_fdr.setText("0.1");
+		_fdr.setPreferredSize(new java.awt.Dimension(60, 21));
+		_fdr.setFont(new java.awt.Font("arial",2,11));
+		_container.add( _fdr, new GridBagConstraints
+			(
+				0, 2, 0, 0, 0.0, 0.0, GridBagConstraints.NORTHWEST,
+				GridBagConstraints.NONE, new Insets(345, 300, 0, 0), 0, 0
+			)
+		);		
 		_imgParam = new JLabel();
 		_imgParam.setText("<html> Multi resolution loop calling:<br><font size=-2>(default: resolution, resolution*2.</html> ");
 		_container.add(_imgParam,new GridBagConstraints
@@ -464,7 +484,7 @@ public class GuiAnalysis extends JFrame{
 			
 		
 		_jlInputFileType = new JLabel();
-	   	_jlInputFileType.setText("Chromosome size file (same chr names than in .hic file):");
+	   	_jlInputFileType.setText("Chromosome size file (same chr names as in .hic file):");
 	   	_jlInputFileType.setFont(new java.awt.Font("arial",1,12));
 	   	_container.add(_jlInputFileType, new GridBagConstraints
 	   			(
@@ -607,7 +627,7 @@ public class GuiAnalysis extends JFrame{
 			);
 	   	   	
 		this._jlNbZero = new JLabel();
-		_jlNbZero.setText("Number of zero allowed in the loop 24 neighboorhoods:");
+		_jlNbZero.setText("Number of zeros allowed in the 24 surrounding pixels:");
 		_jlNbZero.setFont(new java.awt.Font("arial",2,11));
 		_container.add( _jlNbZero, new GridBagConstraints
 					(
@@ -634,13 +654,13 @@ public class GuiAnalysis extends JFrame{
 				)
 		);
 		
-		_checkboxFDR.setFont(new java.awt.Font("arial",2,12));
-		_container.add(_checkboxFDR,new GridBagConstraints
-				(
-						0, 2, 0, 0,  0.0, 0.0, GridBagConstraints.NORTHWEST,
-						GridBagConstraints.NONE,new Insets(345, 300, 0, 0), 0, 0
-				)
-		);
+		//_FDRnumber.setFont(new java.awt.Font("arial",2,12));
+		//_container.add(_checkboxFDR,new GridBagConstraints
+		//		(
+		//				0, 2, 0, 0,  0.0, 0.0, GridBagConstraints.NORTHWEST,
+		//				GridBagConstraints.NONE,new Insets(345, 300, 0, 0), 0, 0
+		//		)
+		//);
 	   	
 		_jbStart.setPreferredSize(new java.awt.Dimension(120, 21));
 	   	_container.add(_jbStart, new GridBagConstraints
@@ -843,8 +863,12 @@ public class GuiAnalysis extends JFrame{
 		return _checkboxDeleteTif.isSelected();
 	}
 	
-	public boolean isFdrFiltering(){
-		return _checkboxFDR.isSelected();
+	
+	public double getFDR(){
+		String x = _fdr.getText();
+		return Double.parseDouble(x.replaceAll(",", "."));
+		//public boolean isFdrFiltering(){
+	//	return _checkboxFDR.isSelected();
 	}
 	/**
 	 * 
