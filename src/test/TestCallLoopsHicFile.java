@@ -63,7 +63,7 @@ public class TestCallLoopsHicFile{
 			File file = new File(output);
 			if (file.exists()==false){file.mkdir();}
 			
-			HiCExperimentAnalysis wga = new HiCExperimentAnalysis(output, chrsize, gauss, min, max, resolution, saturatedPixel, thresholdMax, diagSize, matrixSize, nbZero,factor,true);
+			HiCExperimentAnalysis wga = new HiCExperimentAnalysis(output, chrsize, gauss, min, max, resolution, saturatedPixel, thresholdMax, diagSize, matrixSize, nbZero,factor,0.01);
 			HicFileProcessing hfp =  new HicFileProcessing(input, wga, chrsize, juiceBoxTools, juiceBoXNormalisation);
 			wga.setIsHichip(true);
 			

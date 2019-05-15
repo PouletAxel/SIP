@@ -63,18 +63,17 @@ public class HiCExperimentAnalysis {
 	/** List of file containing the path of the image*/
 	public ArrayList<File> _tifList = new ArrayList<File>();
 	/** loop coolection*/
-	private static HashMap<String,Loop> m_data = new HashMap<String,Loop>();
+	private static HashMap<String,Loop> _data = new HashMap<String,Loop>();
 	/** raw or line with biais value in the hic matrix*/
 	private static HashMap<Integer,String> _normVector = new HashMap<Integer,String>();
 	/** list of the image resolution to find loop*/
 	private ArrayList<Integer> _listFactor = new ArrayList<Integer>();
 	/**	 struturing element for the MM method used (MorpholibJ)*/
-	private Strel m_strel = Strel.Shape.SQUARE.fromRadius(40);
+	private Strel _strel = Strel.Shape.SQUARE.fromRadius(40);
 	/**	boolean if true hichip data if false hic */
-	private boolean m_hichip = false;
+	private boolean _hichip = false;
 	/** */
 	private double _fdr;
-	//private boolean m_FDRFilter = true;
 	/**	 image background value*/
 	private float _backgroudValue = (float) 0.25;
 	
@@ -243,56 +242,70 @@ public class HiCExperimentAnalysis {
 	 * @throws IOException
 	 */
 	private void saveFile(String pathFile, boolean first) throws IOException{
-		Set<String> key2 = m_data.keySet();
+		Set<String> key2 = _data.keySet();
 		Iterator<String> it2 = key2.iterator();
 		List<Float> myFDRvals = new ArrayList<Float>();
+		
 		while (it2.hasNext()) {
 			String FDRcalc = it2.next();
-			Loop FDRloopy = m_data.get(FDRcalc);
+			Loop FDRloopy = _data.get(FDRcalc);
 					
-			double dubFDR = FDRloopy.getPaScoreAvgFDR();
-			//System.out.println("FDR "+dubFDR+"\n");
+			float dubFDR = FDRloopy.getPaScoreAvgFDR();
+			float dubFDR2 = FDRloopy.getPaScoreAvgFDR2();
+			float dubFDR3 = FDRloopy.getPaScoreAvgFDR3();
 			
-			float FDRval = (float)dubFDR;
-			if(FDRval > 0) {
-				myFDRvals.add(FDRval);
-			}
-			else
-			{
-				
-			}
-			
-			
+			if(dubFDR > 0)  myFDRvals.add(dubFDR);
+			if(dubFDR2 > 0) myFDRvals.add(dubFDR2);
+			if(dubFDR3 > 0) myFDRvals.add(dubFDR3);
 		}
+		Set<String> key3 = _data.keySet();
+		Iterator<String> it3 = key3.iterator();
+		List<Float> myRFDRvals = new ArrayList<Float>();
+		
+		while (it3.hasNext()) {
+			String RFDRcalc = it3.next();
+			Loop RFDRloopy = _data.get(RFDRcalc);
+					
+			float dubRFDR = RFDRloopy.getRegionalPaScoreAvgFDR();
+			float dubRFDR2 = RFDRloopy.getRegionalPaScoreAvgFDR2();
+			float dubRFDR3 = RFDRloopy.getRegionalPaScoreAvgFDR3();
+			
+			if(dubRFDR > 0)	 myRFDRvals.add(dubRFDR);
+			if(dubRFDR2 > 0) myRFDRvals.add(dubRFDR2);
+			if(dubRFDR3 > 0) myRFDRvals.add(dubRFDR3);
+		}
+		
 		Collections.sort(myFDRvals);
-		Double topFDRs = myFDRvals.size()*this._fdr;
-		Integer topFDRposition = topFDRs.intValue();
-		List<Float> topFDRlist = new ArrayList<Float>(myFDRvals.subList(myFDRvals.size() -topFDRposition,  myFDRvals.size() -(topFDRposition-1)));
+		int topFDRs = (int)(myFDRvals.size()*this._fdr);
+		//Integer topFDRposition = topFDRs.intValue();
+		List<Float> topFDRlist = new ArrayList<Float>(myFDRvals.subList(myFDRvals.size() -topFDRs,  myFDRvals.size() -(topFDRs-1)));
 		float FDRcutoff = topFDRlist.get(0);
-		System.out.println("FDR filtering value at "+this._fdr+" FDR is "+FDRcutoff+"\n");
+		Collections.sort(myRFDRvals);
+		int topRFDRs = (int)(myRFDRvals.size()*this._fdr);
+		//Integer topRFDRposition = topRFDRs.intValue();
+		List<Float> topRFDRlist = new ArrayList<Float>(myRFDRvals.subList(myRFDRvals.size() -topRFDRs,  myRFDRvals.size() -(topRFDRs-1)));
+		float RFDRcutoff = topRFDRlist.get(0);
+
+		System.out.println("Filtering value at "+this._fdr+" FDR is "+FDRcutoff+" APscore and "+RFDRcutoff+" RegionalAPscore\n");
 		BufferedWriter writer;
 		if(first)
 			writer = new BufferedWriter(new FileWriter(new File(pathFile), true));
 		else{
 			writer = new BufferedWriter(new FileWriter(new File(pathFile)));
-			writer.write("chromosome1\tx1\tx2\tchromosome2\ty1\ty2\tcolor\tAPScoreAvg\tRegAPScoreAvg\tAvg_diffMaxNeihgboor_1\tAvg_diffMaxNeihgboor_2\tavg\tstd\tvalue\n");
+			writer.write("chromosome1\tx1\tx2\tchromosome2\ty1\ty2\tcolor\tAPScoreAvg\tProbabilityofEnrichment\tRegAPScoreAvg\tAvg_diffMaxNeihgboor_1\tAvg_diffMaxNeihgboor_2\tavg\tstd\tvalue\n");
 		}
-		Set<String> key = m_data.keySet();
+		Set<String> key = _data.keySet();
 		Iterator<String> it = key.iterator();
 		while (it.hasNext()){
 			String name = it.next();
-			Loop loop = m_data.get(name);
+			Loop loop = _data.get(name);
 			ArrayList<Integer> coord = loop.getCoordinates();
-			//if(this.m_FDRFilter){
-			if(loop.getPaScoreAvg()> 1.2 && loop.getPaScoreAvg() > 1 && loop.getPaScoreAvg() > FDRcutoff){
+			if(loop.getPaScoreAvg()> 1.2 && loop.getPaScoreAvg() > 1 && loop.getPaScoreAvg() > FDRcutoff && loop.getRegionalPaScoreAvg() > RFDRcutoff && loop.getPaScoreAvgdev() > .9){
 				writer.write(loop.getChr()+"\t"+coord.get(2)+"\t"+coord.get(3)+"\t"+loop.getChr()+"\t"+coord.get(0)+"\t"+coord.get(1)+"\t0,0,0"
-						+"\t"+loop.getPaScoreAvg()+"\t"+loop.getRegionalPaScoreAvg()+"\t"
+						+"\t"+loop.getPaScoreAvg()+"\t"+loop.getPaScoreAvgdev()+"\t"+loop.getRegionalPaScoreAvg()+"\t"
 						+loop.getNeigbhoord1()+"\t"+loop.getNeigbhoord2()+"\t"+loop.getAvg()+"\t"
 						+loop.getStd()+"\t"+loop.getValue()+"\n");
 				
-			}
-			else{
-			
 			}
 		}
 		writer.close();
@@ -351,7 +364,7 @@ public class HiCExperimentAnalysis {
 				if(pixelPercent < 7) 
 					thresh =  _thresholdMaxima/5;
 				FindMaxima findLoop = new FindMaxima(imgNorm, imgFilter, chr, thresh, this._diagSize, this._resolution);
-				HashMap<String,Loop> temp = findLoop.findloop(this.m_hichip,numImage, this._nbZero,imgRaw, this._backgroudValue,1);
+				HashMap<String,Loop> temp = findLoop.findloop(this._hichip,numImage, this._nbZero,imgRaw, this._backgroudValue,1);
 				PeakAnalysisScore pas = new PeakAnalysisScore(imgNorm,temp);
 				pas.computeScore();
 				
@@ -378,7 +391,7 @@ public class HiCExperimentAnalysis {
 							diag = 2 ;
 						thresh = this._thresholdMaxima/100;
 						findLoop = new FindMaxima(imgRawBiggerResNorm, imgFilterBiggerRes, chr,thresh, diag, res);
-						HashMap<String,Loop>tempBiggerRes = findLoop.findloop(this.m_hichip,numImage,this._nbZero,imgRawBiggerRes,this._backgroudValue,this._listFactor.get(j));
+						HashMap<String,Loop>tempBiggerRes = findLoop.findloop(this._hichip,numImage,this._nbZero,imgRawBiggerRes,this._backgroudValue,this._listFactor.get(j));
 						pas = new PeakAnalysisScore(imgRawBiggerResNorm,tempBiggerRes);
 						pas.computeScore();
 						temp.putAll(tempBiggerRes);
@@ -389,8 +402,8 @@ public class HiCExperimentAnalysis {
 				hLoop = coord.imageToGenomeCoordinate(temp, numImage);
 			}
 		}
-		m_data = removedLoopCloseToWhiteStrip(hLoop);
-		System.out.println("chr "+ chr +"\t"+m_data.size());
+		_data = removedLoopCloseToWhiteStrip(hLoop);
+		System.out.println("chr "+ chr +"\t"+_data.size());
 	}
 	
 	/**
@@ -555,7 +568,7 @@ public class HiCExperimentAnalysis {
 	private void imageProcessing(ImagePlus imgFilter, String fileName, ProcessMethod pm){ 
 		pm.enhanceContrast(this._saturatedPixel);
 		pm.runGaussian();
-		imgFilter.setProcessor(Morphology.whiteTopHat(imgFilter.getProcessor(), this.m_strel));
+		imgFilter.setProcessor(Morphology.whiteTopHat(imgFilter.getProcessor(), this._strel));
 		pm.setImg(imgFilter);
 		pm.runGaussian();
 		pm.runMin(this._min);
@@ -758,5 +771,5 @@ public class HiCExperimentAnalysis {
 	 * true rune with hichip parameter 
 	 * @param hichip boolean
 	 */
-	public void setIsHichip(boolean hichip){	this.m_hichip = hichip;}
+	public void setIsHichip(boolean hichip){	this._hichip = hichip;}
 }

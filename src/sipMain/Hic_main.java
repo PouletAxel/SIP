@@ -41,7 +41,7 @@ import utils.HicFileProcessing;
  * java -jar SIP_HiC.jar processed inputDirectory pathToChromosome.size OutputDir .... paramaters
  * java -jar SIP_HiC.jar hic inputDirectory pathToChromosome.size OutputDir juicer_tools.jar
  * 
- * @author Axel Poulet
+ * @author Axel Poulet 
  *
  */
 public class Hic_main {
@@ -62,7 +62,7 @@ public class Hic_main {
 	/**Matrix size: size in bins of the final image and defined the zone of interest in the hic map*/
 	private static int _matrixSize = 2000;
 	/**Distance to the diagonal where the loops are ignored*/
-	private static int _diagSize = 5;
+	private static int _diagSize = 6;
 	/**Resolution of the matric in bases*/
 	private static int _resolution = 5000;
 	/** % of saturated pixel in the image, allow the enhancement of the contrast in the image*/
@@ -76,7 +76,7 @@ public class Hic_main {
 	/** factor(s) used to nalyse the matrix*/
 	private static ArrayList<Integer> _factor = new ArrayList<Integer>();
 	/** String factor option*/
-	private static String _factOption = "2";
+	private static String _factOption = "1";
 	/** if true run only image Processing step*/
 	private static boolean _isProcessed = false;
 	/**boolean true: hichip data if fals hic data */
@@ -87,8 +87,7 @@ public class Hic_main {
 	private static String _chrSizeFile;
 	/**boolean is true supress all the image created*/
 	private static boolean _delImages = true;
-	private static double _fdr = .1;
-	//private static boolean _fdr = true;
+	private static double _fdr = .01;
 	/**boolean is true supress all the image created*/
 	private static boolean _gui = false;
 	/**Strin for the documentation*/

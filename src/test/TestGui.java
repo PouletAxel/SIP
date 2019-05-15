@@ -78,7 +78,7 @@ public class TestGui {
 			HiCExperimentAnalysis hicExp = new HiCExperimentAnalysis(output, chrSize,
 					gauss, min, max, resolution,
 					saturatedPixel, thresholdMax, diagSize, matrixSize, nbZero
-					,factor,true);
+					,factor,0.01);
 			hicExp.setIsHichip(gui.isHiChIP());
 			if(isHic){
 				System.out.println("hic mode:\ninput: "+input+"\noutput: "+output+"\njuiceBox: "+juiceBoxTools+"\nnorm: "+ juiceBoXNormalisation+"\ngauss: "+gauss+"\n"

@@ -35,6 +35,7 @@ public class Loop {
 	private float _neigbhoord1 = -1;
 	/** value of the peak analysis value inspirate from Rao&Huntley et al., 2014, but the score is compute foreach loop and not for a set of loops.*/
 	private float _paScoreAvg = -1;
+	private float _paScoreAvgdev = -1;
 	/** value of the peak analysis value inspirate from Rao&Huntley et al., 2014, but the score is compute foreach loop and not for a set of loops.*/
 	private float _paScoreMed = -1;
 	/** value of the avg of the differential between loops value and the neighbourhood 24.*/
@@ -49,12 +50,18 @@ public class Loop {
 	private float _peakValue = -1;
 	/** Standard deviation value of the neighbourhood 9.*/
 	private float _std = -1;
-	
-	/** value of the peak analysis value inspirate from Rao&Huntley et al., 2014, but the score is compute foreach loop and not for a set of loops.*/
+	/** */
 	private float _paScoreFDR = -1;
-	/**  value of the peak analysis value inspirate from Rao&Huntley et al., 2014, but the score is compute foreach loop and not for a set of loops.*/
+	/** */
 	private float _regPaScoreFDR = -1;
-	
+	/** */
+	private float _paScoreFDR2 = -1;
+	/** */
+	private float _regPaScoreFDR2 = -1;
+	/** */
+	private float _paScoreFDR3 = -1;
+	/** */
+	private float _regPaScoreFDR3 = -1;
 	/**
 	 * Loop constructor
 	 * @param name String name of the loop
@@ -249,12 +256,13 @@ public class Loop {
 	 * @return double PA score
 	 */
 	public float getPaScoreAvg(){	return this._paScoreAvg; }
-	
+	public float getPaScoreAvgdev(){	return this._paScoreAvgdev; }
 	/**
 	 *	Setter  of the peak analysis loop score
 	 * @param m_paScore double PA score
 	 */
 	public void setPaScoreAvg(float paScore){ this._paScoreAvg = paScore; }
+	public void setPaScoreAvgdev(float paScoredev){ this._paScoreAvgdev = paScoredev; }
 	
 	/**
 	 * Getter of the peak analysis loop 
@@ -335,7 +343,17 @@ public class Loop {
 	 * 
 	 * @return
 	 */
-	public float getRegionalPaScoreAvgFDR(){ return this._regPaScoreFDR; }
+	public float getRegionalPaScoreAvgFDR(){ return this._regPaScoreFDR;}
+	/**
+	 * 
+	 * @return
+	 */
+	public float getRegionalPaScoreAvgFDR2(){ return this._regPaScoreFDR2; }
+	/**
+	 * 
+	 * @return
+	 */
+	public float getRegionalPaScoreAvgFDR3(){ return this._regPaScoreFDR3; }
 	
 	/**
 	 * 
@@ -344,13 +362,43 @@ public class Loop {
 	public void setRegionalPaScoreAvgFDR(float rpaScoreFDR){ this._regPaScoreFDR = rpaScoreFDR; }
 	/**
 	 * 
+	 * @param rpaScoreFDR2
+	 */
+	public void setRegionalPaScoreAvgFDR2(float rpaScoreFDR2){ this._regPaScoreFDR2 = rpaScoreFDR2; }
+	/**
+	 * 
+	 * @param rpaScoreFDR3
+	 */
+	public void setRegionalPaScoreAvgFDR3(float rpaScoreFDR3){ this._regPaScoreFDR3 = rpaScoreFDR3; }
+	/**
+	 * 
 	 * @return
 	 */
 	public float getPaScoreAvgFDR(){	return this._paScoreFDR; }
 	/**
 	 * 
+	 * @return
+	 */
+	public float getPaScoreAvgFDR2(){	return this._paScoreFDR2; }
+	/**
+	 * 
+	 * @return
+	 */
+	public float getPaScoreAvgFDR3(){	return this._paScoreFDR3; }
+	/**
+	 * 
 	 * @param paScoreFDR
 	 */
 	public void setPaScoreAvgFDR(float paScoreFDR){ this._paScoreFDR = paScoreFDR; }
+	/**
+	 * 
+	 * @param paScoreFDR2
+	 */
+	public void setPaScoreAvgFDR2(float paScoreFDR2){ this._paScoreFDR2 = paScoreFDR2; }
+	/**
+	 * 
+	 * @param paScoreFDR3
+	 */
+	public void setPaScoreAvgFDR3(float paScoreFDR3){ this._paScoreFDR3 = paScoreFDR3; }
 	
 }
