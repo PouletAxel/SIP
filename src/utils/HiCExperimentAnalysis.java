@@ -278,14 +278,17 @@ public class HiCExperimentAnalysis {
 		Collections.sort(myFDRvals);
 		int topFDRs = (int)(myFDRvals.size()*this._fdr);
 		//Integer topFDRposition = topFDRs.intValue();
-		List<Float> topFDRlist = new ArrayList<Float>(myFDRvals.subList(myFDRvals.size() -topFDRs,  myFDRvals.size() -(topFDRs-1)));
-		float FDRcutoff = topFDRlist.get(0);
-		Collections.sort(myRFDRvals);
-		int topRFDRs = (int)(myRFDRvals.size()*this._fdr);
-		//Integer topRFDRposition = topRFDRs.intValue();
-		List<Float> topRFDRlist = new ArrayList<Float>(myRFDRvals.subList(myRFDRvals.size() -topRFDRs,  myRFDRvals.size() -(topRFDRs-1)));
-		float RFDRcutoff = topRFDRlist.get(0);
-
+		float RFDRcutoff = 10000;
+		float FDRcutoff = 10000;
+		if(topFDRs != 0){
+			List<Float> topFDRlist = new ArrayList<Float>(myFDRvals.subList(myFDRvals.size() -topFDRs,  myFDRvals.size() -(topFDRs-1)));
+			FDRcutoff = topFDRlist.get(0);
+			Collections.sort(myRFDRvals);
+			int topRFDRs = (int)(myRFDRvals.size()*this._fdr);
+			//Integer topRFDRposition = topRFDRs.intValue();
+			List<Float> topRFDRlist = new ArrayList<Float>(myRFDRvals.subList(myRFDRvals.size() -topRFDRs,  myRFDRvals.size() -(topRFDRs-1)));
+			RFDRcutoff = topRFDRlist.get(0);
+		}
 		System.out.println("Filtering value at "+this._fdr+" FDR is "+FDRcutoff+" APscore and "+RFDRcutoff+" RegionalAPscore\n");
 		BufferedWriter writer;
 		if(first)
