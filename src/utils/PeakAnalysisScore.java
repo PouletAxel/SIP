@@ -52,12 +52,10 @@ public class PeakAnalysisScore {
 			float squareCenterAvg = process3By3SquareAvg(x,y);
 
 			if(x >= 12 && y >= 12 && x < this._imgRaw.getWidth()-12 && y < this._imgRaw.getHeight()-12){
-				corner += process3By3SquareAvg(x-10,y-10); 
-				corner += process3By3SquareAvg(x-10,y+10);
-				corner += process3By3SquareAvg(x+10,y-10);
-				corner += process3By3SquareAvg(x+10,y+10);
-				corner = corner/4;
+				corner = computeAvgCorner(x,y);
 				loop.setPaScoreAvg(center/corner);
+				loop.setRegionalPaScoreAvg(squareCenterAvg/corner);	
+				
 				float probnum = 0;
 				float factorial = 1;
 				int countnumber = (int) (corner);
@@ -72,23 +70,18 @@ public class PeakAnalysisScore {
 					probnum = probnum + tmpprobnum;
 				}
 				loop.setPaScoreAvgdev(1-probnum);
-				loop.setRegionalPaScoreAvg(squareCenterAvg/corner);	
+				
 				int xFDR = x+10;
 				int yFDR = y+10;
 				if(xFDR > this._imgRaw.getWidth()-12 && yFDR > this._imgRaw.getHeight()-12){
 					xFDR = x-10;
 					yFDR = y-10;
 				}
-				float cornerFDR = 0;
+				
 				float centerFDR = this._ipRaw.getf(xFDR,yFDR);
 				float squareCenterAvgFDR = process3By3SquareAvg(xFDR,yFDR);	
-				cornerFDR += process3By3SquareAvg(xFDR-10,yFDR-10); 
-				cornerFDR += process3By3SquareAvg(xFDR-10,yFDR+10);
-				cornerFDR += process3By3SquareAvg(xFDR+10,yFDR-10);
-				cornerFDR += process3By3SquareAvg(xFDR+10,yFDR+10);
-				cornerFDR = cornerFDR/4;
-				loop.setPaScoreAvgFDR(centerFDR/cornerFDR);
-				loop.setRegionalPaScoreAvgFDR(squareCenterAvgFDR/cornerFDR);
+				loop.setPaScoreAvgFDR(centerFDR/computeAvgCorner(xFDR,yFDR));
+				loop.setRegionalPaScoreAvgFDR(squareCenterAvgFDR/computeAvgCorner(xFDR,yFDR));
 				
 				int xFDR2 = x+25;
 				int yFDR2 = y+25;
@@ -96,16 +89,10 @@ public class PeakAnalysisScore {
 					xFDR2 = x-25;
 					yFDR2 = y-25;
 				}
-				float cornerFDR2 = 0;
 				float centerFDR2 = this._ipRaw.getf(xFDR2,yFDR2);
 				float squareCenterAvgFDR2 = process3By3SquareAvg(xFDR2,yFDR2);	
-				cornerFDR2 += process3By3SquareAvg(xFDR2-10,yFDR2-10); 
-				cornerFDR2 += process3By3SquareAvg(xFDR2-10,yFDR2+10);
-				cornerFDR2 += process3By3SquareAvg(xFDR2+10,yFDR2-10);
-				cornerFDR2 += process3By3SquareAvg(xFDR2+10,yFDR2+10);
-				cornerFDR2 = cornerFDR2/4;
-				loop.setPaScoreAvgFDR2(centerFDR2/cornerFDR2);
-				loop.setRegionalPaScoreAvgFDR2(squareCenterAvgFDR2/cornerFDR2);
+				loop.setPaScoreAvgFDR2(centerFDR2/computeAvgCorner(xFDR2,yFDR2));
+				loop.setRegionalPaScoreAvgFDR2(squareCenterAvgFDR2/computeAvgCorner(xFDR2,yFDR2));
 			
 				int xFDR3 = x+40;
 				int yFDR3 = y+40;
@@ -113,16 +100,10 @@ public class PeakAnalysisScore {
 					xFDR3 = x-40;
 					yFDR3 = y-40;
 				}
-				float cornerFDR3 = 0;
 				float centerFDR3 = this._ipRaw.getf(xFDR3,yFDR3);
 				float squareCenterAvgFDR3 = process3By3SquareAvg(xFDR3,yFDR3);	
-				cornerFDR3 += process3By3SquareAvg(xFDR3-10,yFDR3-10); 
-				cornerFDR3 += process3By3SquareAvg(xFDR3-10,yFDR3+10);
-				cornerFDR3 += process3By3SquareAvg(xFDR3+10,yFDR3-10);
-				cornerFDR3 += process3By3SquareAvg(xFDR3+10,yFDR3+10);
-				cornerFDR3 = cornerFDR3/4;
-				loop.setPaScoreAvgFDR3(centerFDR3/cornerFDR3);
-				loop.setRegionalPaScoreAvgFDR3(squareCenterAvgFDR3/cornerFDR3);
+				loop.setPaScoreAvgFDR3(centerFDR3/computeAvgCorner(xFDR3,yFDR3));
+				loop.setRegionalPaScoreAvgFDR3(squareCenterAvgFDR3/computeAvgCorner(xFDR3,yFDR3));
 			}
 		}
 	}
@@ -147,5 +128,20 @@ public class PeakAnalysisScore {
 		if(nb == 0)
 			return 0;
 		return sum/nb;
+	}
+	
+	/**
+	 * 
+	 * @param x
+	 * @param y
+	 * @return
+	 */
+	private float computeAvgCorner(int x, int y){
+		float corner = process3By3SquareAvg(x-10,y-10); 
+		corner += process3By3SquareAvg(x-10,y+10);
+		corner += process3By3SquareAvg(x+10,y-10);
+		corner += process3By3SquareAvg(x+10,y+10);
+		if( corner == 0) corner = (float) 0.1;
+		return corner/4;
 	}
 }

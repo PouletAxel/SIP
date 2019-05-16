@@ -27,8 +27,8 @@ public class TestCallLoopsProcessedFile {
 		//String output= "/home/plop/Bureau/DataSetImageHiC/Hichip_H3k4me1_test";
 		//String input= "/home/plop/Bureau/DataSetImageHiC/Hichip_H3k4me1_test";
 		///home/plop/Bureau/DataSetImageHiC/Hichip_H3k4me1_test
-		String input = "/home/plop/Bureau/DataSetImageHiC/GM12878/GM12878_hic";
-		String output= "/home/plop/Bureau/DataSetImageHiC/GM12878/plopi";
+		String input = "/home/plop/Bureau/SIPpaper/Chr2";
+		String output= "/home/plop/Bureau/SIPpaper/Chr2";
 		//String input = "/home/plop/Bureau/DataSetImageHiC/GM12878/subsample/GM12878_full/";
 		//String input = "/home/plop/Bureau/DataSetImageHiC/HiChip/ring1b/test/";//"/home/plop/Bureau/DataSetImageHiC/GM12878/test";
 		//String output = "/home/plop/Bureau/DataSetImageHiC/HiChip/ring1b/testTer/";//"/home/plop/Bureau/DataSetImageHiC/GM12878/test";
@@ -46,7 +46,7 @@ public class TestCallLoopsProcessedFile {
 		factor.add(1);
 		factor.add(2);
 		//factor.add(5);
-		HiCExperimentAnalysis wga = new HiCExperimentAnalysis(output, readChrSizeFile("/home/plop/Documents/Genome/mammals/HumanGenomeHg19/w_hg19.sizes"), gauss, min, max, 
+		HiCExperimentAnalysis wga = new HiCExperimentAnalysis(output, readChrSizeFile("/home/plop/Documents/Genome/mammals/HumanGenomeHg19/chr2.size"), gauss, min, max, 
 				resolution, saturatedPixel, thresholdMax, diagSize, matrixSize,nbZero, factor,0.01);
 		
 		wga.setIsHichip(false);
