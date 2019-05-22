@@ -1,6 +1,5 @@
 #SIP Version 1 run with java 8
 
-Usage:
 	hic <hicFile> <chrSizeFile> <Output> <juicerToolsPath> [options]
 	processed <Directory with processed data> <chrSizeFile> <Output> [options]
 	
