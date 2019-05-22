@@ -31,8 +31,6 @@ public class FindMaxima{
 	private int _diagSize =-1;
 	/**	 Resolution of the image in base*/
 	private int _resolution = -1;
-	/**	 HashMap<String,Loop>  collection of Object loop initialised in this class.*/
-	private HashMap<String,Loop> _data = new HashMap<String,Loop>();
 
 	
 	/**
@@ -65,8 +63,9 @@ public class FindMaxima{
 	 */
 	public HashMap<String,Loop> findloop(boolean hichip, int index, int nbZero, ImagePlus raw, float val, int factor){
 		run(nbZero, raw, val);
-		ArrayList<String> temp = getMaxima();
+		ArrayList<String> temp = this.getMaxima();
 		ImageProcessor ipN = this._imgNorm.getProcessor();
+		HashMap<String,Loop>  data = new HashMap<String,Loop>(); 
 		for(int j = 0; j < temp.size();++j){
 			String[] parts = temp.get(j).split("\\t");
 			int x = Integer.parseInt(parts[0]);
@@ -86,7 +85,7 @@ public class FindMaxima{
 						maxima.setResolution(this._resolution);
 						maxima.setDiagSize(this._diagSize);
 						maxima.setMatrixSize(this._imgNorm.getWidth());
-						this._data.put(name, maxima);
+						data.put(name, maxima);
 					}
 				}else{
 					if(n1 < n2 && n1 >= 0.15 && n2 >= 0.25){ // filter on the neighborood for hic datatset
@@ -96,12 +95,12 @@ public class FindMaxima{
 						maxima.setResolution(this._resolution);
 						maxima.setDiagSize(this._diagSize);
 						maxima.setMatrixSize(this._imgNorm.getWidth());
-						this._data.put(name, maxima);
+						data.put(name, maxima);
 					}
 				}
 			}
 		}
-		return this._data;
+		return data;
 	}
 		
 	/**
@@ -209,7 +208,7 @@ public class FindMaxima{
 		ArrayList<String> listMaxima = new ArrayList<String>();
 		for(int i = 0; i < w; ++i){
 			for(int j = 0; j < h; ++j){
-				if (ipResu.getf(i,j) > 0 && i-j >0)
+				if (ipResu.getf(i,j) > 0 && i-j > 0)
 					listMaxima.add(i+"\t"+j);
 			}
 		}

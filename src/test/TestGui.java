@@ -7,8 +7,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import gui.GuiAnalysis;
-import utils.HiCExperimentAnalysis;
-import utils.HicFileProcessing;
+import multiProcesing.ProcessDetectLoops;
+import multiProcesing.ProcessDumpData;
+import utils.SIPObject;
+
 
 /**
  * test of the GUI
@@ -24,6 +26,7 @@ public class TestGui {
 	 * @throws InterruptedException 
 	 */
 	public static void main(String[] args) throws IOException, InterruptedException{
+		SIPObject sip ;
 		GuiAnalysis gui = new GuiAnalysis();
 		while( gui.isShowing()){
 			try {Thread.sleep(1);}
@@ -31,19 +34,16 @@ public class TestGui {
 	    }	
 		if (gui.isStart()){
 			System.out.println("test");
-			String chrSizeFile = gui.getChrSizeFile();
 			String output = gui.getOutputDir();
 			String input = gui.getRawDataDir();
 			int matrixSize = gui.getMatrixSize();
 			int diagSize = gui.getDiagSize();
 			int resolution = gui.getResolution();
-			
 			double gauss = gui.getGaussian();
 			double max = gui.getMax();
 			double min = gui.getMin();
 			double saturatedPixel = gui.getEnhanceSignal();
 			int thresholdMax = gui.getNoiseTolerance();
-			int factorChoice = gui.getFactorChoice();
 			boolean isHic  = gui.isHic();
 			boolean isProcessed = gui.isProcessed();
 			String juiceBoxTools = gui.getJuiceBox();
@@ -53,50 +53,31 @@ public class TestGui {
 			else if (gui.isVC_SQRT()) juiceBoXNormalisation = "VC_SQRT";	
 			int nbZero = gui.getNbZero();
 			 
-			System.out.println("hic mode:\ninput: "+input
-					+ "\noutput: "+output
-					+ "\nChr size file: "+chrSizeFile
-					+ "\njuiceBox: "+juiceBoxTools
-					+"\nnorm: "+ juiceBoXNormalisation
-					+"\ngauss: "+gauss
-					+ "\nmin: "+min
-					+"\nmax: "+max
-					+"\nmatrix size: "+matrixSize
-					+"\ndiag size: "+diagSize
-					+"\nresolution: "+resolution
-					+"\nsaturated pixel: "+saturatedPixel
-					+"\nthreshold: "+thresholdMax
-					+"\nisHic: "+isHic
-					+"\nisProcessed: "+isProcessed
-					+"\n number of zero:"+nbZero
-					+"\n factor "+ factorChoice+"\n");
 			ArrayList<Integer> factor = new ArrayList<Integer>();
 			factor.add(1);
-			factor.add(2);
+			//factor.add(2);
 			HashMap<String,Integer> chrSize = readChrSizeFile(gui.getChrSizeFile());
 			
-			HiCExperimentAnalysis hicExp = new HiCExperimentAnalysis(output, chrSize,
-					gauss, min, max, resolution,
-					saturatedPixel, thresholdMax, diagSize, matrixSize, nbZero
-					,factor,0.01);
-			hicExp.setIsHichip(gui.isHiChIP());
-			if(isHic){
+			if(gui.isProcessed()==false){
 				System.out.println("hic mode:\ninput: "+input+"\noutput: "+output+"\njuiceBox: "+juiceBoxTools+"\nnorm: "+ juiceBoXNormalisation+"\ngauss: "+gauss+"\n"
 						+ "min: "+min+"\nmax: "+max+"\nmatrix size: "+matrixSize+"\ndiag size: "+diagSize+"\nresolution: "+resolution+"\nsaturated pixel: "+saturatedPixel
 						+"\nthreshold: "+thresholdMax+"\n number of zero:"+nbZero+"\n ");
-				HicFileProcessing hfp =  new HicFileProcessing(input, hicExp, chrSize, juiceBoxTools, juiceBoXNormalisation);
-				hfp.run(true);
-			}else if (isProcessed){
+				sip = new SIPObject(output, chrSize, gauss, min, max, resolution, saturatedPixel, thresholdMax, diagSize, matrixSize, nbZero,factor,0.01,gui.isProcessed(),gui.isHiChIP());
+				sip.setIsGui(true);
+				ProcessDumpData processDumpData = new ProcessDumpData();
+				processDumpData.go(input, sip, chrSize, juiceBoxTools, juiceBoXNormalisation,gui.getNbCpu());
+			}else{
 				System.out.println("processed mode:\ninput: "+input+"\noutput: "+output+"\njuiceBox: "+juiceBoxTools+"\nnorm: "+ juiceBoXNormalisation+"\ngauss: "+gauss
 						+"\nmin: "+min+"\nmax: "+max+"\nmatrix size: "+matrixSize+"\ndiag size: "+diagSize+"\nresolution: "+resolution+"\nsaturated pixel: "+saturatedPixel
 						+"\nthreshold: "+thresholdMax+"\nisHic: "+isHic+"\nisProcessed: "+isProcessed+"\n number of zero:"
 						+nbZero+"\n");
-				hicExp.runGUI(input);
+				sip = new SIPObject(input,output, chrSize, gauss, min, max, resolution, saturatedPixel, thresholdMax, diagSize, matrixSize, nbZero,factor,0.01,gui.isProcessed(),gui.isHiChIP());
+				sip.setIsGui(true);
 			}
-		}
-		else {
-			System.out.println("program NO Name closed: if you want the help: -h");
-			System.exit(0);
+			
+			ProcessDetectLoops processDetectloops = new ProcessDetectLoops();
+			processDetectloops.go(sip, gui.getNbCpu());
+			
 		}
 	}
 	

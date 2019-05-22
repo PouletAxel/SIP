@@ -10,7 +10,7 @@ import java.util.Set;
  * 
  * Loops detected with white strips are removed. Furthermore the corner of the images are not take account. We test also the proximal loops to avoid overlaping loops.
  * 
- * @author Axel Poulet
+ * @author axel poulet
  *
  */
 public class CoordinatesCorrection {

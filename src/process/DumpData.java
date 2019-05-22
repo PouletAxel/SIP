@@ -1,4 +1,4 @@
-package utils;
+package process;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -99,7 +99,6 @@ public class DumpData {
 	 */
 	private void observedMExpected(String obs, String chr) throws IOException{
 		BufferedReader br = Files.newBufferedReader(Paths.get(obs), StandardCharsets.UTF_8);
-		System.out.println(chr);
 		BufferedWriter 	writer = new BufferedWriter(new FileWriter(new File(chr)));
 		for (String line = null; (line = br.readLine()) != null;){
 			String [] tline = line.split("\t");
@@ -113,6 +112,7 @@ public class DumpData {
 		File file = new File(obs);
 		file.delete();
 		writer.close();
+		br.close();
 	}
 	
 	
@@ -138,24 +138,30 @@ public class DumpData {
 	 * @throws IOException
 	 * @throws InterruptedException
 	 */
-	public boolean getExpected(String chr,String output) throws IOException, InterruptedException{
+	public boolean getExpected(String chr,String output){
 		int exitValue=1;
 		Runtime runtime = Runtime.getRuntime();
 		String expected = output.replaceAll(".txt", "_expected.txt");
 		String cmd = "java"+" -jar "+this._juiceBoxTools+" dump expected "+this._normalisation+" "+this._hicFile+" "+chr+" BP "+this._resolution+" "+expected;
 		this._log = this._log+"\n"+expected+"\t"+cmd;
-		Process process = runtime.exec(cmd);
+		Process process;
+		try {
+			process = runtime.exec(cmd);
 		
-		new ReturnFlux(process.getInputStream()).start();
-		new ReturnFlux(process.getErrorStream()).start();
-		exitValue=process.waitFor();
+			new ReturnFlux(process.getInputStream()).start();
+			new ReturnFlux(process.getErrorStream()).start();
+			exitValue=process.waitFor();
 		
-		BufferedReader br = Files.newBufferedReader(Paths.get(expected), StandardCharsets.UTF_8);
-		for (String line = null; (line = br.readLine()) != null;)
-			this._lExpected.add(Double.parseDouble(line));
-		br.close();
-		File file =  new File(expected);
-		file.delete();
+			BufferedReader br = Files.newBufferedReader(Paths.get(expected), StandardCharsets.UTF_8);
+			for (String line = null; (line = br.readLine()) != null;)
+				this._lExpected.add(Double.parseDouble(line));
+			br.close();
+			File file =  new File(expected);
+			file.delete();
+			
+		} catch (IOException | InterruptedException e) {
+			e.printStackTrace();
+		}
 		return exitValue==0;
 	}
 	

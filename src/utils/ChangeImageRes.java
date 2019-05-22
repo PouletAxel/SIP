@@ -9,7 +9,7 @@ import ij.process.ShortProcessor;
  * Change th eimage resolution on function of a specific factor, the new value of the pixel is the sum of the original pixel value merged 
  * to create the new image.
  * 
- * @author Axel Poulet
+ * @author axel poulet
  *
  */
 public class ChangeImageRes{
@@ -45,7 +45,6 @@ public class ChangeImageRes{
 						sum+= ip.getf(ii, jj);
 					}
 				p.setf(i/this._factor,j/this._factor,sum);
-				
 			}
 		}
 		ImagePlus imgResu = new ImagePlus();

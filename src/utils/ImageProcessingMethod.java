@@ -13,7 +13,7 @@ import ij.process.ImageProcessor;
  * @author axel poulet
  *
  */
-public class ProcessMethod{
+public class ImageProcessingMethod{
 	/** Raw image*/
 	ImagePlus _img;
 	/** ImageProcessor of the raw image*/
@@ -34,7 +34,7 @@ public class ProcessMethod{
 	 * @param maxFilterRad double, value of the max strength filter
 	 * @param gaussianFilterRad double, value of the gaussian strength filter
 	 */
-	public ProcessMethod(ImagePlus img, double minFilterRad, double maxFilterRad, double gaussianFilterRad){
+	public ImageProcessingMethod(ImagePlus img, double minFilterRad, double maxFilterRad, double gaussianFilterRad){
 		this._img = img;
 		this._ip = this._img.getProcessor();
 		this._gaussianFilterRadius = gaussianFilterRad;
@@ -47,7 +47,7 @@ public class ProcessMethod{
 	 * @param img ImagePlus, raw image 
 	 * @param gaussianFilterRad double, value of the gaussian strength filter
 	 */
-	public ProcessMethod(ImagePlus img, double gaussianFilterRad){
+	public ImageProcessingMethod(ImagePlus img, double gaussianFilterRad){
 		this._img = img;
 		this._ip = this._img.getProcessor();
 		this._gaussianFilterRadius = gaussianFilterRad;		
