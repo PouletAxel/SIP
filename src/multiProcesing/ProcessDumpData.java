@@ -63,7 +63,7 @@ public class ProcessDumpData{
 			
 			while (_continuer == false)
 				Thread.sleep(10);
-			while (_nbLance >=nbCPU)
+			while (_nbLance > nbCPU)
 				Thread.sleep(10);
 			++j;
 			if(sip.isGui())

@@ -115,7 +115,7 @@ public class CallLoops {
 					thresh =  _thresholdMaxima/5;
 				FindMaxima findLoop = new FindMaxima(imgNorm, imgFilter, chr, thresh, this._diagSize, this._resolution);
 				HashMap<String,Loop> temp = findLoop.findloop(this._hichip,numImage, this._nbZero,imgRaw, this._backgroudValue,1);
-				System.out.println("tpm \t\tchr "+ chr +"\t"+temp.size()+"\tthresh "+thresh+"\tnum "+numImage+"\t"+_hichip+"\tgauss "+this._gauss);
+				//System.out.println("tpm \t\tchr "+ chr +"\t"+temp.size()+"\tthresh "+thresh+"\tnum "+numImage+"\t"+_hichip+"\tgauss "+this._gauss);
 				PeakAnalysisScore pas = new PeakAnalysisScore(imgNorm,temp);
 				pas.computeScore();
 				
@@ -154,7 +154,7 @@ public class CallLoops {
 			}
 		}
 		hLoop = filterLoops.removedLoopCloseToWhiteStrip(hLoop);
-		System.out.println("end chr "+ chr +"\t"+hLoop.size()+" loops before the FDR filter");
+		System.out.println("####### End loops detection for chr "+ chr +"\t"+hLoop.size()+" loops before the FDR filter");
 		return hLoop;
 	}
 

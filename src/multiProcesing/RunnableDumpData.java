@@ -61,7 +61,6 @@ public class RunnableDumpData extends Thread implements Runnable{
 		if (file.exists()==false){file.mkdir();}
 		try {
 			this._dumpData.getNormVector(this._chrName,normOutput+File.separator+this._chrName+".norm");
-			System.out.println(normOutput+File.separator+this._chrName+".norm");
 			System.out.println("start dump "+this._chrName+" size "+this._chrSize);
 			
 			for(int i = 0 ; j-1 <= this._chrSize; i+=step,j+=step){
@@ -82,7 +81,6 @@ public class RunnableDumpData extends Thread implements Runnable{
 					dump = this._chrName+":"+i+":"+j;
 					name = outdir+this._chrName+"_"+i+"_"+j+".txt";
 					System.out.println("start dump "+this._chrName+" size "+this._chrSize+" dump "+dump);
-					System.out.println(expected);
 					juicerTools = this._dumpData.dumpObservedMExpected(dump,name);
 					if (juicerTools == false){
 						System.out.print(dump+" "+"\n"+juicerTools+"\n");
@@ -90,9 +88,11 @@ public class RunnableDumpData extends Thread implements Runnable{
 					}
 				}
 			}
+			System.out.println("##### End dump "+this._chrName);
 		} catch (IOException | InterruptedException e) {
 			e.printStackTrace();
 		}
+		System.gc();
 		ProcessDumpData._nbLance--;
 	}
 }

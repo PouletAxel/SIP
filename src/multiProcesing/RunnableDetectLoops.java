@@ -51,7 +51,7 @@ public class RunnableDetectLoops extends Thread implements Runnable{
 			File[] listOfFiles = _sip.fillList(dir);
 			System.out.println("normVector end loading file: "+_chr+".norm");
 			if (listOfFiles.length == 0)
-				System.out.println("dumped directory of chromosome"+_chr+"empty");
+				System.out.println("!!!!!!!!!! dumped directory of chromosome"+_chr+" empty");
 			else{
 				File file = new File(this._resuFile);
 				HashMap<String, Loop> data = this._callLoops.detectLoops(listOfFiles,_chr,this._normVector);
@@ -63,6 +63,7 @@ public class RunnableDetectLoops extends Thread implements Runnable{
 		} catch (IOException e1) {
 				e1.printStackTrace();
 		}
+		System.gc();
 		ProcessDetectLoops._nbLance--;
 	}
 }

@@ -71,10 +71,10 @@ public class TestCallLoopsHicFile{
 			SIPObject sip = new SIPObject(output, chrsize, gauss, min, max, resolution, saturatedPixel, thresholdMax, diagSize, matrixSize, nbZero,factor,0.01,false,false);
 			sip.setIsGui(false);
 			ProcessDumpData processDumpData = new ProcessDumpData();
-			processDumpData.go(input, sip, chrsize, juiceBoxTools, juiceBoXNormalisation,2);
+			processDumpData.go(input, sip, chrsize, juiceBoxTools, juiceBoXNormalisation,1);
 			
 			ProcessDetectLoops processDetectloops = new ProcessDetectLoops();
-			processDetectloops.go(sip, 2);
+			processDetectloops.go(sip, 1);
 			
 			if(keepTif == false){
 				for(int i = 0; i< sip._tifList.size();++i)

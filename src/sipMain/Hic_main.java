@@ -216,7 +216,8 @@ public class Hic_main {
 					_isProcessed,_isHiChip);
 			sip.setIsGui(_gui);
 			ProcessDumpData processDumpData = new ProcessDumpData();
-			processDumpData.go(_input, sip, _chrSize, _juiceBoxTools, _juiceBoXNormalisation, _cpu);
+			processDumpData.go(_input, sip, _chrSize, _juiceBoxTools, _juiceBoXNormalisation, _cpu-1);
+			System.out.println("########### End of the dump Step");
 		}else{
 			System.out.println("processed mode:\n"
 					+ "input: "+_input+"\n"
@@ -246,10 +247,10 @@ public class Hic_main {
 					_factor,_fdr,_isProcessed,_isHiChip);
 			sip.setIsGui(_gui);
 		}
-		
+		System.out.println("Start loop detction step");
 		ProcessDetectLoops processDetectloops = new ProcessDetectLoops();
-		processDetectloops.go(sip,_cpu);
-		
+		processDetectloops.go(sip,_cpu-1);
+		System.out.println("###########End loop detction step");
 		BufferedWriter writer = new BufferedWriter(new FileWriter(new File(_output+File.separator+"parameters.txt")));
 		if(_isProcessed){
 				writer.write("java -jar sip.jar processed "
@@ -298,7 +299,7 @@ public class Hic_main {
 			for(int i = 0; i< sip._tifList.size();++i)
 				sip._tifList.get(i).delete();
 		}
-		System.out.println("End");
+		System.out.println("End of SIP loops are available in "+_output);
 	}
 	
 	/**
@@ -383,7 +384,7 @@ public class Hic_main {
 				}else if(args[i].equals("-cpu")){
 						try{_cpu =Integer.parseInt(args[i+1]);}
 						catch(NumberFormatException e){ returnError("-cpu",args[i+1],"int");}
-						if(_cpu > Runtime.getRuntime().availableProcessors()){
+						if(_cpu > Runtime.getRuntime().availableProcessors() || _cpu <= 0){
 							System.out.println("the number of CPU "+ _cpu+" is superior of the server/computer' cpu "+Runtime.getRuntime().availableProcessors()+"\n");
 							System.out.println(_doc);
 							System.exit(0);
