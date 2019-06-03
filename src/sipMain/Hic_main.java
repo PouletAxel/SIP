@@ -85,10 +85,10 @@ public class Hic_main {
 			+"-cpu: Number of CPU used for SIP processing (default 1)\n"
 			+"-hichip: true fo HiChIP or false for Hi-C (default false)\n"
 			+"-factor: Multiple resolutions can be specified using: "
-			+ "\t-factor 1: run only for the input res\n"
+			+ "\t-factor 1: run only for the input res (default)\n"
 			+ "\t-factor 2: res and res*2\n"
 			+ "\t-factor 3: res and res*5\n"
-			+ "\t-factor 4: res, res*2 and res*5 (default 2)\n"
+			+ "\t-factor 4: res, res*2 and res*5 \n"
 			+"-max: Maximum filter: increase the region of high intensity (default 2 for hic and 1 hichip)\n"
 			+"-min: Minimum filter: removed the isolated high value (default 2 for hic and 1 hichip)\n"
 			+"-sat: % of staturated pixel: enhance the contrast in the image (default 0.01 for hic and 0.5 for hichip)\n"
@@ -111,7 +111,7 @@ public class Hic_main {
 	
 	public static void main(String[] args) throws IOException, InterruptedException {
 		_factor.add(1);
-		_factor.add(2);
+		//_factor.add(2);
 		if (args.length >= 1 && args.length < 4){
 			System.out.println(_doc);
 			System.exit(0);
@@ -160,17 +160,12 @@ public class Hic_main {
 				_thresholdMax = gui.getNoiseTolerance();
 				_fdr = gui.getFDR();
 				_cpu = gui.getNbCpu();
-				if(gui.getFactorChoice() == 1){
-					_factor = new ArrayList<Integer>();
-					_factor.add(1);
+				if(gui.getFactorChoice() == 2){
+					_factor.add(2);
 				}else if(gui.getFactorChoice() == 4){
-					_factor = new ArrayList<Integer>();
-					_factor.add(1);
 					_factor.add(2);
 					_factor.add(5);
 				}else if(gui.getFactorChoice() == 3){
-					_factor = new ArrayList<Integer>();
-					_factor.add(1);
 					_factor.add(5);
 				}
 				_isHic  = gui.isHic();
@@ -185,7 +180,6 @@ public class Hic_main {
 				System.exit(0);
 			}
 		}
-		
 		
 		SIPObject sip;
 		if(_isProcessed==false){
@@ -363,21 +357,15 @@ public class Hic_main {
 				}else if(args[i].equals("-factor")){
 					int a  = Integer.parseInt(args[i+1]);
 					_factOption = args[i+1];
-					if(a == 1){
-						_factor = new ArrayList<Integer>();
-						_factor.add(1);
+					if(a == 2){
+						_factor.add(2);
 					}else if(a == 4){
-						_factor = new ArrayList<Integer>();
-						_factor.add(1);
 						_factor.add(2);
 						_factor.add(5);
 					}else if(a == 3){
-						_factor = new ArrayList<Integer>();
-						_factor.add(1);
 						_factor.add(5);
-						
-					}else if(a != 2)
-						returnError("-mat",args[i+1],"int or not correct choice");
+					}else if(a != 1)
+						returnError("-factor ",args[i+1]," int or not correct choice (1, 2, 3, 4)");
 				}else if(args[i].equals("-d")){
 					try{_diagSize =Integer.parseInt(args[i+1]);}
 					catch(NumberFormatException e){ returnError("-d",args[i+1],"int");}

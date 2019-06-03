@@ -407,7 +407,7 @@ public class GuiAnalysis extends JFrame{
 			0, 1, 0, 0,  0.0, 0.0, GridBagConstraints.NORTHWEST,
 			GridBagConstraints.NONE,new Insets(240, 300, 0, 0), 0, 0
 		));
-		_checkbox2.setSelected(true);	
+		//_checkbox2.setSelected(true);	
 		
 		_jlInputFileType = new JLabel();
 	   	_jlInputFileType.setText("Chromosome size file (same chr names as in .hic file):");
