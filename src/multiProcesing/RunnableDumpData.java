@@ -11,17 +11,24 @@ import java.io.IOException;
  *
  */
 public class RunnableDumpData extends Thread implements Runnable{
-
+	/**String: path where save the dump data  */
 	private String _outdir ="";
+	/**String: name of the chr*/
 	private String _chrName = "";
+	/**int: chr size */
 	private int _chrSize = 0;
+	/** DumpData object run juicertoolbox.jar*/
 	private DumpData _dumpData;
+	/**int: bin resolution*/
 	private int _res = 0;
+	/**int: image Size */
 	private int _matrixSize = 0;
+	/**int: size of the step to run a chr */
 	private int _step = 0;
 	
 	/**
-	 * 
+	 * Constructor, initialize the variables of interest
+	 *  
 	 * @param outdir
 	 * @param chrName
 	 * @param chrSize
@@ -37,11 +44,11 @@ public class RunnableDumpData extends Thread implements Runnable{
 		this._res = res;
 		this._matrixSize = matrixSize;
 		this._step = step;
-		_dumpData = dumpData;
+		this._dumpData = dumpData;
 	}
 	
 	/**
-	 * 
+	 * Dump teh data by chr
 	 */
 	public void run(){
 		ProcessDumpData._nbLance++;
@@ -58,7 +65,7 @@ public class RunnableDumpData extends Thread implements Runnable{
 		this._dumpData.getExpected(test,name);
 		String normOutput = this._outdir+File.separator+"normVector";
 		file = new File(normOutput);
-		if (file.exists()==false){file.mkdir();}
+		if (file.exists()==false) file.mkdir();
 		try {
 			this._dumpData.getNormVector(this._chrName,normOutput+File.separator+this._chrName+".norm");
 			System.out.println("start dump "+this._chrName+" size "+this._chrSize);
@@ -89,9 +96,7 @@ public class RunnableDumpData extends Thread implements Runnable{
 				}
 			}
 			System.out.println("##### End dump "+this._chrName);
-		} catch (IOException | InterruptedException e) {
-			e.printStackTrace();
-		}
+		} catch (IOException | InterruptedException e) { e.printStackTrace(); }
 		System.gc();
 		ProcessDumpData._nbLance--;
 	}

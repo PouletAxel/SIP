@@ -134,9 +134,7 @@ public class DumpData {
 	 * 
 	 * @param chr: String name of the chromosme
 	 * @param output: path to the output
-	 * @return 
-	 * @throws IOException
-	 * @throws InterruptedException
+	 * @return
 	 */
 	public boolean getExpected(String chr,String output){
 		int exitValue=1;
@@ -194,21 +192,21 @@ public class DumpData {
 	public class ReturnFlux extends Thread {  
 
 		/**  Flux to redirect  */
-		private InputStream flux;
+		private InputStream _flux;
 
 		/**
 		 * <b>Constructor of ReturnFlux</b>
 		 * @param flux
 		 *  flux to redirect
 		 */
-		public ReturnFlux(InputStream flux){	this.flux = flux; }
+		public ReturnFlux(InputStream flux){	this._flux = flux; }
 		
 		/**
 		 * 
 		 */
 		public void run(){
 			try {    
-				InputStreamReader reader = new InputStreamReader(flux);
+				InputStreamReader reader = new InputStreamReader(this._flux);
 				BufferedReader br = new BufferedReader(reader);
 				String line=null;
 				while ( (line = br.readLine()) != null) _logError = _logError+line+"\n";

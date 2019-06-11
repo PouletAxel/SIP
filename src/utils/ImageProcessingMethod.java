@@ -15,17 +15,17 @@ import ij.process.ImageProcessor;
  */
 public class ImageProcessingMethod{
 	/** Raw image*/
-	ImagePlus _img;
+	private ImagePlus _img;
 	/** ImageProcessor of the raw image*/
-	ImageProcessor _ip;
+	private ImageProcessor _ip;
 	/** value for the min filter strength*/
-	double _minFilterRadius = 0;
+	private double _minFilterRadius = 0;
 	/** max filter strength*/
-	double _maxFilterRadius = 0;
+	private double _maxFilterRadius = 0;
 	/** gaussian filter strength*/
-	double _gaussianFilterRadius = 0;
+	private double _gaussianFilterRadius = 0;
 	/** ImageJ object to run the different filters*/
-	RankFilters _rF = new RankFilters();
+	private RankFilters _rF = new RankFilters();
 
 	/**
 	 * Constructor of ProcessMethod

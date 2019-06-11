@@ -27,9 +27,9 @@ public class Loop {
 	private int _xEnd;
 	/** y coordinate+resolution.*/
 	private int _yEnd;
-	/** */
+	/**Strip object X orientaion */
 	private Strip _stripX;
-	/** */
+	/**Strip object Y orientaion */
 	private Strip _stripY;
 	/** value of the avg of the diff  between loops value and the neighbourhood 8.*/
 	private float _neigbhoord1 = -1;
@@ -50,18 +50,19 @@ public class Loop {
 	private float _peakValue = -1;
 	/** Standard deviation value of the neighbourhood 9.*/
 	private float _std = -1;
-	/** */
+	/** FDR score 1*/
 	private float _paScoreFDR = -1;
-	/** */
+	/**reg fdr socre 1 */
 	private float _regPaScoreFDR = -1;
-	/** */
+	/** FDR score 2 */
 	private float _paScoreFDR2 = -1;
-	/** */
+	/** reg fdr socre 2 */
 	private float _regPaScoreFDR2 = -1;
-	/** */
+	/** FDR score 3*/
 	private float _paScoreFDR3 = -1;
-	/** */
+	/**reg fdr socre 3 */
 	private float _regPaScoreFDR3 = -1;
+	
 	/**
 	 * Loop constructor
 	 * @param name String name of the loop
@@ -69,7 +70,6 @@ public class Loop {
 	 * @param x int x coordinate
 	 * @param y int y coordinate
 	 */
-	
 	public Loop(String name, int x, int y, String chr){
 		this.setName(name);
 		this.setX(x);

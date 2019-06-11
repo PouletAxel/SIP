@@ -5,12 +5,22 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Set;
 
+/**
+ * Method to filter the loops close to white strip or loops which don't reach the different threshold filter
+ * @author axel poulet
+ *
+ */
 public class FilterLoops {
-	/** */
+	/** loops resoluiton*/
 	private int _resolution;
 	/** raw or line with biais value in the hic matrix*/
 	private HashMap<Integer,String> _normVector = new HashMap<Integer,String>();
 	
+	/**
+	 * Constructor 
+	 * @param resolution
+	 * @param normVector
+	 */
 	public FilterLoops(int resolution,HashMap<Integer,String> normVector){
 		this._resolution = resolution;
 		this._normVector = normVector;
@@ -105,8 +115,6 @@ public class FilterLoops {
 		return hLoop;
 	}
 	
-	
-	
 	/**
 	 * Removed loops close to biased HiC signal
 	 * @param loop Loop to test
@@ -117,21 +125,21 @@ public class FilterLoops {
 		int x = loop.getCoordinates().get(0);
 		int y = loop.getCoordinates().get(2);
 		if(loop.getResolution() == this._resolution){
-			if(_normVector.containsKey(x) || _normVector.containsKey(y))
+			if(this._normVector.containsKey(x) || this._normVector.containsKey(y))
 				test = true;
 		}
 		else if(loop.getResolution() == this._resolution*2){
-			if(_normVector.containsKey(x) || _normVector.containsKey(y) || _normVector.containsKey(x+_resolution) || _normVector.containsKey(y+_resolution))
+			if(this._normVector.containsKey(x) || this._normVector.containsKey(y) ||this._normVector.containsKey(x+this._resolution) || this._normVector.containsKey(y+this._resolution))
 				test = true;
 		}
 		else if(loop.getResolution() == this._resolution*5){
 			for(int i = x; i <= x+5*this._resolution; i+=this._resolution){
-				if(_normVector.containsKey(i)){
+				if(this._normVector.containsKey(i)){
 					test = true;
 					break;
 				}
 				for(int j = y; j <= y+5*this._resolution; j+=this._resolution){
-					if(_normVector.containsKey(j)){
+					if(this._normVector.containsKey(j)){
 						test = true;
 						break;
 					}

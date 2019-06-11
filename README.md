@@ -20,7 +20,7 @@
 			-factor 1: run only for the input resolution (default)
 			-factor 2: res and res*2
 			-factor 3: res and res*5
-			-factor 4: res, res*2 and res*5 (default 2)
+			-factor 4: res, res*2 and res*5 (default 1)
 		-max: Maximum filter: increase the region of high intensity (default 2 for hic and 1 hichip)
 		-min: Minimum filter: removed the isolated high value (default 2 for hic and 1 hichip)
 		-sat: % of staturated pixel: enhance the contrast in the image (default 0.01 for hic and 0.5 for hichip)
@@ -38,6 +38,7 @@
 		
 		Axel Poulet
 		Department of Biology, Emory University, 1510 Clifton Rd. NE, Atlanta, GA 30322, USA.
+		Department of Molecular, Cellular  and Developmental Biology Yale University 165 Prospect St New Haven, CT 06511, USA
 		
 		M. Jordan Rowley
 		Department of Biology, Emory University, 1510 Clifton Rd. NE, Atlanta, GA 30322, USA.

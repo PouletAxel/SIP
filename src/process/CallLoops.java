@@ -20,7 +20,8 @@ import utils.Loop;
 import utils.PeakAnalysisScore;
 
 /**
- * 
+ * Class with all the methods to call the reginal maxima in the images and filter and write the output loops file list
+ *  
  * @author axel poulet
  *
  */
@@ -59,22 +60,23 @@ public class CallLoops {
 	/** raw or line with biais value in the hic matrix*/
 		
 	/**
-	 * 
-	 * @param sip
+	 * Constructor
+	 *  
+	 * @param sip SIPOject
 	 */
 	public CallLoops(SIPObject sip){
-		_gauss = sip.getGauss();
-		_min = sip.getMin();
-		_max= sip.getMax();
-		_saturatedPixel = sip.getSaturatedPixel();
-		_matrixSize = sip.getMatrixSize();
-		_resolution = sip.getResolution();
-		_thresholdMaxima = sip.getThresholdMaxima();
-		_diagSize = sip.getDiagSize();
-		_step = sip.getStep();
-		_nbZero = sip.getNbZero();
-		_listFactor = sip.getListFactor();
-		_hichip = sip.isHichip();	
+		this._gauss = sip.getGauss();
+		this._min = sip.getMin();
+		this._max= sip.getMax();
+		this._saturatedPixel = sip.getSaturatedPixel();
+		this._matrixSize = sip.getMatrixSize();
+		this._resolution = sip.getResolution();
+		this._thresholdMaxima = sip.getThresholdMaxima();
+		this._diagSize = sip.getDiagSize();
+		this._step = sip.getStep();
+		this._nbZero = sip.getNbZero();
+		this._listFactor = sip.getListFactor();
+		this._hichip = sip.isHichip();	
 	}
 	
 	/**
@@ -85,14 +87,16 @@ public class CallLoops {
 	 * faire un gros for deguelasse por passer les faceteur de grossissement seulement si listDefacteur > 1.
 	 * make and save image at two differents resolution (m_resolution and m_resolution*2)
 	 * if there is a lot pixel at zero in the images adapt the threshold for the maxima detection
-	 * @param fileList list fo the tuple file
-	 * @param chr name of the chr
+	 * @param fileList
+	 * @param chr
+	 * @param normVector
+	 * @return
 	 * @throws IOException
 	 */
 	public HashMap<String,Loop> detectLoops(File[] fileList, String chr,HashMap<Integer,String> normVector) throws IOException{	
 		CoordinatesCorrection coord = new CoordinatesCorrection();
 		HashMap<String,Loop> hLoop= new HashMap<String,Loop>();
-		FilterLoops filterLoops = new FilterLoops(_resolution,normVector);
+		FilterLoops filterLoops = new FilterLoops(this._resolution,normVector);
 		for(int i = 0; i < fileList.length; ++i){
 			if(fileList[i].toString().contains(".txt")){
 				String[] tfile = fileList[i].toString().split("_");
@@ -111,11 +115,11 @@ public class CallLoops {
 				
 				int thresh = this._thresholdMaxima;
 				double pixelPercent = 100*TupleFileToImage._noZeroPixel/(this._matrixSize*this._matrixSize);
-				if(pixelPercent < 7) 
+				if(pixelPercent < 7)  
 					thresh =  _thresholdMaxima/5;
 				FindMaxima findLoop = new FindMaxima(imgNorm, imgFilter, chr, thresh, this._diagSize, this._resolution);
 				HashMap<String,Loop> temp = findLoop.findloop(this._hichip,numImage, this._nbZero,imgRaw, this._backgroudValue,1);
-				//System.out.println("tpm \t\tchr "+ chr +"\t"+temp.size()+"\tthresh "+thresh+"\tnum "+numImage+"\t"+_hichip+"\tgauss "+this._gauss);
+				
 				PeakAnalysisScore pas = new PeakAnalysisScore(imgNorm,temp);
 				pas.computeScore();
 				

@@ -31,7 +31,6 @@ public class DecayAnalysis {
 		this._img = img;
 	}
 	
-	
 	/**
 	 * getter computing the average difference beetwen the loop value and the neighbourhood 8 values
 	 * @return double stocking the average differential value of the neighbourhood 8.

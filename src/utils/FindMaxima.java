@@ -53,13 +53,15 @@ public class FindMaxima{
 	
 	
 	/**
-	 * Method to find loops in the image for observed and oMe, and fill the loop collection. This method also initiate the object loop,
+	 * Method to find loops in oMe image, and fill the loop collection.
 	 * 
+	 * @param hichip
 	 * @param index int index of the image
 	 * @param nbZero int nb zero allowed around the loop
 	 * @param raw ImagePlus raw image
 	 * @param val int background value of the image
-	 * @return HashMap of loop
+	 * @param factor
+	 * @return
 	 */
 	public HashMap<String,Loop> findloop(boolean hichip, int index, int nbZero, ImagePlus raw, float val, int factor){
 		run(nbZero, raw, val);

@@ -34,11 +34,12 @@ public class TupleFileToImage {
 	private static float _avg = 0;
 	/** Image standard deviation */
 	private static float _std = 0;
-	/** */
+	/** number of pixe == 0 */
 	public static int _noZeroPixel = 0;
 	
 	/**
 	 * TupleFileToImage constructor
+	 * 
 	 * @param fileMatrix tuple file path 
 	 * @param size int size of the image
 	 * @param resolution int size of the bin
@@ -152,8 +153,25 @@ public class TupleFileToImage {
 		return semc;
 	}
 	
+	/**
+	 * getter of the raw image 
+	 * @return ImagePLus raw image
+	 */
 	public ImagePlus getRawImage(){return this._img;}
+	/**
+	 * getter of the normalized image
+	 * @return ImagePlus normalized image
+	 */
 	public ImagePlus getNormImage(){return this._imgNorm;}
+	
+	/**
+	 * setter for the raw Image		
+	 * @param img ImagePlus
+	 */
 	public void setRawImage(ImagePlus img){this._img = img;}
+	/**
+	 * setter of the normalized image
+	 * @param img ImagePLus
+	 */
 	public void setNormImage(ImagePlus img){this._imgNorm = img;}
 }

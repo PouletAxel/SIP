@@ -7,20 +7,25 @@ import java.io.IOException;
 import java.util.HashMap;
 
 /**
- * Runnable class
+ * Runnable class for loops detcetion
  * 
  * @author axel poulet
  *
  */
 public class RunnableDetectLoops extends Thread implements Runnable{
-
+	/** SIP object containing all the parameter for the loops detection*/
 	private SIPObject _sip;
+	/** CallLoops object */
 	private CallLoops _callLoops;
+	/** String results file*/
 	private String _resuFile;
+	/** String name of the chr*/
 	private String _chr;
+	/** norn vector table for the chr of interest*/
 	private HashMap<Integer, String> _normVector = new HashMap<Integer, String> ();
 	
 	/**
+	 * Construtor, initialize all the variables  of interest
 	 * 
 	 * @param chr
 	 * @param callLoops
@@ -33,11 +38,11 @@ public class RunnableDetectLoops extends Thread implements Runnable{
 		this._callLoops =callLoops;
 		this._chr= chr;
 		this._resuFile = resuFile;
-		_normVector = normVector;
+		this._normVector = normVector;
 	}
 	
 	/**
-	 * 
+	 * Run all the process for loops detection by chr
 	 */
 	public void run(){
 		ProcessDetectLoops._nbLance++;
@@ -45,24 +50,18 @@ public class RunnableDetectLoops extends Thread implements Runnable{
 		String outputDir = this._sip.getOutputDir();
 		String inputDir = this._sip.getinputDir();
 		String dir = outputDir+File.separator+_chr+File.separator;
-		if (this._sip.isProcessed())
-			dir = inputDir+File.separator+_chr+File.separator;
+		if (this._sip.isProcessed()) dir = inputDir+File.separator+this._chr+File.separator;
 		try {
 			File[] listOfFiles = _sip.fillList(dir);
 			System.out.println("normVector end loading file: "+_chr+".norm");
-			if (listOfFiles.length == 0)
-				System.out.println("!!!!!!!!!! dumped directory of chromosome"+_chr+" empty");
+			if (listOfFiles.length == 0) System.out.println("!!!!!!!!!! dumped directory of chromosome"+this._chr+" empty");
 			else{
 				File file = new File(this._resuFile);
-				HashMap<String, Loop> data = this._callLoops.detectLoops(listOfFiles,_chr,this._normVector);
-				if (file.length() == 0){
-					_sip.saveFile(_resuFile,data,false);
-				}else 
-					_sip.saveFile(_resuFile,data, true);
+				HashMap<String, Loop> data = this._callLoops.detectLoops(listOfFiles,this._chr,this._normVector);
+				if (file.length() == 0)	_sip.saveFile(this._resuFile,data,false);
+				else this._sip.saveFile(this._resuFile,data, true);
 			}
-		} catch (IOException e1) {
-				e1.printStackTrace();
-		}
+		} catch (IOException e1) { e1.printStackTrace();}
 		System.gc();
 		ProcessDetectLoops._nbLance--;
 	}

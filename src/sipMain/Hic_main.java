@@ -65,39 +65,45 @@ public class Hic_main {
 	private static String _chrSizeFile;
 	/**boolean is true supress all the image created*/
 	private static boolean _delImages = true;
-	/** */
-	private static double _fdr = .01;
-	/** */
+	/** double FDR value for filtering */
+	private static double _fdr = 0.1;
+	/** int number of cpu*/
 	private static int _cpu = 1;
 	/**boolean is true supress all the image created*/
 	private static boolean _gui = false;
 	/**Strin for the documentation*/
 	private static String _doc = ("SIP Version 1 run with java 8\n"
-			+"Usage:\n"
-			+"\thic <hicFile> <chrSizeFile> <Output> <juicerToolsPath> [options]\n"
-			+"\tprocessed <Directory with processed data> <chrSizeFile> <Output> [options]\n"
-			+"chrSizeFile: path to the chr size file, with the same name of the chr as in the hic file\n"
-			+"-res: resolution in bases (default 5000 bases)\n"
-			+"-mat: matrix size to use for each chunk of the chromosome (default 2000 bins)\n"
-			+"-d: diagonal size in bins, remove the maxima found at this size (eg: a size of 2 at 5000 bases resolution "
-			+ "removed all maxima detected at a distance inferior or equal to 10kb) (default 5 bins).\n"
-			+"-g: Gaussian filter: smoothing factor reduce noise during primary maxima detection (default 2 for hic and 1 for hichip)\n"
-			+"-cpu: Number of CPU used for SIP processing (default 1)\n"
-			+"-hichip: true fo HiChIP or false for Hi-C (default false)\n"
-			+"-factor: Multiple resolutions can be specified using: "
-			+ "\t-factor 1: run only for the input res (default)\n"
-			+ "\t-factor 2: res and res*2\n"
-			+ "\t-factor 3: res and res*5\n"
-			+ "\t-factor 4: res, res*2 and res*5 \n"
-			+"-max: Maximum filter: increase the region of high intensity (default 2 for hic and 1 hichip)\n"
-			+"-min: Minimum filter: removed the isolated high value (default 2 for hic and 1 hichip)\n"
-			+"-sat: % of staturated pixel: enhance the contrast in the image (default 0.01 for hic and 0.5 for hichip)\n"
-			+"-t Threshold for loops detection (default 2800 for hic and 1 for hichip)\n"
-			+ "-nbZero: number of zeros: number of pixels equal to zero that are allowed in the 24 pixels sourrounding the detected maxima (default parameter 6 for hic and 25 for hichip)\n"
-			+ "-norm: <NONE/VC/VC_SQRT/KR> only for hic option (default KR)\n"
-			+ "-del: true or false, delete tif files used for loop detection (default true)\n"
-			+ "-fdr: FDR value for filtering (default 0.1)\n"
-			+"-h, --help print help\n");
+			+"SIP is implemented in java and includes achoice between command line options or a graphical user interface (gui) allowing for more general use.\n"
+			+ "This method is intended as an alternative loop caller especially for difficult to identify loops and works inconjunction with juicebox .hic files.\n"
+			+ "\nUsage:\n"
+			+ "\thic <hicFile> <chrSizeFile> <Output> <juicerToolsPath> [options]\n"
+			+ "\tprocessed <Directory with processed data> <chrSizeFile> <Output> [options]\n"
+			+ "\nParamters:\n"
+			+ "\tchrSizeFile: path to the chr size file, with the same name of the chr as in the hic file\n"
+			+ "\t-res: resolution in bases (default 5000 bases)\n"
+			+ "\t-mat: matrix size to use for each chunk of the chromosome (default 2000 bins)\n"
+			+ "\t-d: diagonal size in bins, remove the maxima found at this size (eg: a size of 2 at 5000 bases resolution removed all maxima detected at a distance inferior or equal to 10kb) (default 5 bins).\n"
+			+ "\t-g: Gaussian filter: smoothing factor reduce noise during primary maxima detection (default 2 for hic and 1 for hichip)\n"
+			+ "\t-cpu: Number of CPU used for SIP processing (default 1)\n"
+			+ "\t-hichip: true fo HiChIP or false for Hi-C (default false)\n"
+			+ "\t-factor: Multiple resolutions can be specified using:\n"
+			+ "\t\t-factor 1: run only for the input resolution (default)\n"
+			+ "\t\t-factor 2: res and res*2\n"
+			+ "\t\t-factor 3: res and res*5\n"
+			+ "\t\t-factor 4: res, res*2 and res*5 (default 1)\n"
+			+ "\t-max: Maximum filter: increase the region of high intensity (default 2 for hic and 1 hichip)\n"
+			+ "\t-min: Minimum filter: removed the isolated high value (default 2 for hic and 1 hichip)\n"
+			+ "\t-sat: % of staturated pixel: enhance the contrast in the image (default 0.01 for hic and 0.5 for hichip)\n"
+			+ "\t-t Threshold for loops detection (default 2800 for hic and 1 for hichip)\n"
+			+ "\t-nbZero: number of zeros: number of pixels equal to zero that are allowed in the 24 pixels sourrounding the detected maxima (default parameter 6 for hic and 25 for hichip)\n"
+			+ "\t-norm: <NONE/VC/VC_SQRT/KR> only for hic option (default KR)\n"
+			+ "\t-del: true or false, delete tif files used for loop deection (default true)\n"
+			+ "\t-fdr: FDR value for filtering (default 0.1)\n"
+			+ "\t-h, --help print help\n"
+			+ "\ncommand line eg:\n"
+			+ "\tjava -jar SIP_HiC.jar processed inputDirectory pathToChromosome.size OutputDir .... paramaters\n"
+			+ "\tjava -jar SIP_HiC.jar hic inputDirectory pathToChromosome.size OutputDir juicer_tools.jar\n");
+			
 	/**
 	 * Main function to run all the process, can be run with gui or in command line.
 	 * With command line with 1 or less than 5 parameter => run only the help
@@ -111,7 +117,6 @@ public class Hic_main {
 	
 	public static void main(String[] args) throws IOException, InterruptedException {
 		_factor.add(1);
-		//_factor.add(2);
 		if (args.length >= 1 && args.length < 4){
 			System.out.println(_doc);
 			System.exit(0);
@@ -183,62 +188,26 @@ public class Hic_main {
 		
 		SIPObject sip;
 		if(_isProcessed==false){
-			System.out.println("hic mode: \n"
-					+ "input: "+_input+"\n"
-					+ "output: "+_output+"\n"
-					+ "juiceBox: "+_juiceBoxTools+"\n"
-					+ "norm: "+ _juiceBoXNormalisation+"\n"
-					+ "gauss: "+_gauss+"\n"
-					+ "min: "+_min+"\n"
-					+ "max: "+_max+"\n"
-					+ "matrix size: "+_matrixSize+"\n"
-					+ "diag size: "+_diagSize+"\n"
-					+ "resolution: "+_resolution+"\n"
-					+ "saturated pixel: "+_saturatedPixel+"\n"
-					+ "threshold: "+_thresholdMax+"\n"
-					+ "number of zero :"+_nbZero+"\n"
-					+ "factor "+ _factOption+"\n"
-					+ "fdr "+_fdr+"\n"
-					+ "del "+_delImages+"\n"
-					+ "cpu"+ _cpu+"\n"
-					+ "isHichip"+ _isHiChip+"\n");
+			System.out.println("hic mode: \n"+ "input: "+_input+"\n"+ "output: "+_output+"\n"+ "juiceBox: "+_juiceBoxTools+"\n"+ "norm: "+ _juiceBoXNormalisation+"\n"
+					+ "gauss: "+_gauss+"\n"+ "min: "+_min+"\n"+ "max: "+_max+"\n"+ "matrix size: "+_matrixSize+"\n"+ "diag size: "+_diagSize+"\n"+ "resolution: "+_resolution+"\n"
+					+ "saturated pixel: "+_saturatedPixel+"\n"+ "threshold: "+_thresholdMax+"\n"+ "number of zero :"+_nbZero+"\n"+ "factor "+ _factOption+"\n"+ "fdr "+_fdr+"\n"
+					+ "del "+_delImages+"\n"+ "cpu"+ _cpu+"\n"+ "isHichip"+ _isHiChip+"\n");
 			
-			sip = new SIPObject(_output, _chrSize, _gauss,
-					_min, _max, _resolution, _saturatedPixel,
-					_thresholdMax, _diagSize, _matrixSize,
-					_nbZero, _factor,_fdr,
-					_isProcessed,_isHiChip);
+			sip = new SIPObject(_output, _chrSize, _gauss, _min, _max, _resolution, _saturatedPixel,
+					_thresholdMax, _diagSize, _matrixSize, _nbZero, _factor,_fdr, _isProcessed,_isHiChip);
 			sip.setIsGui(_gui);
 			ProcessDumpData processDumpData = new ProcessDumpData();
 			processDumpData.go(_input, sip, _chrSize, _juiceBoxTools, _juiceBoXNormalisation, _cpu-1);
 			System.out.println("########### End of the dump Step");
 		}else{
-			System.out.println("processed mode:\n"
-					+ "input: "+_input+"\n"
-					+ "output: "+_output+"\n"
-					+ "juiceBox: "+_juiceBoxTools+"\n"
-					+ "norm: "+ _juiceBoXNormalisation+"\n"
-					+ "gauss: "+_gauss+"\n"
-					+ "min: "+_min+"\n"
-					+ "max: "+_max+"\n"
-					+ "matrix size: "+_matrixSize+"\n"
-					+ "diag size: "+_diagSize+"\n"
-					+ "resolution: "+_resolution+"\n"
-					+ "saturated pixel: "+_saturatedPixel+"\n"
-					+ "threshold: "+_thresholdMax+"\n"
-					+ "isHic: "+_isHic+"\n"
-					+ "isProcessed: "+_isProcessed+"\n"
-					+ "number of zero:"+_nbZero+"\n"
-					+ "factor "+ _factOption+"\n"
-					+ "fdr "+_fdr+ "\n"
-					+ "del "+_delImages+"\n"
-					+ "cpu"+ _cpu+"\n"
-					+ "isHichip"+ _isHiChip+"\n");
-			sip = new SIPObject(_input,_output, _chrSize,
-					_gauss, _min, _max,
-					_resolution, _saturatedPixel, _thresholdMax,
-					_diagSize, _matrixSize, _nbZero,
-					_factor,_fdr,_isProcessed,_isHiChip);
+			System.out.println("processed mode:\n"+ "input: "+_input+"\n"+ "output: "+_output+"\n"+ "juiceBox: "+_juiceBoxTools+"\n"
+					+ "norm: "+ _juiceBoXNormalisation+"\n"+ "gauss: "+_gauss+"\n"+ "min: "+_min+"\n"+ "max: "+_max+"\n"+ "matrix size: "+_matrixSize+"\n"
+					+ "diag size: "+_diagSize+"\n"+ "resolution: "+_resolution+"\n"+ "saturated pixel: "+_saturatedPixel+"\n"+ "threshold: "+_thresholdMax+"\n"
+					+ "isHic: "+_isHic+"\n"	+ "isProcessed: "+_isProcessed+"\n"+ "number of zero:"+_nbZero+"\n"+ "factor "+ _factOption+"\n"+ "fdr "+_fdr+ "\n"
+					+ "del "+_delImages+"\n"+ "cpu"+ _cpu+"\n"+ "isHichip"+ _isHiChip+"\n");
+			
+			sip = new SIPObject(_input,_output, _chrSize, _gauss, _min, _max, _resolution, _saturatedPixel, _thresholdMax,
+					_diagSize, _matrixSize, _nbZero,_factor,_fdr,_isProcessed,_isHiChip);
 			sip.setIsGui(_gui);
 		}
 		System.out.println("Start loop detction step");
@@ -247,45 +216,15 @@ public class Hic_main {
 		System.out.println("###########End loop detction step");
 		BufferedWriter writer = new BufferedWriter(new FileWriter(new File(_output+File.separator+"parameters.txt")));
 		if(_isProcessed){
-				writer.write("java -jar sip.jar processed "
-					+ _input+" "
-					+ _chrSizeFile+" "
-					+_output+" "
-					+_gauss
-					+" -mat "+_matrixSize
-					+" -d "+_diagSize
-					+" -res "+_resolution
-					+" -t "+_thresholdMax
-					+" -min "+_min
-					+" -max "+_max
-					+" -sat "+_saturatedPixel
-					+" -nbZero "+_nbZero
-					+" -factor "+ _factOption
-					+" -fdr "+_fdr
-					+" -del "+_delImages
-					+" -cpu "+ _cpu
-					+" -hichip "+_isHiChip+"\n");
+				writer.write("java -jar sip.jar processed "	+ _input+" "+ _chrSizeFile+" "+_output+" "+_gauss+" -mat "+_matrixSize+" -d "+_diagSize
+					+" -res "+_resolution+" -t "+_thresholdMax+" -min "+_min+" -max "+_max+" -sat "+_saturatedPixel+" -nbZero "+_nbZero
+					+" -factor "+ _factOption+" -fdr "+_fdr+" -del "+_delImages+" -cpu "+ _cpu+" -hichip "+_isHiChip+"\n");
 			
 		}else{
-			writer.write("java -jar sip.jar hic "+_input+" "
-					+_chrSizeFile+" "
-					+_output+" "
-					+_juiceBoxTools+
-					" -norm "+ _juiceBoXNormalisation+
-					" -g "+_gauss+
-					" -min "+_min+
-					" -max "+_max+
-					" -mat "+_matrixSize+
-					" -d "+_diagSize+
-					" -res "+_resolution+
-					" -sat "+_saturatedPixel+
-					" -t "+_thresholdMax+
-					" -nbZero "+_nbZero+
-					" -factor "+ _factOption+
-					" -fdr "+_fdr+
-					" -del "+_delImages+
-					" -cpu "+ _cpu+
-					" -hichip "+_isHiChip+"\n");
+			writer.write("java -jar sip.jar hic "+_input+" "+_chrSizeFile+" "+_output+" "+_juiceBoxTools+
+					" -norm "+ _juiceBoXNormalisation+" -g "+_gauss+" -min "+_min+" -max "+_max+" -mat "+_matrixSize+
+					" -d "+_diagSize+" -res "+_resolution+" -sat "+_saturatedPixel+" -t "+_thresholdMax+" -nbZero "+_nbZero+
+					" -factor "+ _factOption+" -fdr "+_fdr+" -del "+_delImages+" -cpu "+ _cpu+" -hichip "+_isHiChip+"\n");
 		}
 		writer.close();	
 		if(_delImages){

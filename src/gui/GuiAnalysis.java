@@ -472,7 +472,7 @@ public class GuiAnalysis extends JFrame{
 			GridBagConstraints.NONE, new Insets(190, 230, 0, 0), 0, 0
 		));
 		
-		this._jtfFdr.setText("0.01");
+		this._jtfFdr.setText("0.1");
 		this._jtfFdr.setPreferredSize(new java.awt.Dimension(60, 21));
 		this._jtfFdr.setFont(new java.awt.Font("arial",2,11));
 		this._container.add( this._jtfFdr, new GridBagConstraints(

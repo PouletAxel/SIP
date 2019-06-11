@@ -16,24 +16,24 @@ public class Progress extends JFrame{
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	public JProgressBar bar;
+	public JProgressBar _bar;
 	
 	public Progress(String title, int nbChromo){      
 		this.setSize(300, 80);
 		this.setTitle("*** "+title+" ***");
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		this.setLocationRelativeTo(null);      
-      
-		bar  = new JProgressBar();
-		bar.setMaximum(nbChromo);
-		bar.setMinimum(0);
-		bar.setStringPainted(true);
-      
-		this.getContentPane().add(bar, BorderLayout.CENTER);  
+		this._bar  = new JProgressBar();
+		this._bar.setMaximum(nbChromo);
+		this._bar.setMinimum(0);
+		this._bar.setStringPainted(true);
+		this.getContentPane().add(this._bar, BorderLayout.CENTER);  
 		this.setVisible(true);
   }
 
-  public static void main(String[] args){
-    new Progress("prout", 22);
-  }   
+	/**
+	 * 
+	 * @param args
+	 */
+	public static void main(String[] args){ new Progress("test", 22);}   
 }

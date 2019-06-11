@@ -57,30 +57,34 @@ public class SIPObject {
 	private ArrayList<Integer> _listFactor = new ArrayList<Integer>();
 	/**	boolean if true hichip data if false hic */
 	private boolean _isHichip = false;
-	/** */
+	/** fdr value */
 	private double _fdr;
-	/** */
+	/** is processed booelan*/
 	private boolean _isProcessed = false;
-	/** */
+	/** id is gui analysis*/
 	private boolean _isGui = false;
 	
 	
 	
 	/**
-	 * WholeGenomeAnalysis constructor
+	 * SIPObject constructor
 	 * 
-	 * @param output: String path of the results 
-	 * @param chrSize: HashMap<String, Integer> hashmap with the chr size info
-	 * @param gauss: double of the strength of the gaussian filter
-	 * @param min: double of the strength of the min filter
-	 * @param max: double of the strength of the max filter
-	 * @param resolution: int size of the bins
-	 * @param saturatedPixel: % of staurated pixel after enhance contrast
-	 * @param thresholdMax: threshold for the maxima detection 
-	 * @param diagSize: size of the diag
-	 * @param matrixSize: size of the image to analyse
+	 * @param output
+	 * @param chrSize
+	 * @param gauss
+	 * @param min
+	 * @param max
+	 * @param resolution
+	 * @param saturatedPixel
+	 * @param thresholdMax
+	 * @param diagSize
+	 * @param matrixSize
+	 * @param nbZero
+	 * @param listFactor
+	 * @param fdr
+	 * @param isProcessed
+	 * @param isHichip
 	 */
-	 
 	public SIPObject(String output, HashMap<String, Integer> chrSize, double gauss, double min,
 			double max, int resolution, double saturatedPixel, int thresholdMax,
 			int diagSize, int matrixSize, int nbZero,ArrayList<Integer> listFactor,
@@ -104,6 +108,25 @@ public class SIPObject {
 		this._isHichip = isHichip;
 	}
 
+	/**
+	 * SIPObject constructor
+	 * @param input
+	 * @param output
+	 * @param chrSize
+	 * @param gauss
+	 * @param min
+	 * @param max
+	 * @param resolution
+	 * @param saturatedPixel
+	 * @param thresholdMax
+	 * @param diagSize
+	 * @param matrixSize
+	 * @param nbZero
+	 * @param listFactor
+	 * @param fdr
+	 * @param isProcessed
+	 * @param isHichip
+	 */
 	public SIPObject(String input, String output, HashMap<String, Integer> chrSize, double gauss, double min,
 			double max, int resolution, double saturatedPixel, int thresholdMax,
 			int diagSize, int matrixSize, int nbZero,ArrayList<Integer> listFactor,
@@ -132,17 +155,17 @@ public class SIPObject {
 	 * 
 	 * @param pathFile String path for the results file
 	 * @param first boolean to know idf it is teh first chromo
+	 * @param data
 	 * @throws IOException
 	 */
 	public void saveFile(String pathFile, HashMap<String,Loop> data, boolean first) throws IOException{
 		FDR fdrDetection = new FDR ();
-		fdrDetection.run(_fdr, data);
+		fdrDetection.run(this._fdr, data);
 		double RFDRcutoff = fdrDetection.getRFDRcutoff();
 		double FDRcutoff = fdrDetection.getFDRcutoff();
 		System.out.println("Filtering value at "+this._fdr+" FDR is "+FDRcutoff+" APscore and "+RFDRcutoff+" RegionalAPscore\n");
 		BufferedWriter writer;
-		if(first)
-			writer = new BufferedWriter(new FileWriter(new File(pathFile), true));
+		if(first) writer = new BufferedWriter(new FileWriter(new File(pathFile), true));
 		else{
 			writer = new BufferedWriter(new FileWriter(new File(pathFile)));
 			writer.write("chromosome1\tx1\tx2\tchromosome2\ty1\ty2\tcolor\tAPScoreAvg\tProbabilityofEnrichment\tRegAPScoreAvg\tAvg_diffMaxNeihgboor_1\tAvg_diffMaxNeihgboor_2\tavg\tstd\tvalue\n");
@@ -158,7 +181,6 @@ public class SIPObject {
 						+"\t"+loop.getPaScoreAvg()+"\t"+loop.getPaScoreAvgdev()+"\t"+loop.getRegionalPaScoreAvg()+"\t"
 						+loop.getNeigbhoord1()+"\t"+loop.getNeigbhoord2()+"\t"+loop.getAvg()+"\t"
 						+loop.getStd()+"\t"+loop.getValue()+"\n");
-				
 			}
 		}
 		writer.close();
@@ -170,6 +192,7 @@ public class SIPObject {
 	 * @return
 	 * @throws IOException
 	 */
+	
 	public File[] fillList(String dir) throws IOException{
 		File folder = new File(dir);
 		File[] listOfFiles = folder.listFiles();
@@ -192,7 +215,7 @@ public class SIPObject {
 			while (line != null){
 				sb.append(line);
 				if((line.equals("NaN")|| line.equals("NAN") || line.equals("nan") || line.equals("na")  || Double.parseDouble(line) < 0.30)){
-					normVector.put(lineNumber*_resolution, "plop");
+					normVector.put(lineNumber*this._resolution, "plop");
 				}
 				++lineNumber;
 				sb.append(System.lineSeparator());
