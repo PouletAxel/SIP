@@ -21,7 +21,7 @@ import javax.swing.JTextField;
 
 
 /**
- * Class to construct graphical interface for the chromocenter analysis pipeline in batch
+ * GUI for SIP program
  * 
  * @author poulet axel
  *
@@ -32,8 +32,6 @@ public class GuiAnalysis extends JFrame{
 	private static final long serialVersionUID = 1L;
 	/** */
 	private Container _container;
-	/** */
-	private JLabel _jlWorkDir;
 	/** */
 	private JButton _jbWorkDir = new JButton("Output directory");
 	/** */
@@ -51,8 +49,6 @@ public class GuiAnalysis extends JFrame{
 	/** */
 	private JButton _jbQuit = new JButton("Quit");
 	/** */
-	private JLabel _jlInputFileType;
-	/** */
 	private ButtonGroup _bGroupInputType = new ButtonGroup();
 	/** */
 	private JRadioButton _jrbHic = new JRadioButton("hic");
@@ -64,14 +60,10 @@ public class GuiAnalysis extends JFrame{
 	private JRadioButton _jrbHiCData = new JRadioButton("hic");
 	/** */
 	private JRadioButton _jrbHichipData = new JRadioButton("HiChIP");
-	/** */
-    private String _juiceBoxTools;
     /** */
     private JTextField _jtfBoxTools = new JTextField();
     /** */
     private JButton _jbBoxTools = new JButton("JuiceBox Tools");
-    /** */
-    private JLabel _jlNorm;
     /** */
     private ButtonGroup _bNorm = new ButtonGroup();
     /** */
@@ -82,53 +74,28 @@ public class GuiAnalysis extends JFrame{
     private JRadioButton _jrbVC = new JRadioButton("VC");
     /** */
     private JRadioButton _jrbVC_sqrt = new JRadioButton("VC SQRT");
-    /** */    
-    private JLabel _imgParam;
     /** */
-	private JFormattedTextField _matrixSize = new JFormattedTextField(Number.class);
+	private JFormattedTextField _jtfMatrixSize = new JFormattedTextField(Number.class);
 	/** */
-	private JFormattedTextField _resolution = new JFormattedTextField(Number.class);
+	private JFormattedTextField _jtfResolution = new JFormattedTextField(Number.class);
 	/** */
-	private JFormattedTextField _diagSize =  new JFormattedTextField(Number.class);
-	/** */
-    private JLabel _jlMatrixSize;
+	private JFormattedTextField _jtfDiagSize =  new JFormattedTextField(Number.class);
     /** */
-    private JLabel _jlResolution;
+    private JFormattedTextField _jtfGaussian = new JFormattedTextField(Number.class);
     /** */
-    private JLabel _jldiagSize;
+    private JFormattedTextField _jtfMin = new JFormattedTextField(Number.class);
     /** */
-    private JFormattedTextField _gaussian = new JFormattedTextField(Number.class);
+    private JFormattedTextField _jtfMax =  new JFormattedTextField(Number.class);
     /** */
-    private JFormattedTextField _min = new JFormattedTextField(Number.class);
+    private JFormattedTextField _jtfEnhanceContrast =  new JFormattedTextField(Number.class);
     /** */
-    private JFormattedTextField _max =  new JFormattedTextField(Number.class);
+    private JFormattedTextField _jtfNbZero =  new JFormattedTextField(Number.class);
     /** */
-    private JFormattedTextField _enhanceContrast =  new JFormattedTextField(Number.class);
-    /** */
-    private JFormattedTextField _nbZero =  new JFormattedTextField(Number.class);
-    /** */
-    private JFormattedTextField _noiseTolerance =  new JFormattedTextField(Number.class);
-    /** */
-    private JLabel _jlGaussian;
-    /** */
-    private JLabel _jlMin;
-    /** */
-    private JLabel _jlMax;
-    /** */
-    private JLabel _jlEnhance;
-    /** */
-    private JLabel _jlNbZero;
-    /** */
-    private JLabel _jlNT;
-    /** */
-    private JLabel _jlFDR;
+    private JFormattedTextField _jtfNoiseTolerance =  new JFormattedTextField(Number.class);
     /** */
     private boolean _start = false;
     /** */
-    private JLabel _jCPU;
-    /** */
-    private JFormattedTextField _cpu = new JFormattedTextField(Number.class);
-    
+    private JFormattedTextField _jtfCpu = new JFormattedTextField(Number.class);
     /** */
     private JCheckBox _checkbox2 = new JCheckBox("resolution*2",false);
     /** */
@@ -136,8 +103,11 @@ public class GuiAnalysis extends JFrame{
    
     private JCheckBox _checkboxDeleteTif = new JCheckBox("Delete tif files",true);
     /** */
-    private JFormattedTextField _fdr =  new JFormattedTextField(Number.class);
-	/**
+    private JFormattedTextField _jtfFdr =  new JFormattedTextField(Number.class);
+	
+    
+    /**
+	 * gui main
 	 * 
 	 * @param args
 	 */
@@ -148,7 +118,7 @@ public class GuiAnalysis extends JFrame{
 	
     
     /**
-     * Architecture of the graphical windows
+     * GUI Architecture
      *
      */
     
@@ -162,427 +132,399 @@ public class GuiAnalysis extends JFrame{
 		this.setBackground(Color.LIGHT_GRAY);
 		
 		
-		_container = getContentPane();
+		this._container = getContentPane();
 		GridBagLayout gridBagLayout = new GridBagLayout();
 	   	gridBagLayout.rowWeights = new double[] {0.0, 0.0, 0.0, 0.1};
 	   	gridBagLayout.rowHeights = new int[] {17, 270, 124, 7};
 	   	gridBagLayout.columnWeights = new double[] {0.0, 0.0, 0.0, 0.1};
 	   	gridBagLayout.columnWidths = new int[] {270, 120, 72, 20};
-	   	_container.setLayout (gridBagLayout);
+	   	this._container.setLayout (gridBagLayout);
 	   	
 	   	//////////////////////////////////////// First case of the grid bag layout
 	   	
 	    /////////////////////// group of radio button to choose the input type file 
-	   	_jlInputFileType = new JLabel();
-		_jlInputFileType.setFont(new java.awt.Font("arial",1,12));
-	   	_jlInputFileType.setText("Program choice:");
-	   	_container.add(_jlInputFileType, new GridBagConstraints(
+	   	JLabel label= new JLabel();
+	   	label.setFont(new java.awt.Font("arial",1,12));
+	   	label.setText("Program choice:");
+	   	this._container.add(label, new GridBagConstraints(
 	   		0, 1, 0, 0, 0.0, 0.0, GridBagConstraints.NORTHWEST,
 	   		GridBagConstraints.NONE, new Insets(0, 10, 0, 0), 0, 0
 	   	));
 	   	
-	   	_bGroupInputType.add(_jrbProcessed);
-	 	_bGroupInputType.add(_jrbHic);
+	   	this._bGroupInputType.add(this._jrbProcessed);
+	   	this._bGroupInputType.add(this._jrbHic);
 	 	
-		_jrbHic.setFont(new java.awt.Font("arial",2,11));
-		_jrbProcessed.setFont(new java.awt.Font("arial",2,11));
-		_container.add(_jrbHic,new GridBagConstraints(
+	   	this._jrbHic.setFont(new java.awt.Font("arial",2,11));
+	   	this._jrbProcessed.setFont(new java.awt.Font("arial",2,11));
+	   	this._container.add(this._jrbHic,new GridBagConstraints(
 			0, 1, 0, 0, 0.0, 0.0, GridBagConstraints.NORTHWEST,
 			GridBagConstraints.NONE, new Insets(20, 20, 0, 0), 0, 0
 		));
-		_container.add(_jrbProcessed,new GridBagConstraints(
+	   	this._container.add(this._jrbProcessed,new GridBagConstraints(
 			0, 1, 0, 0,  0.0, 0.0, GridBagConstraints.NORTHWEST,
 			GridBagConstraints.NONE,new Insets(20, 100, 0, 0), 0, 0
 		));
 		
-		_jrbHic.setSelected(true);
+	   	this._jrbHic.setSelected(true);
 		
 /////////////////////////////////////
-		_jlInputFileType = new JLabel();
-		_jlInputFileType.setFont(new java.awt.Font("arial",1,12));
-	   	_jlInputFileType.setText("Data type:");
-	   	_container.add(_jlInputFileType, new GridBagConstraints(
+		label = new JLabel();
+		label.setFont(new java.awt.Font("arial",1,12));
+		label.setText("Data type:");
+		this._container.add(label, new GridBagConstraints(
 	   		0, 1, 0, 0, 0.0, 0.0, GridBagConstraints.NORTHWEST,
 	   		GridBagConstraints.NONE, new Insets(0, 250, 0, 0), 0, 0
 	   	));
 	   	
 	   	this._bGroupInputData.add(this._jrbHiCData);
-	   	_bGroupInputData.add(this._jrbHichipData);
-	 	
-	 	_jrbHiCData.setFont(new java.awt.Font("arial",2,11));
-	 	_jrbHichipData.setFont(new java.awt.Font("arial",2,11));
-		_container.add(_jrbHiCData,new GridBagConstraints(
+	   	this._bGroupInputData.add(this._jrbHichipData);
+	   	this._jrbHiCData.setFont(new java.awt.Font("arial",2,11));
+	   	this._jrbHichipData.setFont(new java.awt.Font("arial",2,11));
+	   	this._container.add(this._jrbHiCData,new GridBagConstraints(
 			0, 1, 0, 0, 0.0, 0.0, GridBagConstraints.NORTHWEST,
 			GridBagConstraints.NONE, new Insets(20, 280, 0, 0), 0, 0
 		));
-		
-		_container.add(_jrbHichipData,new GridBagConstraints(
+	   	this._container.add(this._jrbHichipData,new GridBagConstraints(
 			0, 1, 0, 0,  0.0, 0.0, GridBagConstraints.NORTHWEST,
 			GridBagConstraints.NONE,new Insets(20, 380, 0, 0), 0, 0
 		));
-		
-		_jrbHiCData.setSelected(true);
+	   	this._jrbHiCData.setSelected(true);
 //////////////////////////////////////////////
 			
-		_jbBoxTools.setPreferredSize(new java.awt.Dimension(120, 21));
-		_jbBoxTools.setFont(new java.awt.Font("Albertus",2,10));
-	   	_container.add(_jbBoxTools, new GridBagConstraints(
+	   	this._jbBoxTools.setPreferredSize(new java.awt.Dimension(120, 21));
+	   	this._jbBoxTools.setFont(new java.awt.Font("Albertus",2,10));
+	   	this._container.add(this._jbBoxTools, new GridBagConstraints(
 	   		0, 1, 0, 0, 0.0, 0.0,GridBagConstraints.NORTHWEST,
 	   		GridBagConstraints.NONE, new Insets(50, 20, 0, 0), 0, 0
 	   	));
 	  
-	   	_jtfBoxTools.setPreferredSize(new java.awt.Dimension(280, 21));
-	   	_jtfBoxTools.setFont(new java.awt.Font("Albertus",2,10));	
-		_container.add( _jtfBoxTools, new GridBagConstraints(
+	   	this._jtfBoxTools.setPreferredSize(new java.awt.Dimension(280, 21));
+	   	this._jtfBoxTools.setFont(new java.awt.Font("Albertus",2,10));	
+	   	this._container.add( this._jtfBoxTools, new GridBagConstraints(
 			0, 1, 0, 0, 0.0, 0.0, GridBagConstraints.NORTHWEST,
 			GridBagConstraints.NONE, new Insets(50, 160, 0, 0), 0, 0
 		));
-		
-		_jlNorm = new JLabel();
-		_jlNorm.setText("Normalization scheme (prefers KR):");
-		_jlNorm.setFont(new java.awt.Font("arial",2,11));
-	   	_container.add(_jlNorm, new GridBagConstraints(
+/////////////////////////////////////////////////////		
+		label = new JLabel();
+		label.setText("Normalization scheme (prefers KR):");
+		label.setFont(new java.awt.Font("arial",2,11));
+		this._container.add(label, new GridBagConstraints(
 	   		0, 1, 0, 0, 0.0, 0.0, GridBagConstraints.NORTHWEST,
 	   		GridBagConstraints.NONE, new Insets(83, 20, 0, 0), 0, 0
 	   	));
 	   	
-	   	_bNorm.add(_jrbNone);
-	   	_bNorm.add(_jrbKR);
-	   	_bNorm.add(_jrbVC);
-	   	_bNorm.add(_jrbVC_sqrt);
-	   	
-	   	_jrbNone.setFont(new java.awt.Font("arial",2,11));
-	   	_jrbKR.setFont(new java.awt.Font("arial",2,11));
-	   	_jrbVC.setFont(new java.awt.Font("arial",2,11));
-	   	_jrbVC_sqrt.setFont(new java.awt.Font("arial",2,11));
-		
-	   	_container.add(_jrbNone,new GridBagConstraints(
+		this._bNorm.add(this._jrbNone);
+		this._bNorm.add(this._jrbKR);
+		this._bNorm.add(this._jrbVC);
+		this._bNorm.add(this._jrbVC_sqrt);
+		this._jrbNone.setFont(new java.awt.Font("arial",2,11));
+		this._jrbKR.setFont(new java.awt.Font("arial",2,11));
+		this._jrbVC.setFont(new java.awt.Font("arial",2,11));
+		this._jrbVC_sqrt.setFont(new java.awt.Font("arial",2,11));
+		this._container.add(this._jrbNone,new GridBagConstraints(
 	   		0, 1, 0, 0, 0.0, 0.0, GridBagConstraints.NORTHWEST,
 			GridBagConstraints.NONE, new Insets(80, 220, 0, 0), 0, 0
 		));
-		
-	   	_container.add(_jrbKR,new GridBagConstraints(
+		this._container.add(this._jrbKR,new GridBagConstraints(
 	   		0, 1, 0, 0,  0.0, 0.0, GridBagConstraints.NORTHWEST,
 			GridBagConstraints.NONE,new Insets(80, 290, 0, 0), 0, 0
 		));
 		
-	   	_container.add(_jrbVC, new GridBagConstraints(
+		this._container.add(this._jrbVC, new GridBagConstraints(
 			0,1, 0, 0, 0.0, 0.0,GridBagConstraints.NORTHWEST,
 			GridBagConstraints.NONE, new Insets(80, 340, 0, 0), 0, 0
 		));
 	   	
-		_container.add(_jrbVC_sqrt, new GridBagConstraints(
+		this._container.add(this._jrbVC_sqrt, new GridBagConstraints(
 			0,1, 0, 0, 0.0, 0.0,GridBagConstraints.NORTHWEST,
 			GridBagConstraints.NONE, new Insets(80, 390, 0, 0), 0, 0
 		));
-		_jrbKR.setSelected(true);
-		
-	   	_jlWorkDir = new JLabel();
-		_jlWorkDir.setText("Data and Output directories : ");
-		_jlWorkDir.setFont(new java.awt.Font("arial",1,12));
-	   	_container.add( _jlWorkDir, new GridBagConstraints(
+		this._jrbKR.setSelected(true);
+/////////////////////////////////////////////////////////////////////////		
+		label = new JLabel();
+		label.setText("Data and Output directories : ");
+		label.setFont(new java.awt.Font("arial",1,12));
+		this._container.add( label, new GridBagConstraints(
 	   		0, 1, 0, 0, 0.0, 0.0, GridBagConstraints.NORTHWEST,
 	   		GridBagConstraints.NONE, new Insets(105, 10, 0, 0), 0, 0
 	   	));
 	   	
-	   
-	   	/*JTextPane jTextPane = new JTextPane();
-	   	jTextPane.setContentType("text/html");
-	   	jTextPane.setBackground(Color.LIGHT_GRAY);
-	   	jTextPane.setText(
-	   			"<html> <font face=arial><font size=-1><center> The data directory must contain:"
-	   			
-	   			+ "<br/>.hic file"
-	   			+ "<strong><br/>OR</strong>"
-	   			+ "<br/>data processed by SIP" );
-	   	jTextPane.setEditable(false);
-	   	_container.add( jTextPane,new GridBagConstraints(
-	   		0, 1, 0, 0, 0.0, 0.0, GridBagConstraints.NORTHWEST,
-	   		GridBagConstraints.NONE, new Insets(150, 150, 0, 0), 0, 0
-	   	));*/
-	   	
-	   	///////////////////// Rawdata and work dir button and text.	   	
-	   	
-	   	_jbRawData.setPreferredSize(new java.awt.Dimension(120, 21));
-	   	_jbRawData.setFont(new java.awt.Font("arial",2,10));
-	   	_container.add ( _jbRawData, new GridBagConstraints(
+		this._jbRawData.setPreferredSize(new java.awt.Dimension(120, 21));
+		this._jbRawData.setFont(new java.awt.Font("arial",2,10));
+		this._container.add ( this._jbRawData, new GridBagConstraints(
 	   		0, 1, 0, 0, 0.0, 0.0, GridBagConstraints.NORTHWEST, 
 	   		GridBagConstraints.NONE, new Insets(130, 20, 0, 0), 0, 0
 	   	));
 	   	
-	   	_jtfRawData.setPreferredSize(new java.awt.Dimension(280, 21));
-		_jtfRawData.setFont(new java.awt.Font("arial",2,10));
-		_container.add(_jtfRawData, new GridBagConstraints(
+		this._jtfRawData.setPreferredSize(new java.awt.Dimension(280, 21));
+		this._jtfRawData.setFont(new java.awt.Font("arial",2,10));
+		this._container.add(this._jtfRawData, new GridBagConstraints(
 			0, 1, 0, 0, 0.0, 0.0, GridBagConstraints.NORTHWEST,
 			GridBagConstraints.NONE, new Insets(130, 160, 0, 0),0, 0
 		));
 		
-		_jbWorkDir.setPreferredSize(new java.awt.Dimension(120, 21));
-	   	_jbWorkDir.setFont(new java.awt.Font("arial",2,10));
-	   	_container.add(_jbWorkDir, new GridBagConstraints(
+		this._jbWorkDir.setPreferredSize(new java.awt.Dimension(120, 21));
+		this._jbWorkDir.setFont(new java.awt.Font("arial",2,10));
+		this._container.add(this._jbWorkDir, new GridBagConstraints(
 	   		0, 1, 0, 0, 0.0, 0.0,GridBagConstraints.NORTHWEST,
 	   		GridBagConstraints.NONE, new Insets(160, 20, 0, 0), 0, 0
 	   	));
 	  
-		_jtfWorkDir.setPreferredSize(new java.awt.Dimension(280, 21));
-	   	_jtfWorkDir.setFont(new java.awt.Font("arial",2,10));	
-		_container.add( _jtfWorkDir, new GridBagConstraints(
+		this._jtfWorkDir.setPreferredSize(new java.awt.Dimension(280, 21));
+		this._jtfWorkDir.setFont(new java.awt.Font("arial",2,10));	
+		this._container.add( this._jtfWorkDir, new GridBagConstraints(
 			0, 1, 0, 0, 0.0, 0.0, GridBagConstraints.NORTHWEST,
 			GridBagConstraints.NONE, new Insets(160, 160, 0, 0), 0, 0
 		));
 		
-		////////////////////////// second case
-		_imgParam = new JLabel();
-		_imgParam.setText("Matrix parameters:");
-		_imgParam.setFont(new java.awt.Font("arial",1,12));
-	   	_container.add (_imgParam, new GridBagConstraints(
+		//////////////////////////////////////
+		label = new JLabel();
+		label.setText("Matrix parameters:");
+		label.setFont(new java.awt.Font("arial",1,12));
+		this._container.add (label, new GridBagConstraints(
 	   		0, 1, 0, 0, 0.0, 0.0, GridBagConstraints.NORTHWEST,
 	   		GridBagConstraints.NONE, new Insets(190, 10, 0, 0), 0, 0
 	   	));
-	   	  	
-	   	_container.setLayout (gridBagLayout);
-		_jlMatrixSize = new JLabel();
-		_jlMatrixSize.setText("Matrix size (in bins):");
-		_jlMatrixSize.setFont(new java.awt.Font("arial",2,11));
-		_container.add( _jlMatrixSize, new GridBagConstraints(
+		this._container.setLayout (gridBagLayout);
+	   	label = new JLabel();
+	   	label.setText("Matrix size (in bins):");
+	   	label.setFont(new java.awt.Font("arial",2,11));
+	   	this._container.add( label, new GridBagConstraints(
 			0, 1, 0, 0, 0.0, 0.0, GridBagConstraints.NORTHWEST,
 			GridBagConstraints.NONE, new Insets(220, 20, 0, 0), 0, 0
 		));
-		
-		_matrixSize.setText("2000");
-		_matrixSize.setPreferredSize(new java.awt.Dimension(60, 21));
-		_matrixSize.setFont(new java.awt.Font("arial",2,11));
-		_container.add( _matrixSize, new GridBagConstraints(
+	   	this._jtfMatrixSize.setText("2000");
+	   	this._jtfMatrixSize.setPreferredSize(new java.awt.Dimension(60, 21));
+	   	this._jtfMatrixSize.setFont(new java.awt.Font("arial",2,11));
+	   	this._container.add( this._jtfMatrixSize, new GridBagConstraints(
 			0, 1, 0, 0, 0.0, 0.0,  GridBagConstraints.NORTHWEST, 
 			GridBagConstraints.NONE, new Insets(217, 170, 0, 0), 0, 0
 		));
 		
-	 	_container.setLayout (gridBagLayout);
-		_jldiagSize = new JLabel();
-		_jldiagSize.setText("Diag size (in bins):");
-		_jldiagSize.setFont(new java.awt.Font("arial",2,11));
-		_container.add( _jldiagSize, new GridBagConstraints(
+	   	this._container.setLayout (gridBagLayout);
+	 	label = new JLabel();
+	 	label.setText("Diag size (in bins):");
+	 	label.setFont(new java.awt.Font("arial",2,11));
+	 	this._container.add(label, new GridBagConstraints(
 			0, 1, 0, 0, 0.0, 0.0, GridBagConstraints.NORTHWEST,
 			GridBagConstraints.NONE, new Insets(250, 20, 0, 0), 0, 0
 		));
-			
-		_diagSize.setText("5");
-		_diagSize.setPreferredSize(new java.awt.Dimension(60, 21));
-		_diagSize.setFont(new java.awt.Font("arial",2,11));
-		_container.add( _diagSize, new GridBagConstraints(
+	 	this._jtfDiagSize.setText("5");
+	 	this._jtfDiagSize.setPreferredSize(new java.awt.Dimension(60, 21));
+	 	this._jtfDiagSize.setFont(new java.awt.Font("arial",2,11));
+	 	this._container.add( this._jtfDiagSize, new GridBagConstraints(
 			0, 1, 0, 0, 0.0, 0.0,  GridBagConstraints.NORTHWEST, 
 			GridBagConstraints.NONE, new Insets(247, 170, 0, 0), 0, 0
 		));
 		
-		_jlResolution = new JLabel();
-		_jlResolution.setText("Resolution (in bases):");
-		_jlResolution.setFont(new java.awt.Font("arial",2,11));
-		_container.add( _jlResolution, new GridBagConstraints(
+		label = new JLabel();
+		label.setText("Resolution (in bases):");
+		label.setFont(new java.awt.Font("arial",2,11));
+		this._container.add( label, new GridBagConstraints(
 			0, 2, 0, 0, 0.0, 0.0, GridBagConstraints.NORTHWEST,
 			GridBagConstraints.NONE, new Insets(10, 20, 0, 0), 0, 0
 		));
 		
-		_resolution.setText("5000");
-		_resolution.setPreferredSize(new java.awt.Dimension(60, 21));
-		_resolution.setFont(new java.awt.Font("arial",2,11));
-		_container.add( _resolution, new GridBagConstraints(
+		this._jtfResolution.setText("5000");
+		this._jtfResolution.setPreferredSize(new java.awt.Dimension(60, 21));
+		this._jtfResolution.setFont(new java.awt.Font("arial",2,11));
+		this._container.add( this._jtfResolution, new GridBagConstraints(
 			0, 2, 0, 0, 0.0, 0.0, GridBagConstraints.NORTHWEST,
 			GridBagConstraints.NONE, new Insets(7, 170, 0, 0), 0, 0
 		));
 		
-		
-		_imgParam = new JLabel();
-		_imgParam.setText("<html> Multi resolution loop calling:<br><font size=-1>(default: resolution, resolution*2.)</html>");
-		_container.add(_imgParam,new GridBagConstraints(
+		label = new JLabel();
+		label.setText("<html> Multi resolution loop calling:<br><font size=-1>(default: resolution, resolution*2.)</html>");
+		this._container.add(label,new GridBagConstraints(
 			0, 1, 0, 0, 0.0, 0.0, GridBagConstraints.NORTHWEST,
 			GridBagConstraints.NONE, new Insets(190, 250, 0, 0), 0, 0
 		));
-		_checkbox2.setFont(new java.awt.Font("arial",2,12));
-		_container.add(_checkbox2,new GridBagConstraints(
+		this._checkbox2.setFont(new java.awt.Font("arial",2,12));
+		this._container.add(this._checkbox2,new GridBagConstraints(
 				0, 1, 0, 0, 0.0, 0.0, GridBagConstraints.NORTHWEST,
 				GridBagConstraints.NONE, new Insets(220, 300, 0, 0), 0, 0
 		));
-		_checkbox5.setFont(new java.awt.Font("arial",2,12));
-		_container.add(_checkbox5,new GridBagConstraints(
+		this._checkbox5.setFont(new java.awt.Font("arial",2,12));
+		this._container.add(this._checkbox5,new GridBagConstraints(
 			0, 1, 0, 0,  0.0, 0.0, GridBagConstraints.NORTHWEST,
 			GridBagConstraints.NONE,new Insets(240, 300, 0, 0), 0, 0
 		));
-		//_checkbox2.setSelected(true);	
 		
-		_jlInputFileType = new JLabel();
-	   	_jlInputFileType.setText("Chromosome size file (same chr names as in .hic file):");
-	   	_jlInputFileType.setFont(new java.awt.Font("arial",1,12));
-	   	_container.add(_jlInputFileType, new GridBagConstraints(
+		////////////////////////////////////////////////////////////////////////////////
+		
+		label = new JLabel();
+		label.setText("Chromosome size file (same chr names as in .hic file):");
+		label.setFont(new java.awt.Font("arial",1,12));
+		this._container.add(label, new GridBagConstraints(
 	   		0, 2, 0, 0, 0.0, 0.0, GridBagConstraints.NORTHWEST,
 	   		GridBagConstraints.NONE, new Insets(40, 10, 0, 0), 0, 0
 	   	));
-	   	
-		_jbChrSize.setPreferredSize(new java.awt.Dimension(120, 21));
-		_jbChrSize.setFont(new java.awt.Font("arial",2,11));
-	   	_container.add ( _jbChrSize, new GridBagConstraints(
+	 
+		this._jbChrSize.setPreferredSize(new java.awt.Dimension(120, 21));
+		this._jbChrSize.setFont(new java.awt.Font("arial",2,11));
+		this._container.add ( this._jbChrSize, new GridBagConstraints(
 	   		0, 2, 0, 0, 0.0, 0.0, GridBagConstraints.NORTHWEST, 
 	   		GridBagConstraints.NONE, new Insets(70, 20, 0, 0), 0, 0
 	   	));
 	   	
-	   	this._jtfChrSize.setPreferredSize(new java.awt.Dimension(280, 21));
-	   	_jtfChrSize.setFont(new java.awt.Font("arial",2,10));
-		_container.add(_jtfChrSize, new GridBagConstraints(
+		this._jtfChrSize.setPreferredSize(new java.awt.Dimension(280, 21));
+		this._jtfChrSize.setFont(new java.awt.Font("arial",2,10));
+		this._container.add(this._jtfChrSize, new GridBagConstraints(
 			0, 2, 0, 0, 0.0, 0.0, GridBagConstraints.NORTHWEST,
 			GridBagConstraints.NONE, new Insets(70, 160, 0, 0),0, 0
 		));
-		
-		_jlInputFileType = new JLabel();
-	   	_jlInputFileType.setText("Image processing parameters:");
-	   	_jlInputFileType.setFont(new java.awt.Font("arial",1,12));
-	   	_container.add(_jlInputFileType, new GridBagConstraints(
+		/////////////////////////////////////////////////////////////////////////////////////
+		label = new JLabel();
+		label.setText("Image processing parameters:");
+		label.setFont(new java.awt.Font("arial",1,12));
+		this._container.add(label, new GridBagConstraints(
 	   		0, 2, 0, 0, 0.0, 0.0, GridBagConstraints.NORTHWEST,
 	   		GridBagConstraints.NONE, new Insets(100, 10, 0, 0), 0, 0
 	   	));
 		
-	   	_container.setLayout (gridBagLayout);
-		this._jlGaussian = new JLabel();
-		_jlGaussian.setText("Gaussian filter:");
-		_jlGaussian.setFont(new java.awt.Font("arial",2,11));
-		_container.add( _jlGaussian, new GridBagConstraints(
+		this._container.setLayout (gridBagLayout);
+		label = new JLabel();
+		label.setText("Gaussian filter:");
+		label.setFont(new java.awt.Font("arial",2,11));
+		this._container.add( label, new GridBagConstraints(
 			0, 2, 0, 0, 0.0, 0.0, GridBagConstraints.NORTHWEST,
 			GridBagConstraints.NONE, new Insets(130, 20, 0, 0), 0, 0
 		));
 		
-		this._gaussian.setText("1.5");
-		_gaussian.setPreferredSize(new java.awt.Dimension(60, 21));
-		_gaussian.setFont(new java.awt.Font("arial",2,11));
-		_container.add( _gaussian, new GridBagConstraints(
+		this._jtfGaussian.setText("1.5");
+		this._jtfGaussian.setPreferredSize(new java.awt.Dimension(60, 21));
+		this._jtfGaussian.setFont(new java.awt.Font("arial",2,11));
+		this._container.add( this._jtfGaussian, new GridBagConstraints(
 			0, 2, 0, 0, 0.0, 0.0,  GridBagConstraints.NORTHWEST, 
 			GridBagConstraints.NONE, new Insets(127, 150, 0, 0), 0, 0
 		));
 		
-	 	_container.setLayout (gridBagLayout);
-	
-	 	this._jlNT = new JLabel();
-		_jlNT.setText("Threshold for maxima detection:");
-		_jlNT.setFont(new java.awt.Font("arial",2,11));
-		_container.add( _jlNT, new GridBagConstraints(
+		this._container.setLayout (gridBagLayout);
+	 	label= new JLabel();
+	 	label.setText("Threshold for maxima detection:");
+	 	label.setFont(new java.awt.Font("arial",2,11));
+	 	this._container.add( label, new GridBagConstraints(
 			0, 2, 0, 0, 0.0, 0.0, GridBagConstraints.NORTHWEST,
 			GridBagConstraints.NONE, new Insets(130, 230, 0, 0), 0, 0
 		));
 			
-		this._noiseTolerance.setText("2800");
-		_noiseTolerance.setPreferredSize(new java.awt.Dimension(60, 21));
-		_noiseTolerance.setFont(new java.awt.Font("arial",2,11));
-		_container.add( _noiseTolerance, new GridBagConstraints(
+	 	this._jtfNoiseTolerance.setText("2800");
+	 	this._jtfNoiseTolerance.setPreferredSize(new java.awt.Dimension(60, 21));
+	 	this._jtfNoiseTolerance.setFont(new java.awt.Font("arial",2,11));
+	 	this._container.add( this._jtfNoiseTolerance, new GridBagConstraints(
 			0, 2, 0, 0, 0.0, 0.0,  GridBagConstraints.NORTHWEST, 
 			GridBagConstraints.NONE, new Insets(127, 430, 0, 0), 0, 0
 		));
 		
 	
-		this._jlMax = new JLabel();
-		_jlMax.setText("Maximum filter:");
-		_jlMax.setFont(new java.awt.Font("arial",2,11));
-		_container.add( _jlMax, new GridBagConstraints(
+		label = new JLabel();
+		label.setText("Maximum filter:");
+		label.setFont(new java.awt.Font("arial",2,11));
+		this._container.add( label, new GridBagConstraints(
 			0, 2, 0, 0, 0.0, 0.0, GridBagConstraints.NORTHWEST,
 			GridBagConstraints.NONE, new Insets(160, 20, 0, 0), 0, 0
 		));
 			
-		this._max.setText("2");
-		_max.setPreferredSize(new java.awt.Dimension(60, 21));
-		_max.setFont(new java.awt.Font("arial",2,11));
-		_container.add( _max, new GridBagConstraints(
+		this._jtfMax.setText("2");
+		this._jtfMax.setPreferredSize(new java.awt.Dimension(60, 21));
+		this._jtfMax.setFont(new java.awt.Font("arial",2,11));
+		this._container.add( this._jtfMax, new GridBagConstraints(
 			0, 2, 0, 0, 0.0, 0.0,  GridBagConstraints.NORTHWEST, 
 			GridBagConstraints.NONE, new Insets(157, 150, 0, 0), 0, 0
 		));
 	   	
-		this._jlMin = new JLabel();
-		_jlMin.setText("Minimum filter:");
-		_jlMin.setFont(new java.awt.Font("arial",2,11));
-		_container.add( _jlMin, new GridBagConstraints(
+		label = new JLabel();
+		label.setText("Minimum filter:");
+		label.setFont(new java.awt.Font("arial",2,11));
+		this._container.add( label, new GridBagConstraints(
 			0, 2, 0, 0, 0.0, 0.0, GridBagConstraints.NORTHWEST,
 			GridBagConstraints.NONE, new Insets(160, 230, 0, 0), 0, 0
 		));
 			
-		this._min.setText("2");
-		_min.setPreferredSize(new java.awt.Dimension(60, 21));
-		_container.add( _min, new GridBagConstraints(
+		this._jtfMin.setText("2");
+		this._jtfMin.setPreferredSize(new java.awt.Dimension(60, 21));
+		this._container.add( this._jtfMin, new GridBagConstraints(
 			0, 2, 0, 0, 0.0, 0.0,  GridBagConstraints.NORTHWEST, 
 			GridBagConstraints.NONE, new Insets(157, 350, 0, 0), 0, 0
 		));
 	   	
-		this._jlEnhance = new JLabel();
-		_jlEnhance.setText("% of satured pixel:");
-		_jlEnhance.setFont(new java.awt.Font("arial",2,11));
-		_container.add( _jlEnhance, new GridBagConstraints(
+		label = new JLabel();
+		label.setText("% of satured pixel:");
+		label.setFont(new java.awt.Font("arial",2,11));
+		this._container.add( label, new GridBagConstraints(
 			0, 2, 0, 0, 0.0, 0.0, GridBagConstraints.NORTHWEST,
 			GridBagConstraints.NONE, new Insets(190, 20, 0, 0), 0, 0
 		));
 			
-		this._enhanceContrast.setText("0.01");
-		_enhanceContrast.setPreferredSize(new java.awt.Dimension(60, 21));
-		_enhanceContrast.setFont(new java.awt.Font("arial",2,11));
-		_container.add( _enhanceContrast, new GridBagConstraints(
+		this._jtfEnhanceContrast.setText("0.01");
+		this._jtfEnhanceContrast.setPreferredSize(new java.awt.Dimension(60, 21));
+		this._jtfEnhanceContrast.setFont(new java.awt.Font("arial",2,11));
+		this._container.add( this._jtfEnhanceContrast, new GridBagConstraints(
 			0, 2, 0, 0, 0.0, 0.0,  GridBagConstraints.NORTHWEST, 
 			GridBagConstraints.NONE, new Insets(187, 150, 0, 0), 0, 0
 		));
 	   	
-		_jlFDR = new JLabel();
-		_jlFDR.setText("FDR:");
-		_jlFDR.setFont(new java.awt.Font("arial",2,11));
-		_container.add( _jlFDR, new GridBagConstraints(
+		label = new JLabel();
+		label.setText("FDR:");
+		label.setFont(new java.awt.Font("arial",2,11));
+		this._container.add( label, new GridBagConstraints(
 			0, 2, 0, 0, 0.0, 0.0, GridBagConstraints.NORTHWEST,
 			GridBagConstraints.NONE, new Insets(190, 230, 0, 0), 0, 0
 		));
 		
-		_fdr.setText("0.01");
-		_fdr.setPreferredSize(new java.awt.Dimension(60, 21));
-		_fdr.setFont(new java.awt.Font("arial",2,11));
-		_container.add( _fdr, new GridBagConstraints(
+		this._jtfFdr.setText("0.01");
+		this._jtfFdr.setPreferredSize(new java.awt.Dimension(60, 21));
+		this._jtfFdr.setFont(new java.awt.Font("arial",2,11));
+		this._container.add( this._jtfFdr, new GridBagConstraints(
 			0, 2, 0, 0, 0.0, 0.0, GridBagConstraints.NORTHWEST,
 			GridBagConstraints.NONE, new Insets(187, 350, 0, 0), 0, 0
 		));		
 		
-		this._jlNbZero = new JLabel();
-		_jlNbZero.setText("Number of zeros allowed in the 24 surrounding pixels:");
-		_jlNbZero.setFont(new java.awt.Font("arial",2,11));
-		_container.add( _jlNbZero, new GridBagConstraints(
+		label = new JLabel();
+		label.setText("Number of zeros allowed in the 24 surrounding pixels:");
+		label.setFont(new java.awt.Font("arial",2,11));
+		this._container.add( label, new GridBagConstraints(
 			0, 2, 0, 0, 0.0, 0.0, GridBagConstraints.NORTHWEST,
 			GridBagConstraints.NONE, new Insets(220, 20, 0, 0), 0, 0
 		));
 			
-		this._nbZero.setText("6");
-		_nbZero.setPreferredSize(new java.awt.Dimension(60, 21));
-		_nbZero.setFont(new java.awt.Font("arial",2,11));
-		_container.add( _nbZero, new GridBagConstraints(
+		this._jtfNbZero.setText("6");
+		this._jtfNbZero.setPreferredSize(new java.awt.Dimension(60, 21));
+		this._jtfNbZero.setFont(new java.awt.Font("arial",2,11));
+		this._container.add( this._jtfNbZero, new GridBagConstraints(
 			0, 2, 0, 0, 0.0, 0.0,  GridBagConstraints.NORTHWEST, 
 			GridBagConstraints.NONE, new Insets(217, 350, 0, 0), 0, 0
 		));
 		
-		_checkboxDeleteTif.setFont(new java.awt.Font("arial",1,12));
-		_container.add(_checkboxDeleteTif,new GridBagConstraints(
+		this._checkboxDeleteTif.setFont(new java.awt.Font("arial",1,12));
+		this._container.add(this._checkboxDeleteTif,new GridBagConstraints(
 			0, 2, 0, 0,  0.0, 0.0, GridBagConstraints.NORTHWEST,
 			GridBagConstraints.NONE,new Insets(245, 10, 0, 0), 0, 0
 		));
 		
-		this._jCPU = new JLabel();
-		_jCPU.setText("Number of CPU:");
-		_jCPU.setFont(new java.awt.Font("arial",1,12));
-		_container.add( _jCPU, new GridBagConstraints(
+		label = new JLabel();
+		label.setText("Number of CPU:");
+		label.setFont(new java.awt.Font("arial",1,12));
+		this._container.add( label, new GridBagConstraints(
 			0, 2, 0, 0, 0.0, 0.0, GridBagConstraints.NORTHWEST,
 			GridBagConstraints.NONE, new Insets(275, 10, 0, 0), 0, 0
 		));
 			
-		this._cpu.setText("1");
-		_cpu.setPreferredSize(new java.awt.Dimension(60, 21));
-		_container.add( _cpu, new GridBagConstraints(
+		this._jtfCpu.setText("1");
+		this._jtfCpu.setPreferredSize(new java.awt.Dimension(60, 21));
+		this._container.add( this._jtfCpu, new GridBagConstraints(
 			0, 2, 0, 0, 0.0, 0.0,  GridBagConstraints.NORTHWEST, 
 			GridBagConstraints.NONE, new Insets(272, 140, 0, 0), 0, 0
 		));
 	   	
-		_jbStart.setPreferredSize(new java.awt.Dimension(120, 21));
-	   	_container.add(_jbStart, new GridBagConstraints(
+		this._jbStart.setPreferredSize(new java.awt.Dimension(120, 21));
+		this._container.add(this._jbStart, new GridBagConstraints(
 	   		0, 2, 0, 0,  0.0, 0.0, GridBagConstraints.NORTHWEST,
 	   		GridBagConstraints.NONE, new Insets(310, 140, 0,0), 0, 0
 	   	));
 	   	
-	   	_jbQuit.setPreferredSize(new java.awt.Dimension(120, 21));
-		_container.add(_jbQuit,new GridBagConstraints(
+		this._jbQuit.setPreferredSize(new java.awt.Dimension(120, 21));
+		this._container.add(this._jbQuit,new GridBagConstraints(
 			0, 2, 0, 0,  0.0, 0.0,GridBagConstraints.NORTHWEST,
 			GridBagConstraints.NONE,new Insets(310, 10, 0, 0), 0, 0
 		));
@@ -593,151 +535,157 @@ public class GuiAnalysis extends JFrame{
 	  	this._jrbHichipData.addActionListener(hic);
 	  	this._jrbProcessed.addActionListener(hic);
 	  	WorkDirectoryListener wdListener = new WorkDirectoryListener();
-	  	_jbWorkDir.addActionListener(wdListener);
-		FileListener chr = new FileListener(_jtfChrSize);
-	  	_jbChrSize.addActionListener(chr);
-	  	JuiceBoxListener juice = new JuiceBoxListener();
-	  	_jbBoxTools.addActionListener(juice);
-	  	RawDataDirectoryListener ddListener = new RawDataDirectoryListener(this,_jtfRawData);
-	  	_jbRawData.addActionListener(ddListener);
+	  	this._jbWorkDir.addActionListener(wdListener);
+		FileListener chr = new FileListener(this._jtfChrSize);
+		this._jbChrSize.addActionListener(chr);
+	  	FileListener juice = new FileListener(this._jtfBoxTools);
+	  	this._jbBoxTools.addActionListener(juice);
+	  	RawDataDirectoryListener ddListener = new RawDataDirectoryListener(this,this._jtfRawData);
+	  	this._jbRawData.addActionListener(ddListener);
 	  	QuitListener quitListener = new QuitListener(this);
-	   	_jbQuit.addActionListener(quitListener);
+	  	this._jbQuit.addActionListener(quitListener);
 	   	StartListener startListener = new StartListener(this);
-	   	_jbStart.addActionListener(startListener);	  
+	   	this._jbStart.addActionListener(startListener);	  
 	   	this.setVisible(true);
 	 }
 	
 	/**
-	 * 
-	 * @return
+	 * getter of the size of the image 
+	 * @return int size
 	 */
 	public int getMatrixSize(){
-		String x = _matrixSize.getText();
+		String x = this._jtfMatrixSize.getText();
 		return Integer.parseInt(x.replaceAll(",", "."));
 	}
 	
 	/**
-	 * 
-	 * @return
+	 * getter of the bins resolution
+	 * @return int bin size
 	 */
 	public int getResolution(){
-		String x = _resolution.getText();
+		String x = this._jtfResolution.getText();
 		return Integer.parseInt(x.replaceAll(",", ".")); 
 	}
 	
 	/**
-	 * 
-	 * @return
+	 * getter for the core of the filter max
+	 * @return double max value
 	 */
 	public double getMax(){
-		String x = _max.getText();
+		String x = this._jtfMax.getText();
 		return Double.parseDouble(x.replaceAll(",", "."));
 	}
 	
 	/**
-	 * 
-	 * @return
+	 * getter of the nb of zero allow around a detected loops
+	 * @return int nb of zero
 	 */
 	public int getNbZero(){
-		String x = _nbZero.getText();
+		String x = this._jtfNbZero.getText();
 		return Integer.parseInt(x.replaceAll(",", "."));
 	}
 	
+	/**
+	 *getter of the nb of CPU 
+	 * @return int nb of CPU
+	 */
 	public int getNbCpu(){
-		String x = _cpu.getText();
+		String x = this._jtfCpu.getText();
 		return Integer.parseInt(x.replaceAll(",", "."));
 	}
 	/**
-	 * 
-	 * @return
+	 * getter for the core of the filter min
+	 * @return double min value
 	 */
 	public double getMin(){
-		String x = _min.getText();
+		String x = this._jtfMin.getText();
 		return Double.parseDouble(x.replaceAll(",", "."));
 	}
 	
 	/**
-	 * 
-	 * @return
+	 * getter of the percentage of pixel saturated in the image
+	 *  
+	 * @return double 
 	 */
 	public double getEnhanceSignal(){
-		String x = this._enhanceContrast.getText();
+		String x = this._jtfEnhanceContrast.getText();
 		return Double.parseDouble(x.replaceAll(",", "."));
 	}
 	
 	/**
+	 * getter of the different resolution used in the SIP analysis
 	 * 
-	 * @return
+	 * @return int factor
 	 */
 	public int getFactorChoice(){
-		if(_checkbox2.isSelected() && _checkbox5.isSelected())	return 4;
-		else if( _checkbox5.isSelected()) return 3;
-		else if( _checkbox2.isSelected()) return 2;
+		if(this._checkbox2.isSelected() && this._checkbox5.isSelected())	return 4;
+		else if( this._checkbox5.isSelected()) return 3;
+		else if( this._checkbox2.isSelected()) return 2;
 		else return 1;
 	}
 	
 	/**
-	 * 
-	 * @return
+	 * threshold for the regional maxima detection
+	 * @return int 
 	 */
 	public int getNoiseTolerance(){
-		String x = this._noiseTolerance.getText();
+		String x = this._jtfNoiseTolerance.getText();
 		return Integer.parseInt(x.replaceAll(",", "."));
 	}
 	/**
-	 * 
-	 * @return
+	 * getter of the gaussian filter core
+	 * @return double gaussian
 	 */
 	public double getGaussian(){
-		String x = _gaussian.getText();
+		String x = this._jtfGaussian.getText();
 		return Double.parseDouble(x.replaceAll(",", "."));
 	}
 	
 	/**
-	 * 
-	 * @return
+	 * size of the diag, all the loops detected inside this size will be removed
+	 * @return int diag size
 	 */
 	public int getDiagSize(){
-		String x = _diagSize.getText();
+		String x = this._jtfDiagSize.getText();
 		return Integer.parseInt(x.replaceAll(",", "."));
 	}
 	
 	/**
-	 * 
-	 * @return
+	 * getter of the workdir path
+	 * @return String workdir path
 	 */
-	public String getOutputDir(){ return _jtfWorkDir.getText(); }
+	public String getOutputDir(){ return this._jtfWorkDir.getText(); }
 	
 	
 	/**
-	 * 
-	 * @return
+	 * getter of the input path (hic file or SIP)
+	 * @return String input path
 	 */
-	public String getRawDataDir(){	return _jtfRawData.getText();}
+	public String getRawDataDir(){	return this._jtfRawData.getText();}
 	
 	/**
-	 * 
-	 * @return
+	 * getter of the chrSize file path
+	 * @return String 
 	 */
-	public String getChrSizeFile(){	return _jtfChrSize.getText();}
+	public String getChrSizeFile(){	return this._jtfChrSize.getText();}
 	
 	/**
-	 * 
-	 * @return
+	 * getter of the juicerToolsBox.jar path
+	 * @return String path
 	 */
-	public String getJuiceBox(){ return _jtfBoxTools.getText();}
+	public String getJuiceBox(){ return this._jtfBoxTools.getText();}
 	
 	/**
-	 * 
+	 * boolean if true start was pushed else keep the gui active
 	 * @return
 	 */
-	public boolean isStart(){ return _start;}
+	public boolean isStart(){ return this._start;}
 	
 	/**
-	 * 
-	 * @return
+	 * boolean isProcessed if true SIP data to reprocess
+	 * @return boolean
 	 */
-	public boolean isProcessed(){return _jrbProcessed.isSelected();}
+	public boolean isProcessed(){return this._jrbProcessed.isSelected();}
 	
 	/**
 	 * 
@@ -754,40 +702,44 @@ public class GuiAnalysis extends JFrame{
 	 * 
 	 * @return
 	 */
-	public boolean isHic(){ return _jrbHic.isSelected();}
+	public boolean isHic(){ return this._jrbHic.isSelected();}
 	
 	/**
 	 * 
 	 * @return
 	 */
-	public boolean isDeletTif(){ return _checkboxDeleteTif.isSelected();}
+	public boolean isDeletTif(){ return this._checkboxDeleteTif.isSelected();}
 	
-	
+	/**
+	 * getter of fdr
+	 * @return double fdr
+	 */
 	public double getFDR(){
-		String x = _fdr.getText();
+		String x = _jtfFdr.getText();
 		return Double.parseDouble(x.replaceAll(",", "."));
 	}
+	
 	/**
-	 * 
-	 * @return
+	 * normalization for dumpdata 
+	 * @return boolean
 	 */
 	public boolean isVC_SQRT(){	return _jrbVC_sqrt.isSelected();}
 	
 	/**
-	 * 
-	 * @return
+	 * normalization for dumpdata 
+	 * @return boolean
 	 */
 	public boolean isVC(){ return _jrbVC.isSelected(); }
 	
 	/**
-	 * 
-	 * @return
+	 * normalization for dumpdata 
+	 * @return boolean
 	 */
 	public boolean isNONE(){ return _jrbNone.isSelected(); }
 	
 	/**
-	 * 
-	 * @return
+	 * normalization for dumpdata 
+	 * @return boolean
 	 */
 	public boolean isKR(){	return _jrbKR.isSelected();}
 
@@ -803,66 +755,67 @@ public class GuiAnalysis extends JFrame{
 	
 
 	/**
+	 * Radio button listener, manage teh access of the different button box etc on function of the parameters choose
 	 * 
 	 * @author axel poulet
 	 *
 	 */
 	class RBHicListener implements ActionListener{
 		/** */
-		GuiAnalysis m_gui;
+		GuiAnalysis _gui;
 		/**
 		 * 
 		 * @param gui
 		 */
-		public  RBHicListener (GuiAnalysis gui){ m_gui = gui; }
+		public  RBHicListener (GuiAnalysis gui){ _gui = gui; }
 		
 		/**
-		 * 
+		 * manage the access of the different gui element on function of the paramter choose
 		 */
 		public void actionPerformed(ActionEvent actionEvent){
-			if(m_gui.isHiChIP()){
-        		_gaussian.setText("1.5");
-        		_enhanceContrast.setText("0.5");
-        		_min.setText("1");
-        		_max.setText("1");
-        		_nbZero.setText("25");
-        		_noiseTolerance.setText("1");
-        		m_gui._jrbNone.setSelected(true);
-        	}else if(m_gui.isHiCData()){
-        		_gaussian.setText("1.5");
-        		_enhanceContrast.setText("0.005");
-        		_min.setText("2.0");
-        		_max.setText("2.0");
-        		_nbZero.setText("6");
-        		_noiseTolerance.setText("2800");
-        		m_gui._jrbKR.setSelected(true);
+			if(_gui.isHiChIP()){
+        		_jtfGaussian.setText("1.5");
+        		_jtfEnhanceContrast.setText("0.5");
+        		_jtfMin.setText("1");
+        		_jtfMax.setText("1");
+        		_jtfNbZero.setText("25");
+        		_jtfNoiseTolerance.setText("1");
+        		_gui._jrbNone.setSelected(true);
+        	}else if(_gui.isHiCData()){
+        		_jtfGaussian.setText("1.5");
+        		_jtfEnhanceContrast.setText("0.005");
+        		_jtfMin.setText("2.0");
+        		_jtfMax.setText("2.0");
+        		_jtfNbZero.setText("6");
+        		_jtfNoiseTolerance.setText("2800");
+        		_gui._jrbKR.setSelected(true);
         	}
 			
-			if (m_gui.isHic()){
-				m_gui._jrbHiCData.setEnabled(true);
-				m_gui._jrbHichipData.setEnabled(true);
-	        	m_gui._jrbVC_sqrt.setEnabled(true);
-	        	m_gui._jrbVC.setEnabled(true);
-	        	m_gui._jrbNone.setEnabled(true);
-	        	m_gui._jrbKR.setEnabled(true);
-	        	m_gui._jtfBoxTools.setEnabled(true);
+			if (_gui.isHic()){
+				_gui._jrbHiCData.setEnabled(true);
+				_gui._jrbHichipData.setEnabled(true);
+	        	_gui._jrbVC_sqrt.setEnabled(true);
+	        	_gui._jrbVC.setEnabled(true);
+	        	_gui._jrbNone.setEnabled(true);
+	        	_gui._jrbKR.setEnabled(true);
+	        	_gui._jtfBoxTools.setEnabled(true);
 	        	_jbBoxTools.setEnabled(true);
-	        	m_gui._max.setEditable(true);
-        		m_gui._min.setEditable(true);
-        		m_gui._enhanceContrast.setEditable(true);
-	        }else if(m_gui.isProcessed()){
-	        	m_gui._jrbHiCData.setEnabled(true);
-				m_gui._jrbHichipData.setEnabled(true);
-	        	m_gui._jrbVC_sqrt.setEnabled(false);
-	        	m_gui._jrbVC.setEnabled(false);
-	        	m_gui._jrbNone.setEnabled(false);
-	        	m_gui._jrbKR.setEnabled(false);
-	        	m_gui._jtfBoxTools.setEnabled(false);
+	        	_gui._jtfMax.setEditable(true);
+        		_gui._jtfMin.setEditable(true);
+        		_gui._jtfEnhanceContrast.setEditable(true);
+	        }else if(_gui.isProcessed()){
+	        	_gui._jrbHiCData.setEnabled(true);
+				_gui._jrbHichipData.setEnabled(true);
+	        	_gui._jrbVC_sqrt.setEnabled(false);
+	        	_gui._jrbVC.setEnabled(false);
+	        	_gui._jrbNone.setEnabled(false);
+	        	_gui._jrbKR.setEnabled(false);
+	        	_gui._jtfBoxTools.setEnabled(false);
 	        	_jbBoxTools.setEnabled(false);
-	        	m_gui._max.setEditable(true);
-	        	m_gui._jlNbZero.setEnabled(true);
-	        	m_gui._min.setEditable(true);
-	        	m_gui._enhanceContrast.setEditable(true);
+	        	_gui._jtfMax.setEditable(true);
+	        	_gui._jtfNbZero.setEnabled(true);
+	        	_gui._jtfMin.setEditable(true);
+	        	_gui._jtfEnhanceContrast.setEditable(true);
 	        }
 	    }
 	}
@@ -871,82 +824,78 @@ public class GuiAnalysis extends JFrame{
 	/**
 	 * 
 	 * @author axel poulet
-	 *
+	 * Listerner for the start button 
 	 */
+	
 	class StartListener implements ActionListener {
 		/** */
-		GuiAnalysis m_gui;
+		GuiAnalysis _gui;
 		/**
 		 * 
 		 * @param gui
 		 */
-		public  StartListener (GuiAnalysis gui){ m_gui = gui; }
+		public  StartListener (GuiAnalysis gui){ _gui = gui; }
 		/**
-		 * 
+		 * Test all the box, condition etc before to allow the program to run and dispose the gui
 		 */
 		public void actionPerformed(ActionEvent actionEvent){
-			if (_jtfWorkDir.getText().isEmpty() || _jtfRawData.getText().isEmpty() || m_gui._jtfChrSize.getText().isEmpty())
-				JOptionPane.showMessageDialog
-				(
-					null,
-					"You did not choose a output directory, the raw data, or chromosom size file",
-					"Error",
-					JOptionPane.ERROR_MESSAGE
+			if (_jtfWorkDir.getText().isEmpty() || _jtfRawData.getText().isEmpty() || _gui._jtfChrSize.getText().isEmpty()){
+				JOptionPane.showMessageDialog(
+					null, "You did not choose a output directory, the raw data, or chromosom size file",
+					"Error", JOptionPane.ERROR_MESSAGE
 				); 
-			else if(m_gui.isHic() && (m_gui._jtfBoxTools.getText().isEmpty() ))
-				JOptionPane.showMessageDialog
-				(
+			}else if(_gui.isHic() && (_gui._jtfBoxTools.getText().isEmpty() )){
+				JOptionPane.showMessageDialog(
 					null,"You did not choose a Juicer_box_tools.jar path",
 					"Error", JOptionPane.ERROR_MESSAGE
 				);
-			else if(m_gui._diagSize.getText().matches("[a-zA-Z]") || m_gui._enhanceContrast.getText().matches("[a-zA-Z]") ||
-					m_gui._gaussian.getText().matches("[a-zA-Z]") || m_gui._matrixSize.getText().matches("[a-zA-Z]") ||
-					m_gui._max.getText().matches("[a-zA-Z]") || m_gui._min.getText().matches("[a-zA-Z]") ||
-					m_gui._resolution.getText().matches("[a-zA-Z]") || m_gui._nbZero.getText().matches("[a-zA-Z]") ||
-					m_gui._noiseTolerance.getText().matches("[a-zA-Z]")|| m_gui._cpu.getText().matches("[a-zA-Z]")){
+			}else if(_gui._jtfDiagSize.getText().matches("[a-zA-Z]") || _gui._jtfEnhanceContrast.getText().matches("[a-zA-Z]") ||
+					_gui._jtfGaussian.getText().matches("[a-zA-Z]") || _gui._jtfMatrixSize.getText().matches("[a-zA-Z]") ||
+					_gui._jtfMax.getText().matches("[a-zA-Z]") || _gui._jtfMin.getText().matches("[a-zA-Z]") ||
+					_gui._jtfResolution.getText().matches("[a-zA-Z]") || _gui._jtfNbZero.getText().matches("[a-zA-Z]") ||
+					_gui._jtfNoiseTolerance.getText().matches("[a-zA-Z]")|| _gui._jtfCpu.getText().matches("[a-zA-Z]")){
 					JOptionPane.showMessageDialog(
 						null, "some alphabetic character detected in integer or float paramters",
 						"Error", JOptionPane.ERROR_MESSAGE
 					);	
-			}else if(m_gui.getNbCpu() > Runtime.getRuntime().availableProcessors() || m_gui.getNbCpu()<=0 ){
+			}else if(_gui.getNbCpu() > Runtime.getRuntime().availableProcessors() || _gui.getNbCpu()<=0 ){
 				JOptionPane.showMessageDialog(
 						null, "The number of CPU chose is superior to the number of computer's CPU",
 						"Error", JOptionPane.ERROR_MESSAGE
 					);	
 			}else{
 				_start=true;
-				m_gui.dispose();
+				_gui.dispose();
 			}
 		}
 	}
 	
 	/**
+	 * Quit button listener
 	 * 
 	 * @author axel poulet
 	 *
 	 */
 	class QuitListener implements ActionListener {
 		/** */
-		GuiAnalysis m_gui;	
+		GuiAnalysis _gui;	
 		/**
-		 * 
+		 *	 Constructor
 		 * @param gui
 		 */
-		public  QuitListener (GuiAnalysis gui){ m_gui = gui;}
-		
+		public  QuitListener (GuiAnalysis gui){ _gui = gui; }
 		/**
-		 * 
+		 * dipose the gui and quit the program 
 		 */
 		public void actionPerformed(ActionEvent actionEvent){
-			m_gui.dispose();
+			_gui.dispose();
 			System.exit(0);
 		}
 	}
 	
 	
 	
-	/**
-	 * 
+	/** 
 	 * @author axel poulet
 	 *
 	 */
@@ -959,8 +908,7 @@ public class GuiAnalysis extends JFrame{
 			 JFileChooser jFileChooser = new JFileChooser();
 			 jFileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 			 int returnValue = jFileChooser.showOpenDialog(getParent());
-			 if(returnValue == JFileChooser.APPROVE_OPTION)
-			 {
+			 if(returnValue == JFileChooser.APPROVE_OPTION){
 				@SuppressWarnings("unused")
 				String run = jFileChooser.getSelectedFile().getName();
 				 String workDir = jFileChooser.getSelectedFile().getAbsolutePath();
@@ -977,17 +925,17 @@ public class GuiAnalysis extends JFrame{
 	 */
 	class RawDataDirectoryListener implements ActionListener{
 		/** */
-		GuiAnalysis m_gui;
+		GuiAnalysis _gui;
 		/** */
-		JTextField m_jtf;
+		JTextField _jtf;
 		/**
 		 * 
 		 * @param gui
 		 * @param jtf
 		 */
 		public RawDataDirectoryListener(GuiAnalysis gui,JTextField jtf){
-			m_gui = gui;
-			m_jtf = jtf;
+			_gui = gui;
+			_jtf = jtf;
 		}
 		/**
 		 * 
@@ -996,14 +944,14 @@ public class GuiAnalysis extends JFrame{
 			setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 			JFileChooser jFileChooser = new JFileChooser();
 			jFileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-			if(m_gui._jrbHic.isSelected())
+			if(_gui._jrbHic.isSelected())
 				jFileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
 			int returnValue = jFileChooser.showOpenDialog(getParent());
 			if(returnValue == JFileChooser.APPROVE_OPTION){
 				@SuppressWarnings("unused")
 				String run = jFileChooser.getSelectedFile().getName();
 				String text= jFileChooser.getSelectedFile().getAbsolutePath();
-				m_jtf.setText(text);
+				_jtf.setText(text);
 			 }
 			 setCursor (Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 		 }	
@@ -1016,12 +964,12 @@ public class GuiAnalysis extends JFrame{
 	 */
 	class FileListener implements ActionListener{
 		/** */
-		JTextField m_jtf;
+		JTextField _jtf;
 		/**
 		 * 
 		 * @param jtf
 		 */
-		public FileListener(JTextField jtf){ m_jtf = jtf; }
+		public FileListener(JTextField jtf){ _jtf = jtf; }
 		
 		/**
 		 * 
@@ -1034,32 +982,8 @@ public class GuiAnalysis extends JFrame{
 			if(returnValue == JFileChooser.APPROVE_OPTION){
 				@SuppressWarnings("unused")
 				String run = jFileChooser.getSelectedFile().getName();
-				String chrSize = jFileChooser.getSelectedFile().getAbsolutePath();
-				m_jtf.setText(chrSize);
-			}
-			setCursor (Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
-		}	
-	}
-	
-	/**
-	 * 
-	 * @author axel poulet
-	 *
-	 */
-	class JuiceBoxListener implements ActionListener{
-		/**
-		 * 
-		 */
-		public void actionPerformed(ActionEvent actionEvent){
-			setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-			JFileChooser jFileChooser = new JFileChooser();
-			jFileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
-			int returnValue = jFileChooser.showOpenDialog(getParent());
-			if(returnValue == JFileChooser.APPROVE_OPTION){
-				@SuppressWarnings("unused")
-				String run = jFileChooser.getSelectedFile().getName();
-				_juiceBoxTools = jFileChooser.getSelectedFile().getAbsolutePath();
-				_jtfBoxTools.setText(_juiceBoxTools);
+				String file = jFileChooser.getSelectedFile().getAbsolutePath();
+				_jtf.setText(file);
 			}
 			setCursor (Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 		}	
