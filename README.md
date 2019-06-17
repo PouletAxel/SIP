@@ -1,6 +1,8 @@
 # SIP version 1.0
-	SIP is implemented in java and includes achoice between command line options or a graphical user interface (gui) allowing for more general use. 
-	This method is intended as an alternative loop caller especially for difficult to identify loops and works inconjunction with juicebox .hic files.
+	SIP is implemented in java and includes achoice between command line options or
+	a graphical user interface (gui) allowing for more general use. 
+	This method is intended as an alternative loop caller especially for difficult to identify loops
+	and works inconjunction with juicebox .hic files.
 
 	Usage:
 	 
@@ -12,8 +14,10 @@
 		chrSizeFile: path to the chr size file, with the same name of the chr as in the hic file
 		-res: resolution in bases (default 5000 bases)
 		-mat: matrix size to use for each chunk of the chromosome (default 2000 bins)
-		-d: diagonal size in bins, remove the maxima found at this size (eg: a size of 2 at 5000 bases resolution removed all maxima detected at a distance inferior or equal to 10kb) (default 5 bins).
-		-g: Gaussian filter: smoothing factor reduce noise during primary maxima detection (default 2 for hic and 1 for hichip)
+		-d: diagonal size in bins, remove the maxima found at this size (eg: a size of 2 at 5000 bases
+		resolution removed all maxima detected at a distance inferior or equal to 10kb) (default 5 bins).
+		-g: Gaussian filter: smoothing factor reduce noise during primary maxima detection (default 2 for
+		hic and 1 for hichip)
 		-cpu: Number of CPU used for SIP processing (default 1)
 		-hichip: true fo HiChIP or false for Hi-C (default false)
 		-factor: Multiple resolutions can be specified using: 
@@ -25,7 +29,8 @@
 		-min: Minimum filter: removed the isolated high value (default 2 for hic and 1 hichip)
 		-sat: % of staturated pixel: enhance the contrast in the image (default 0.01 for hic and 0.5 for hichip)
 		-t Threshold for loops detection (default 2800 for hic and 1 for hichip)
-		-nbZero: number of zeros: number of pixels equal to zero that are allowed in the 24 pixels sourrounding the detected maxima (default parameter 6 for hic and 25 for hichip)
+		-nbZero: number of zeros: number of pixels equal to zero that are allowed in the 24 pixels
+		sourrounding the detected maxima (default parameter 6 for hic and 25 for hichip)
 		-norm: <NONE/VC/VC_SQRT/KR> only for hic option (default KR)
 		-del: true or false, delete tif files used for loop detection (default true)
 		-fdr: FDR value for filtering (default 0.1)
