@@ -27,7 +27,8 @@
 			-factor 4: res, res*2 and res*5 (default 1)
 		-max: Maximum filter: increase the region of high intensity (default 2 for hic and 1 hichip)
 		-min: Minimum filter: removed the isolated high value (default 2 for hic and 1 hichip)
-		-sat: % of staturated pixel: enhance the contrast in the image (default 0.01 for hic and 0.5 for hichip)
+		-sat: % of staturated pixel: enhance the contrast in the image (default 0.01 for hic and
+		0.5 for hichip)
 		-t Threshold for loops detection (default 2800 for hic and 1 for hichip)
 		-nbZero: number of zeros: number of pixels equal to zero that are allowed in the 24 pixels
 		sourrounding the detected maxima (default parameter 6 for hic and 25 for hichip)
@@ -36,14 +37,17 @@
 		-fdr: FDR value for filtering (default 0.1)
 		-h, --help print help
 
-		command line eg:
-			java -jar SIP_HiC.jar processed inputDirectory pathToChromosome.size OutputDir .... paramaters
-			java -jar SIP_HiC.jar hic inputDirectory pathToChromosome.size OutputDir juicer_tools.jar
+	command line eg:
+		
+		java -jar SIP_HiC.jar processed inputDirectory pathToChromosome.size OutputDir .... paramaters
+		java -jar SIP_HiC.jar hic inputDirectory pathToChromosome.size OutputDir juicer_tools.jar
+	
 	Authors:
 		
 		Axel Poulet
 		Department of Biology, Emory University, 1510 Clifton Rd. NE, Atlanta, GA 30322, USA.
-		Department of Molecular, Cellular  and Developmental Biology Yale University 165 Prospect St New Haven, CT 06511, USA
+		Department of Molecular, Cellular  and Developmental Biology Yale University 165 Prospect 
+		St New Haven, CT 06511, USA
 		
 		M. Jordan Rowley
 		Department of Biology, Emory University, 1510 Clifton Rd. NE, Atlanta, GA 30322, USA.
