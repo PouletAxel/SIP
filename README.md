@@ -1,8 +1,7 @@
 # SIP version 1.0
-	SIP is implemented in java and includes achoice between command line options or
-	a graphical user interface (gui) allowing for more general use. 
-	This method is intended as an alternative loop caller especially for difficult to identify loops
-	and works inconjunction with juicebox .hic files.
+	SIP is implemented in java and includes achoice between command line options or	a graphical user interface (gui)
+	allowing for more general use. This method is intended as an alternative loop caller especially for difficult to
+	identify loops and works inconjunction with juicebox .hic files.
 
 	Usage:
 	 
