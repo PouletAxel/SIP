@@ -63,7 +63,7 @@ public class GuiAnalysis extends JFrame{
     /** */
     private JTextField _jtfBoxTools = new JTextField();
     /** */
-    private JButton _jbBoxTools = new JButton("JuiceBox Tools");
+    private JButton _jbBoxTools = new JButton("Juicer Tools");
     /** */
     private ButtonGroup _bNorm = new ButtonGroup();
     /** */
@@ -240,6 +240,7 @@ public class GuiAnalysis extends JFrame{
 			GridBagConstraints.NONE, new Insets(80, 390, 0, 0), 0, 0
 		));
 		this._jrbKR.setSelected(true);
+		
 /////////////////////////////////////////////////////////////////////////		
 		label = new JLabel();
 		label.setText("Data and Output directories : ");
@@ -300,9 +301,8 @@ public class GuiAnalysis extends JFrame{
 			0, 1, 0, 0, 0.0, 0.0,  GridBagConstraints.NORTHWEST, 
 			GridBagConstraints.NONE, new Insets(217, 170, 0, 0), 0, 0
 		));
-		
 	   	this._container.setLayout (gridBagLayout);
-	 	label = new JLabel();
+	   	label = new JLabel();
 	 	label.setText("Diag size (in bins):");
 	 	label.setFont(new java.awt.Font("arial",2,11));
 	 	this._container.add(label, new GridBagConstraints(
@@ -334,7 +334,7 @@ public class GuiAnalysis extends JFrame{
 		));
 		
 		label = new JLabel();
-		label.setText("<html> Multi resolution loop calling:<br><font size=-1>(default: resolution, resolution*2.)</html>");
+		label.setText("<html> Multi resolution loop calling:</html>");
 		this._container.add(label,new GridBagConstraints(
 			0, 1, 0, 0, 0.0, 0.0, GridBagConstraints.NORTHWEST,
 			GridBagConstraints.NONE, new Insets(190, 250, 0, 0), 0, 0
@@ -342,7 +342,7 @@ public class GuiAnalysis extends JFrame{
 		this._checkbox2.setFont(new java.awt.Font("arial",2,12));
 		this._container.add(this._checkbox2,new GridBagConstraints(
 				0, 1, 0, 0, 0.0, 0.0, GridBagConstraints.NORTHWEST,
-				GridBagConstraints.NONE, new Insets(220, 300, 0, 0), 0, 0
+				GridBagConstraints.NONE, new Insets(210, 300, 0, 0), 0, 0
 		));
 		this._checkbox5.setFont(new java.awt.Font("arial",2,12));
 		this._container.add(this._checkbox5,new GridBagConstraints(
@@ -465,14 +465,14 @@ public class GuiAnalysis extends JFrame{
 		));
 	   	
 		label = new JLabel();
-		label.setText("FDR:");
+		label.setText("Empirical FDR:");
 		label.setFont(new java.awt.Font("arial",2,11));
 		this._container.add( label, new GridBagConstraints(
 			0, 2, 0, 0, 0.0, 0.0, GridBagConstraints.NORTHWEST,
 			GridBagConstraints.NONE, new Insets(190, 230, 0, 0), 0, 0
 		));
 		
-		this._jtfFdr.setText("0.1");
+		this._jtfFdr.setText("0.01");
 		this._jtfFdr.setPreferredSize(new java.awt.Dimension(60, 21));
 		this._jtfFdr.setFont(new java.awt.Font("arial",2,11));
 		this._container.add( this._jtfFdr, new GridBagConstraints(
