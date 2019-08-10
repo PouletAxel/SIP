@@ -42,7 +42,9 @@ public class RunnableDetectLoops extends Thread implements Runnable{
 	}
 	
 	/**
-	 * Run all the process for loops detection by chr
+	 * Run all the process for loops detection by chr using the objet CallLoops and then save loops in 
+	 * txt file with SIPObject via he method saveFile
+	 * 
 	 */
 	public void run(){
 		ProcessDetectLoops._nbLance++;

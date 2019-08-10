@@ -5,7 +5,11 @@ import java.io.File;
 import java.io.IOException;
 
 /**
- * Runnable class
+ * Runnable class dumping the raw data set via juicer tool.
+ * The data are dumped by chr and by windows size, with user's parameters choose.
+ * 
+ * two sorts of file file will be created one for the raw value with the observed minus expected value and also with the diatnce normalized value.
+ * Then the "norm" vector is also dump in an other deirectory.
  * 
  * @author axel poulet
  *

@@ -53,6 +53,8 @@ public class GuiAnalysis extends JFrame{
 	/** */
 	private JRadioButton _jrbHic = new JRadioButton("hic");
 	/** */
+	private JCheckBox  _jCbIsDroso = new JCheckBox("Is Droso");
+	/** */
 	private JRadioButton _jrbProcessed = new JRadioButton("processed");
 	/** */
 	private ButtonGroup _bGroupInputData = new ButtonGroup();
@@ -496,10 +498,25 @@ public class GuiAnalysis extends JFrame{
 			GridBagConstraints.NONE, new Insets(217, 350, 0, 0), 0, 0
 		));
 		
+		label = new JLabel();
+		label.setText("If is droso or like droso HiC map:");
+		label.setFont(new java.awt.Font("arial",1,12));
+		this._container.add(label, new GridBagConstraints(
+	   		0, 2, 0, 0, 0.0, 0.0, GridBagConstraints.NORTHWEST,
+	   		GridBagConstraints.NONE, new Insets(250, 10, 0, 0), 0, 0
+	   	));
+		
+		
+		this._jCbIsDroso.setFont(new java.awt.Font("arial",2,11));
+		this._container.add(this._jCbIsDroso,new GridBagConstraints(
+			0, 2, 0, 0,  0.0, 0.0, GridBagConstraints.NORTHWEST,
+			GridBagConstraints.NONE,new Insets(268, 20, 0, 0), 0, 0
+		));
+		
 		this._checkboxDeleteTif.setFont(new java.awt.Font("arial",1,12));
 		this._container.add(this._checkboxDeleteTif,new GridBagConstraints(
 			0, 2, 0, 0,  0.0, 0.0, GridBagConstraints.NORTHWEST,
-			GridBagConstraints.NONE,new Insets(245, 10, 0, 0), 0, 0
+			GridBagConstraints.NONE,new Insets(298, 300, 0, 0), 0, 0
 		));
 		
 		label = new JLabel();
@@ -507,26 +524,26 @@ public class GuiAnalysis extends JFrame{
 		label.setFont(new java.awt.Font("arial",1,12));
 		this._container.add( label, new GridBagConstraints(
 			0, 2, 0, 0, 0.0, 0.0, GridBagConstraints.NORTHWEST,
-			GridBagConstraints.NONE, new Insets(275, 10, 0, 0), 0, 0
+			GridBagConstraints.NONE, new Insets(300, 10, 0, 0), 0, 0
 		));
 			
 		this._jtfCpu.setText("1");
 		this._jtfCpu.setPreferredSize(new java.awt.Dimension(60, 21));
 		this._container.add( this._jtfCpu, new GridBagConstraints(
 			0, 2, 0, 0, 0.0, 0.0,  GridBagConstraints.NORTHWEST, 
-			GridBagConstraints.NONE, new Insets(272, 140, 0, 0), 0, 0
+			GridBagConstraints.NONE, new Insets(298, 140, 0, 0), 0, 0
 		));
 	   	
 		this._jbStart.setPreferredSize(new java.awt.Dimension(120, 21));
 		this._container.add(this._jbStart, new GridBagConstraints(
 	   		0, 2, 0, 0,  0.0, 0.0, GridBagConstraints.NORTHWEST,
-	   		GridBagConstraints.NONE, new Insets(310, 140, 0,0), 0, 0
+	   		GridBagConstraints.NONE, new Insets(340, 140, 0,0), 0, 0
 	   	));
 	   	
 		this._jbQuit.setPreferredSize(new java.awt.Dimension(120, 21));
 		this._container.add(this._jbQuit,new GridBagConstraints(
 			0, 2, 0, 0,  0.0, 0.0,GridBagConstraints.NORTHWEST,
-			GridBagConstraints.NONE,new Insets(310, 10, 0, 0), 0, 0
+			GridBagConstraints.NONE,new Insets(340, 10, 0, 0), 0, 0
 		));
 		
 		RBHicListener hic = new RBHicListener(this);
@@ -703,6 +720,12 @@ public class GuiAnalysis extends JFrame{
 	 * @return
 	 */
 	public boolean isHic(){ return this._jrbHic.isSelected();}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public boolean isDroso(){ return this._jCbIsDroso.isSelected();}
 	
 	/**
 	 * 

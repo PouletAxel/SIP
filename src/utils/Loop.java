@@ -307,7 +307,7 @@ public class Loop {
 	 * 
 	 * @return
 	 */
-	public double getRegionalPaScoreMed(){ return this._regPaScoreMed; }
+	public float getRegionalPaScoreMed(){ return this._regPaScoreMed; }
 
 	/**
 	 * 
@@ -319,7 +319,7 @@ public class Loop {
 	 * Getter of regional peak analysis score 
 	 * @return doubl reginal PA score
 	 */
-	public double getRegionalPaScoreAvg(){ return this._regPaScoreAvg; }
+	public float getRegionalPaScoreAvg(){ return this._regPaScoreAvg; }
 	
 	/**
 	 * Setter of regional PA score

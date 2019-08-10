@@ -62,7 +62,7 @@ public class TestGui {
 				System.out.println("hic mode:\ninput: "+input+"\noutput: "+output+"\njuiceBox: "+juiceBoxTools+"\nnorm: "+ juiceBoXNormalisation+"\ngauss: "+gauss+"\n"
 						+ "min: "+min+"\nmax: "+max+"\nmatrix size: "+matrixSize+"\ndiag size: "+diagSize+"\nresolution: "+resolution+"\nsaturated pixel: "+saturatedPixel
 						+"\nthreshold: "+thresholdMax+"\n number of zero:"+nbZero+"\n ");
-				sip = new SIPObject(output, chrSize, gauss, min, max, resolution, saturatedPixel, thresholdMax, diagSize, matrixSize, nbZero,factor,0.01,gui.isProcessed(),gui.isHiChIP());
+				sip = new SIPObject(output, chrSize, gauss, min, max, resolution, saturatedPixel, thresholdMax, diagSize, matrixSize, nbZero,factor,0.01,gui.isProcessed(),gui.isHiChIP(),false);
 				sip.setIsGui(true);
 				ProcessDumpData processDumpData = new ProcessDumpData();
 				processDumpData.go(input, sip, chrSize, juiceBoxTools, juiceBoXNormalisation,gui.getNbCpu());
@@ -71,7 +71,7 @@ public class TestGui {
 						+"\nmin: "+min+"\nmax: "+max+"\nmatrix size: "+matrixSize+"\ndiag size: "+diagSize+"\nresolution: "+resolution+"\nsaturated pixel: "+saturatedPixel
 						+"\nthreshold: "+thresholdMax+"\nisHic: "+isHic+"\nisProcessed: "+isProcessed+"\n number of zero:"
 						+nbZero+"\n");
-				sip = new SIPObject(input,output, chrSize, gauss, min, max, resolution, saturatedPixel, thresholdMax, diagSize, matrixSize, nbZero,factor,0.01,gui.isProcessed(),gui.isHiChIP());
+				sip = new SIPObject(input,output, chrSize, gauss, min, max, resolution, saturatedPixel, thresholdMax, diagSize, matrixSize, nbZero,factor,0.01,gui.isProcessed(),gui.isHiChIP(),false);
 				sip.setIsGui(true);
 			}
 			

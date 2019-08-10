@@ -9,6 +9,7 @@ import utils.SIPObject;
 
 /**
  * multi thread class
+ * Construct all the RunnableDetectLoops Object and run them sequencily with the available processors
  * 
  * @author axel poulet
  *
@@ -24,18 +25,18 @@ public class ProcessDetectLoops{
 	/** progress bar if gui is true*/
 	private Progress _p;
 
-	/**
-	 * 
-	 */
+	/**	 */
 	public ProcessDetectLoops(){ }
 
 	/**
-	 * Run the process of loops detcetion in different CPU for each chr
-	 * 
-	 * @param sip
-	 * @param nbCPU
+	 * Run the process of loops detcetion in different CPU for each chr.
+	 * Make a RunnableDetectLoops for each chr
+	 * The SiIPObject contains all the information and parameters for the loops detection and post filtering
+	 * @param sip SiIPObject
+	 * @param nbCPU int number of CPU
 	 * @throws InterruptedException
 	 */
+	
 	public void go(SIPObject sip,int nbCPU) throws InterruptedException{
 		String resuFile = sip.getOutputDir()+File.separator+"loops.txt";
 		File file = new File(resuFile);
@@ -48,7 +49,7 @@ public class ProcessDetectLoops{
 			_p._bar.setValue(nb);
 		}
 		_nbLance = 0;
-		ArrayList<Thread> arrayListImageThread = new ArrayList<Thread>();
+		ArrayList<Thread> threadCallLoops = new ArrayList<Thread>();
 		int j = 0; 
 		Iterator<String> chrName = sip.getChrSizeHashMap().keySet().iterator();
 		while(chrName.hasNext()){
@@ -58,8 +59,8 @@ public class ProcessDetectLoops{
 			if (sip.isProcessed()){
 				normFile = sip.getinputDir()+File.separator+"normVector"+File.separator+chr+".norm";
 			}
-			arrayListImageThread.add( new RunnableDetectLoops(chr,  cl,	resuFile, sip, sip.testNormaVectorValue(normFile)));
-			arrayListImageThread.get(j).start();
+			threadCallLoops.add( new RunnableDetectLoops(chr,  cl,	resuFile, sip, sip.testNormaVectorValue(normFile)));
+			threadCallLoops.get(j).start();
 			
 			while (_continuer == false) 	Thread.sleep(10);
 			while (_nbLance > nbCPU)		Thread.sleep(10);
@@ -67,8 +68,8 @@ public class ProcessDetectLoops{
 			if(sip.isGui()) 	_p._bar.setValue(nb);
 			nb++;
 		}
-		for (int i = 0; i < arrayListImageThread.size(); ++i)
-			while(arrayListImageThread.get(i).isAlive())
+		for (int i = 0; i < threadCallLoops.size(); ++i)
+			while(threadCallLoops.get(i).isAlive())
 				Thread.sleep(10);
 		if(sip.isGui())	_p.dispose();
 	}

@@ -45,21 +45,21 @@ public class ProcessDumpData{
 	 */
 	public void go(String hicFile, SIPObject sip, HashMap<String,Integer> chrSize, String juiceBoxTools, String normJuiceBox,int nbCPU) throws InterruptedException{
 		int nb = 0;
-		File file = new File(sip.getOutputDir());
-		if (file.exists()==false) file.mkdir();
+		File outDir = new File(sip.getOutputDir());
+		if (outDir.exists()==false) outDir.mkdir();
 		if(sip.isGui()){
 			_p = new Progress("Dump data step",chrSize.size());
 			_p._bar.setValue(nb);
 		}
 		_nbLance = 0;
-		ArrayList<Thread> arrayListImageThread = new ArrayList<Thread>() ;
+		ArrayList<Thread> threadDumpData = new ArrayList<Thread>() ;
 		int j = 0; 
 		Iterator<String> chrName = chrSize.keySet().iterator();
 		while(chrName.hasNext()){
 			String chr = chrName.next();
 			DumpData dumpData = new DumpData(juiceBoxTools, hicFile, normJuiceBox, sip.getResolution());
-			arrayListImageThread.add(	new RunnableDumpData(sip.getOutputDir(), chr, chrSize.get(chr), dumpData, sip.getResolution(), sip.getMatrixSize(),	sip.getStep()));
-			arrayListImageThread.get(j).start();
+			threadDumpData.add(	new RunnableDumpData(sip.getOutputDir(), chr, chrSize.get(chr), dumpData, sip.getResolution(), sip.getMatrixSize(),	sip.getStep()));
+			threadDumpData.get(j).start();
 		
 			while (_continuer == false)		Thread.sleep(10);
 			while (_nbLance > nbCPU)		Thread.sleep(10);
@@ -67,8 +67,8 @@ public class ProcessDumpData{
 			if(sip.isGui())	_p._bar.setValue(nb);
 			nb++;
 		}
-		for (int i = 0; i < arrayListImageThread.size(); ++i)
-			while(arrayListImageThread.get(i).isAlive())
+		for (int i = 0; i < threadDumpData.size(); ++i)
+			while(threadDumpData.get(i).isAlive())
 				Thread.sleep(10);
 		if(sip.isGui())	_p.dispose();
 	}

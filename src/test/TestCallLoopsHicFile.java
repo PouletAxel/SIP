@@ -68,7 +68,7 @@ public class TestCallLoopsHicFile{
 			File file = new File(output);
 			if (file.exists()==false){file.mkdir();}
 			
-			SIPObject sip = new SIPObject(output, chrsize, gauss, min, max, resolution, saturatedPixel, thresholdMax, diagSize, matrixSize, nbZero,factor,0.01,false,false);
+			SIPObject sip = new SIPObject(output, chrsize, gauss, min, max, resolution, saturatedPixel, thresholdMax, diagSize, matrixSize, nbZero,factor,0.01,false,false,false);
 			sip.setIsGui(false);
 			ProcessDumpData processDumpData = new ProcessDumpData();
 			processDumpData.go(input, sip, chrsize, juiceBoxTools, juiceBoXNormalisation,1);

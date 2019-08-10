@@ -7,6 +7,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Set;
@@ -61,10 +62,12 @@ public class SIPObject {
 	private double _fdr;
 	/** is processed booelan*/
 	private boolean _isProcessed = false;
-	/** id is gui analysis*/
+	/** if is gui analysis*/
 	private boolean _isGui = false;
-	
-	
+	/** if rfdr*/
+	private boolean _isDroso = false;
+	private double _medianAP = 0;
+	private double _medianAPReg = 0;
 	
 	/**
 	 * SIPObject constructor
@@ -88,7 +91,7 @@ public class SIPObject {
 	public SIPObject(String output, HashMap<String, Integer> chrSize, double gauss, double min,
 			double max, int resolution, double saturatedPixel, int thresholdMax,
 			int diagSize, int matrixSize, int nbZero,ArrayList<Integer> listFactor,
-			double fdr, boolean isProcessed, boolean isHichip) {
+			double fdr, boolean isProcessed, boolean isHichip, boolean rfdr) {
 		this._output = output;
 		this._input = output;
 		this._chrSize = chrSize;
@@ -106,6 +109,7 @@ public class SIPObject {
 		this._fdr = fdr;
 		this._isProcessed = isProcessed;
 		this._isHichip = isHichip;
+		this._isDroso = rfdr;
 	}
 
 	/**
@@ -130,7 +134,7 @@ public class SIPObject {
 	public SIPObject(String input, String output, HashMap<String, Integer> chrSize, double gauss, double min,
 			double max, int resolution, double saturatedPixel, int thresholdMax,
 			int diagSize, int matrixSize, int nbZero,ArrayList<Integer> listFactor,
-			double fdr, boolean isProcessed, boolean isHichip) {
+			double fdr, boolean isProcessed, boolean isHichip, boolean rfdr) {
 		this._output = output;
 		this._input = input;
 		this._chrSize = chrSize;
@@ -148,6 +152,7 @@ public class SIPObject {
 		this._fdr = fdr;
 		this._isProcessed = isProcessed;
 		this._isHichip = isHichip;
+		this._isDroso = rfdr;
 	}
 	
 	/**
@@ -163,27 +168,63 @@ public class SIPObject {
 		fdrDetection.run(this._fdr, data);
 		double RFDRcutoff = fdrDetection.getRFDRcutoff();
 		double FDRcutoff = fdrDetection.getFDRcutoff();
-		System.out.println("Filtering value at "+this._fdr+" FDR is "+FDRcutoff+" APscore and "+RFDRcutoff+" RegionalAPscore\n");
+		boolean supToTen = false;
+		if(this._isDroso){ 
+			median(data,FDRcutoff);
+			System.out.println("Filtering value at "+this._fdr+" FDR is "+FDRcutoff+" APscore ");
+			if(_medianAPReg > 10){
+				supToTen = true;
+				 _medianAPReg = _medianAPReg/4;
+				 _medianAP = _medianAP/10;
+			}
+		}
+		else 
+			System.out.println("Filtering value at "+this._fdr+" FDR is "+FDRcutoff+" APscore and "+RFDRcutoff+" RegionalAPscore\n");
 		BufferedWriter writer;
 		if(first) writer = new BufferedWriter(new FileWriter(new File(pathFile), true));
 		else{
 			writer = new BufferedWriter(new FileWriter(new File(pathFile)));
 			writer.write("chromosome1\tx1\tx2\tchromosome2\ty1\ty2\tcolor\tAPScoreAvg\tProbabilityofEnrichment\tRegAPScoreAvg\tAvg_diffMaxNeihgboor_1\tAvg_diffMaxNeihgboor_2\tavg\tstd\tvalue\n");
 		}
-		Set<String> key = data.keySet();
-		Iterator<String> it = key.iterator();
-		while (it.hasNext()){
-			String name = it.next();
-			Loop loop = data.get(name);
-			ArrayList<Integer> coord = loop.getCoordinates();
-			if(loop.getPaScoreAvg()> 1.2 && loop.getPaScoreAvg() > 1 && loop.getPaScoreAvg() > FDRcutoff && loop.getRegionalPaScoreAvg() > RFDRcutoff && loop.getPaScoreAvgdev() > .9){
-				writer.write(loop.getChr()+"\t"+coord.get(2)+"\t"+coord.get(3)+"\t"+loop.getChr()+"\t"+coord.get(0)+"\t"+coord.get(1)+"\t0,0,0"
-						+"\t"+loop.getPaScoreAvg()+"\t"+loop.getPaScoreAvgdev()+"\t"+loop.getRegionalPaScoreAvg()+"\t"
-						+loop.getNeigbhoord1()+"\t"+loop.getNeigbhoord2()+"\t"+loop.getAvg()+"\t"
-						+loop.getStd()+"\t"+loop.getValue()+"\n");
+		
+		if(data.size()>0){
+			Set<String> key = data.keySet();
+			Iterator<String> it = key.iterator();
+			while (it.hasNext()){
+				String name = it.next();
+				Loop loop = data.get(name);
+				ArrayList<Integer> coord = loop.getCoordinates();
+				if(this._isDroso){
+					if(loop.getPaScoreAvg()> 1.2 && loop.getPaScoreAvg() > 1 && loop.getPaScoreAvg() > FDRcutoff && loop.getPaScoreAvgdev() > .9 && (loop.getNeigbhoord1() > 1 || loop.getNeigbhoord2() > 1)){
+						if(supToTen){
+							if(loop.getRegionalPaScoreAvg() >= (_medianAPReg-_medianAPReg*0.7) && loop.getRegionalPaScoreAvg() <= (_medianAPReg*2)&& loop.getPaScoreAvg() <= (_medianAP*2)){
+								writer.write(loop.getChr()+"\t"+coord.get(2)+"\t"+coord.get(3)+"\t"+loop.getChr()+"\t"+coord.get(0)+"\t"+coord.get(1)+"\t0,0,0"
+									+"\t"+loop.getPaScoreAvg()+"\t"+loop.getPaScoreAvgdev()+"\t"+loop.getRegionalPaScoreAvg()+"\t"
+									+loop.getNeigbhoord1()+"\t"+loop.getNeigbhoord2()+"\t"+loop.getAvg()+"\t"
+									+loop.getStd()+"\t"+loop.getValue()+"\n");
+							}
+						}
+					else{
+						if( loop.getRegionalPaScoreAvg() >= (_medianAPReg-_medianAPReg*0.5) && loop.getRegionalPaScoreAvg() <= (_medianAPReg*2)&& loop.getPaScoreAvg() <= (_medianAP*2)){
+							writer.write(loop.getChr()+"\t"+coord.get(2)+"\t"+coord.get(3)+"\t"+loop.getChr()+"\t"+coord.get(0)+"\t"+coord.get(1)+"\t0,0,0"
+							+"\t"+loop.getPaScoreAvg()+"\t"+loop.getPaScoreAvgdev()+"\t"+loop.getRegionalPaScoreAvg()+"\t"
+							+loop.getNeigbhoord1()+"\t"+loop.getNeigbhoord2()+"\t"+loop.getAvg()+"\t"
+							+loop.getStd()+"\t"+loop.getValue()+"\n");
+							}
+						}
+					}
+				}else{
+					if(loop.getPaScoreAvg()> 1.2 && loop.getPaScoreAvg() > 1 && loop.getPaScoreAvg() > FDRcutoff && loop.getRegionalPaScoreAvg() > RFDRcutoff && loop.getPaScoreAvgdev() > .9){
+						writer.write(loop.getChr()+"\t"+coord.get(2)+"\t"+coord.get(3)+"\t"+loop.getChr()+"\t"+coord.get(0)+"\t"+coord.get(1)+"\t0,0,0"
+							+"\t"+loop.getPaScoreAvg()+"\t"+loop.getPaScoreAvgdev()+"\t"+loop.getRegionalPaScoreAvg()+"\t"
+							+loop.getNeigbhoord1()+"\t"+loop.getNeigbhoord2()+"\t"+loop.getAvg()+"\t"
+							+loop.getStd()+"\t"+loop.getValue()+"\n");
+					}
+					
+				}
 			}
-		}
 		writer.close();
+		}
 	}
 
 	/**
@@ -226,6 +267,39 @@ public class SIPObject {
 		return normVector;
 	}
 
+	/**
+	 * 
+	 * @return
+	 */
+	private void median(HashMap<String,Loop> data, double fdrCutoff){
+		Set<String> key = data.keySet();
+		Iterator<String> it = key.iterator();
+		ArrayList<Float> n1 = new ArrayList<Float> ();
+		ArrayList<Float> n2 = new ArrayList<Float> ();
+		int nb = 0;
+		while (it.hasNext()){
+			String name = it.next();
+			Loop loop = data.get(name);
+			if(loop.getPaScoreAvg()> 1.2 && loop.getPaScoreAvg() > 1 && loop.getPaScoreAvg() > fdrCutoff && loop.getPaScoreAvgdev() > .9){
+				n1.add(loop.getPaScoreAvg());
+				n2.add(loop.getRegionalPaScoreAvg());
+				nb++;
+			}
+		}
+		if(nb>0){
+			n1.sort(Comparator.naturalOrder());
+			n2.sort(Comparator.naturalOrder());
+			double pos1 = Math.floor((n1.size() - 1.0) / 2.0);
+			double pos2 = Math.ceil((n1.size() - 1.0) / 2.0);
+			if (pos1 == pos2 ) 	_medianAP = n1.get((int)pos1);
+			else _medianAP = (n1.get((int)pos1) + n1.get((int)pos2)) / 2.0 ;
+			pos1 = Math.floor((n2.size() - 1.0) / 2.0);
+			pos2 = Math.ceil((n2.size() - 1.0) / 2.0);
+			if (pos1 == pos2 ) 	_medianAPReg = n2.get((int)pos1);
+			else _medianAPReg = (n2.get((int)pos1) + n2.get((int)pos2)) / 2.0 ;
+			System.out.println("AP\t"+_medianAP+"\nAPREG\t"+_medianAPReg);
+		}
+	}
 	/**
 	 * Getter of the input dir
 	 * @return path of the input dir
