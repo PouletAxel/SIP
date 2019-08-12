@@ -537,13 +537,13 @@ public class GuiAnalysis extends JFrame{
 		this._jbStart.setPreferredSize(new java.awt.Dimension(120, 21));
 		this._container.add(this._jbStart, new GridBagConstraints(
 	   		0, 2, 0, 0,  0.0, 0.0, GridBagConstraints.NORTHWEST,
-	   		GridBagConstraints.NONE, new Insets(340, 140, 0,0), 0, 0
+	   		GridBagConstraints.NONE, new Insets(325, 140, 0,0), 0, 0
 	   	));
 	   	
 		this._jbQuit.setPreferredSize(new java.awt.Dimension(120, 21));
 		this._container.add(this._jbQuit,new GridBagConstraints(
 			0, 2, 0, 0,  0.0, 0.0,GridBagConstraints.NORTHWEST,
-			GridBagConstraints.NONE,new Insets(340, 10, 0, 0), 0, 0
+			GridBagConstraints.NONE,new Insets(325, 10, 0, 0), 0, 0
 		));
 		
 		RBHicListener hic = new RBHicListener(this);
