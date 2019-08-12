@@ -99,7 +99,7 @@ public class Hic_main {
 			+"\t-norm: <NONE/VC/VC_SQRT/KR> only for hic option (default KR)\n"
 			+"\t-del: true or false, delete tif files used for loop detection (default true)\n"
 			+"\t-fdr: Empirical FDR value for filtering based on random sites (default 0.01)\n"
-			//+"\t-isDroso: default false, if true aplly specific filter due to the enrichment of loops in D. mel\n"
+			+"\t-isDroso: default false, if true aplly specific filter due to the specific enrichment of loops in D. mel\n"
 			+"\t-h, --help print help\n"
 			+"\ncommand line eg:\n"
 			+"\tjava -jar SIP_HiC.jar processed inputDirectory pathToChromosome.size OutputDir .... paramaters\n"

@@ -34,6 +34,7 @@
 		-norm: <NONE/VC/VC_SQRT/KR> only for hic option (default KR)
 		-del: true or false, delete tif files used for loop detection (default true)
 		-fdr: Empirical FDR value for filtering based on random sites (default 0.01)
+		-isDroso: default false, if true aplly specific filter due to the specific enrichment of loops in D. mel
 		-h, --help print help
 		
 		command line eg:
