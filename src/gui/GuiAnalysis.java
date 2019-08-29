@@ -170,7 +170,7 @@ public class GuiAnalysis extends JFrame{
 	   	this._jrbHic.setSelected(true);
 		
 /////////////////////////////////////
-		label = new JLabel();
+		/*label = new JLabel();
 		label.setFont(new java.awt.Font("arial",1,12));
 		label.setText("Data type:");
 		this._container.add(label, new GridBagConstraints(
@@ -190,7 +190,7 @@ public class GuiAnalysis extends JFrame{
 			0, 1, 0, 0,  0.0, 0.0, GridBagConstraints.NORTHWEST,
 			GridBagConstraints.NONE,new Insets(20, 380, 0, 0), 0, 0
 		));
-	   	this._jrbHiCData.setSelected(true);
+	   	this._jrbHiCData.setSelected(true);*/
 //////////////////////////////////////////////
 			
 	   	this._jbBoxTools.setPreferredSize(new java.awt.Dimension(120, 21));

@@ -19,7 +19,6 @@
 		-g: Gaussian filter: smoothing factor reduce noise during primary maxima detection (default 1.5 for hic 
 		and 1 for hichip
 		-cpu: Number of CPU used for SIP processing (default 1)
-		-hichip: true fo HiChIP or false for Hi-C (default false)
 		-factor: Multiple resolutions can be specified using: 
 			-factor 1: run only for the input res (default)
 			-factor 2: res and res*2

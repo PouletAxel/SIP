@@ -79,7 +79,7 @@ public class FindMaxima{
 				DecayAnalysis da = new DecayAnalysis(this._imgNorm,x,y);
 				float n1 =da.getNeighbourhood1();
 				float n2 =da.getNeighbourhood2();				
-				if(hichip){
+				/*if(hichip){
 					if(n1 > 2 && n2 > 2){ // filter on the neighborood for hichip datatset
 						Loop maxima = new Loop(temp.get(j),x,y,this._chr,avg,std,ipN.getf(x, y));
 						maxima.setNeigbhoord1(n1);
@@ -89,7 +89,7 @@ public class FindMaxima{
 						maxima.setMatrixSize(this._imgNorm.getWidth());
 						data.put(name, maxima);
 					}
-				}else{
+				}else{*/
 					if(n1 < n2 && n1 >= 0.15 && n2 >= 0.25){ // filter on the neighborood for hic datatset
 						Loop maxima = new Loop(temp.get(j),x,y,this._chr,avg,std,ipN.getf(x, y));
 						maxima.setNeigbhoord1(n1);
@@ -99,7 +99,7 @@ public class FindMaxima{
 						maxima.setMatrixSize(this._imgNorm.getWidth());
 						data.put(name, maxima);
 					}
-				}
+				//}
 			}
 		}
 		return data;
