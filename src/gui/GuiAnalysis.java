@@ -57,7 +57,7 @@ public class GuiAnalysis extends JFrame{
 	/** */
 	private JRadioButton _jrbProcessed = new JRadioButton("processed");
 	/** */
-	private ButtonGroup _bGroupInputData = new ButtonGroup();
+	//private ButtonGroup _bGroupInputData = new ButtonGroup();
 	/** */
 	private JRadioButton _jrbHiCData = new JRadioButton("hic");
 	/** */
