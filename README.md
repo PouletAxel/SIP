@@ -39,15 +39,17 @@
 
 		Command line eg:
 
-			java -jar SIP_HiC.jar processed inputDirectory pathToChromosome.size OutputDir .... paramaters
-			java -jar SIP_HiC.jar hic inputDirectory pathToChromosome.size OutputDir juicer_tools.jar
+		  java -jar SIP_HiC.jar processed inputDirectory pathToChromosome.size OutputDir .... paramaters
+		  java -jar SIP_HiC.jar hic inputDirectory pathToChromosome.size OutputDir juicer_tools.jar
 			
 		Authors:
 			Axel Poulet
-				Department of Molecular, Cellular  and Developmental Biology Yale University 165 Prospect St
-				New Haven, CT 06511, USA
+				Department of Molecular, Cellular  and Developmental Biology
+				Yale University
+				165 Prospect St New Haven, CT 06511, USA
 			M. Jordan Rowley
-				Department of Genetics, Cell Biology and Anatomy, University of Nebraska Medical Center 
+				Department of Genetics, Cell Biology and Anatomy, 
+				University of Nebraska Medical Center 
 				Omaha,NE 68198-5805
 				
 		Contact: pouletaxel@gmail.com OR jordan.rowley@unmc.edu
