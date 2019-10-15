@@ -24,32 +24,24 @@ public class TestCallLoopsProcessedFile {
 	 * @throws InterruptedException 
 	 */
 	public static void main(String[] args) throws IOException, InterruptedException {
-		//String input = "/home/plop/Bureau/DataSetImageHiC/GM12878/subsample/GM12878_100mil/";
-		//String output= "/home/plop/Bureau/DataSetImageHiC/GM12878/subsample/100mil_test/";
-		//String output= "/home/plop/Bureau/DataSetImageHiC/Hichip_H3k4me1_test";
-		//String input= "/home/plop/Bureau/DataSetImageHiC/Hichip_H3k4me1_test";
-		///home/plop/Bureau/DataSetImageHiC/Hichip_H3k4me1_test
-		String input = "/home/plop/Bureau/kc_1kb";
-		String output= "/home/plop/Bureau/kc_1kbTestBis";
-		//String input = "/home/plop/Bureau/DataSetImageHiC/GM12878/subsample/GM12878_full/";
-		//String input = "/home/plop/Bureau/DataSetImageHiC/HiChip/ring1b/test/";//"/home/plop/Bureau/DataSetImageHiC/GM12878/test";
-		//String output = "/home/plop/Bureau/DataSetImageHiC/HiChip/ring1b/testTer/";//"/home/plop/Bureau/DataSetImageHiC/GM12878/test";
-		int matrixSize = 500;
-		int resolution = 1000;
-		int diagSize = 20;
+		String input = "/home/plop/Desktop/TestSIP";
+		String output= "/home/plop/Desktop/TestBis";
+		int matrixSize = 2000;
+		int resolution = 5000;
+		int diagSize = 5;
 		double gauss = 1.5;
-		int thresholdMax = 6000;// 2800;//1800
-		int nbZero = 10;//6;
+		int thresholdMax = 2800;// 2800;//1800
+		int nbZero = 6;//6;
 		double min = 2;//1.5;
 		double max = 2;//1.5;
-		double saturatedPixel = 0.01;//0.005;
+		double saturatedPixel = 0.005;//0.005;
 		boolean keepTif = false;
 		ArrayList<Integer> factor = new ArrayList<Integer>();
 		factor.add(1);
 		//factor.add(2);
 		//factor.add(5);
 		
-		HashMap<String,Integer> chrsize = readChrSizeFile("/home/plop/Bureau/armsizes.txt");
+		HashMap<String,Integer> chrsize = readChrSizeFile("/home/plop/Desktop/SIP/armsizes.txt");
 		SIPObject sip = new SIPObject(input,output, chrsize, gauss, min, max, resolution, saturatedPixel, thresholdMax, diagSize, matrixSize, nbZero,factor,0.05,true,false,false);
 		sip.setIsGui(false);
 		System.out.println("Processed Data\n");
@@ -65,13 +57,8 @@ public class TestCallLoopsProcessedFile {
 			+ "threshold "+thresholdMax+"\n"
 			+ "isProcessed "+sip.isProcessed()+"\n");		
 		ProcessDetectLoops processDetectloops = new ProcessDetectLoops();
-		processDetectloops.go(sip, 3);
-		
-		if(keepTif == false){
-			for(int i = 0; i< sip._tifList.size();++i)
-				sip._tifList.get(i).delete();
-		}
-	
+		processDetectloops.go(sip, 3,true);
+			
 		System.out.println("End");
 	}
 			

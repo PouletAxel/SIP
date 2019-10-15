@@ -19,7 +19,7 @@ public class Progress extends JFrame{
 	public JProgressBar _bar;
 	
 	public Progress(String title, int nbChromo){      
-		this.setSize(300, 80);
+		this.setSize(400, 80);
 		this.setTitle("*** "+title+" ***");
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		this.setLocationRelativeTo(null);      

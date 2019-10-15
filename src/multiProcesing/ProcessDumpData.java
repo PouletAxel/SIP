@@ -44,11 +44,11 @@ public class ProcessDumpData{
 	 * @throws InterruptedException
 	 */
 	public void go(String hicFile, SIPObject sip, HashMap<String,Integer> chrSize, String juiceBoxTools, String normJuiceBox,int nbCPU) throws InterruptedException{
-		int nb = 0;
+		int nb = 1;
 		File outDir = new File(sip.getOutputDir());
 		if (outDir.exists()==false) outDir.mkdir();
 		if(sip.isGui()){
-			_p = new Progress("Dump data step",chrSize.size());
+			_p = new Progress(" Dump data step",chrSize.size()+1);
 			_p._bar.setValue(nb);
 		}
 		_nbLance = 0;
@@ -60,16 +60,19 @@ public class ProcessDumpData{
 			DumpData dumpData = new DumpData(juiceBoxTools, hicFile, normJuiceBox, sip.getResolution());
 			threadDumpData.add(	new RunnableDumpData(sip.getOutputDir(), chr, chrSize.get(chr), dumpData, sip.getResolution(), sip.getMatrixSize(),	sip.getStep()));
 			threadDumpData.get(j).start();
-		
+			
 			while (_continuer == false)		Thread.sleep(10);
-			while (_nbLance > nbCPU)		Thread.sleep(10);
+			while (_nbLance >= nbCPU)		Thread.sleep(10);
 			++j;
 			if(sip.isGui())	_p._bar.setValue(nb);
 			nb++;
+			
 		}
+		
 		for (int i = 0; i < threadDumpData.size(); ++i)
 			while(threadDumpData.get(i).isAlive())
 				Thread.sleep(10);
+	
 		if(sip.isGui())	_p.dispose();
 	}
 }

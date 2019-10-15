@@ -53,7 +53,7 @@ public class SIPObject {
 	/** Number of pixel = 0 allowed around the loop*/
 	private int _nbZero = -1;
 	/** List of file containing the path of the image*/
-	public ArrayList<File> _tifList = new ArrayList<File>();
+	private ArrayList<File> _tifList = new ArrayList<File>();
 	/** list of the image resolution to find loop*/
 	private ArrayList<Integer> _listFactor = new ArrayList<Integer>();
 	/**	boolean if true hichip data if false hic */
@@ -484,4 +484,12 @@ public class SIPObject {
 	 */
 			
 	public void setIsGui(boolean _isGui) { this._isGui = _isGui;}
+
+	public ArrayList<File> getTifList() {
+		return _tifList;
+	}
+
+	public void setTifList(ArrayList<File> _tifList) {
+		this._tifList = _tifList;
+	}
 }

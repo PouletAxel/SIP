@@ -8,6 +8,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import javax.swing.JOptionPane;
+
 import gui.GuiAnalysis;
 import multiProcesing.ProcessDetectLoops;
 import multiProcesing.ProcessDumpData;
@@ -206,7 +208,7 @@ public class Hic_main {
 					_thresholdMax, _diagSize, _matrixSize, _nbZero, _factor,_fdr, _isProcessed,_isHiChip,_isDroso);
 			sip.setIsGui(_gui);
 			ProcessDumpData processDumpData = new ProcessDumpData();
-			processDumpData.go(_input, sip, _chrSize, _juiceBoxTools, _juiceBoXNormalisation, _cpu-1);
+			processDumpData.go(_input, sip, _chrSize, _juiceBoxTools, _juiceBoXNormalisation, _cpu);
 			System.out.println("########### End of the dump Step");
 		}else{
 			System.out.println("processed mode:\n"+ "input: "+_input+"\n"+ "output: "+_output+"\n"+ "juiceBox: "+_juiceBoxTools+"\n"
@@ -221,7 +223,7 @@ public class Hic_main {
 		}
 		System.out.println("Start loop detction step");
 		ProcessDetectLoops processDetectloops = new ProcessDetectLoops();
-		processDetectloops.go(sip,_cpu-1);
+		processDetectloops.go(sip,_cpu,_delImages);
 		System.out.println("###########End loop detction step");
 		BufferedWriter writer = new BufferedWriter(new FileWriter(new File(_output+File.separator+"parameters.txt")));
 		if(_isProcessed){
@@ -236,10 +238,9 @@ public class Hic_main {
 					" -factor "+ _factOption+" -fdr "+_fdr+" -del "+_delImages+" -cpu "+ _cpu+/*" -hichip "+_isHiChip+*/" -isDroso "+_isDroso+"\n");
 		}
 		writer.close();	
-		if(_delImages){
-			System.out.println("Deleting image file");
-			for(int i = 0; i< sip._tifList.size();++i)
-				sip._tifList.get(i).delete();
+		
+		if(_gui){
+			JOptionPane.showMessageDialog(null,"Results available: "+_output , "End of SIP program", JOptionPane.INFORMATION_MESSAGE);
 		}
 		System.out.println("End of SIP loops are available in "+_output);
 	}

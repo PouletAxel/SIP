@@ -21,6 +21,8 @@ public class RunnableDetectLoops extends Thread implements Runnable{
 	private String _resuFile;
 	/** String name of the chr*/
 	private String _chr;
+	/** String name of the chr*/
+	private boolean _delImages = true;
 	/** norn vector table for the chr of interest*/
 	private HashMap<Integer, String> _normVector = new HashMap<Integer, String> ();
 	
@@ -33,12 +35,13 @@ public class RunnableDetectLoops extends Thread implements Runnable{
 	 * @param sip
 	 * @param normVector
 	 */
-	public RunnableDetectLoops (String chr, CallLoops callLoops, String resuFile, SIPObject sip, HashMap<Integer, String> normVector){
+	public RunnableDetectLoops (String chr, CallLoops callLoops, String resuFile, SIPObject sip, HashMap<Integer, String> normVector, boolean delFile){
 		this._sip = sip;
 		this._callLoops =callLoops;
 		this._chr= chr;
 		this._resuFile = resuFile;
 		this._normVector = normVector;
+		this._delImages = delFile;
 	}
 	
 	/**
@@ -62,6 +65,14 @@ public class RunnableDetectLoops extends Thread implements Runnable{
 				HashMap<String, Loop> data = this._callLoops.detectLoops(listOfFiles,this._chr,this._normVector);
 				if (file.length() == 0)	_sip.saveFile(this._resuFile,data,false);
 				else this._sip.saveFile(this._resuFile,data, true);
+				listOfFiles = _sip.fillList(dir);
+				if(_delImages){
+					System.out.println("Deleting image file for "+_chr);
+					for(int i = 0; i < listOfFiles.length;++i) {
+						String name = listOfFiles[i].toString();
+						if(name.contains(".tif"))  listOfFiles[i].delete();
+					}
+				}
 			}
 		} catch (IOException e1) { e1.printStackTrace();}
 		System.gc();

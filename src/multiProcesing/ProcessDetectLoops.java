@@ -37,15 +37,15 @@ public class ProcessDetectLoops{
 	 * @throws InterruptedException
 	 */
 	
-	public void go(SIPObject sip,int nbCPU) throws InterruptedException{
+	public void go(SIPObject sip,int nbCPU, boolean delImage) throws InterruptedException{
 		String resuFile = sip.getOutputDir()+File.separator+"loops.txt";
 		File file = new File(resuFile);
 		if(file.exists()) file.delete();
 		file = new File(sip.getOutputDir());
 		if (file.exists()==false) file.mkdir();
-		int nb = 0;
+		int nb = 1;
 		if(sip.isGui()){
-			_p = new Progress("Loop Detection step",sip.getChrSizeHashMap().size());
+			_p = new Progress("Loop Detection step",sip.getChrSizeHashMap().size()+1);
 			_p._bar.setValue(nb);
 		}
 		_nbLance = 0;
@@ -59,18 +59,20 @@ public class ProcessDetectLoops{
 			if (sip.isProcessed()){
 				normFile = sip.getinputDir()+File.separator+"normVector"+File.separator+chr+".norm";
 			}
-			threadCallLoops.add( new RunnableDetectLoops(chr,  cl,	resuFile, sip, sip.testNormaVectorValue(normFile)));
+			threadCallLoops.add( new RunnableDetectLoops(chr,  cl,	resuFile, sip, sip.testNormaVectorValue(normFile), delImage));
 			threadCallLoops.get(j).start();
-			
+		
 			while (_continuer == false) 	Thread.sleep(10);
-			while (_nbLance > nbCPU)		Thread.sleep(10);
+			while (_nbLance >= nbCPU)		Thread.sleep(10);
 			++j;
-			if(sip.isGui()) 	_p._bar.setValue(nb);
+			if(sip.isGui()) _p._bar.setValue(nb);
 			nb++;
 		}
+		
 		for (int i = 0; i < threadCallLoops.size(); ++i)
 			while(threadCallLoops.get(i).isAlive())
 				Thread.sleep(10);
 		if(sip.isGui())	_p.dispose();
+
 	}
 }

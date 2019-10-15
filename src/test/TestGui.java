@@ -76,7 +76,7 @@ public class TestGui {
 			}
 			
 			ProcessDetectLoops processDetectloops = new ProcessDetectLoops();
-			processDetectloops.go(sip, gui.getNbCpu());
+			processDetectloops.go(sip, gui.getNbCpu(),gui.isDeletTif());
 			
 		}
 	}

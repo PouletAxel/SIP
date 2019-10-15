@@ -74,12 +74,8 @@ public class TestCallLoopsHicFile{
 			processDumpData.go(input, sip, chrsize, juiceBoxTools, juiceBoXNormalisation,1);
 			
 			ProcessDetectLoops processDetectloops = new ProcessDetectLoops();
-			processDetectloops.go(sip, 1);
+			processDetectloops.go(sip, 1,true);
 			
-			if(keepTif == false){
-				for(int i = 0; i< sip._tifList.size();++i)
-					sip._tifList.get(i).delete();
-			}
 			System.out.println("End");
 		}
 		

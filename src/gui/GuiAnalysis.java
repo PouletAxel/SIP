@@ -881,7 +881,7 @@ public class GuiAnalysis extends JFrame{
 						null, "some alphabetic character detected in integer or float paramters",
 						"Error", JOptionPane.ERROR_MESSAGE
 					);	
-			}else if(_gui.getNbCpu() > Runtime.getRuntime().availableProcessors() || _gui.getNbCpu()<=0 ){
+			}else if(_gui.getNbCpu() > Runtime.getRuntime().availableProcessors() || _gui.getNbCpu()<0 ){
 				JOptionPane.showMessageDialog(
 						null, "The number of CPU chose is superior to the number of computer's CPU",
 						"Error", JOptionPane.ERROR_MESSAGE
