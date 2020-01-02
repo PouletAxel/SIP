@@ -71,7 +71,7 @@ public class FilterLoops {
 			if(testRemoved)
 				removed.add(name);
 			else{
-				String [] tname = name.split("\t");
+				String [] tname = name.split("_");
 				int x = Integer.parseInt(tname[1]);
 				int y = Integer.parseInt(tname[2]);
 				for(int i = x-5*this._resolution; i <= x+5*this._resolution; i+=this._resolution){

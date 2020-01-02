@@ -18,6 +18,8 @@ public class Progress extends JFrame{
 	private static final long serialVersionUID = 1L;
 	public JProgressBar _bar;
 	
+	public Progress(){}
+	
 	public Progress(String title, int nbChromo){      
 		this.setSize(400, 80);
 		this.setTitle("*** "+title+" ***");

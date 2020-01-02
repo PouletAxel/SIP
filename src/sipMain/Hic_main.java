@@ -13,6 +13,7 @@ import javax.swing.JOptionPane;
 import gui.GuiAnalysis;
 import multiProcesing.ProcessDetectLoops;
 import multiProcesing.ProcessDumpData;
+import process.SIPProcess;
 import utils.SIPObject;
 
 /**
@@ -75,6 +76,8 @@ public class Hic_main {
 	private static int _cpu = 1;
 	/**boolean is true supress all the image created*/
 	private static boolean _gui = false;
+	/**boolean is true supress all the image created*/
+	private static boolean _isaccurate = false;
 	/**Strin for the documentation*/
 	private static String _doc = ("#SIP Version 1 run with java 8\n"
 			+ "\nUsage:\n"
@@ -102,6 +105,7 @@ public class Hic_main {
 			+ "\t-del: true or false, whether not to delete tif files used for loop detection (default true)\n"
 			+ "\t-fdr: Empirical FDR value for filtering based on random sites (default 0.01)\n"
 			+ "\t-isDroso: default false, if true apply extra filter to help detect loops similar to those found in D. mel cells\n"
+			+ "\t-isAccurate: sacrifice speed for increased accuracy (default false)"
 			+ "\t-h, --help print help\n"
 			+ "\nCommand line eg:\n"
 			+ "\tjava -jar SIP_HiC.jar processed inputDirectory pathToChromosome.size OutputDir .... paramaters\n"
@@ -133,8 +137,7 @@ public class Hic_main {
 		}else if(args.length >= 4){
 			if (args[0].equals("hic") || args[0].equals("processed")){
 				_input = args[1];
-				_output = args[3];
-				readChrSizeFile(args[2]);
+				_output = args[3];;
 				_chrSizeFile = args[2];	
 				if (args[0].equals("hic")){
 					readOption(args,5);
@@ -147,7 +150,7 @@ public class Hic_main {
 			}else{
 				System.out.println(args[0]+" not defined\n");
 				System.out.println(_doc);
-				System.exit(0);
+				return;
 			}
 						
 		}else{////////////////////////////////////////GUI parameter initialisation
@@ -159,7 +162,6 @@ public class Hic_main {
 		    }	
 			if (gui.isStart()){
 				_chrSizeFile = gui.getChrSizeFile();
-				readChrSizeFile(gui.getChrSizeFile());
 				_output = gui.getOutputDir();
 				_input = gui.getRawDataDir();
 				_matrixSize = gui.getMatrixSize();
@@ -171,6 +173,7 @@ public class Hic_main {
 				_min = gui.getMin();
 				//_isHiChip= gui.isHiChIP();
 				_isDroso= gui.isDroso();
+				_isaccurate= gui.isAccurate();
 				_nbZero = gui.getNbZero();
 				_saturatedPixel = gui.getEnhanceSignal();
 				_thresholdMax = gui.getNoiseTolerance();
@@ -193,16 +196,37 @@ public class Hic_main {
 				else if (gui.isVC_SQRT()) _juiceBoXNormalisation = "VC_SQRT";				
 			}else {
 				System.out.println("SIP closed: if you want the help: -h");
-				System.exit(0);
+				return;
 			}
 		}
+		File f = new File(_input);
+		if(f.exists()==false){
+				System.out.println(_input+" doesn't existed !!! \n\n");
+				System.out.println(_doc);
+				return;
+		}
+		
+		f = new File(_chrSizeFile);
+		if(f.exists()==false){
+				System.out.println(_chrSizeFile+" doesn't existed !!! \n\n");
+				System.out.println(_doc);
+				return;
+		}
+
 		
 		SIPObject sip;
+		readChrSizeFile(_chrSizeFile);
 		if(_isProcessed==false){
+			f = new File(_juiceBoxTools);
+			if(f.exists()==false){
+				System.out.println(_juiceBoxTools+" doesn't existed !!! \n\n");
+				System.out.println(_doc);
+				return;
+			}
 			System.out.println("hic mode: \n"+ "input: "+_input+"\n"+ "output: "+_output+"\n"+ "juiceBox: "+_juiceBoxTools+"\n"+ "norm: "+ _juiceBoXNormalisation+"\n"
 					+ "gauss: "+_gauss+"\n"+ "min: "+_min+"\n"+ "max: "+_max+"\n"+ "matrix size: "+_matrixSize+"\n"+ "diag size: "+_diagSize+"\n"+ "resolution: "+_resolution+"\n"
 					+ "saturated pixel: "+_saturatedPixel+"\n"+ "threshold: "+_thresholdMax+"\n"+ "number of zero :"+_nbZero+"\n"+ "factor "+ _factOption+"\n"+ "fdr "+_fdr+"\n"
-					+ "del "+_delImages+"\n"+ "cpu"+ _cpu+/*"\n"+ "isHichip"+ _isHiChip+*/"\n-isDroso "+_isDroso+"\n");
+					+ "del "+_delImages+"\n"+ "cpu "+ _cpu+"\nisAccurate: "+_isaccurate+/*"\n"+ "isHichip"+ _isHiChip+*/"\n-isDroso "+_isDroso+"\n");
 			
 			sip = new SIPObject(_output, _chrSize, _gauss, _min, _max, _resolution, _saturatedPixel,
 					_thresholdMax, _diagSize, _matrixSize, _nbZero, _factor,_fdr, _isProcessed,_isHiChip,_isDroso);
@@ -215,27 +239,33 @@ public class Hic_main {
 					+ "norm: "+ _juiceBoXNormalisation+"\n"+ "gauss: "+_gauss+"\n"+ "min: "+_min+"\n"+ "max: "+_max+"\n"+ "matrix size: "+_matrixSize+"\n"
 					+ "diag size: "+_diagSize+"\n"+ "resolution: "+_resolution+"\n"+ "saturated pixel: "+_saturatedPixel+"\n"+ "threshold: "+_thresholdMax+"\n"
 					+ "isHic: "+_isHic+"\n"	+ "isProcessed: "+_isProcessed+"\n"+ "number of zero:"+_nbZero+"\n"+ "factor "+ _factOption+"\n"+ "fdr "+_fdr+ "\n"
-					+ "del "+_delImages+"\n"+ "cpu"+ _cpu+"\n"/*+ "isHichip"+ _isHiChip*/+"\n-isDroso "+_isDroso+"\n");
+					+ "del "+_delImages+"\n"+"cpu "+ _cpu+"\nisAccurate: "+_isaccurate/*"\n"+ "isHichip"+ _isHiChip*/+"\n-isDroso "+_isDroso+"\n");
 			
 			sip = new SIPObject(_input,_output, _chrSize, _gauss, _min, _max, _resolution, _saturatedPixel, _thresholdMax,
 					_diagSize, _matrixSize, _nbZero,_factor,_fdr,_isProcessed,_isHiChip, _isDroso);
 			sip.setIsGui(_gui);
 		}
 		System.out.println("Start loop detction step");
-		ProcessDetectLoops processDetectloops = new ProcessDetectLoops();
-		processDetectloops.go(sip,_cpu,_delImages);
+		if(_isaccurate == false) {
+			ProcessDetectLoops processDetectloops = new ProcessDetectLoops();
+			processDetectloops.go(sip,_cpu,_delImages); 
+		}else{
+			SIPProcess plop = new SIPProcess(sip, _delImages);
+			plop.run();
+		}
+		
 		System.out.println("###########End loop detction step");
 		BufferedWriter writer = new BufferedWriter(new FileWriter(new File(_output+File.separator+"parameters.txt")));
 		if(_isProcessed){
 				writer.write("java -jar Sip_HiC.jar processed "+ _input+" "+ _chrSizeFile+" "+_output+" -g "+_gauss+" -mat "+_matrixSize+" -d "+_diagSize
 					+" -res "+_resolution+" -t "+_thresholdMax+" -min "+_min+" -max "+_max+" -sat "+_saturatedPixel+" -nbZero "+_nbZero
-					+" -factor "+ _factOption+" -fdr "+_fdr+" -del "+_delImages+" -cpu "+ _cpu+/*" -hichip "+_isHiChip+*/" -isDroso "+_isDroso+"\n");
+					+" -factor "+ _factOption+" -fdr "+_fdr+" -del "+_delImages+" -cpu "+ _cpu+" -isAccurate "+_isaccurate+" -isDroso "+_isDroso+"\n");
 			
 		}else{
 			writer.write("java -jar SIP_HiC.jar hic "+_input+" "+_chrSizeFile+" "+_output+" "+_juiceBoxTools+
 					" -norm "+ _juiceBoXNormalisation+" -g "+_gauss+" -min "+_min+" -max "+_max+" -mat "+_matrixSize+
 					" -d "+_diagSize+" -res "+_resolution+" -sat "+_saturatedPixel+" -t "+_thresholdMax+" -nbZero "+_nbZero+
-					" -factor "+ _factOption+" -fdr "+_fdr+" -del "+_delImages+" -cpu "+ _cpu+/*" -hichip "+_isHiChip+*/" -isDroso "+_isDroso+"\n");
+					" -factor "+ _factOption+" -fdr "+_fdr+" -del "+_delImages+" -cpu "+ _cpu+" -isAccurate "+_isaccurate+" -isDroso "+_isDroso+"\n");
 		}
 		writer.close();	
 		
@@ -392,6 +422,16 @@ public class Hic_main {
 						_isDroso = false;
 					else{
 						System.out.println("-_isDroso = "+args[i+1]+", not defined\n");
+						System.out.println(_doc);
+						System.exit(0);
+					}
+				}else if(args[i].equals("-isAccurate")){
+					if(args[i+1].equals("true") || args[i+1].equals("T") || args[i+1].equals("TRUE"))
+						_isaccurate = true;
+					else if(args[i+1].equals("false") || args[i+1].equals("F") || args[i+1].equals("False"))
+						_isaccurate = false;
+					else{
+						System.out.println("-isAccurate = "+args[i+1]+", not defined\n");
 						System.out.println(_doc);
 						System.exit(0);
 					}

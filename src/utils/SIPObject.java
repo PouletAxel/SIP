@@ -12,6 +12,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Set;
 
+
 /**
  * Analyse and detect a whole genome HiC with .hic file or already processed data.
  * The class is used for the observed and oMe method.
@@ -155,6 +156,30 @@ public class SIPObject {
 		this._isDroso = rfdr;
 	}
 	
+	/*void run(){
+		Progress _p = new Progress();
+		int nb = 1;
+		if(this.isGui()){
+			_p = new Progress("Loop Detection step",this.getChrSizeHashMap().size()+1);
+			_p._bar.setValue(nb);
+		}
+		String resuFile = _output+File.separator+"loops.txt";
+		File file = new File(resuFile);
+		if(file.exists()) file.delete();
+		file = new File(_output);
+		if (file.exists()==false) file.mkdir();
+		Iterator<String> chrName = _chrSize.keySet().iterator();
+		while(chrName.hasNext()){
+			TestLoopProcess processDetectloops = new TestLoopProcess();
+			processDetectloops.go(this, 2,true);
+			if(this.isGui()) 
+				_p._bar.setValue(nb);
+			nb++;
+		}
+		if(this.isGui())	_p.dispose();
+		
+	}*/
+	
 	/**
 	 * Save the result file in tabulated file
 	 * 
@@ -203,13 +228,12 @@ public class SIPObject {
 									+loop.getNeigbhoord1()+"\t"+loop.getNeigbhoord2()+"\t"+loop.getAvg()+"\t"
 									+loop.getStd()+"\t"+loop.getValue()+"\n");
 							}
-						}
-					else{
-						if( loop.getRegionalPaScoreAvg() >= (_medianAPReg-_medianAPReg*0.5) && loop.getRegionalPaScoreAvg() <= (_medianAPReg*2)&& loop.getPaScoreAvg() <= (_medianAP*2)){
-							writer.write(loop.getChr()+"\t"+coord.get(2)+"\t"+coord.get(3)+"\t"+loop.getChr()+"\t"+coord.get(0)+"\t"+coord.get(1)+"\t0,0,0"
-							+"\t"+loop.getPaScoreAvg()+"\t"+loop.getPaScoreAvgdev()+"\t"+loop.getRegionalPaScoreAvg()+"\t"
-							+loop.getNeigbhoord1()+"\t"+loop.getNeigbhoord2()+"\t"+loop.getAvg()+"\t"
-							+loop.getStd()+"\t"+loop.getValue()+"\n");
+						}else{
+							if( loop.getRegionalPaScoreAvg() >= (_medianAPReg-_medianAPReg*0.5) && loop.getRegionalPaScoreAvg() <= (_medianAPReg*2)&& loop.getPaScoreAvg() <= (_medianAP*2)){
+								writer.write(loop.getChr()+"\t"+coord.get(2)+"\t"+coord.get(3)+"\t"+loop.getChr()+"\t"+coord.get(0)+"\t"+coord.get(1)+"\t0,0,0"
+								+"\t"+loop.getPaScoreAvg()+"\t"+loop.getPaScoreAvgdev()+"\t"+loop.getRegionalPaScoreAvg()+"\t"
+								+loop.getNeigbhoord1()+"\t"+loop.getNeigbhoord2()+"\t"+loop.getAvg()+"\t"
+								+loop.getStd()+"\t"+loop.getValue()+"\n");
 							}
 						}
 					}
@@ -220,7 +244,6 @@ public class SIPObject {
 							+loop.getNeigbhoord1()+"\t"+loop.getNeigbhoord2()+"\t"+loop.getAvg()+"\t"
 							+loop.getStd()+"\t"+loop.getValue()+"\n");
 					}
-					
 				}
 			}
 		writer.close();

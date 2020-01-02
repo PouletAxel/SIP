@@ -47,8 +47,8 @@ public class CallLoops {
 	private int _step;
 	/** Number of pixel = 0 allowed around the loop*/
 	private int _nbZero = -1;
-	/** List of file containing the path of the image*/
-	public ArrayList<File> _tifList = new ArrayList<File>();
+	///** List of file containing the path of the image*/
+	//public ArrayList<File> _tifList = new ArrayList<File>();
 	/** list of the image resolution to find loop*/
 	private ArrayList<Integer> _listFactor = new ArrayList<Integer>();
 	/**	 struturing element for the MM method used (MorpholibJ)*/
@@ -108,9 +108,7 @@ public class CallLoops {
 				ImagePlus imgCorrect = imgFilter.duplicate();
 				ImageProcessingMethod m = new ImageProcessingMethod(imgFilter,this._min,this._max,this._gauss);
 				imageProcessing(imgFilter,fileList[i].toString(), m);
-				this._tifList.add(new File(imgRaw.getTitle()));
 				imgRaw.getTitle().replaceAll(".tif", "_N.tif");
-				this._tifList.add(new File(imgRaw.getTitle().replaceAll(".tif", "_N.tif")));
 				ImagePlus imgNorm = IJ.openImage(imgRaw.getTitle().replaceAll(".tif", "_N.tif"));
 				
 				int thresh = this._thresholdMaxima;
@@ -132,8 +130,6 @@ public class CallLoops {
 						
 						saveFile(imgRawBiggerRes,fileList[i].toString().replaceAll(".txt", "_"+this._listFactor.get(j)+".tif")); 
 						saveFile(imgRawBiggerResNorm,fileList[i].toString().replaceAll(".txt", "_"+this._listFactor.get(j)+"_N.tif"));
-						this._tifList.add(new File(fileList[i].toString().replaceAll(".txt", "_"+this._listFactor.get(j)+".tif")));
-						this._tifList.add(new File(fileList[i].toString().replaceAll(".txt", "_"+this._listFactor.get(j)+"_N.tif")));
 											
 						ImagePlus imgFilterBiggerRes = imgRawBiggerRes.duplicate();
 						m = new ImageProcessingMethod(imgFilter,this._min,this._max,this._gauss);
@@ -160,8 +156,8 @@ public class CallLoops {
 		hLoop = filterLoops.removedLoopCloseToWhiteStrip(hLoop);
 		System.out.println("####### End loops detection for chr "+ chr +"\t"+hLoop.size()+" loops before the FDR filter");
 		return hLoop;
-	}
-
+	}	
+	
 	/**
 	 * Image processing method
 	 * @param imgFilter ImagePlus to correct
@@ -179,11 +175,11 @@ public class CallLoops {
 		pm.runMax(this._max);
 		pm.runMin(this._min);
 		if(fileName.contains(".tif")){
-			this._tifList.add(new File(fileName.replaceAll(".tif", "_processed.tif")));
+			//this._tifList.add(new File(fileName.replaceAll(".tif", "_processed.tif")));
 			saveFile(imgFilter, fileName.replaceAll(".tif", "_processed.tif"));
 		}
 		else{
-			this._tifList.add(new File(fileName.replaceAll(".txt", "_processed.tif")));
+			//this._tifList.add(new File(fileName.replaceAll(".txt", "_processed.tif")));
 			saveFile(imgFilter, fileName.replaceAll(".txt", "_processed.tif"));
 		}
 	}

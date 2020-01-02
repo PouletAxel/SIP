@@ -77,6 +77,35 @@ public class Loop {
 		this._chr = chr;
 	}
 	
+	
+	public Loop(String loop){
+		String[] tLoop = loop.toString().split("\t");
+		this._chr = tLoop[0];
+		this._name = tLoop[1];
+		this._x = Integer.parseInt(tLoop[2]);
+		this._y = Integer.parseInt(tLoop[3]);
+		this._resolution = Integer.parseInt(tLoop[4]);
+		this._matrixSize = Integer.parseInt(tLoop[5]);
+		this._diagSize = Integer.parseInt(tLoop[6]);
+		this._xEnd = Integer.parseInt(tLoop[7]);
+		this._yEnd= Integer.parseInt(tLoop[8]);
+		this._neigbhoord1 = Float.parseFloat(tLoop[9]);
+		this._paScoreAvg = Float.parseFloat(tLoop[10]);
+		this._paScoreAvgdev = Float.parseFloat(tLoop[11]);
+		this._paScoreMed = Float.parseFloat(tLoop[12]);
+		this._neigbhoord2 = Float.parseFloat(tLoop[13]);
+		this._regPaScoreMed = Float.parseFloat(tLoop[14]);
+		this._regPaScoreAvg = Float.parseFloat(tLoop[15]);
+		this._avg = Float.parseFloat(tLoop[16]);
+		this._peakValue = Float.parseFloat(tLoop[17]);
+		this._std = Float.parseFloat(tLoop[18]);
+		this._paScoreFDR = Float.parseFloat(tLoop[19]);
+		this._regPaScoreFDR = Float.parseFloat(tLoop[20]);
+		this._paScoreFDR2 = Float.parseFloat(tLoop[21]);
+		this._regPaScoreFDR2 = Float.parseFloat(tLoop[22]);
+		this._paScoreFDR3 = Float.parseFloat(tLoop[23]);
+		this._regPaScoreFDR3 = Float.parseFloat(tLoop[24]);
+	}
 	/**
 	 * Loop constructor
 	 * @param name String name of the loop
@@ -127,7 +156,20 @@ public class Loop {
 	 * @param name String
 	 */
 	public void setName(String name){ this._name = name;}
-		
+	
+	
+	/**
+	 * Setter of the name loop
+	 * @param name String
+	 */
+	public String loopToString(){
+	String loop = _chr+"\t"+_name+"\t"+_x+"\t"+_y+"\t"+ _resolution+"\t"+_matrixSize+"\t"+ _diagSize+"\t"+
+			_xEnd+"\t"+ _yEnd+"\t"+_neigbhoord1+"\t"+_paScoreAvg+"\t"+_paScoreAvgdev+"\t"+_paScoreMed
+			+"\t"+_neigbhoord2+"\t"+_regPaScoreMed+"\t"+_regPaScoreAvg+"\t"+_avg+"\t"+_peakValue
+			+"\t"+_std+"\t"+_paScoreFDR+"\t"+_regPaScoreFDR+"\t"+_paScoreFDR2+"\t"+_regPaScoreFDR2+"\t"
+			+_paScoreFDR3+"\t"+_regPaScoreFDR3;
+	return loop;
+	}
 	/**
 	 * Getter of the x coordinate
 	 * @return int x coordinate

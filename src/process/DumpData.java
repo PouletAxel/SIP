@@ -45,6 +45,7 @@ public class DumpData {
 	private String _juiceBoxTools = "";
 	/** List of doucle to stock the expected vector*/
 	private ArrayList<Double> _lExpected =  new ArrayList<Double>();
+
 	
 	
 	/**
@@ -78,6 +79,7 @@ public class DumpData {
 			String line = "java"+" -jar "+this._juiceBoxTools+" dump observed "+this._normalisation+" "+this._hicFile+" "+chr+" "+chr+" BP "+this._resolution+" "+obs;
 			this._log = this._log+"\n"+obs+"\t"+line;
 			Process process = runtime.exec(line);
+
 			new ReturnFlux(process.getInputStream()).start();
 			new ReturnFlux(process.getErrorStream()).start();
 			exitValue=process.waitFor();		
@@ -85,6 +87,10 @@ public class DumpData {
 		catch (IOException e) {	e.printStackTrace();}
 		catch (InterruptedException e) {e.printStackTrace();}
 		observedMExpected(obs,output);
+		if(_logError!=""){
+			System.out.println(_logError);
+			System.exit(0);
+		}
 		return exitValue==0;
 	}
 	
@@ -160,6 +166,10 @@ public class DumpData {
 		} catch (IOException | InterruptedException e) {
 			e.printStackTrace();
 		}
+		if(_logError!=""){
+			System.out.println(_logError);
+			System.exit(0);
+		}
 		return exitValue==0;
 	}
 	
@@ -180,7 +190,12 @@ public class DumpData {
 		Process process = runtime.exec(cmd);
 		new ReturnFlux(process.getInputStream()).start();
 		new ReturnFlux(process.getErrorStream()).start();
+		process.getOutputStream();
 		exitValue=process.waitFor();
+		if(_logError!=""){
+			System.out.println(_logError);
+			System.exit(0);
+		}
 		return exitValue==0;
 	}
 	
@@ -199,7 +214,7 @@ public class DumpData {
 		 * @param flux
 		 *  flux to redirect
 		 */
-		public ReturnFlux(InputStream flux){	this._flux = flux; }
+		public ReturnFlux(InputStream flux){this._flux = flux; }
 		
 		/**
 		 * 
@@ -209,11 +224,13 @@ public class DumpData {
 				InputStreamReader reader = new InputStreamReader(this._flux);
 				BufferedReader br = new BufferedReader(reader);
 				String line=null;
-				while ( (line = br.readLine()) != null) _logError = _logError+line+"\n";
+				while ( (line = br.readLine()) != null) {
+					if(line.contains("WARN")== false) _logError = _logError+line+"\n";
+				}
 			}
 			catch (IOException ioe){
 				ioe.printStackTrace();
 			}
 		}		
-	} 
+	}  
 }

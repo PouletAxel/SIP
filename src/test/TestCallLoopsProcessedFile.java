@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import multiProcesing.ProcessDetectLoops;
-
+import process.SIPProcess;
 import utils.SIPObject;
 
 /**
@@ -24,8 +24,8 @@ public class TestCallLoopsProcessedFile {
 	 * @throws InterruptedException 
 	 */
 	public static void main(String[] args) throws IOException, InterruptedException {
-		String input = "/home/plop/Desktop/TestSIP";
-		String output= "/home/plop/Desktop/TestBis";
+		String input = "/home/plop/Desktop/test/short/";
+		String output= "/home/plop/Desktop/test/shortPLopThreadBis/";
 		int matrixSize = 2000;
 		int resolution = 5000;
 		int diagSize = 5;
@@ -34,15 +34,15 @@ public class TestCallLoopsProcessedFile {
 		int nbZero = 6;//6;
 		double min = 2;//1.5;
 		double max = 2;//1.5;
-		double saturatedPixel = 0.005;//0.005;
+		double saturatedPixel = 0.01;//0.005;
 		boolean keepTif = false;
 		ArrayList<Integer> factor = new ArrayList<Integer>();
 		factor.add(1);
 		//factor.add(2);
 		//factor.add(5);
 		
-		HashMap<String,Integer> chrsize = readChrSizeFile("/home/plop/Desktop/SIP/armsizes.txt");
-		SIPObject sip = new SIPObject(input,output, chrsize, gauss, min, max, resolution, saturatedPixel, thresholdMax, diagSize, matrixSize, nbZero,factor,0.05,true,false,false);
+		HashMap<String,Integer> chrsize = readChrSizeFile("/home/plop/Documents/Genome/mammals/HumanGenomeHg19/chr1.size");
+		SIPObject sip = new SIPObject(input,output, chrsize, gauss, min, max, resolution, saturatedPixel, thresholdMax, diagSize, matrixSize, nbZero,factor,0.01,true,false,false);
 		sip.setIsGui(false);
 		System.out.println("Processed Data\n");
 		System.out.println("input "+input+"\n"
@@ -56,9 +56,11 @@ public class TestCallLoopsProcessedFile {
 			+ "saturated pixel "+saturatedPixel+"\n"
 			+ "threshold "+thresholdMax+"\n"
 			+ "isProcessed "+sip.isProcessed()+"\n");		
-		ProcessDetectLoops processDetectloops = new ProcessDetectLoops();
-		processDetectloops.go(sip, 3,true);
-			
+		System.out.println("ahhhhhhhhhhhhh\n");
+		//ProcessDetectLoops processDetectloops = new ProcessDetectLoops();
+		//processDetectloops.go(sip, 2,true);
+		//Testpb plop = new Testpb(sip, true);
+		//plop.run(2);
 		System.out.println("End");
 	}
 			

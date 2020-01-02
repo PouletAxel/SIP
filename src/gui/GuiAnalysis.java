@@ -104,6 +104,8 @@ public class GuiAnalysis extends JFrame{
     private JCheckBox _checkbox5 = new JCheckBox("resolution*5",false);
    
     private JCheckBox _checkboxDeleteTif = new JCheckBox("Delete tif files",true);
+    /**    */
+    private JCheckBox _checkboxIsAccurate = new JCheckBox("Sacrifice speed for increased accuracy ",true);
     /** */
     private JFormattedTextField _jtfFdr =  new JFormattedTextField(Number.class);
 	
@@ -127,7 +129,7 @@ public class GuiAnalysis extends JFrame{
 	public GuiAnalysis(){
 		///////////////////////////////////////////// Global parameter of the JFram and def of the gridBaglayout
 		this.setTitle("SIP_HiC ");
-		this.setSize(550, 680);
+		this.setSize(550, 750);
 		this.setLocationRelativeTo(null);
 		this.setResizable(false);
 		this.setLocationByPlatform(true);
@@ -516,7 +518,13 @@ public class GuiAnalysis extends JFrame{
 		this._checkboxDeleteTif.setFont(new java.awt.Font("arial",1,12));
 		this._container.add(this._checkboxDeleteTif,new GridBagConstraints(
 			0, 2, 0, 0,  0.0, 0.0, GridBagConstraints.NORTHWEST,
-			GridBagConstraints.NONE,new Insets(298, 300, 0, 0), 0, 0
+			GridBagConstraints.NONE,new Insets(330, 10, 0, 0), 0, 0
+		));
+		
+		this._checkboxIsAccurate.setFont(new java.awt.Font("arial",1,12));
+		this._container.add(this._checkboxIsAccurate,new GridBagConstraints(
+			0, 2, 0, 0,  0.0, 0.0, GridBagConstraints.NORTHWEST,
+			GridBagConstraints.NONE,new Insets(298, 230, 0, 0), 0, 0
 		));
 		
 		label = new JLabel();
@@ -537,13 +545,13 @@ public class GuiAnalysis extends JFrame{
 		this._jbStart.setPreferredSize(new java.awt.Dimension(120, 21));
 		this._container.add(this._jbStart, new GridBagConstraints(
 	   		0, 2, 0, 0,  0.0, 0.0, GridBagConstraints.NORTHWEST,
-	   		GridBagConstraints.NONE, new Insets(325, 140, 0,0), 0, 0
+	   		GridBagConstraints.NONE, new Insets(365, 140, 0,0), 0, 0
 	   	));
 	   	
 		this._jbQuit.setPreferredSize(new java.awt.Dimension(120, 21));
 		this._container.add(this._jbQuit,new GridBagConstraints(
 			0, 2, 0, 0,  0.0, 0.0,GridBagConstraints.NORTHWEST,
-			GridBagConstraints.NONE,new Insets(325, 10, 0, 0), 0, 0
+			GridBagConstraints.NONE,new Insets(365, 10, 0, 0), 0, 0
 		));
 		
 		RBHicListener hic = new RBHicListener(this);
@@ -732,6 +740,12 @@ public class GuiAnalysis extends JFrame{
 	 * @return
 	 */
 	public boolean isDeletTif(){ return this._checkboxDeleteTif.isSelected();}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public boolean isAccurate(){ return this._checkboxIsAccurate.isSelected();}
 	
 	/**
 	 * getter of fdr

@@ -63,6 +63,7 @@ public class RunnableDetectLoops extends Thread implements Runnable{
 			else{
 				File file = new File(this._resuFile);
 				HashMap<String, Loop> data = this._callLoops.detectLoops(listOfFiles,this._chr,this._normVector);
+				//System.out.println("SIZEEEEEEEEEEEEEEEEEEEEEEEEEE"+_chr+" "+data.size());
 				if (file.length() == 0)	_sip.saveFile(this._resuFile,data,false);
 				else this._sip.saveFile(this._resuFile,data, true);
 				listOfFiles = _sip.fillList(dir);

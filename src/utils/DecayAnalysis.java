@@ -62,7 +62,7 @@ public class DecayAnalysis {
 		for(int i = this._x-c; i <= this._x+c; ++i){
 			for(int j = this._y-c ; j <= this._y+c; ++j){
 				if((i != this._x || j != this._y)  && (i-this._x == -c || j-this._y == -c || i-this._x == c || j-this._y == c)){
-					if(i >=0 && j>= 0){
+					if(i >=0 && j>= 0 && i < ip.getWidth() && j < ip.getHeight()){
 						double a =  ip.getf(this._x, this._y)- ip.getf(i, j);
 						sum+= a;
 						++nb;

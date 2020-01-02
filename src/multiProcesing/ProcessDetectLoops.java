@@ -62,8 +62,9 @@ public class ProcessDetectLoops{
 			threadCallLoops.add( new RunnableDetectLoops(chr,  cl,	resuFile, sip, sip.testNormaVectorValue(normFile), delImage));
 			threadCallLoops.get(j).start();
 		
-			while (_continuer == false) 	Thread.sleep(10);
 			while (_nbLance >= nbCPU)		Thread.sleep(10);
+			while (_continuer == false) 	Thread.sleep(10);
+			
 			++j;
 			if(sip.isGui()) _p._bar.setValue(nb);
 			nb++;
@@ -72,6 +73,7 @@ public class ProcessDetectLoops{
 		for (int i = 0; i < threadCallLoops.size(); ++i)
 			while(threadCallLoops.get(i).isAlive())
 				Thread.sleep(10);
+		//System.out.println("plop");
 		if(sip.isGui())	_p.dispose();
 
 	}

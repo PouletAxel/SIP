@@ -68,6 +68,7 @@ public class FindMaxima{
 		ArrayList<String> temp = this.getMaxima();
 		ImageProcessor ipN = this._imgNorm.getProcessor();
 		HashMap<String,Loop>  data = new HashMap<String,Loop>(); 
+		//System.out.println("size raw maxima !!!!!!!!!!!!!! "+raw.getTitle()+"  "+temp.size());
 		for(int j = 0; j < temp.size();++j){
 			String[] parts = temp.get(j).split("\\t");
 			int x = Integer.parseInt(parts[0]);
@@ -99,9 +100,10 @@ public class FindMaxima{
 						maxima.setMatrixSize(this._imgNorm.getWidth());
 						data.put(name, maxima);
 					}
-				//}
-			}
+				}
+			//}
 		}
+		//System.out.println("#######"+_chr+" size raw maxima !!!!!!!!!!!!!! "+raw.getTitle()+"  "+data.size());
 		return data;
 	}
 		
@@ -118,11 +120,11 @@ public class FindMaxima{
 		MaximumFinder mf = new MaximumFinder(); 
 		ByteProcessor bp = mf.findMaxima(ip, this._noiseTolerance, MaximumFinder.SINGLE_POINTS, true);
 		this._imgResu.setProcessor(bp);
+		this.putLoopLowerTriangle();
 		this.removedCloseMaxima();
 		this.correctMaxima();
 		this.removeMaximaCloseToZero(nbZero,rawImage, backgroundValue);
 	}
-	
 	
 	/**
 	 * Save the image 
@@ -134,6 +136,23 @@ public class FindMaxima{
 	    fileSaver.saveAsTiff(pathFile);
 	}
 
+	private void putLoopLowerTriangle() {
+		ImageProcessor ipMaxima = this._imgResu.getProcessor();
+		int w = ipMaxima.getWidth();
+		int h = ipMaxima.getHeight();
+		for(int i = 1; i < w-1; ++i){
+			for(int j= 1; j < h-1; ++j){	
+				if(ipMaxima.getPixel(i,j) > 0){
+					if(j > i){
+					ipMaxima.set(j,i,255);
+					ipMaxima.set(i,j,0);
+					}
+				}
+			}
+		}
+		this._imgResu.setProcessor(ipMaxima);
+	}
+ 
 	/**
 	 * Correction of the maxima. Search around the detected maxima on the raw image,
 	 * To correct the shift of maxima due to the gaussian, min and max filter.
@@ -143,15 +162,15 @@ public class FindMaxima{
 		int w = rawIpNorm.getWidth();
 		int h = rawIpNorm.getHeight();
 		ImageProcessor ipMaxima = this._imgResu.getProcessor();
-		for(int i = 1; i< w-1; ++i){
-			for(int j=2; j< h-2; ++j){		
-				if (ipMaxima.getPixel(i,j) > 0){
+		for(int i = 2; i< w-2; ++i){
+			for(int j = 2; j< h-2; ++j){		
+				if (ipMaxima.getPixel(i,j) == 255 ){
 					double max = rawIpNorm.getf(i,j);
 					int imax = i;
 					int jmax =j;
-					for(int ii=i-1; ii<=i+1; ++ii){
-						for(int jj = j-1; jj <= j+1; ++jj){
-							if(max < rawIpNorm.getf(ii, jj) && Math.abs(ii-jj) >= Math.abs(i-j)){
+					for(int ii=i-2; ii<=i+2; ++ii){
+						for(int jj = j-2; jj <= j+2; ++jj){
+							if(max < rawIpNorm.getf(ii, jj)){
 								imax = ii;
 								jmax = jj;
 								max = rawIpNorm.getf(ii, jj);
@@ -210,7 +229,7 @@ public class FindMaxima{
 		ArrayList<String> listMaxima = new ArrayList<String>();
 		for(int i = 0; i < w; ++i){
 			for(int j = 0; j < h; ++j){
-				if (ipResu.getf(i,j) > 0 && i-j > 0)
+				if (ipResu.getf(i,j) > 0 )//&& i-j > 0)
 					listMaxima.add(i+"\t"+j);
 			}
 		}
