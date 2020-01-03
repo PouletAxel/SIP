@@ -11,7 +11,9 @@ includes either command line options or a graphical user interface.
 Follow the links below to get started:
 * [Quick Start](https://github.com/PouletAxel/SIP/wiki/SIP-Quick-Start)
 
+* [Parameter Selection Guide](https://github.com/PouletAxel/SIP/wiki/Explanations-of-Parameters)
 
+SIP help menu:
 
 #SIP Version 1 run with java 8
 
