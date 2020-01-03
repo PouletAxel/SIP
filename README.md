@@ -1,3 +1,18 @@
+# SIP
+
+<img src="https://github.com/PouletAxel/SIPImage/blob/master/guiSIP.jpeg" width="1000">
+
+# What is SIP?
+
+SIP (Significant Interaction Peak caller) is a tool to identify and analyze loops that appear as high intensity
+signal in Hi-C maps. This program is written in java and can be run on Linux, Windows, or MAC systems and
+includes either command line options or a graphical user interface.
+
+Follow the links below to get started:
+* [Quick Start](https://github.com/PouletAxel/SIP/wiki/SIP-Quick-Start)
+
+
+
 #SIP Version 1 run with java 8
 
 	SIP is implemented in java and includes achoice between command line options or	a graphical user
