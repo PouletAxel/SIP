@@ -1,6 +1,6 @@
 # SIP
 
-<img src="https://github.com/PouletAxel/SIPImage/blob/master/guiSIP.jpeg" width="1000">
+<img src="https://github.com/PouletAxel/SIPImage/blob/master/guiSIP.jpeg" width="800">
 
 # What is SIP?
 
