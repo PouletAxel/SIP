@@ -98,8 +98,8 @@ public class Hic_main {
 			+ "\t\t-factor 4: res, res*2 and res*5\n"
 			+ "\t-max: Maximum filter: increases the region of high intensity (default 2)\n"
 			+ "\t-min: Minimum filter: removes the isolated high value (default 2)\n"
-			+ "\t-sat: % of staturated pixel: enhances the contrast in the image (default 0.01)\n"
-			+ "\t-t Threshold for loops detection (default 2800 for hic)\n"
+			+ "\t-sat: % of saturated pixel: enhances the contrast in the image (default 0.01)\n"
+			+ "\t-t Threshold for loops detection (default 2800)\n"
 			+ "\t-nbZero: number of zeros: number of pixels equal to zero that are allowed in the 24 pixels surrounding the detected maxima (default 6)\n"
 			+ "\t-norm: <NONE/VC/VC_SQRT/KR> (default KR)\n"
 			+ "\t-del: true or false, whether not to delete tif files used for loop detection (default true)\n"
@@ -333,7 +333,7 @@ public class Hic_main {
 				}else if(args[i].equals("-mat")){
 					try{_matrixSize =Integer.parseInt(args[i+1]);}
 					catch(NumberFormatException e){ returnError("-mat",args[i+1],"int");} 
-				}else if(args[i].equals("-factor")){
+				}/*else if(args[i].equals("-factor")){
 					int a  = Integer.parseInt(args[i+1]);
 					_factOption = args[i+1];
 					if(a == 2){	_factor.add(2);}
@@ -342,7 +342,7 @@ public class Hic_main {
 						_factor.add(5);
 					}else if(a == 3){ _factor.add(5);}
 					else if(a != 1)	returnError("-factor ",args[i+1]," int or not correct choice (1, 2, 3, 4)");
-				}else if(args[i].equals("-d")){
+				}*/else if(args[i].equals("-d")){
 					try{_diagSize =Integer.parseInt(args[i+1]);}
 					catch(NumberFormatException e){ returnError("-d",args[i+1],"int");}
 				}else if(args[i].equals("-cpu")){

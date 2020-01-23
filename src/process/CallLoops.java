@@ -158,6 +158,58 @@ public class CallLoops {
 		return hLoop;
 	}	
 	
+	
+	/**
+	 * Detect loops methods
+	 * detect the loops at two different resolution, initial resolution + 2 fold bigger
+	 * call the loops first in the smaller resolution 
+	 * then making image with bigger resolution and fill no Zero list
+	 * faire un gros for deguelasse por passer les faceteur de grossissement seulement si listDefacteur > 1.
+	 * make and save image at two differents resolution (m_resolution and m_resolution*2)
+	 * if there is a lot pixel at zero in the images adapt the threshold for the maxima detection
+	 * @param fileList
+	 * @param chr
+	 * @param normVector
+	 * @return
+	 * @throws IOException
+	 */
+	public HashMap<String,Loop> detect(File[] fileList, String chr,HashMap<Integer,String> normVector) throws IOException{	
+		CoordinatesCorrection coord = new CoordinatesCorrection();
+		HashMap<String,Loop> hLoop= new HashMap<String,Loop>();
+		FilterLoops filterLoops = new FilterLoops(this._resolution,normVector);
+		for(int i = 0; i < fileList.length; ++i){
+			if(fileList[i].toString().contains(".txt")){
+				String[] tfile = fileList[i].toString().split("_");
+				int numImage = Integer.parseInt(tfile[tfile.length-2])/(this._step*this._resolution);
+				System.out.println(numImage+" "+fileList[i]);
+				ImagePlus imgRaw = doImage(fileList[i].toString());
+				ImagePlus imgFilter = imgRaw.duplicate();
+				TupleFileToImage.correctImage(imgFilter);
+				ImagePlus imgCorrect = imgFilter.duplicate();
+				ImageProcessingMethod m = new ImageProcessingMethod(imgFilter,this._min,this._max,this._gauss);
+				imageProcessing(imgFilter,fileList[i].toString(), m);
+				imgRaw.getTitle().replaceAll(".tif", "_N.tif");
+				ImagePlus imgNorm = IJ.openImage(imgRaw.getTitle().replaceAll(".tif", "_N.tif"));
+				
+				int thresh = this._thresholdMaxima;
+				double pixelPercent = 100*TupleFileToImage._noZeroPixel/(this._matrixSize*this._matrixSize);
+				if(pixelPercent < 7)  
+					thresh =  _thresholdMaxima/5;
+				FindMaxima findLoop = new FindMaxima(imgNorm, imgFilter, chr, thresh, this._diagSize, this._resolution);
+				HashMap<String,Loop> temp = findLoop.findloop(this._hichip,numImage, this._nbZero,imgRaw, this._backgroudValue,1);
+				
+				PeakAnalysisScore pas = new PeakAnalysisScore(imgNorm,temp);
+				pas.computeScore();
+				temp = filterLoops.removedBadLoops(temp);
+				coord.setData(hLoop);
+				coord.imageToGenomeCoordinate(temp, numImage);
+				hLoop = coord.getData();
+			}
+		}
+		hLoop = filterLoops.removedLoopCloseToWhiteStrip(hLoop);
+		System.out.println("####### End loops detection for chr "+ chr +"\t"+hLoop.size()+" loops before the FDR filter");
+		return hLoop;
+	}	
 	/**
 	 * Image processing method
 	 * @param imgFilter ImagePlus to correct

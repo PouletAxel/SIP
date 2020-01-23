@@ -21,7 +21,10 @@ public class SIPProcess {
 		this._delImages = delFile;
 	}
 	
-	
+	/**
+	 * 
+	 * @throws InterruptedException
+	 */
 	public void run() throws InterruptedException { 
 		String resuFile = _sip.getOutputDir()+File.separator+"loops.txt";
 		File fileResu = new File(resuFile);
@@ -50,7 +53,7 @@ public class SIPProcess {
 				System.out.println("normVector end loading file: "+chr+".norm");
 				if (listOfFiles.length == 0) System.out.println("!!!!!!!!!! dumped directory of chromosome"+chr+" empty");
 				else{
-					HashMap<String, Loop> data = cl.detectLoops(listOfFiles,chr,_sip.testNormaVectorValue(normFile));
+					HashMap<String, Loop> data = cl.detect(listOfFiles,chr,_sip.testNormaVectorValue(normFile));
 					if (fileResu.length() == 0)	_sip.saveFile(resuFile,data,false);
 					else this._sip.saveFile(resuFile,data, true);
 					listOfFiles = _sip.fillList(dir);
@@ -69,4 +72,15 @@ public class SIPProcess {
 		}
 		if(_sip.isGui())	_p.dispose();
 	}
+	
+	
+	
+	public void runMultiRes(){
+		
+	}
+	
+	
+	
+	
+	
 }

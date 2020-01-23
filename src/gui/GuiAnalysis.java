@@ -337,7 +337,7 @@ public class GuiAnalysis extends JFrame{
 			GridBagConstraints.NONE, new Insets(7, 170, 0, 0), 0, 0
 		));
 		
-		label = new JLabel();
+	/*	label = new JLabel();
 		label.setText("<html> Multi resolution loop calling:</html>");
 		this._container.add(label,new GridBagConstraints(
 			0, 1, 0, 0, 0.0, 0.0, GridBagConstraints.NORTHWEST,
@@ -352,7 +352,7 @@ public class GuiAnalysis extends JFrame{
 		this._container.add(this._checkbox5,new GridBagConstraints(
 			0, 1, 0, 0,  0.0, 0.0, GridBagConstraints.NORTHWEST,
 			GridBagConstraints.NONE,new Insets(240, 300, 0, 0), 0, 0
-		));
+		));*/
 		
 		////////////////////////////////////////////////////////////////////////////////
 		

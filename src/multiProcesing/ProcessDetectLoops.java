@@ -73,7 +73,6 @@ public class ProcessDetectLoops{
 		for (int i = 0; i < threadCallLoops.size(); ++i)
 			while(threadCallLoops.get(i).isAlive())
 				Thread.sleep(10);
-		//System.out.println("plop");
 		if(sip.isGui())	_p.dispose();
 
 	}
