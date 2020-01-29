@@ -48,7 +48,7 @@ public class CoordinatesCorrection {
 			int a_end = a+resolution;
 			int b = (y+(index*step))*resolution;
 			int b_end =b+resolution;
-			String newName = loop.getChr()+"_"+a+"_"+b;
+			String newName = loop.getChr()+"\t"+a+"\t"+b;
 			if(a!=b && Math.abs(a-b) > diagSize){
 				if (x > 1 && y > 1 && y < imageSize-2 && x < imageSize-2){
 					if(this._data.containsKey(newName) == false){

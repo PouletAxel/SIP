@@ -24,8 +24,8 @@ public class TestCallLoopsProcessedFile {
 	 * @throws InterruptedException 
 	 */
 	public static void main(String[] args) throws IOException, InterruptedException {
-		String input = "/home/plop/Desktop/test/short/";
-		String output= "/home/plop/Desktop/test/shortPLopThreadBis/";
+		String input = "/home/plop/Desktop/SIP/Droso/";
+		String output= "/home/plop/Desktop/SIP/DrosoTest/";
 		int matrixSize = 2000;
 		int resolution = 5000;
 		int diagSize = 5;
@@ -40,8 +40,8 @@ public class TestCallLoopsProcessedFile {
 		factor.add(1);
 		//factor.add(2);
 		//factor.add(5);
-		
-		HashMap<String,Integer> chrsize = readChrSizeFile("/home/plop/Documents/Genome/mammals/HumanGenomeHg19/chr1.size");
+		//SIP_HiC_v1.3.6.jar hic SIP/Kc_allcombined.hic SIP/armsizes.txt SIP/Droso/ ../Tools/juicer_tools_1.13.02.jar 
+		HashMap<String,Integer> chrsize = readChrSizeFile("/home/plop/Desktop/SIP/armsizes.txt");
 		SIPObject sip = new SIPObject(input,output, chrsize, gauss, min, max, resolution, saturatedPixel, thresholdMax, diagSize, matrixSize, nbZero,factor,0.01,true,false,false);
 		sip.setIsGui(false);
 		System.out.println("Processed Data\n");
@@ -57,8 +57,8 @@ public class TestCallLoopsProcessedFile {
 			+ "threshold "+thresholdMax+"\n"
 			+ "isProcessed "+sip.isProcessed()+"\n");		
 		System.out.println("ahhhhhhhhhhhhh\n");
-		//ProcessDetectLoops processDetectloops = new ProcessDetectLoops();
-		//processDetectloops.go(sip, 2,true);
+		ProcessDetectLoops processDetectloops = new ProcessDetectLoops();
+		processDetectloops.go(sip, 2,true);
 		//Testpb plop = new Testpb(sip, true);
 		//plop.run(2);
 		System.out.println("End");
