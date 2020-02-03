@@ -73,7 +73,7 @@ public class RunnableDumpData extends Thread implements Runnable{
 		try {
 			this._dumpData.getNormVector(this._chrName,normOutput+File.separator+this._chrName+".norm");
 			System.out.println("start dump "+this._chrName+" size "+this._chrSize);
-			
+			if(j > this._chrSize) j = this._chrSize;
 			for(int i = 0 ; j-1 <= this._chrSize; i+=step,j+=step){
 				int end =j-1;
 				String dump = this._chrName+":"+i+":"+end;
