@@ -52,6 +52,7 @@ SIP help menu:
         -fdr: Empirical FDR value for filtering based on random sites (default 0.01)
         -isDroso: default false, if true apply extra filter to help detect loops similar to those found in 
         D. mel cells
+	-isAccurate: sacrifice speed for increased accuracy and reproducibility (default false)
         -h, --help print help
 
 		Command line eg:
