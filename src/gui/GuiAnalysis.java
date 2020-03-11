@@ -104,8 +104,8 @@ public class GuiAnalysis extends JFrame{
     private JCheckBox _checkbox5 = new JCheckBox("resolution*5",false);
    
     private JCheckBox _checkboxDeleteTif = new JCheckBox("Delete tif files",true);
-    /**    */
-    private JCheckBox _checkboxIsAccurate = new JCheckBox("Sacrifice speed for increased accuracy ",true);
+    ///**    */
+    //private JCheckBox _checkboxIsAccurate = new JCheckBox("Sacrifice speed for increased accuracy ",true);
     /** */
     private JFormattedTextField _jtfFdr =  new JFormattedTextField(Number.class);
 	
@@ -521,11 +521,11 @@ public class GuiAnalysis extends JFrame{
 			GridBagConstraints.NONE,new Insets(330, 10, 0, 0), 0, 0
 		));
 		
-		this._checkboxIsAccurate.setFont(new java.awt.Font("arial",1,12));
+		/*this._checkboxIsAccurate.setFont(new java.awt.Font("arial",1,12));
 		this._container.add(this._checkboxIsAccurate,new GridBagConstraints(
 			0, 2, 0, 0,  0.0, 0.0, GridBagConstraints.NORTHWEST,
 			GridBagConstraints.NONE,new Insets(298, 230, 0, 0), 0, 0
-		));
+		));*/
 		
 		label = new JLabel();
 		label.setText("Number of CPU:");
@@ -745,7 +745,7 @@ public class GuiAnalysis extends JFrame{
 	 * 
 	 * @return
 	 */
-	public boolean isAccurate(){ return this._checkboxIsAccurate.isSelected();}
+	//public boolean isAccurate(){ return this._checkboxIsAccurate.isSelected();}
 	
 	/**
 	 * getter of fdr

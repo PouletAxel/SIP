@@ -55,8 +55,6 @@ public class RunnableDumpData extends Thread implements Runnable{
 	 * Dump teh data by chr
 	 */
 	public void run(){
-		ProcessDumpData._nbLance++;
-		ProcessDumpData._continuer = true;
 		boolean juicerTools;
 		String expected ="";
 		String outdir = this._outdir+File.separator+this._chrName+File.separator;
@@ -102,6 +100,5 @@ public class RunnableDumpData extends Thread implements Runnable{
 			System.out.println("##### End dump "+this._chrName);
 		} catch (IOException | InterruptedException e) { e.printStackTrace(); }
 		System.gc();
-		ProcessDumpData._nbLance--;
 	}
 }

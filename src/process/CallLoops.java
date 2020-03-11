@@ -99,20 +99,20 @@ public class CallLoops {
 		FilterLoops filterLoops = new FilterLoops(this._resolution,normVector);
 		for(int i = 0; i < fileList.length; ++i){
 			if(fileList[i].toString().contains(".txt")){
+				TupleFileToImage tuple = new  TupleFileToImage(fileList[i].toString(),this._matrixSize,this._resolution);
 				String[] tfile = fileList[i].toString().split("_");
 				int numImage = Integer.parseInt(tfile[tfile.length-2])/(this._step*this._resolution);
 				System.out.println(numImage+" "+fileList[i]);
-				ImagePlus imgRaw = doImage(fileList[i].toString());
+				ImagePlus imgRaw = doImage(tuple);
 				ImagePlus imgFilter = imgRaw.duplicate();
-				TupleFileToImage.correctImage(imgFilter);
+				tuple.correctImage(imgFilter);
 				ImagePlus imgCorrect = imgFilter.duplicate();
 				ImageProcessingMethod m = new ImageProcessingMethod(imgFilter,this._min,this._max,this._gauss);
 				imageProcessing(imgFilter,fileList[i].toString(), m);
 				imgRaw.getTitle().replaceAll(".tif", "_N.tif");
 				ImagePlus imgNorm = IJ.openImage(imgRaw.getTitle().replaceAll(".tif", "_N.tif"));
-				
 				int thresh = this._thresholdMaxima;
-				double pixelPercent = 100*TupleFileToImage._noZeroPixel/(this._matrixSize*this._matrixSize);
+				double pixelPercent = 100*tuple.getNbZero()/(this._matrixSize*this._matrixSize);
 				if(pixelPercent < 7)  
 					thresh =  _thresholdMaxima/5;
 				FindMaxima findLoop = new FindMaxima(imgNorm, imgFilter, chr, thresh, this._diagSize, this._resolution);
@@ -121,7 +121,7 @@ public class CallLoops {
 				PeakAnalysisScore pas = new PeakAnalysisScore(imgNorm,temp);
 				pas.computeScore();
 				
-				if (this._listFactor.size() > 1){
+				/*if (this._listFactor.size() > 1){
 					for (int j = 1; j < this._listFactor.size(); ++j ){					
 						ChangeImageRes test =  new ChangeImageRes(imgCorrect, this._listFactor.get(j));
 						ImagePlus imgRawBiggerRes = test.run();
@@ -146,7 +146,7 @@ public class CallLoops {
 						pas.computeScore();
 						temp.putAll(tempBiggerRes);
 					}
-				}
+				}*/
 				temp = filterLoops.removedBadLoops(temp);
 				coord.setData(hLoop);
 				coord.imageToGenomeCoordinate(temp, numImage);
@@ -179,12 +179,13 @@ public class CallLoops {
 		FilterLoops filterLoops = new FilterLoops(this._resolution,normVector);
 		for(int i = 0; i < fileList.length; ++i){
 			if(fileList[i].toString().contains(".txt")){
+				TupleFileToImage tuple = new  TupleFileToImage(fileList[i].toString(),this._matrixSize,this._resolution);
 				String[] tfile = fileList[i].toString().split("_");
 				int numImage = Integer.parseInt(tfile[tfile.length-2])/(this._step*this._resolution);
 				System.out.println(numImage+" "+fileList[i]);
-				ImagePlus imgRaw = doImage(fileList[i].toString());
+				ImagePlus imgRaw = doImage(tuple);
 				ImagePlus imgFilter = imgRaw.duplicate();
-				TupleFileToImage.correctImage(imgFilter);
+				tuple.correctImage(imgFilter);
 				ImagePlus imgCorrect = imgFilter.duplicate();
 				ImageProcessingMethod m = new ImageProcessingMethod(imgFilter,this._min,this._max,this._gauss);
 				imageProcessing(imgFilter,fileList[i].toString(), m);
@@ -192,7 +193,7 @@ public class CallLoops {
 				ImagePlus imgNorm = IJ.openImage(imgRaw.getTitle().replaceAll(".tif", "_N.tif"));
 				
 				int thresh = this._thresholdMaxima;
-				double pixelPercent = 100*TupleFileToImage._noZeroPixel/(this._matrixSize*this._matrixSize);
+				double pixelPercent = 100*tuple.getNbZero()/(this._matrixSize*this._matrixSize);
 				if(pixelPercent < 7)  
 					thresh =  _thresholdMaxima/5;
 				FindMaxima findLoop = new FindMaxima(imgNorm, imgFilter, chr, thresh, this._diagSize, this._resolution);
@@ -242,8 +243,9 @@ public class CallLoops {
 	 * @param file path 
 	 * @return ImagePlus with oMe  value
 	 */
-	private ImagePlus doImage(String file){	
-		TupleFileToImage readFile = new TupleFileToImage(file,this._matrixSize,this._resolution);
+	private ImagePlus doImage(TupleFileToImage readFile){	
+		//TupleFileToImage readFile = new TupleFileToImage(file,this._matrixSize,this._resolution);
+		String file = readFile.getInputFile();
 		readFile.readTupleFile();
 		saveFile(readFile.getNormImage(),file.replaceAll(".txt", "_N.tif"));
 		ImagePlus imageOutput = readFile.getRawImage();

@@ -43,6 +43,24 @@ public class RunnableDetectLoops extends Thread implements Runnable{
 		this._normVector = normVector;
 		this._delImages = delFile;
 	}
+
+	/**
+	 * Construtor, initialize all the variables  of interest
+	 * 
+	 * @param chr
+	 * @param callLoops
+	 * @param resuFile
+	 * @param sip
+	 * @param normVector
+	 */
+	public RunnableDetectLoops (String chr, String resuFile, SIPObject sip, HashMap<Integer, String> normVector, boolean delFile){
+		this._sip = sip;
+		this._callLoops = new CallLoops(sip);
+		this._chr= chr;
+		this._resuFile = resuFile;
+		this._normVector = normVector;
+		this._delImages = delFile;
+	}
 	
 	/**
 	 * Run all the process for loops detection by chr using the objet CallLoops and then save loops in 
@@ -50,12 +68,9 @@ public class RunnableDetectLoops extends Thread implements Runnable{
 	 * 
 	 */
 	public void run(){
-		ProcessDetectLoops._nbLance++;
-		ProcessDetectLoops._continuer = true;
-		String outputDir = this._sip.getOutputDir();
-		String inputDir = this._sip.getinputDir();
-		String dir = outputDir+File.separator+_chr+File.separator;
-		if (this._sip.isProcessed()) dir = inputDir+File.separator+this._chr+File.separator;
+		String dir =  this._sip.getOutputDir()+File.separator+_chr+File.separator;
+		String test =  this._sip.getOutputDir()+File.separator+_chr+"_loops.txt";
+		if (this._sip.isProcessed()) dir = this._sip.getinputDir()+File.separator+this._chr+File.separator;
 		try {
 			File[] listOfFiles = _sip.fillList(dir);
 			System.out.println("normVector end loading file: "+_chr+".norm");
@@ -63,9 +78,12 @@ public class RunnableDetectLoops extends Thread implements Runnable{
 			else{
 				File file = new File(this._resuFile);
 				HashMap<String, Loop> data = this._callLoops.detectLoops(listOfFiles,this._chr,this._normVector);
-				//System.out.println("SIZEEEEEEEEEEEEEEEEEEEEEEEEEE"+_chr+" "+data.size());
-				if (file.length() == 0)	_sip.saveFile(this._resuFile,data,false);
-				else this._sip.saveFile(this._resuFile,data, true);
+				synchronized(this) {
+					if (file.length() == 0)	_sip.saveFile(this._resuFile,data,false);
+					else this._sip.saveFile(this._resuFile,data, true);
+				}
+				if (file.length() == 0)	_sip.saveFile(test,data,false);
+				else this._sip.saveFile(test,data, true);
 				listOfFiles = _sip.fillList(dir);
 				if(_delImages){
 					System.out.println("Deleting image file for "+_chr);
@@ -77,6 +95,5 @@ public class RunnableDetectLoops extends Thread implements Runnable{
 			}
 		} catch (IOException e1) { e1.printStackTrace();}
 		System.gc();
-		ProcessDetectLoops._nbLance--;
 	}
 }

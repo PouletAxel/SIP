@@ -31,11 +31,11 @@ public class TupleFileToImage {
 	/** Step to process the whole chromosme*/
 	private int _step ;
 	/** Image value average*/
-	private static float _avg = 0;
+	private float _avg = 0;
 	/** Image standard deviation */
-	private static float _std = 0;
+	private float _std = 0;
 	/** number of pixe == 0 */
-	public static int _noZeroPixel = 0;
+	private int _noZeroPixel = 0;
 	
 	/**
 	 * TupleFileToImage constructor
@@ -107,7 +107,7 @@ public class TupleFileToImage {
 	 * the dection of the structure of interest
 	 * @param img ImagePlus to correct
 	 */
-	public static void correctImage(ImagePlus img){
+	public void correctImage(ImagePlus img){
 		ImageProcessor ip = img.getProcessor();
 		_noZeroPixel = 0;
 		float sum = 0;
@@ -137,7 +137,7 @@ public class TupleFileToImage {
 	 * @param img ImagePlus
 	 * @return double satndard deivation
 	 */
-	private static float std(float mean,ImagePlus img){
+	private float std(float mean,ImagePlus img){
 		float semc = 0;
 		ImageProcessor ip = img.getProcessor();
 		int noZeroPixel = 0;
@@ -152,7 +152,13 @@ public class TupleFileToImage {
 		semc = (float) Math.sqrt(semc/noZeroPixel);
 		return semc;
 	}
-	
+
+	public int getNbZero() { return this._noZeroPixel; }
+	/**
+	 * getter of the raw image 
+	 * @return ImagePLus raw image
+	 */
+	public String getInputFile(){return this._file;}
 	/**
 	 * getter of the raw image 
 	 * @return ImagePLus raw image

@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import multiProcesing.ProcessDetectLoops;
-import process.SIPProcess;
 import utils.SIPObject;
 
 /**
@@ -35,7 +34,7 @@ public class TestCallLoopsProcessedFile {
 		double min = 2;//1.5;
 		double max = 2;//1.5;
 		double saturatedPixel = 0.01;//0.005;
-		boolean keepTif = false;
+		//boolean keepTif = false;
 		ArrayList<Integer> factor = new ArrayList<Integer>();
 		factor.add(1);
 		//factor.add(2);
