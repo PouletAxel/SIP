@@ -13,7 +13,7 @@ Follow the links below to get started:
 
 * [Parameter Selection Guide](https://github.com/PouletAxel/SIP/wiki/Explanations-of-Parameters)
 
-* [View the Published Paper] (https://genome.cshlp.org/content/early/2020/03/03/gr.257832.119.long)
+* [View the Published Paper](https://genome.cshlp.org/content/early/2020/03/03/gr.257832.119.long)
 
 ## Citing SIP
 
