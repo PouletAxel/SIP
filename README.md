@@ -13,7 +13,15 @@ Follow the links below to get started:
 
 * [Parameter Selection Guide](https://github.com/PouletAxel/SIP/wiki/Explanations-of-Parameters)
 
-SIP help menu:
+* [View the Published Paper] (https://genome.cshlp.org/content/early/2020/03/03/gr.257832.119.long)
+
+## Citing SIP
+
+If you use SIP or SIPMeta, please cite us.
+
+Rowley MJ, Poulet A, Nichols MH, Bixler BJ, Sanborn AL, Brouhard EA, Hermetz K, Linsenbaum H, Csankovszki G, Lieberman Aiden E, Corces G. Analysis of Hi-C data using SIP effectively identifies loops in organisms from C. elegans to mammals. Genome Research 2020.
+
+## SIP help menu:
 
 #SIP Version 1 run with java 8
 
@@ -52,7 +60,6 @@ SIP help menu:
         -fdr: Empirical FDR value for filtering based on random sites (default 0.01)
         -isDroso: default false, if true apply extra filter to help detect loops similar to those found in 
         D. mel cells
-        -isAccurate: sacrifice speed for increased accuracy and reproducibility (default false)
         -h, --help print help
 
 		Command line eg:
