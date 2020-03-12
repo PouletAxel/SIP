@@ -82,8 +82,8 @@ public class RunnableDetectLoops extends Thread implements Runnable{
 					if (file.length() == 0)	_sip.saveFile(this._resuFile,data,false);
 					else this._sip.saveFile(this._resuFile,data, true);
 				}
-				if (file.length() == 0)	_sip.saveFile(test,data,false);
-				else this._sip.saveFile(test,data, true);
+				//if (file.length() == 0)	_sip.saveFile(test,data,false);
+				//else this._sip.saveFile(test,data, true);
 				listOfFiles = _sip.fillList(dir);
 				if(_delImages){
 					System.out.println("Deleting image file for "+_chr);

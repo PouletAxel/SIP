@@ -62,7 +62,7 @@ public class ProcessDetectLoops{
 			if (nb != executor.getCompletedTaskCount()) {
 				nb = (int) executor.getCompletedTaskCount();
 				if(sip.isGui()) _p._bar.setValue(nb);
-				System.out.println("plop:"+executor.getCompletedTaskCount());
+				//System.out.println("plop:"+executor.getCompletedTaskCount());
 			}
 		}
 		if(sip.isGui())	_p.dispose();
