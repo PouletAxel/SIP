@@ -31,7 +31,7 @@ public class CoordinatesCorrection {
 	 * @return HashMap: key is a string  with the name of the chr start end. And value is Loop class, to stock 
 	 * the loop characteristics.
 	 */
-	public HashMap<String,Loop> imageToGenomeCoordinate(HashMap<String,Loop> temp, int index){
+	public HashMap<String,Loop> imageToGenomeCoordinate(HashMap<String,Loop> temp, int index,int step){
 		int x;
 		int y;
 		Set<String> key = temp.keySet();
@@ -43,7 +43,7 @@ public class CoordinatesCorrection {
 			int resolution = loop.getResolution(); 
 			int diagSize = loop.getDiagSize()*resolution;
 			int imageSize = loop.getMatrixSize();
-			int step = imageSize/2;
+	
 			int a = (x+(index*step))*resolution;
 			int a_end = a+resolution;
 			int b = (y+(index*step))*resolution;
@@ -54,15 +54,13 @@ public class CoordinatesCorrection {
 					if(this._data.containsKey(newName) == false){
 						loop.setCoordinates(a, a_end, b, b_end);
 						loop.setName(newName);
+						//System.out.println(newName+" "+resolution+" "+step+" "+index+" "+x);
 						this._data.put(newName, loop);
 					}else{
-						if(this._data.get(newName).getResolution() > resolution){
+						if(loop.getPaScoreAvg()> this._data.get(newName).getPaScoreAvg()){
 							loop.setCoordinates(a, a_end, b, b_end);
 							loop.setName(newName);
-							this._data.put(newName, loop);
-						}else if(loop.getPaScoreAvg()> this._data.get(newName).getPaScoreAvg()){
-							loop.setCoordinates(a, a_end, b, b_end);
-							loop.setName(newName);
+							//System.out.println("!!!!!!!! "+newName);
 							this._data.put(newName, loop);
 						}
 					}
@@ -83,19 +81,4 @@ public class CoordinatesCorrection {
 	 * @param data 
 	 */
 	public void setData(HashMap<String,Loop> data){ this._data = data;}
-	
-	
-	
-	/*
-	 * Strip idea
-	 * 
-	 * Strip stripY = loop.getStripY();
-	
-	if(stripY != null){
-		stripY.setName("Y_"+a);
-		stripY.setX((stripY.getX()+(index*step))*resolution);
-		stripY.setXEnd((stripY.getXEnd()+(index*step))*resolution);					
-		stripY.setYEnd((stripY.getYEnd()+(index*step))*resolution);
-		stripY.setY((stripY.getY()+(index*step))*resolution);
-	}*/
 }

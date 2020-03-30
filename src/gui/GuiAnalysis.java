@@ -59,9 +59,9 @@ public class GuiAnalysis extends JFrame{
 	/** */
 	//private ButtonGroup _bGroupInputData = new ButtonGroup();
 	/** */
-	private JRadioButton _jrbHiCData = new JRadioButton("hic");
+	//private JRadioButton _jrbHiCData = new JRadioButton("hic");
 	/** */
-	private JRadioButton _jrbHichipData = new JRadioButton("HiChIP");
+	//private JRadioButton _jrbHichipData = new JRadioButton("HiChIP");
     /** */
     private JTextField _jtfBoxTools = new JTextField();
     /** */
@@ -337,7 +337,7 @@ public class GuiAnalysis extends JFrame{
 			GridBagConstraints.NONE, new Insets(7, 170, 0, 0), 0, 0
 		));
 		
-	/*	label = new JLabel();
+		label = new JLabel();
 		label.setText("<html> Multi resolution loop calling:</html>");
 		this._container.add(label,new GridBagConstraints(
 			0, 1, 0, 0, 0.0, 0.0, GridBagConstraints.NORTHWEST,
@@ -352,7 +352,7 @@ public class GuiAnalysis extends JFrame{
 		this._container.add(this._checkbox5,new GridBagConstraints(
 			0, 1, 0, 0,  0.0, 0.0, GridBagConstraints.NORTHWEST,
 			GridBagConstraints.NONE,new Insets(240, 300, 0, 0), 0, 0
-		));*/
+		));
 		
 		////////////////////////////////////////////////////////////////////////////////
 		
@@ -556,8 +556,6 @@ public class GuiAnalysis extends JFrame{
 		
 		RBHicListener hic = new RBHicListener(this);
 	  	this._jrbHic.addActionListener(hic);
-	  	this._jrbHiCData.addActionListener(hic);
-	  	this._jrbHichipData.addActionListener(hic);
 	  	this._jrbProcessed.addActionListener(hic);
 	  	WorkDirectoryListener wdListener = new WorkDirectoryListener();
 	  	this._jbWorkDir.addActionListener(wdListener);
@@ -716,17 +714,6 @@ public class GuiAnalysis extends JFrame{
 	 * 
 	 * @return
 	 */
-	public boolean isHiChIP(){	return this._jrbHichipData.isSelected();}
-	/**
-	 * 
-	 * @return
-	 */
-	public boolean isHiCData(){	return this._jrbHiCData.isSelected();}
-	
-	/**
-	 * 
-	 * @return
-	 */
 	public boolean isHic(){ return this._jrbHic.isSelected();}
 	
 	/**
@@ -810,28 +797,8 @@ public class GuiAnalysis extends JFrame{
 		 * manage the access of the different gui element on function of the paramter choose
 		 */
 		public void actionPerformed(ActionEvent actionEvent){
-			if(_gui.isHiChIP()){
-        		_jtfGaussian.setText("1.5");
-        		_jtfEnhanceContrast.setText("0.5");
-        		_jtfMin.setText("1");
-        		_jtfMax.setText("1");
-        		_jtfNbZero.setText("25");
-        		_jtfNoiseTolerance.setText("1");
-        		_gui._jrbNone.setSelected(true);
-        	}else if(_gui.isHiCData()){
-        		_jtfGaussian.setText("1.5");
-        		_jtfEnhanceContrast.setText("0.005");
-        		_jtfMin.setText("2.0");
-        		_jtfMax.setText("2.0");
-        		_jtfNbZero.setText("6");
-        		_jtfNoiseTolerance.setText("2800");
-        		_gui._jrbKR.setSelected(true);
-        	}
-			
 			if (_gui.isHic()){
-				_gui._jrbHiCData.setEnabled(true);
-				_gui._jrbHichipData.setEnabled(true);
-	        	_gui._jrbVC_sqrt.setEnabled(true);
+				_gui._jrbVC_sqrt.setEnabled(true);
 	        	_gui._jrbVC.setEnabled(true);
 	        	_gui._jrbNone.setEnabled(true);
 	        	_gui._jrbKR.setEnabled(true);
@@ -841,8 +808,6 @@ public class GuiAnalysis extends JFrame{
         		_gui._jtfMin.setEditable(true);
         		_gui._jtfEnhanceContrast.setEditable(true);
 	        }else if(_gui.isProcessed()){
-	        	_gui._jrbHiCData.setEnabled(true);
-				_gui._jrbHichipData.setEnabled(true);
 	        	_gui._jrbVC_sqrt.setEnabled(false);
 	        	_gui._jrbVC.setEnabled(false);
 	        	_gui._jrbNone.setEnabled(false);

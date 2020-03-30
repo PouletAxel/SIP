@@ -53,12 +53,8 @@ public class SIPObject {
 	private int _step;
 	/** Number of pixel = 0 allowed around the loop*/
 	private int _nbZero = -1;
-	/** List of file containing the path of the image*/
-	private ArrayList<File> _tifList = new ArrayList<File>();
 	/** list of the image resolution to find loop*/
 	private ArrayList<Integer> _listFactor = new ArrayList<Integer>();
-	/**	boolean if true hichip data if false hic */
-	private boolean _isHichip = false;
 	/** fdr value */
 	private double _fdr;
 	/** is processed booelan*/
@@ -69,7 +65,12 @@ public class SIPObject {
 	private boolean _isDroso = false;
 	private double _medianAP = 0;
 	private double _medianAPReg = 0;
+	//private HashMap<Integer,String> _normVector = new HashMap<Integer,String>();
 	
+	
+	public SIPObject() {
+		
+	}
 	/**
 	 * SIPObject constructor
 	 * 
@@ -92,7 +93,9 @@ public class SIPObject {
 	public SIPObject(String output, HashMap<String, Integer> chrSize, double gauss, double min,
 			double max, int resolution, double saturatedPixel, int thresholdMax,
 			int diagSize, int matrixSize, int nbZero,ArrayList<Integer> listFactor,
-			double fdr, boolean isProcessed, boolean isHichip, boolean rfdr) {
+			double fdr, boolean isProcessed, boolean rfdr) {
+		if(output.endsWith(File.separator) == false) 
+			output = output+File.separator;
 		this._output = output;
 		this._input = output;
 		this._chrSize = chrSize;
@@ -109,7 +112,6 @@ public class SIPObject {
 		this._listFactor = listFactor;
 		this._fdr = fdr;
 		this._isProcessed = isProcessed;
-		this._isHichip = isHichip;
 		this._isDroso = rfdr;
 	}
 
@@ -135,7 +137,11 @@ public class SIPObject {
 	public SIPObject(String input, String output, HashMap<String, Integer> chrSize, double gauss, double min,
 			double max, int resolution, double saturatedPixel, int thresholdMax,
 			int diagSize, int matrixSize, int nbZero,ArrayList<Integer> listFactor,
-			double fdr, boolean isProcessed, boolean isHichip, boolean rfdr) {
+			double fdr, boolean isProcessed, boolean rfdr) {
+		if(output.endsWith(File.separator) == false) 
+			output = output+File.separator;
+		if(input.endsWith(File.separator) == false) 
+			input = input+File.separator;
 		this._output = output;
 		this._input = input;
 		this._chrSize = chrSize;
@@ -152,33 +158,9 @@ public class SIPObject {
 		this._listFactor = listFactor;
 		this._fdr = fdr;
 		this._isProcessed = isProcessed;
-		this._isHichip = isHichip;
 		this._isDroso = rfdr;
 	}
 	
-	/*void run(){
-		Progress _p = new Progress();
-		int nb = 1;
-		if(this.isGui()){
-			_p = new Progress("Loop Detection step",this.getChrSizeHashMap().size()+1);
-			_p._bar.setValue(nb);
-		}
-		String resuFile = _output+File.separator+"loops.txt";
-		File file = new File(resuFile);
-		if(file.exists()) file.delete();
-		file = new File(_output);
-		if (file.exists()==false) file.mkdir();
-		Iterator<String> chrName = _chrSize.keySet().iterator();
-		while(chrName.hasNext()){
-			TestLoopProcess processDetectloops = new TestLoopProcess();
-			processDetectloops.go(this, 2,true);
-			if(this.isGui()) 
-				_p._bar.setValue(nb);
-			nb++;
-		}
-		if(this.isGui())	_p.dispose();
-		
-	}*/
 	
 	/**
 	 * Save the result file in tabulated file
@@ -250,6 +232,8 @@ public class SIPObject {
 		}
 	}
 
+	
+	
 	/**
 	 * Full the list with file in directory
 	 * @param dir
@@ -268,10 +252,10 @@ public class SIPObject {
 	 * Test the normalized vector by chromosme
 	 * @param normFile
 	 */
-	public HashMap<Integer,String> testNormaVectorValue(String normFile){
-		HashMap<Integer,String> normVector = new HashMap<Integer,String>();
+	public HashMap<Integer, String> getNormValueFilter(String normFile){
 		BufferedReader br;
 		int lineNumber = 0;
+		HashMap<Integer, String> vector = new HashMap<Integer, String>();
 		try {
 			br = new BufferedReader(new FileReader(normFile));
 			StringBuilder sb = new StringBuilder();
@@ -279,7 +263,7 @@ public class SIPObject {
 			while (line != null){
 				sb.append(line);
 				if((line.equals("NaN")|| line.equals("NAN") || line.equals("nan") || line.equals("na")  || Double.parseDouble(line) < 0.30)){
-					normVector.put(lineNumber*this._resolution, "plop");
+					vector.put(lineNumber*this._resolution, "plop");
 				}
 				++lineNumber;
 				sb.append(System.lineSeparator());
@@ -287,9 +271,10 @@ public class SIPObject {
 			}
 			br.close();
 		} catch (IOException e) { e.printStackTrace();}
-		return normVector;
+		return vector;
 	}
 
+	
 	/**
 	 * 
 	 * @return
@@ -323,11 +308,15 @@ public class SIPObject {
 			System.out.println("AP\t"+_medianAP+"\nAPREG\t"+_medianAPReg);
 		}
 	}
+	
+	
+	public double getFdr() { 	return	this._fdr; }
+	public void setFdr(double fdr) { 		this._fdr = fdr; }
 	/**
 	 * Getter of the input dir
 	 * @return path of the input dir
 	 */
-	public String getinputDir(){ return this._input; }
+	public String getInputDir(){ return this._input; }
 	
 	/**
 	 * Getter of the matrix size
@@ -373,6 +362,11 @@ public class SIPObject {
 	 */
 	public void setGauss(double gauss){ this._gauss = gauss; }
 	
+	/**
+	 * Getter of diagSize 
+	 * @return
+	 */
+	public int getDiagSize(){ return this._diagSize;}
 	/**
 	 * Setter of the diagonal size
 	 * @param diagSize int of the size of the diagonal
@@ -445,10 +439,14 @@ public class SIPObject {
 	 */
 	public int getThresholdMaxima(){ return _thresholdMaxima;}
 	/**
-	 * Getter of diagSize 
-	 * @return
+	 * Setter of threshold for the detection of the maxima
+	 * @param thresholdMaxima
 	 */
-	public int getDiagSize(){ return this._diagSize;}
+	public void setThresholdMaxima(int thresholdMaxima) { this._thresholdMaxima = thresholdMaxima;}
+
+	
+	
+
 	
 	/**
 	 * Getter of getNbZero 
@@ -456,43 +454,29 @@ public class SIPObject {
 	 */
 	public int getNbZero(){ return this._nbZero;}
 	
+
+	public void setNbZero(int nbZero){ this._nbZero = nbZero;}
+	
 	/**
 	 * 
 	 * @return
 	 */
 	public ArrayList<Integer> getListFactor() {return this._listFactor;}
+	public void setListFactor(ArrayList<Integer> listFactor) {this._listFactor = listFactor;}
 	
-	public boolean isHichip(){return this._isHichip;}
-	/**
-	 * Setter of threshold for the detection of the maxima
-	 * @param thresholdMaxima
-	 */
-	public void setThresholdMaxima(int thresholdMaxima) { this._thresholdMaxima = thresholdMaxima;}
-
-	/**
-	 * 
-	 * @return
-	 */
+	public boolean isDroso(){return this._isDroso;}
+	public void setIsDroso(boolean droso){	this._isDroso = droso;}
+	
 	public HashMap<String,Integer> getChrSizeHashMap(){return this._chrSize;} 
+	public void setChrSizeHashMap(HashMap<String,Integer> chrSize){this._chrSize = chrSize;} 
 	
-	/**
-	 * Setter of hichip,
-	 * false run with hic parameter
-	 * true rune with hichip parameter 
-	 * @param hichip boolean
-	 */
-	public void setIsHichip(boolean hichip){	this._isHichip = hichip;}
+
 
 	/**
 	 * 
 	 * @return
 	 */
 	public boolean isProcessed() { return _isProcessed;}
-
-	/**
-	 * 
-	 * @param _isProcessed
-	 */
 	public void setIsProcessed(boolean _isProcessed) { this._isProcessed = _isProcessed;}
 
 	/**
@@ -500,19 +484,5 @@ public class SIPObject {
 	 * @return
 	 */
 	public boolean isGui() { return _isGui;}
-	
-	/**
-	 * 
-	 * @param _isGui
-	 */
-			
 	public void setIsGui(boolean _isGui) { this._isGui = _isGui;}
-
-	public ArrayList<File> getTifList() {
-		return _tifList;
-	}
-
-	public void setTifList(ArrayList<File> _tifList) {
-		this._tifList = _tifList;
-	}
 }

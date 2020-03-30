@@ -115,6 +115,6 @@ public class ImageProcessingMethod{
 	 * @param m_min
 	 */
 	public void runMax(double m_max) {
-		_rF.rank(_ip, m_max, RankFilters.MAX);// TODO Auto-generated method stub
+		_rF.rank(_ip, m_max, RankFilters.MAX);
 	}
 }

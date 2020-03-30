@@ -88,6 +88,8 @@ public class PeakAnalysisScore {
 				if(xFDR2 > this._imgRaw.getWidth()-12 || yFDR2 > this._imgRaw.getHeight()-12){
 					xFDR2 = x-25;
 					yFDR2 = y-25;
+					if(xFDR2 <= 0) xFDR2 = 13;
+					if(yFDR2 <= 0) yFDR2 = 13;
 				}
 				//System.out.println(xFDR2+" "+yFDR2);
 				float centerFDR2 = this._ipRaw.getf(xFDR2,yFDR2);
@@ -100,7 +102,10 @@ public class PeakAnalysisScore {
 				if(xFDR3 > this._imgRaw.getWidth()-12 || yFDR3 > this._imgRaw.getHeight()-12){
 					xFDR3 = x-40;
 					yFDR3 = y-40;
+					if(xFDR3 <= 0) xFDR3 = 13;
+					if(yFDR3 <= 0) yFDR3 = 13;
 				}
+				
 				float centerFDR3 = this._ipRaw.getf(xFDR3,yFDR3);
 				float squareCenterAvgFDR3 = process3By3SquareAvg(xFDR3,yFDR3);	
 				loop.setPaScoreAvgFDR3(centerFDR3/computeAvgCorner(xFDR3,yFDR3));

@@ -47,8 +47,8 @@ public class ProcessDumpData{
 		if (outDir.exists()==false) outDir.mkdir();
 		while(chrName.hasNext()){
 			String chr = chrName.next();
-			DumpData dumpData = new DumpData(juiceBoxTools, hicFile, normJuiceBox, sip.getResolution());
-			RunnableDumpData task =  new RunnableDumpData(sip.getOutputDir(), chr, chrSize.get(chr), dumpData, sip.getResolution(), sip.getMatrixSize(),	sip.getStep());
+			DumpData dumpData = new DumpData(juiceBoxTools, hicFile, normJuiceBox);
+			RunnableDumpData task =  new RunnableDumpData(sip.getOutputDir(), chr, chrSize.get(chr), dumpData, sip.getResolution(), sip.getMatrixSize(), sip.getStep(), sip.getListFactor());
 			executor.execute(task);	
 
 		}
@@ -63,7 +63,6 @@ public class ProcessDumpData{
 			if (nb != executor.getCompletedTaskCount()) {
 				nb = (int) executor.getCompletedTaskCount();
 				if(sip.isGui()) _p._bar.setValue(nb);
-				System.out.println("plop:"+executor.getCompletedTaskCount());
 			}
 		}
 		if(sip.isGui())	_p.dispose();

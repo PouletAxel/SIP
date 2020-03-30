@@ -11,8 +11,8 @@ import java.util.HashMap;
 import javax.swing.JOptionPane;
 
 import gui.GuiAnalysis;
-import multiProcesing.ProcessDetectLoops;
 import multiProcesing.ProcessDumpData;
+import process.MultiResProcess;
 import utils.SIPObject;
 
 /**
@@ -61,8 +61,6 @@ public class Hic_main {
 	private static String _factOption = "1";
 	/** if true run only image Processing step*/
 	private static boolean _isProcessed = false;
-	/**boolean true: hichip data if fals hic data */
-	private static boolean _isHiChip = false;
 	/** hash map stocking in key the name of the chr and in value the size*/
 	private static HashMap<String,Integer> _chrSize =  new HashMap<String,Integer>();
 	/** path to the chromosome size file */
@@ -75,9 +73,7 @@ public class Hic_main {
 	private static int _cpu = 1;
 	/**boolean is true supress all the image created*/
 	private static boolean _gui = false;
-	/**boolean is true supress all the image created*/
-	//private static boolean _isaccurate = false;
-	/**Strin for the documentation*/
+	/**String for the documentation*/
 	private static String _doc = ("#SIP Version 1 run with java 8\n"
 			+ "\nUsage:\n"
 			+ "\thic <hicFile> <chrSizeFile> <Output> <juicerToolsPath> [options]\n"
@@ -168,9 +164,7 @@ public class Hic_main {
 				_gauss = gui.getGaussian();
 				_max = gui.getMax();
 				_min = gui.getMin();
-				//_isHiChip= gui.isHiChIP();
 				_isDroso= gui.isDroso();
-				//_isaccurate= gui.isAccurate();
 				_nbZero = gui.getNbZero();
 				_saturatedPixel = gui.getEnhanceSignal();
 				_thresholdMax = gui.getNoiseTolerance();
@@ -223,10 +217,10 @@ public class Hic_main {
 			System.out.println("hic mode: \n"+ "input: "+_input+"\n"+ "output: "+_output+"\n"+ "juiceBox: "+_juiceBoxTools+"\n"+ "norm: "+ _juiceBoXNormalisation+"\n"
 					+ "gauss: "+_gauss+"\n"+ "min: "+_min+"\n"+ "max: "+_max+"\n"+ "matrix size: "+_matrixSize+"\n"+ "diag size: "+_diagSize+"\n"+ "resolution: "+_resolution+"\n"
 					+ "saturated pixel: "+_saturatedPixel+"\n"+ "threshold: "+_thresholdMax+"\n"+ "number of zero :"+_nbZero+"\n"+ "factor "+ _factOption+"\n"+ "fdr "+_fdr+"\n"
-					+ "del "+_delImages+"\n"+ "cpu "+ _cpu/*+"\nisAccurate: "+_isaccurate+"\n"+ "isHichip"+ _isHiChip+*/+"\n-isDroso "+_isDroso+"\n");
+					+ "del "+_delImages+"\n"+ "cpu "+ _cpu+"\n-isDroso "+_isDroso+"\n");
 			
 			sip = new SIPObject(_output, _chrSize, _gauss, _min, _max, _resolution, _saturatedPixel,
-					_thresholdMax, _diagSize, _matrixSize, _nbZero, _factor,_fdr, _isProcessed,_isHiChip,_isDroso);
+					_thresholdMax, _diagSize, _matrixSize, _nbZero, _factor,_fdr, _isProcessed,_isDroso);
 			sip.setIsGui(_gui);
 			ProcessDumpData processDumpData = new ProcessDumpData();
 			processDumpData.go(_input, sip, _chrSize, _juiceBoxTools, _juiceBoXNormalisation, _cpu);
@@ -236,15 +230,16 @@ public class Hic_main {
 					+ "norm: "+ _juiceBoXNormalisation+"\n"+ "gauss: "+_gauss+"\n"+ "min: "+_min+"\n"+ "max: "+_max+"\n"+ "matrix size: "+_matrixSize+"\n"
 					+ "diag size: "+_diagSize+"\n"+ "resolution: "+_resolution+"\n"+ "saturated pixel: "+_saturatedPixel+"\n"+ "threshold: "+_thresholdMax+"\n"
 					+ "isHic: "+_isHic+"\n"	+ "isProcessed: "+_isProcessed+"\n"+ "number of zero:"+_nbZero+"\n"+ "factor "+ _factOption+"\n"+ "fdr "+_fdr+ "\n"
-					+ "del "+_delImages+"\n"+"cpu "+ _cpu/*+"\nisAccurate: "/*_isaccurate"\n"+ "isHichip"+ _isHiChip*/+"\n-isDroso "+_isDroso+"\n");
+					+ "del "+_delImages+"\n"+"cpu "+ _cpu+"\n-isDroso "+_isDroso+"\n");
 			
 			sip = new SIPObject(_input,_output, _chrSize, _gauss, _min, _max, _resolution, _saturatedPixel, _thresholdMax,
-					_diagSize, _matrixSize, _nbZero,_factor,_fdr,_isProcessed,_isHiChip, _isDroso);
+					_diagSize, _matrixSize, _nbZero,_factor,_fdr,_isProcessed, _isDroso);
 			sip.setIsGui(_gui);
 		}
 		System.out.println("Start loop detction step");
-		ProcessDetectLoops processDetectloops = new ProcessDetectLoops();
-		processDetectloops.go(sip,_cpu,_delImages); 
+		
+		MultiResProcess multi = new MultiResProcess(sip, _cpu, _delImages,_chrSizeFile);
+		multi.run();
 		System.out.println("###########End loop detction step");
 		BufferedWriter writer = new BufferedWriter(new FileWriter(new File(_output+File.separator+"parameters.txt")));
 		if(_isProcessed){
@@ -308,15 +303,6 @@ public class Hic_main {
 	 */
 	private static void readOption(String args[], int index) throws IOException{
 		if(index < args.length){
-		/*	boolean tresh = false;
-			boolean norm = false;
-			boolean  nbZero = false;
-			boolean  gauss = false;
-			boolean  min = false;
-			boolean  cpu = false;
-			boolean  max = false;
-			boolean sat =false;
-			boolean fdr =false;*/
 			for(int i = index; i < args.length;i+=2){
 				if(args[i].equals("-res")){
 					try{_resolution =Integer.parseInt(args[i+1]);}
@@ -324,7 +310,7 @@ public class Hic_main {
 				}else if(args[i].equals("-mat")){
 					try{_matrixSize =Integer.parseInt(args[i+1]);}
 					catch(NumberFormatException e){ returnError("-mat",args[i+1],"int");} 
-				}/*else if(args[i].equals("-factor")){
+				}else if(args[i].equals("-factor")){
 					int a  = Integer.parseInt(args[i+1]);
 					_factOption = args[i+1];
 					if(a == 2){	_factor.add(2);}
@@ -333,7 +319,7 @@ public class Hic_main {
 						_factor.add(5);
 					}else if(a == 3){ _factor.add(5);}
 					else if(a != 1)	returnError("-factor ",args[i+1]," int or not correct choice (1, 2, 3, 4)");
-				}*/else if(args[i].equals("-d")){
+				}else if(args[i].equals("-d")){
 					try{_diagSize =Integer.parseInt(args[i+1]);}
 					catch(NumberFormatException e){ returnError("-d",args[i+1],"int");}
 				}else if(args[i].equals("-cpu")){
@@ -345,39 +331,28 @@ public class Hic_main {
 							System.exit(0);
 						}
 				}else if(args[i].equals("-nbZero")){
-					//nbZero = true;
 					try{_nbZero =Integer.parseInt(args[i+1]);}
 					catch(NumberFormatException e){ returnError("-d",args[i+1],"int");} 
 				}else if(args[i].equals("-g")){
-					//gauss = true;
 					try{_gauss =Double.parseDouble(args[i+1]);}
 					catch(NumberFormatException e){ returnError("-g",args[i+1],"double");}
 				}else if(args[i].equals("-fdr")){
-					//fdr = true;
 					try{_fdr =Double.parseDouble(args[i+1]);}
 					catch(NumberFormatException e){ returnError("-fdr",args[i+1],"double");}				
 				}else if(args[i].equals("-max")){
-					//max = true;
 					try{_max = Double.parseDouble(args[i+1]);}
 					catch(NumberFormatException e){ returnError("-max",args[i+1],"double");}
 					
 				}else if(args[i].equals("-min")){
-					//min =  true;
 					try{_min = Double.parseDouble(args[i+1]);}
 					catch(NumberFormatException e){ returnError("-min",args[i+1],"double");}
-				
 				}else if(args[i].equals("-sat")){
-					//sat = true;
 					try{_saturatedPixel = Double.parseDouble(args[i+1]);}
 					catch(NumberFormatException e){ returnError("-sat",args[i+1],"double");}
-				
 				}else if(args[i].equals("-t")){
-					//tresh = true;
 					try{_thresholdMax =Integer.parseInt(args[i+1]);}
 					catch(NumberFormatException e){ returnError("-t",args[i+1],"int");}
-				
 				}else if(args[i].equals("-norm")){
-					//norm = true;
 					if(args[i+1].equals("NONE") || args[i+1].equals("VC") 
 							|| args[i+1].equals("VC_SQRT") || args[i+1].equals("KR")){
 						_juiceBoXNormalisation = args[i+1];
@@ -396,17 +371,7 @@ public class Hic_main {
 						System.out.println(_doc);
 						System.exit(0);
 					}
-				}/*else if(args[i].equals("-hichip")){
-					if(args[i+1].equals("true") || args[i+1].equals("T") || args[i+1].equals("TRUE"))
-						_isHiChip = true;
-					else if(args[i+1].equals("false") || args[i+1].equals("F") || args[i+1].equals("False"))
-						_isHiChip = false;
-					else{
-						System.out.println("-hichip = "+args[i+1]+", not defined\n");
-						System.out.println(_doc);
-						System.exit(0);
-					}
-				}*/else if(args[i].equals("-isDroso")){
+				}else if(args[i].equals("-isDroso")){
 					if(args[i+1].equals("true") || args[i+1].equals("T") || args[i+1].equals("TRUE"))
 						_isDroso = true;
 					else if(args[i+1].equals("false") || args[i+1].equals("F") || args[i+1].equals("False"))
@@ -416,33 +381,12 @@ public class Hic_main {
 						System.out.println(_doc);
 						System.exit(0);
 					}
-				}/*else if(args[i].equals("-isAccurate")){
-					if(args[i+1].equals("true") || args[i+1].equals("T") || args[i+1].equals("TRUE"))
-						_isaccurate = true;
-					else if(args[i+1].equals("false") || args[i+1].equals("F") || args[i+1].equals("False"))
-						_isaccurate = false;
-					else{
-						System.out.println("-isAccurate = "+args[i+1]+", not defined\n");
-						System.out.println(_doc);
-						System.exit(0);
-					}
-				}*/else{
+				}else{
 					System.out.println(args[i]+" doesn't existed\n");
 					System.out.println(_doc);
 					System.exit(0);
 				}
 			}
-			/*if(_isHiChip){
-				if(sat == false) _saturatedPixel = 0.5;
-				if(norm == false) _juiceBoXNormalisation = "NONE";
-				if(gauss == false) _gauss = 1.5;
-				if(max == false) _max = 1;
-				if(min == false) _min = 1;
-				if(tresh == false) _thresholdMax = 1;
-				if(nbZero == false ) _nbZero = 25;
-				if(fdr == false ) _fdr = .1;
-				if(cpu == false ) _cpu = 1;
-			}*/
 		}
 	}
 	

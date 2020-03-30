@@ -13,17 +13,15 @@ import java.util.Set;
 public class FilterLoops {
 	/** loops resoluiton*/
 	private int _resolution;
-	/** raw or line with biais value in the hic matrix*/
-	private HashMap<Integer,String> _normVector = new HashMap<Integer,String>();
+	
 	
 	/**
 	 * Constructor 
 	 * @param resolution
 	 * @param normVector
 	 */
-	public FilterLoops(int resolution,HashMap<Integer,String> normVector){
+	public FilterLoops(int resolution){
 		this._resolution = resolution;
-		this._normVector = normVector;
 	}
 	
 	
@@ -59,14 +57,15 @@ public class FilterLoops {
 	 * @param hLoop loop collection before correction of the loops
 	 * @return loop collection sfter correction of the loops
 	 */
-	public HashMap<String,Loop> removedLoopCloseToWhiteStrip(HashMap<String,Loop> hLoop){
+	public HashMap<String,Loop> removedLoopCloseToWhiteStrip(HashMap<String,Loop> hLoop, HashMap<Integer,String> normVector){
+		//System.out.println("plop "+hLoop.size()+" debut Filter");
 		Set<String> key = hLoop.keySet();
 		Iterator<String> it = key.iterator();
 		ArrayList<String> removed = new ArrayList<String>();
 		while (it.hasNext()){
 			String name = it.next();
 			Loop loop = hLoop.get(name);
-			Boolean testRemoved = removedVectoNorm(loop);
+			Boolean testRemoved = removedVectoNorm(loop,normVector);
 			boolean testBreak = false;
 			if(testRemoved)
 				removed.add(name);
@@ -113,6 +112,7 @@ public class FilterLoops {
 		}
 		for (int i = 0; i< removed.size(); ++i)
 			hLoop.remove(removed.get(i));
+		//System.out.println("####### fin Filter "+hLoop.size());
 		return hLoop;
 	}
 	
@@ -121,26 +121,27 @@ public class FilterLoops {
 	 * @param loop Loop to test
 	 * @return boolean true if loop have to be removed else false
 	 */
-	private boolean removedVectoNorm(Loop loop){
+	private boolean removedVectoNorm(Loop loop, HashMap<Integer,String> normVector){
 		boolean test = false;
 		int x = loop.getCoordinates().get(0);
 		int y = loop.getCoordinates().get(2);
+		//System.out.println(loop.getName()+" "+loop.getResolution());
 		if(loop.getResolution() == this._resolution){
-			if(this._normVector.containsKey(x) || this._normVector.containsKey(y))
+			if(normVector.containsKey(x) || normVector.containsKey(y))
 				test = true;
 		}
 		else if(loop.getResolution() == this._resolution*2){
-			if(this._normVector.containsKey(x) || this._normVector.containsKey(y) ||this._normVector.containsKey(x+this._resolution) || this._normVector.containsKey(y+this._resolution))
+			if(normVector.containsKey(x) || normVector.containsKey(y) ||normVector.containsKey(x+this._resolution) || normVector.containsKey(y+this._resolution))
 				test = true;
 		}
 		else if(loop.getResolution() == this._resolution*5){
 			for(int i = x; i <= x+5*this._resolution; i+=this._resolution){
-				if(this._normVector.containsKey(i)){
+				if(normVector.containsKey(i)){
 					test = true;
 					break;
 				}
 				for(int j = y; j <= y+5*this._resolution; j+=this._resolution){
-					if(this._normVector.containsKey(j)){
+					if(normVector.containsKey(j)){
 						test = true;
 						break;
 					}

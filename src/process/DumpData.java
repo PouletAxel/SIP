@@ -39,8 +39,6 @@ public class DumpData {
 	private String _normalisation= "";
 	/** path to the hic file or url link*/
 	private String _hicFile = "";
-	/** int in base for the bin resolution (5000,10000, etc)*/
-	private int _resolution;
 	/** path to juicer_toolsbox.jars*/
 	private String _juiceBoxTools = "";
 	/** List of doucle to stock the expected vector*/
@@ -56,10 +54,9 @@ public class DumpData {
 	 * @param norm: String: type of normalisation
 	 * @param resolution: int: resolution of the bins 
 	 */
-	public DumpData(String juiceboxTools,String hicFile, String norm, int resolution){
+	public DumpData(String juiceboxTools,String hicFile, String norm) {
 		this._juiceBoxTools = juiceboxTools;
 		this._normalisation = norm;
-		this._resolution = resolution;
 		this._hicFile = hicFile;
 	}
 	
@@ -71,12 +68,12 @@ public class DumpData {
 	 * @return
 	 * @throws IOException
 	 */
-	public boolean dumpObservedMExpected(String chr, String output) throws IOException{
+	public boolean dumpObservedMExpected(String chr, String output, int resolution) throws IOException{
 		int exitValue=1;
 		Runtime runtime = Runtime.getRuntime();
 		String obs = output.replaceAll(".txt", "_obs.txt");
 		try {
-			String line = "java"+" -jar "+this._juiceBoxTools+" dump observed "+this._normalisation+" "+this._hicFile+" "+chr+" "+chr+" BP "+this._resolution+" "+obs;
+			String line = "java"+" -jar "+this._juiceBoxTools+" dump observed "+this._normalisation+" "+this._hicFile+" "+chr+" "+chr+" BP "+resolution+" "+obs;
 			this._log = this._log+"\n"+obs+"\t"+line;
 			Process process = runtime.exec(line);
 
@@ -86,7 +83,7 @@ public class DumpData {
 		}
 		catch (IOException e) {	e.printStackTrace();}
 		catch (InterruptedException e) {e.printStackTrace();}
-		observedMExpected(obs,output);
+		observedMExpected(obs,output,resolution);
 		if(_logError!=""){
 			System.out.println(_logError);
 			System.exit(0);
@@ -103,14 +100,14 @@ public class DumpData {
 	 * @param chr: name of the chr
 	 * @throws IOException
 	 */
-	private void observedMExpected(String obs, String chr) throws IOException{
+	private void observedMExpected(String obs, String chr, int resolution) throws IOException{
 		BufferedReader br = Files.newBufferedReader(Paths.get(obs), StandardCharsets.UTF_8);
 		BufferedWriter 	writer = new BufferedWriter(new FileWriter(new File(chr)));
 		for (String line = null; (line = br.readLine()) != null;){
 			String [] tline = line.split("\t");
-			int dist = Math.abs((Integer.parseInt(tline[0])-Integer.parseInt(tline[1]))/this._resolution);
+			int dist = Math.abs((Integer.parseInt(tline[0])-Integer.parseInt(tline[1]))/resolution);
 			if(!tline[2].equals("NaN")){
-				double normalizedValue = 1+(((Double.parseDouble(tline[2])+1)-(this._lExpected.get(dist)+1))/(this._lExpected.get(dist)+1));
+				double normalizedValue = (Double.parseDouble(tline[2])+1)/(this._lExpected.get(dist)+1);
 				double oMe = Double.parseDouble(tline[2])-this._lExpected.get(dist);
 				writer.write(tline[0]+"\t"+tline[1]+"\t"+oMe+"\t"+normalizedValue+"\n");
 			}
@@ -142,11 +139,11 @@ public class DumpData {
 	 * @param output: path to the output
 	 * @return
 	 */
-	public boolean getExpected(String chr,String output){
+	public boolean getExpected(String chr,String output,int resolution){
 		int exitValue=1;
 		Runtime runtime = Runtime.getRuntime();
 		String expected = output.replaceAll(".txt", "_expected.txt");
-		String cmd = "java"+" -jar "+this._juiceBoxTools+" dump expected "+this._normalisation+" "+this._hicFile+" "+chr+" BP "+this._resolution+" "+expected;
+		String cmd = "java"+" -jar "+this._juiceBoxTools+" dump expected "+this._normalisation+" "+this._hicFile+" "+chr+" BP "+resolution+" "+expected;
 		this._log = this._log+"\n"+expected+"\t"+cmd;
 		Process process;
 		try {
@@ -182,10 +179,10 @@ public class DumpData {
 	 * @throws IOException
 	 * @throws InterruptedException
 	 */
-	public boolean getNormVector(String chr,String output) throws IOException, InterruptedException{
+	public boolean getNormVector(String chr,String output,int resolution) throws IOException, InterruptedException{
 		int exitValue=1;
 		Runtime runtime = Runtime.getRuntime();
-		String cmd = "java"+" -jar "+this._juiceBoxTools+" dump norm VC "+this._hicFile+" "+chr+" BP "+this._resolution+" "+output;
+		String cmd = "java"+" -jar "+this._juiceBoxTools+" dump norm VC "+this._hicFile+" "+chr+" BP "+resolution+" "+output;
 		this._log = this._log+"\n"+output+"\t"+cmd;
 		Process process = runtime.exec(cmd);
 		new ReturnFlux(process.getInputStream()).start();

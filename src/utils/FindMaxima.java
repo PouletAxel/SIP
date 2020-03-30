@@ -63,7 +63,7 @@ public class FindMaxima{
 	 * @param factor
 	 * @return
 	 */
-	public HashMap<String,Loop> findloop(boolean hichip, int index, int nbZero, ImagePlus raw, float val, int factor){
+	public HashMap<String,Loop> findloop(int index, int nbZero, ImagePlus raw, float val){
 		run(nbZero, raw, val);
 		ArrayList<String> temp = this.getMaxima();
 		ImageProcessor ipN = this._imgNorm.getProcessor();
@@ -76,34 +76,23 @@ public class FindMaxima{
 			String name= this._chr+"\t"+temp.get(j)+"\t"+index;
 			float avg = average(x,y);
 			float std =standardDeviation(x,y,avg);
-			if(avg > 1.45*factor*factor && ipN.getf(x, y) >= 1.85*factor*factor){ // filter on the loop value and region value
+			if(avg > 1.45 && ipN.getf(x, y) >= 1.85){ // filter on the loop value and region value
 				DecayAnalysis da = new DecayAnalysis(this._imgNorm,x,y);
 				float n1 =da.getNeighbourhood1();
-				float n2 =da.getNeighbourhood2();				
-				/*if(hichip){
-					if(n1 > 2 && n2 > 2){ // filter on the neighborood for hichip datatset
-						Loop maxima = new Loop(temp.get(j),x,y,this._chr,avg,std,ipN.getf(x, y));
-						maxima.setNeigbhoord1(n1);
-						maxima.setNeigbhoord2(n2);
-						maxima.setResolution(this._resolution);
-						maxima.setDiagSize(this._diagSize);
-						maxima.setMatrixSize(this._imgNorm.getWidth());
-						data.put(name, maxima);
-					}
-				}else{*/
-					if(n1 < n2 && n1 >= 0.15 && n2 >= 0.25){ // filter on the neighborood for hic datatset
-						Loop maxima = new Loop(temp.get(j),x,y,this._chr,avg,std,ipN.getf(x, y));
-						maxima.setNeigbhoord1(n1);
-						maxima.setNeigbhoord2(n2);
-						maxima.setResolution(this._resolution);
-						maxima.setDiagSize(this._diagSize);
-						maxima.setMatrixSize(this._imgNorm.getWidth());
-						data.put(name, maxima);
-					}
+				float n2 =da.getNeighbourhood2();	
+				if(n1 < n2 && n1 >= 0.15 && n2 >= 0.25){ // filter on the neighborood for hic datatset
+					Loop maxima = new Loop(temp.get(j),x,y,this._chr,avg,std,ipN.getf(x, y));
+					maxima.setNeigbhoord1(n1);
+					maxima.setNeigbhoord2(n2);
+					maxima.setResolution(this._resolution);
+					//System.out.println(_resolution+" "+maxima.getResolution());
+					maxima.setDiagSize(this._diagSize);
+					maxima.setMatrixSize(this._imgNorm.getWidth());
+					data.put(name, maxima);
 				}
-			//}
+			}
 		}
-		//System.out.println("#######"+_chr+" size raw maxima !!!!!!!!!!!!!! "+raw.getTitle()+"  "+data.size());
+		//System.out.println("after filter ################# "+raw.getTitle()+"  "+data.size());
 		return data;
 	}
 		
@@ -258,93 +247,7 @@ public class FindMaxima{
 	}
 	
 	
-	/**
-	 * 
-	 * @param x  int x coordinate's of the loop
-	 * @param y  int y coordinate's of the loop
-	 * @return Strip
-	 */
-	@SuppressWarnings("unused")
-	private Strip stripX(int x, int y){
-		Strip strip = null;
-		float sum = 0;
-		float sumLeft = 0;
-		float sumRight = 0;
-		int nb = 0;
-		ArrayList<Float> list = new ArrayList<Float>();
-		ImageProcessor ip = this._imgNorm.getProcessor();
-		for(int i = x; i >= y; --i){
-			sum +=ip.getf(i, y)+ip.getf(x-1, y)+ip.getf(x+1, y);
-			sumLeft +=ip.getf(i, y-2)+ip.getf(i, y-3)+ip.getf(i, y-4);
-			sumRight +=ip.getf(i, y+2)+ip.getf(i, y+3)+ip.getf(i, y+4);
-			sum +=ip.getf(i, y)+ip.getf(i, y-1)+ip.getf(i, y+1);
-			nb+=3;
-			list.add( ip.getf(i,y-1));
-			list.add(ip.getf(i,y));
-			list.add(ip.getf(i,y+1));
-		}
-		sumLeft = sumLeft/nb;
-		sumRight = sumRight/nb;
-		float semc = 0;
-		for(int i = 0; i < list.size();++i){
-			semc += (list.get(i)-sum)*(list.get(i)-sum);
-		}
-		semc = (float)Math.sqrt(semc);
-		//System.out.println("avg "+sum+" std "+semc);
-		if(sum > sumLeft && sum > sumRight){
-			String name = "X\t"+x;
-			strip = new Strip(name,this._chr, x-1,y-1,x-1,x+1);
-			strip.setLeftNeigStrip(sumLeft);
-			strip.setLeftNeigStrip(sumRight);
-			strip.setStripValue(sum);
-			strip.setStripStd(semc);
-			strip.setSize(nb*this._resolution);
-		}
-		return strip;
-	}
 	
-	/**
-	 * 
-	 * @param x  int x coordinate's of the loop
-	 * @param y  int y coordinate's of the loop
-	 * @return Strip
-	 */
-	@SuppressWarnings("unused")
-	private Strip stripY(int x, int y){
-		Strip strip = null;
-		float sum = 0;
-		float sumLeft = 0;
-		float sumRight = 0;
-		int nb = 0;
-		ArrayList<Float> list = new ArrayList<Float>();
-		ImageProcessor ip = this._imgNorm.getProcessor();
-		for(int j = y; j <= x; ++j){
-			sum +=ip.getf(x, j)+ip.getf(x-1, j)+ip.getf(x+1, j);
-			sumLeft = sumLeft+ip.getf(x-2, j)+ip.getf(x-3, j)+ip.getf(x-4, j);
-			sumRight = sumRight+ip.getf(x+2, j)+ip.getf(x+3, j)+ip.getf(x+4, j);
-			nb+=3;
-			list.add(ip.getf(x-1,j));
-			list.add(ip.getf(x,j));
-			list.add(ip.getf(x+1,j));
-		}
-		sum = sum/nb;
-		sumLeft = sumLeft/nb;
-		sumRight = sumRight/nb;
-		float semc = 0;
-		for(int i = 0; i < list.size();++i)
-			semc += (list.get(i)-sum)*(list.get(i)-sum);
-		semc = (float)Math.sqrt(semc);
-		if((sumLeft/sum) < 0.9 || sumRight/sum < 0.9){
-			String name = "Y_"+y;
-			strip = new Strip(name,this._chr,y+1,x+1,x-1,x+1);
-			strip.setLeftNeigStrip(sumLeft/sum);
-			strip.setRightNeigStrip(sumRight/sum);
-			strip.setStripValue(sum);
-			strip.setStripStd(semc);
-			strip.setSize(nb*this._resolution);
-		}
-		return strip;
-	}
 	/**
 	 * Compute standard deviation of the loop region at the neighbourhood 8.
 	 * 

@@ -27,10 +27,6 @@ public class Loop {
 	private int _xEnd;
 	/** y coordinate+resolution.*/
 	private int _yEnd;
-	/**Strip object X orientaion */
-	private Strip _stripX;
-	/**Strip object Y orientaion */
-	private Strip _stripY;
 	/** value of the avg of the diff  between loops value and the neighbourhood 8.*/
 	private float _neigbhoord1 = -1;
 	/** value of the peak analysis value inspirate from Rao&Huntley et al., 2014, but the score is compute foreach loop and not for a set of loops.*/
@@ -76,35 +72,17 @@ public class Loop {
 		this.setY(y);
 		this._chr = chr;
 	}
-	
+	//0				1	2	3			4	5	6		7			8						9				10						11						12	13	14
+	//chromosome1	x1	x2	chromosome2	y1	y2	color	APScoreAvg	ProbabilityofEnrichment	RegAPScoreAvg	Avg_diffMaxNeihgboor_1	Avg_diffMaxNeihgboor_2	avg	std	value
 	
 	public Loop(String loop){
 		String[] tLoop = loop.toString().split("\t");
 		this._chr = tLoop[0];
-		this._name = tLoop[1];
-		this._x = Integer.parseInt(tLoop[2]);
-		this._y = Integer.parseInt(tLoop[3]);
-		this._resolution = Integer.parseInt(tLoop[4]);
-		this._matrixSize = Integer.parseInt(tLoop[5]);
-		this._diagSize = Integer.parseInt(tLoop[6]);
-		this._xEnd = Integer.parseInt(tLoop[7]);
-		this._yEnd= Integer.parseInt(tLoop[8]);
-		this._neigbhoord1 = Float.parseFloat(tLoop[9]);
-		this._paScoreAvg = Float.parseFloat(tLoop[10]);
-		this._paScoreAvgdev = Float.parseFloat(tLoop[11]);
-		this._paScoreMed = Float.parseFloat(tLoop[12]);
-		this._neigbhoord2 = Float.parseFloat(tLoop[13]);
-		this._regPaScoreMed = Float.parseFloat(tLoop[14]);
-		this._regPaScoreAvg = Float.parseFloat(tLoop[15]);
-		this._avg = Float.parseFloat(tLoop[16]);
-		this._peakValue = Float.parseFloat(tLoop[17]);
-		this._std = Float.parseFloat(tLoop[18]);
-		this._paScoreFDR = Float.parseFloat(tLoop[19]);
-		this._regPaScoreFDR = Float.parseFloat(tLoop[20]);
-		this._paScoreFDR2 = Float.parseFloat(tLoop[21]);
-		this._regPaScoreFDR2 = Float.parseFloat(tLoop[22]);
-		this._paScoreFDR3 = Float.parseFloat(tLoop[23]);
-		this._regPaScoreFDR3 = Float.parseFloat(tLoop[24]);
+		this._name = loop;
+		this._x = Integer.parseInt(tLoop[1]);
+		this._xEnd = Integer.parseInt(tLoop[2]);
+		this._y = Integer.parseInt(tLoop[4]);
+		this._yEnd= Integer.parseInt(tLoop[5]); 
 	}
 	/**
 	 * Loop constructor
@@ -257,29 +235,7 @@ public class Loop {
 	 * @param neigbhoord1 double differential avg
 	 */
 	public void setNeigbhoord1(float neigbhoord1){ this._neigbhoord1 = neigbhoord1; }
-	/**
-	 * Getter of avg differential n 8 
-	 * @return double of the differential avg
-	 */
-	public Strip getStripX(){ return this._stripX;  }
 	
-	/**
-	 * Setter of avg differential n 8 
-	 * @param neigbhoord1 double differential avg
-	 */
-	public void setStripX(Strip strip){ this._stripX = strip; }
-	
-	/**
-	 * Getter of avg differential n 8 
-	 * @return double of the differential avg
-	 */
-	public Strip getStripY(){	return this._stripY; }
-		
-	/**
-	 * Setter of avg differential n 8 
-	 * @param neigbhoord1 double differential avg
-	 */
-	public void setStripY(Strip strip){ this._stripY = strip; }
 		
 	/**
 	 * Getter of avg differential n 24 

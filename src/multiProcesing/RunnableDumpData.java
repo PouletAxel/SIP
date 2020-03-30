@@ -3,6 +3,7 @@ import process.DumpData;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 
 /**
  * Runnable class dumping the raw data set via juicer tool.
@@ -29,6 +30,9 @@ public class RunnableDumpData extends Thread implements Runnable{
 	private int _matrixSize = 0;
 	/**int: size of the step to run a chr */
 	private int _step = 0;
+	/** */
+	private ArrayList<Integer> _listFactor;
+	
 	
 	/**
 	 * Constructor, initialize the variables of interest
@@ -41,7 +45,7 @@ public class RunnableDumpData extends Thread implements Runnable{
 	 * @param matrixSize
 	 * @param step
 	 */
-	public RunnableDumpData (String outdir, String chrName, int chrSize, DumpData dumpData,int res, int matrixSize, int step){
+	public RunnableDumpData (String outdir, String chrName, int chrSize, DumpData dumpData,int res, int matrixSize, int step, ArrayList<Integer> listFactor){
 		this._outdir = outdir;
 		this._chrName = chrName;
 		this._chrSize = chrSize;
@@ -49,6 +53,7 @@ public class RunnableDumpData extends Thread implements Runnable{
 		this._matrixSize = matrixSize;
 		this._step = step;
 		this._dumpData = dumpData;
+		this._listFactor = listFactor;
 	}
 	
 	/**
@@ -56,49 +61,54 @@ public class RunnableDumpData extends Thread implements Runnable{
 	 */
 	public void run(){
 		boolean juicerTools;
-		String expected ="";
-		String outdir = this._outdir+File.separator+this._chrName+File.separator;
-		File file = new File(outdir);
-		if (file.exists()==false) file.mkdir();
-		int step = this._step*this._res;
-		int j = this._matrixSize*this._res;
-		String test = this._chrName+":0:"+j;
-		String name = outdir+this._chrName+"_0_"+j+".txt";
-		this._dumpData.getExpected(test,name);
-		String normOutput = this._outdir+File.separator+"normVector";
-		file = new File(normOutput);
-		if (file.exists()==false) file.mkdir();
-		try {
-			this._dumpData.getNormVector(this._chrName,normOutput+File.separator+this._chrName+".norm");
-			System.out.println("start dump "+this._chrName+" size "+this._chrSize);
-			if(j > this._chrSize) j = this._chrSize;
-			for(int i = 0 ; j-1 <= this._chrSize; i+=step,j+=step){
-				int end =j-1;
-				String dump = this._chrName+":"+i+":"+end;
-				name = outdir+this._chrName+"_"+i+"_"+end+".txt";
-				System.out.println("start dump "+this._chrName+" size "+this._chrSize+" dump "+dump);
-				System.out.println(expected);
-				juicerTools = this._dumpData.dumpObservedMExpected(dump,name);
-				if (juicerTools == false){
-					System.out.print(dump+" "+"\n"+juicerTools+"\n");
-					System.exit(0);
-				}
-				
+		for(int indexFact = 0; indexFact < this._listFactor.size(); ++indexFact) {
+			int res = _res*this._listFactor.get(indexFact);
+			int matrixSize = _matrixSize/this._listFactor.get(indexFact);
+			_step = matrixSize/2;
+			String nameRes = String.valueOf(res);
+			nameRes = nameRes.replace("000", "");
+			nameRes = nameRes+"kb"; 
+			String outdir = this._outdir+File.separator+nameRes+File.separator+this._chrName+File.separator;
+			File file = new File(outdir);
+			if (file.exists()==false) file.mkdirs();
+			int step = this._step*res;
+			int j = matrixSize*res;
+			String test = this._chrName+":0:"+j;
+			String name = outdir+this._chrName+"_0_"+j+".txt";
+			this._dumpData.getExpected(test,name,res);
+			String normOutput = this._outdir+File.separator+nameRes+File.separator+"normVector";
+			file = new File(normOutput);
+			if (file.exists()==false) file.mkdir();
+			try {
+				this._dumpData.getNormVector(this._chrName,normOutput+File.separator+this._chrName+".norm",res);
+				System.out.println("start dump "+this._chrName+" size "+this._chrSize+" res "+ nameRes);
+				if(j > this._chrSize) j = this._chrSize;
+				for(int i = 0 ; j-1 <= this._chrSize; i+=step,j+=step){
+					int end =j-1;
+					String dump = this._chrName+":"+i+":"+end;
+					name = outdir+this._chrName+"_"+i+"_"+end+".txt";
+					System.out.println("start dump "+this._chrName+" size "+this._chrSize+" dump "+dump+" res "+ nameRes);
+					juicerTools = this._dumpData.dumpObservedMExpected(dump,name,res);
+					if (juicerTools == false){
+						System.out.print(dump+" "+"\n"+juicerTools+"\n");
+						System.exit(0);
+					}		
 				if(j+step > this._chrSize && j < this._chrSize){
 					j= this._chrSize;
 					i+=step;
 					dump = this._chrName+":"+i+":"+j;
 					name = outdir+this._chrName+"_"+i+"_"+j+".txt";
-					System.out.println("start dump "+this._chrName+" size "+this._chrSize+" dump "+dump);
-					juicerTools = this._dumpData.dumpObservedMExpected(dump,name);
+					System.out.println("start dump "+this._chrName+" size "+this._chrSize+" dump "+dump+" res "+ nameRes);
+					juicerTools = this._dumpData.dumpObservedMExpected(dump,name,res);
 					if (juicerTools == false){
 						System.out.print(dump+" "+"\n"+juicerTools+"\n");
 						System.exit(0);
 					}
 				}
 			}
-			System.out.println("##### End dump "+this._chrName);
-		} catch (IOException | InterruptedException e) { e.printStackTrace(); }
+			System.out.println("##### End dump "+this._chrName+" "+nameRes);
+			} catch (IOException | InterruptedException e) { e.printStackTrace(); }
+		}
 		System.gc();
 	}
 }
