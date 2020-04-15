@@ -5,15 +5,22 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 
 import javax.swing.JOptionPane;
 
 import gui.GuiAnalysis;
-import multiProcesing.ProcessDumpData;
+import multiProcesing.ProcessCoolerDumpData;
+import multiProcesing.ProcessHicDumpData;
 import process.MultiResProcess;
 import utils.SIPObject;
+import utils.CoolerExpected.ReturnFlux;
 
 /**
  * 
@@ -31,6 +38,10 @@ public class Hic_main {
 	private static String _output = "";
 	/** Path to the jucier_tools_box to dump the data not necessary for Processed and dumped method */
 	private static String _juiceBoxTools = "";
+	/** Path to the jucier_tools_box to dump the data not necessary for Processed and dumped method */
+	private static String _cooler = "";
+	/** Path to the jucier_tools_box to dump the data not necessary for Processed and dumped method */
+	private static String _cooltools = "";
 	/**Normalisation method to dump the the data with hic method (KR,NONE.VC,VC_SQRT)*/
 	private static String _juiceBoXNormalisation = "KR";
 	/**Size of the core for the gaussian blur filter allow to smooth the signal*/
@@ -54,6 +65,8 @@ public class Hic_main {
 	/** boolean if true run all the process (dump data + image +image processing*/
 	private static boolean _isHic = true;
 	/** boolean if true run all the process (dump data + image +image processing*/
+	private static boolean _isCool = false;
+	/** boolean if true run all the process (dump data + image +image processing*/
 	private static boolean _isDroso = false;
 	/** factor(s) used to nalyse the matrix*/
 	private static ArrayList<Integer> _factor = new ArrayList<Integer>();
@@ -73,10 +86,12 @@ public class Hic_main {
 	private static int _cpu = 1;
 	/**boolean is true supress all the image created*/
 	private static boolean _gui = false;
+	private static String _logError = "";
 	/**String for the documentation*/
 	private static String _doc = ("#SIP Version 1 run with java 8\n"
 			+ "\nUsage:\n"
 			+ "\thic <hicFile> <chrSizeFile> <Output> <juicerToolsPath> [options]\n"
+			+ "\tcool <mcoolFile> <chrSizeFile> <Output> <cooltoolsPath> <coolerPath> [options]\n"
 			+ "\tprocessed <Directory with processed data> <chrSizeFile> <Output> [options]\n"
 			+ "\nParameters:\n"
 			+ "\t chrSizeFile: path to the chr size file, with the same name of the chr as in the hic file (i.e. chr1 does not match Chr1 or 1)\n"
@@ -128,7 +143,7 @@ public class Hic_main {
 			System.out.println(_doc);
 			System.exit(0);
 		}else if(args.length >= 4){
-			if (args[0].equals("hic") || args[0].equals("processed")){
+			if (args[0].equals("hic") || args[0].equals("processed") || args[0].equals("cool")){
 				_input = args[1];
 				_output = args[3];;
 				_chrSizeFile = args[2];	
@@ -139,6 +154,13 @@ public class Hic_main {
 					_isHic = false;
 					_isProcessed = true;
 					readOption(args,4);
+				}else if(args[0].equals("cool")){
+					_isHic = false;
+					_isProcessed = false;
+					_isCool = true;
+					_cooler = args[5];
+					_cooltools = args[4];
+					readOption(args,6);
 				}
 			}else{
 				System.out.println(args[0]+" not defined\n");
@@ -154,6 +176,7 @@ public class Hic_main {
 				catch (InterruptedException e) {e.printStackTrace();}
 		    }	
 			if (gui.isStart()){
+				_isCool = gui.isCool();
 				_chrSizeFile = gui.getChrSizeFile();
 				_output = gui.getOutputDir();
 				_input = gui.getRawDataDir();
@@ -181,6 +204,8 @@ public class Hic_main {
 				_isHic  = gui.isHic();
 				_isProcessed = gui.isProcessed();
 				_juiceBoxTools = gui.getJuiceBox();
+				_cooltools = gui.getCooltools();
+				_cooler = gui.getCooler();
 				
 				if(gui.isNONE()) _juiceBoXNormalisation = "NONE";
 				else if (gui.isVC()) _juiceBoXNormalisation = "VC";
@@ -207,7 +232,7 @@ public class Hic_main {
 		
 		SIPObject sip;
 		readChrSizeFile(_chrSizeFile);
-		if(_isProcessed==false){
+		if(_isHic){
 			f = new File(_juiceBoxTools);
 			if(f.exists()==false){
 				System.out.println(_juiceBoxTools+" doesn't existed !!! \n\n");
@@ -222,10 +247,38 @@ public class Hic_main {
 			sip = new SIPObject(_output, _chrSize, _gauss, _min, _max, _resolution, _saturatedPixel,
 					_thresholdMax, _diagSize, _matrixSize, _nbZero, _factor,_fdr, _isProcessed,_isDroso);
 			sip.setIsGui(_gui);
-			ProcessDumpData processDumpData = new ProcessDumpData();
+			ProcessHicDumpData processDumpData = new ProcessHicDumpData();
 			processDumpData.go(_input, sip, _chrSize, _juiceBoxTools, _juiceBoXNormalisation, _cpu);
 			System.out.println("########### End of the dump Step");
-		}else{
+		}else if(_isCool){
+			f = new File(_cooltools);
+			if(f.exists()==false){
+				System.out.println(_cooltools+" doesn't existed or wrong path !!! \n\n");
+				System.out.println(_doc);
+				return;
+			}
+			f = new File(_cooler);
+			if(f.exists()==false){
+				System.out.println(_cooler+" doesn't existed or wrong path !!! \n\n");
+				System.out.println(_doc);
+				return;
+			}
+			if( testTools(_cooltools,0,3,0) == false || testTools(_cooler,0,8,6) == false) {
+				System.out.println( _cooltools +" or" + _cooler+" is not the good version for SIP (it needs cooltools version >= 0.3.0 and cooler version >= 0.8.6) !!! \n\n");
+				System.out.println(_doc);
+				return;
+			}
+			System.out.println("cool mode: \n"+ "input: "+_input+"\n"+ "output: "+_output+"\n"+"cooltools: "+_cooltools+"\n"+ "cooler: "+_cooler+"\n"+ "norm: "+ _juiceBoXNormalisation+"\n"
+					+ "gauss: "+_gauss+"\n"+ "min: "+_min+"\n"+ "max: "+_max+"\n"+ "matrix size: "+_matrixSize+"\n"+ "diag size: "+_diagSize+"\n"+ "resolution: "+_resolution+"\n"
+					+ "saturated pixel: "+_saturatedPixel+"\n"+ "threshold: "+_thresholdMax+"\n"+ "number of zero :"+_nbZero+"\n"+ "factor "+ _factOption+"\n"+ "fdr "+_fdr+"\n"
+					+ "del "+_delImages+"\n"+ "cpu "+ _cpu+"\n-isDroso "+_isDroso+"\n");
+			sip = new SIPObject(_output, _chrSize, _gauss, _min, _max, _resolution, _saturatedPixel, _thresholdMax, _diagSize, _matrixSize, _nbZero, _factor,_fdr, _isProcessed,_isDroso);
+			sip.setIsCooler(_isCool);
+
+			ProcessCoolerDumpData processDumpData = new ProcessCoolerDumpData();
+			processDumpData.go(_cooltools, _cooler, sip, _input, _chrSize,_cpu);
+			
+			}else{
 			System.out.println("processed mode:\n"+ "input: "+_input+"\n"+ "output: "+_output+"\n"+ "juiceBox: "+_juiceBoxTools+"\n"
 					+ "norm: "+ _juiceBoXNormalisation+"\n"+ "gauss: "+_gauss+"\n"+ "min: "+_min+"\n"+ "max: "+_max+"\n"+ "matrix size: "+_matrixSize+"\n"
 					+ "diag size: "+_diagSize+"\n"+ "resolution: "+_resolution+"\n"+ "saturated pixel: "+_saturatedPixel+"\n"+ "threshold: "+_thresholdMax+"\n"
@@ -247,6 +300,11 @@ public class Hic_main {
 					+" -res "+_resolution+" -t "+_thresholdMax+" -min "+_min+" -max "+_max+" -sat "+_saturatedPixel+" -nbZero "+_nbZero
 					+" -factor "+ _factOption+" -fdr "+_fdr+" -del "+_delImages+" -cpu "+ _cpu+" -isDroso "+_isDroso+"\n");
 			
+		}else if(_isCool){
+			writer.write("java -jar SIP_HiC.jar hic "+_input+" "+_chrSizeFile+" "+_output+" "+_cooltools+" "+_cooler+
+					" -g "+_gauss+" -min "+_min+" -max "+_max+" -mat "+_matrixSize+
+					" -d "+_diagSize+" -res "+_resolution+" -sat "+_saturatedPixel+" -t "+_thresholdMax+" -nbZero "+_nbZero+
+					" -factor "+ _factOption+" -fdr "+_fdr+" -del "+_delImages+" -cpu "+ _cpu+" -isDroso "+_isDroso+"\n");
 		}else{
 			writer.write("java -jar SIP_HiC.jar hic "+_input+" "+_chrSizeFile+" "+_output+" "+_juiceBoxTools+
 					" -norm "+ _juiceBoXNormalisation+" -g "+_gauss+" -min "+_min+" -max "+_max+" -mat "+_matrixSize+
@@ -402,4 +460,67 @@ public class Hic_main {
 		System.out.println(_doc);
 		System.exit(0);
 	}
+	
+	
+	public static boolean testTools(String pathTools, int first, int second, int third) {
+		Runtime runtime = Runtime.getRuntime();
+		String cmd = pathTools+" --version";
+		//System.out.println(cmd);
+		Process process;
+		try {
+			process = runtime.exec(cmd);
+	
+		new ReturnFlux(process.getInputStream()).start();
+		new ReturnFlux(process.getErrorStream()).start();
+		process.waitFor();
+		
+		} catch (IOException | InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		String [] tline = _logError.split(" ");
+		System.out.println(_logError);
+		_logError = "";
+		if(tline.length > 0){
+			tline = tline[tline.length-1].split("\\.");
+			tline[2] = tline[2].replace("\n", "");
+			if(Integer.parseInt(tline[0]) >= first && Integer.parseInt(tline[1]) >= second && Integer.parseInt(tline[2]) >= third)
+				return true;
+			else
+				return false;
+		}else
+			return false;
+	}
+	
+	public static class ReturnFlux extends Thread {  
+
+		/**  Flux to redirect  */
+		private InputStream _flux;
+
+		/**
+		 * <b>Constructor of ReturnFlux</b>
+		 * @param flux
+		 *  flux to redirect
+		 */
+		public ReturnFlux(InputStream flux){this._flux = flux; }
+		
+		/**
+		 * 
+		 */
+		public void run(){
+			try {    
+				InputStreamReader reader = new InputStreamReader(this._flux);
+				BufferedReader br = new BufferedReader(reader);
+				String line=null;
+				while ( (line = br.readLine()) != null) {
+					if(line.contains("WARN")== false) _logError = _logError+line+"\n";
+				}
+			}
+			catch (IOException ioe){
+				ioe.printStackTrace();
+			}
+		}		
+	}
+	
+	
 }

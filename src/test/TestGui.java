@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import gui.GuiAnalysis;
-import multiProcesing.ProcessDumpData;
+import multiProcesing.ProcessHicDumpData;
 import utils.SIPObject;
 
 
@@ -63,7 +63,7 @@ public class TestGui {
 						+"\nthreshold: "+thresholdMax+"\n number of zero:"+nbZero+"\n ");
 				sip = new SIPObject(output, chrSize, gauss, min, max, resolution, saturatedPixel, thresholdMax, diagSize, matrixSize, nbZero,factor,0.01,gui.isProcessed(),false);
 				sip.setIsGui(true);
-				ProcessDumpData processDumpData = new ProcessDumpData();
+				ProcessHicDumpData processDumpData = new ProcessHicDumpData();
 				processDumpData.go(input, sip, chrSize, juiceBoxTools, juiceBoXNormalisation,gui.getNbCpu());
 			}else{
 				System.out.println("processed mode:\ninput: "+input+"\noutput: "+output+"\njuiceBox: "+juiceBoxTools+"\nnorm: "+ juiceBoXNormalisation+"\ngauss: "+gauss

@@ -35,6 +35,7 @@ public class MultiResProcess {
 	private String _doc = ("#SIP Version 1 run with java 8\n"
 				+ "\nUsage:\n"
 				+ "\thic <hicFile> <chrSizeFile> <Output> <juicerToolsPath> [options]\n"
+				+ "\tcool <mcoolFile> <chrSizeFile> <Output> <cooltoolsPath> <coolerPath> [options]\n"
 				+ "\tprocessed <Directory with processed data> <chrSizeFile> <Output> [options]\n"
 				+ "\nParameters:\n"
 				+ "\t chrSizeFile: path to the chr size file, with the same name of the chr as in the hic file (i.e. chr1 does not match Chr1 or 1)\n"
@@ -139,7 +140,8 @@ public class MultiResProcess {
 				sipTmp.setNbZero(_sip.getNbZero());
 				sipTmp.setIsProcessed(_sip.isProcessed());
 				sipTmp.setFdr(_sip.getFdr());
-				sipTmp.setIsDroso(_sip.isDroso());	
+				sipTmp.setIsDroso(_sip.isDroso());
+				sipTmp.setIsCooler(_sip.isCooler());
 				ProcessDetectLoops processDetectloops = new ProcessDetectLoops();
 				processDetectloops.go(sipTmp, this._nbCpu,this._delImage,resuFile,resName);
 			}

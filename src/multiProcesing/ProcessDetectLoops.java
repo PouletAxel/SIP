@@ -35,14 +35,25 @@ public class ProcessDetectLoops{
 	public void go(SIPObject sip,int nbCPU, boolean delImage, String resuFile,String resName) throws InterruptedException { 
 		ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(nbCPU);
 		Iterator<String> chrName = sip.getChrSizeHashMap().keySet().iterator();
+		if(sip.isProcessed()) {
+			boolean isCool = isProcessedMcool(sip.getOutputDir()+resName+File.separator+"normVector");
+			//System.out.println(isCool);
+			sip.setIsCooler(isCool);
+		}
 		while(chrName.hasNext()){
 			String chr = chrName.next();
-			String normFile = sip.getOutputDir()+resName+File.separator+"normVector"+File.separator+chr+".norm";
-			if (sip.isProcessed()){
-				normFile = sip.getInputDir()+resName+File.separator+"normVector"+File.separator+chr+".norm";
+			if(sip.isCooler()){
+				RunnableDetectLoops task =  new RunnableDetectLoops(chr, resuFile, sip, delImage);
+				executor.execute(task);	
+				
+			}else {
+				String normFile = sip.getOutputDir()+resName+File.separator+"normVector"+File.separator+chr+".norm";
+				if (sip.isProcessed()){
+					normFile = sip.getInputDir()+resName+File.separator+"normVector"+File.separator+chr+".norm";
+				}
+				RunnableDetectLoops task =  new RunnableDetectLoops(chr, resuFile, sip,normFile, delImage);
+				executor.execute(task);	
 			}
-			RunnableDetectLoops task =  new RunnableDetectLoops(chr, resuFile, sip,normFile, delImage);
-			executor.execute(task);	
 		}
 		executor.shutdown();
 		int nb = 0;
@@ -59,4 +70,17 @@ public class ProcessDetectLoops{
 		if(sip.isGui())	_p.dispose();
 		
 	}
+	
+	/**
+	 * 
+	 * @param dirToTest
+	 * @return
+	 */
+	 private boolean isProcessedMcool(String dirToTest) {
+		 File test = new File (dirToTest);
+		 if (test.exists() == false) 
+				 return true;
+		 else 
+			 return false;
+	 }
 }

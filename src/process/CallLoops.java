@@ -49,6 +49,7 @@ public class CallLoops {
 	private Strel _strel = Strel.Shape.SQUARE.fromRadius(40);
 	/**	 image background value*/
 	private float _backgroudValue = (float) 0.25;
+	private boolean _isCooler = false;
 
 	/**
 	 * Constructor
@@ -66,6 +67,7 @@ public class CallLoops {
 		this._diagSize = sip.getDiagSize();
 		this._step = sip.getStep();
 		this._nbZero = sip.getNbZero();
+		this._isCooler = sip.isCooler();
 		//System.out.println("gauss:"+this._gauss+" min:"+this._min+" max:"+_max+" sat:"+_saturatedPixel+
 		//" matrix:"+_matrixSize+" res:"+_resolution+" thresh:"+_thresholdMaxima+" diag:"+_diagSize+
 		//" step:"+_step+" nbZero:"+_nbZero);
@@ -117,7 +119,10 @@ public class CallLoops {
 				hLoop = coord.getData();
 			}
 		}
-		hLoop = filterLoops.removedLoopCloseToWhiteStrip(hLoop,normVector);
+		if(_isCooler)
+			hLoop = filterLoops.removedLoopCloseToWhiteStrip(hLoop);
+		else
+			hLoop = filterLoops.removedLoopCloseToWhiteStrip(hLoop,normVector);
 		System.out.println("####### End loops detection for chr "+ chr +"\t"+hLoop.size()+" loops before the FDR filter");
 		return hLoop;
 	}	

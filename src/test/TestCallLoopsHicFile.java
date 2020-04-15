@@ -1,14 +1,15 @@
 package test;
 import java.io.BufferedReader;
-import java.io.File;
+
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+
 import java.util.HashMap;
 
-import multiProcesing.ProcessDumpData;
-import process.MultiResProcess;
-import utils.SIPObject;
+import sipMain.Hic_main.ReturnFlux;
+
 
 /**
  * Test loops calling on Hic file
@@ -23,6 +24,8 @@ public class TestCallLoopsHicFile{
 	 * @throws IOException 
 	 * @throws InterruptedException 
 	 */
+	static String _logError = "";
+	
 	public static void main(String[] args) throws IOException, InterruptedException {
 		String output= "/home/plop/Desktop/testChr1Ter";
 		//output= "/home/plop/Bureau/SIPpaper/chr1/testNewNew";
@@ -34,7 +37,7 @@ public class TestCallLoopsHicFile{
 		//HumanGenomeHg19/chr2.size");
 		//readChrSizeFile("/home/plop/Documents/Genome/HumanGenomeHg19/hg19_withoutChr.sizes");
 		//chrsize = readChrSizeFile("/home/plop/Documents/Genome/mammals/HumanGenomeHg19/chr1.size");
-		String fileChr = "/home/plop/Desktop/w_hg19.sizes";
+		/*String fileChr = "/home/plop/Desktop/w_hg19.sizes";
 		HashMap<String,Integer> chrsize = readChrSizeFile(fileChr);
 		String juiceBoxTools = "/home/plop/Tools/juicer_tools_1.13.02.jar";
 		int matrixSize = 2000;
@@ -73,13 +76,16 @@ public class TestCallLoopsHicFile{
 			
 			SIPObject sip = new SIPObject(output, chrsize, gauss, min, max, resolution, saturatedPixel, thresholdMax, diagSize, matrixSize, nbZero,factor,0.01,keepTif,false);
 			sip.setIsGui(false);
-			ProcessDumpData processDumpData = new ProcessDumpData();
+			ProcessHicDumpData processDumpData = new ProcessHicDumpData();
 			processDumpData.go(input, sip, chrsize, juiceBoxTools, juiceBoXNormalisation,cpu);
 			
 			MultiResProcess multi = new MultiResProcess(sip, cpu, keepTif,fileChr);
-			multi.run();
-			
-			System.out.println("End");
+			multi.run();*/
+			String cooler = "/home/plop/anaconda3/bin/cooler";
+			String cooltools = "/home/plop/anaconda3/bin/cooltools";
+		
+		    
+			System.out.println("End "+testTools(cooltools,0,3,0));
 		}
 		
 		/**
@@ -104,4 +110,74 @@ public class TestCallLoopsHicFile{
 		br.close();
 		return  chrSize;
 	} 
+	
+	public static boolean testTools(String pathTools, int first, int second, int third) {
+		Runtime runtime = Runtime.getRuntime();
+		String cmd = pathTools+" --version";
+		//System.out.println(cmd);
+		Process process;
+		try {
+			process = runtime.exec(cmd);
+	
+		new ReturnFlux(process.getInputStream()).start();
+		new ReturnFlux(process.getErrorStream()).start();
+		process.waitFor();
+		
+		} catch (IOException | InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		String [] tline = _logError.split(" ");
+		System.out.println(_logError);
+		if(tline.length > 0){
+			//tline[tline.length-1].replaceAll(, "")
+			
+			tline = tline[tline.length-1].split("\\.");
+			System.out.println("aa"+tline[tline.length-3]+"aa");
+			System.out.println("aa"+tline[tline.length-2]+"aa");
+			System.out.println("aa"+tline[tline.length-1]+"aa");
+			tline[tline.length-1] = tline[tline.length-1].replace("\n", "");
+			System.out.println("aa"+tline[tline.length-1]+"aa");
+			/*int a = Integer.parseInt(tline[tline.length-3]);
+			int b = Integer.parseInt(tline[tline.length-2]);
+			int c = Integer.parseInt(tline[tline.length-1]);
+			if(a >= first && b >= second && c >= third)
+				return true;
+			else
+				return false;
+		}else*/
+		}
+			return false;
+	}
+	
+	public static class ReturnFlux extends Thread {  
+
+		/**  Flux to redirect  */
+		private InputStream _flux;
+
+		/**
+		 * <b>Constructor of ReturnFlux</b>
+		 * @param flux
+		 *  flux to redirect
+		 */
+		public ReturnFlux(InputStream flux){this._flux = flux; }
+		
+		/**
+		 * 
+		 */
+		public void run(){
+			try {    
+				InputStreamReader reader = new InputStreamReader(this._flux);
+				BufferedReader br = new BufferedReader(reader);
+				String line=null;
+				while ( (line = br.readLine()) != null) {
+					if(line.contains("WARN")== false) _logError = _logError+line+"\n";
+				}
+			}
+			catch (IOException ioe){
+				ioe.printStackTrace();
+			}
+		}		
+	}
+	
 }

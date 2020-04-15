@@ -15,7 +15,7 @@ import java.util.ArrayList;
  * @author axel poulet
  *
  */
-public class RunnableDumpData extends Thread implements Runnable{
+public class RunnableDumpDataHiC extends Thread implements Runnable{
 	/**String: path where save the dump data  */
 	private String _outdir ="";
 	/**String: name of the chr*/
@@ -45,7 +45,7 @@ public class RunnableDumpData extends Thread implements Runnable{
 	 * @param matrixSize
 	 * @param step
 	 */
-	public RunnableDumpData (String outdir, String chrName, int chrSize, DumpData dumpData,int res, int matrixSize, int step, ArrayList<Integer> listFactor){
+	public RunnableDumpDataHiC (String outdir, String chrName, int chrSize, DumpData dumpData,int res, int matrixSize, int step, ArrayList<Integer> listFactor){
 		this._outdir = outdir;
 		this._chrName = chrName;
 		this._chrSize = chrSize;

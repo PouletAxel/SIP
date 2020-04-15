@@ -33,6 +33,7 @@ Rowley MJ, Poulet A, Nichols MH, Bixler BJ, Sanborn AL, Brouhard EA, Hermetz K, 
 	
         hic <hicFile> <chrSizeFile> <Output> <juicerToolsPath> [options]
         processed <Directory with processed data> <chrSizeFile> <Output> [options]
+        cool <mcoolFile> <chrSizeFile> <Output> <cooltoolsPath> <coolerPath> [options]
 
 	Parameters:
     

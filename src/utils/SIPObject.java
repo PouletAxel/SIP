@@ -65,6 +65,7 @@ public class SIPObject {
 	private boolean _isDroso = false;
 	private double _medianAP = 0;
 	private double _medianAPReg = 0;
+	private boolean _isCooler = false;
 	//private HashMap<Integer,String> _normVector = new HashMap<Integer,String>();
 	
 	
@@ -477,7 +478,14 @@ public class SIPObject {
 	 * @return
 	 */
 	public boolean isProcessed() { return _isProcessed;}
-	public void setIsProcessed(boolean _isProcessed) { this._isProcessed = _isProcessed;}
+	public void setIsProcessed(boolean isProcessed) { this._isProcessed = isProcessed;}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public boolean isCooler() { return _isCooler;}
+	public void setIsCooler(boolean cool) { this._isCooler = cool;}
 
 	/**
 	 * 

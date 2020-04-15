@@ -49,6 +49,14 @@ public class RunnableDetectLoops extends Thread implements Runnable{
 		this._normvectorFile = normVectorFile; 
 	}
 	
+	public RunnableDetectLoops (String chr, String resuFile, SIPObject sip, boolean delFile){
+		this._sip = sip;
+		this._callLoops = new CallLoops(sip);
+		this._chr= chr;
+		this._resuFile = resuFile;
+		this._delImages = delFile;
+	}
+	
 	/**
 	 * Run all the process for loops detection by chr using the objet CallLoops and then save loops in 
 	 * txt file with SIPObject via he method saveFile
@@ -63,10 +71,12 @@ public class RunnableDetectLoops extends Thread implements Runnable{
 		try {
 			File[] listOfFiles = _sip.fillList(dir);
 			System.out.println(dir);
-			System.out.println(_normvectorFile+"normVector end loading file: "+_chr+".norm "+resName);
 			if (listOfFiles.length == 0) System.out.println("!!!!!!!!!! dumped directory of chromosome"+this._chr+" empty");
 			else{
 				File file = new File(this._resuFile);
+				if(_sip.isCooler() == false) {
+					System.out.println(_normvectorFile+"normVector end loading file: "+_chr+".norm "+resName);
+				}
 				data = this._callLoops.detectLoops(listOfFiles,this._chr,this._normVector);
 				synchronized(this) {
 					if (file.length() == 0)	_sip.saveFile(this._resuFile,data,false);

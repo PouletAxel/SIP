@@ -116,6 +116,66 @@ public class FilterLoops {
 		return hLoop;
 	}
 	
+	
+	/**
+	 * Removed loop close to white  strip
+	 * 
+	 * @param hLoop loop collection before correction of the loops
+	 * @return loop collection sfter correction of the loops
+	 */
+	public HashMap<String,Loop> removedLoopCloseToWhiteStrip(HashMap<String,Loop> hLoop){
+		//System.out.println("plop "+hLoop.size()+" debut Filter");
+		Set<String> key = hLoop.keySet();
+		Iterator<String> it = key.iterator();
+		ArrayList<String> removed = new ArrayList<String>();
+		while (it.hasNext()){
+			String name = it.next();
+			Loop loop = hLoop.get(name);
+			boolean testBreak = false;
+			String [] tname = name.split("\t");
+			//System.out.println(name);
+			int x = Integer.parseInt(tname[1]);
+			int y = Integer.parseInt(tname[2]);
+			for(int i = x-5*this._resolution; i <= x+5*this._resolution; i+=this._resolution){
+				for(int j = y-5*this._resolution; j <= y+5*this._resolution; j+=this._resolution){
+					String test = tname[0]+"\t"+i+"\t"+j;
+					if(!test.equals(name)){
+						if(hLoop.containsKey(test)){
+							if(hLoop.get(test).getResolution() < hLoop.get(name).getResolution()){
+								removed.add(name);
+								testBreak =true;
+								break;
+							}else if(hLoop.get(test).getResolution() == hLoop.get(name).getResolution()){
+								if((Math.abs(x-hLoop.get(test).getX()) < this._resolution*3 || Math.abs(y-hLoop.get(test).getY()) < this._resolution*3)){
+									if(hLoop.get(test).getAvg() > hLoop.get(name).getAvg()){
+										removed.add(name);
+										testBreak =true;
+										break;
+									}else if(hLoop.get(test).getAvg() < hLoop.get(name).getAvg())
+										removed.add(test);
+									else{
+										if(hLoop.get(test).getPaScoreAvg() > hLoop.get(name).getPaScoreAvg()){
+											removed.add(name);
+											testBreak =true;
+											break;
+										}else
+											removed.add(test);
+									}	
+								}
+							}else
+								removed.add(test);
+						}
+					}
+				}
+				if(testBreak)
+					break;
+			}
+		}
+		for (int i = 0; i< removed.size(); ++i)
+			hLoop.remove(removed.get(i));
+		//System.out.println("####### fin Filter "+hLoop.size());
+		return hLoop;
+	}
 	/**
 	 * Removed loops close to biased HiC signal
 	 * @param loop Loop to test
