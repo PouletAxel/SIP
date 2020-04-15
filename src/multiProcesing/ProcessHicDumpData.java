@@ -1,7 +1,6 @@
 package multiProcesing;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.concurrent.Executors;
@@ -9,14 +8,12 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import gui.Progress;
-import process.CoolerDumpData;
 import process.DumpData;
-import utils.CoolerExpected;
 import utils.SIPObject;
 
 
 /**
- * multi thread class dumping the data via juicertoolsbox.jar 
+ * multi thread class dumping the data via cooler 
  *  and make file step by step
  * bed file: start1 start2 obs-expected distanceNormalizedValue
  * 

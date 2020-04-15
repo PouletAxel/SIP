@@ -10,7 +10,6 @@ import java.util.concurrent.TimeUnit;
 
 import gui.Progress;
 import process.CoolerDumpData;
-import process.DumpData;
 import utils.CoolerExpected;
 import utils.SIPObject;
 

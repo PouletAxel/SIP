@@ -130,7 +130,7 @@ public class FilterLoops {
 		ArrayList<String> removed = new ArrayList<String>();
 		while (it.hasNext()){
 			String name = it.next();
-			Loop loop = hLoop.get(name);
+			//Loop loop = hLoop.get(name);
 			boolean testBreak = false;
 			String [] tname = name.split("\t");
 			//System.out.println(name);

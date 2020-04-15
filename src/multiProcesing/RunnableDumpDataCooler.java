@@ -7,6 +7,11 @@ import java.util.ArrayList;
 import process.CoolerDumpData;
 import utils.CoolerExpected;
 
+/**
+ * 
+ * @author axel poulet
+ *
+ */
 public class RunnableDumpDataCooler extends Thread implements Runnable{
 	/**String: path where save the dump data  */
 	private String _outdir ="";

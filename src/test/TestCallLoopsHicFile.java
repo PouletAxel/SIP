@@ -8,7 +8,6 @@ import java.io.InputStreamReader;
 
 import java.util.HashMap;
 
-import sipMain.Hic_main.ReturnFlux;
 
 
 /**
@@ -26,6 +25,7 @@ public class TestCallLoopsHicFile{
 	 */
 	static String _logError = "";
 	
+	@SuppressWarnings("unused")
 	public static void main(String[] args) throws IOException, InterruptedException {
 		String output= "/home/plop/Desktop/testChr1Ter";
 		//output= "/home/plop/Bureau/SIPpaper/chr1/testNewNew";
@@ -93,6 +93,7 @@ public class TestCallLoopsHicFile{
 		 * @param chrSizeFile
 		 * @throws IOException
 		 */
+	@SuppressWarnings("unused")
 	private static HashMap<String, Integer> readChrSizeFile( String chrSizeFile) throws IOException{
 		HashMap<String,Integer> chrSize =  new HashMap<String,Integer>();
 		BufferedReader br = new BufferedReader(new FileReader(chrSizeFile));

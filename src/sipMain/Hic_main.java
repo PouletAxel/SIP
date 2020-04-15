@@ -7,9 +7,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -20,7 +17,6 @@ import multiProcesing.ProcessCoolerDumpData;
 import multiProcesing.ProcessHicDumpData;
 import process.MultiResProcess;
 import utils.SIPObject;
-import utils.CoolerExpected.ReturnFlux;
 
 /**
  * 
@@ -145,7 +141,7 @@ public class Hic_main {
 		}else if(args.length >= 4){
 			if (args[0].equals("hic") || args[0].equals("processed") || args[0].equals("cool")){
 				_input = args[1];
-				_output = args[3];;
+				_output = args[3];
 				_chrSizeFile = args[2];	
 				if (args[0].equals("hic")){
 					readOption(args,5);
@@ -266,6 +262,10 @@ public class Hic_main {
 			if( testTools(_cooltools,0,3,0) == false || testTools(_cooler,0,8,6) == false) {
 				System.out.println( _cooltools +" or" + _cooler+" is not the good version for SIP (it needs cooltools version >= 0.3.0 and cooler version >= 0.8.6) !!! \n\n");
 				System.out.println(_doc);
+				if(_gui){
+					JOptionPane.showMessageDialog(null, "Error SIP program", _cooltools +" or" + _cooler+" is not the good version for SIP (it needs cooltools version >= 0.3.0 and cooler version >= 0.8.6) !!!"
+							 , JOptionPane.ERROR_MESSAGE);
+				}
 				return;
 			}
 			System.out.println("cool mode: \n"+ "input: "+_input+"\n"+ "output: "+_output+"\n"+"cooltools: "+_cooltools+"\n"+ "cooler: "+_cooler+"\n"+ "norm: "+ _juiceBoXNormalisation+"\n"

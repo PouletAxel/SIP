@@ -20,6 +20,11 @@ import multiProcesing.ProcessDetectLoops;
 import utils.Loop;
 import utils.SIPObject;
 
+/**
+ * 
+ * @author axel poulet
+ *
+ */
 public class MultiResProcess {
 
 	private SIPObject _sip;

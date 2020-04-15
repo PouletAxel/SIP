@@ -13,6 +13,7 @@ import process.CoolerDumpData;
 import process.MultiResProcess;
 import utils.CoolerExpected;
 import utils.SIPObject;
+@SuppressWarnings("unused")
 public class TestCoolFormat {
 	
 	public static void main(String[] args) throws IOException, InterruptedException {
