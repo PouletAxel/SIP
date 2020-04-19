@@ -47,7 +47,7 @@ public class CoolerExpected {
 	public boolean dumpExpected(String expected){
 		int exitValue=1;
 		Runtime runtime = Runtime.getRuntime();
-		String cmd = this._coolTools+" compute-expected "+_coolFile+" -p "+_cpu+" --ignore-diags 0 -o "+expected;
+		String cmd = this._coolTools+" compute-expected "+_coolFile+" -p "+_cpu+" --drop-diags 0 -o "+expected;
 		System.out.println(cmd);
 		this._log = this._log+"\n"+expected+"\t"+cmd;
 		Process process;
@@ -64,14 +64,14 @@ public class CoolerExpected {
 			for (line = null; (line = br.readLine()) != null;){
 				String [] tline = line.split("\t");
 				if(Integer.parseInt(tline[1]) < this._imgSize) {
-					if(!tline[6].equals("nan")){
+					if(!tline[5].equals("nan")){
 						if (_hashExpected.containsKey(tline[0])){
 							ArrayList<Double> lExpected =  _hashExpected.get(tline[0]);
-							lExpected.add(Double.parseDouble(tline[6]));
+							lExpected.add(Double.parseDouble(tline[5]));// 6 with version 0.4.0 
 							_hashExpected.put(tline[0], lExpected);
 						}else {
 							ArrayList<Double> lExpected =  new ArrayList<Double>();
-							lExpected.add(Double.parseDouble(tline[6]));
+							lExpected.add(Double.parseDouble(tline[5]));
 							_hashExpected.put(tline[0], lExpected);
 						}
 					}else {
@@ -108,14 +108,14 @@ public class CoolerExpected {
 		for (line = null; (line = br.readLine()) != null;){
 			String [] tline = line.split("\t");
 			if(Integer.parseInt(tline[1]) < this._imgSize) {
-				if(!tline[6].equals("nan")){
+				if(!tline[5].equals("nan")){
 					if (_hashExpected.containsKey(tline[0])){
 						ArrayList<Double> lExpected =  _hashExpected.get(tline[0]);
-						lExpected.add(Double.parseDouble(tline[6]));
+						lExpected.add(Double.parseDouble(tline[5]));
 						_hashExpected.put(tline[0], lExpected);
 					}else {
 						ArrayList<Double> lExpected =  new ArrayList<Double>();
-						lExpected.add(Double.parseDouble(tline[6]));
+						lExpected.add(Double.parseDouble(tline[5]));
 						_hashExpected.put(tline[0], lExpected);
 					}
 				}else {

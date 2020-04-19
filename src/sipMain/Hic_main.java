@@ -482,6 +482,8 @@ public class Hic_main {
 		System.out.println(_logError);
 		_logError = "";
 		if(tline.length > 0){
+			if(tline[tline.length-1].endsWith("dev"))
+				return false;
 			tline = tline[tline.length-1].split("\\.");
 			tline[2] = tline[2].replace("\n", "");
 			if(Integer.parseInt(tline[0]) >= first && Integer.parseInt(tline[1]) >= second && Integer.parseInt(tline[2]) >= third)
