@@ -64,14 +64,27 @@ public class CoolerExpected {
 			for (line = null; (line = br.readLine()) != null;){
 				String [] tline = line.split("\t");
 				if(Integer.parseInt(tline[1]) < this._imgSize) {
-					if (_hashExpected.containsKey(tline[0])){
-						ArrayList<Double> lExpected =  _hashExpected.get(tline[0]);
-						lExpected.add(Double.parseDouble(tline[6]));
-						_hashExpected.put(tline[0], lExpected);
+					if(!tline[6].equals("nan")){
+						if (_hashExpected.containsKey(tline[0])){
+							ArrayList<Double> lExpected =  _hashExpected.get(tline[0]);
+							lExpected.add(Double.parseDouble(tline[6]));
+							_hashExpected.put(tline[0], lExpected);
+						}else {
+							ArrayList<Double> lExpected =  new ArrayList<Double>();
+							lExpected.add(Double.parseDouble(tline[6]));
+							_hashExpected.put(tline[0], lExpected);
+						}
 					}else {
-						ArrayList<Double> lExpected =  new ArrayList<Double>();
-						lExpected.add(Double.parseDouble(tline[6]));
-						_hashExpected.put(tline[0], lExpected);
+						double value =0;
+						if (_hashExpected.containsKey(tline[0])){
+							ArrayList<Double> lExpected =  _hashExpected.get(tline[0]);
+							lExpected.add(value);
+							_hashExpected.put(tline[0], lExpected);
+						}else {
+							ArrayList<Double> lExpected =  new ArrayList<Double>();
+							lExpected.add(value);
+							_hashExpected.put(tline[0], lExpected);
+						}
 					}
 					
 				}
@@ -95,16 +108,28 @@ public class CoolerExpected {
 		for (line = null; (line = br.readLine()) != null;){
 			String [] tline = line.split("\t");
 			if(Integer.parseInt(tline[1]) < this._imgSize) {
-				if (_hashExpected.containsKey(tline[0])){
-					ArrayList<Double> lExpected =  _hashExpected.get(tline[0]);
-					lExpected.add(Double.parseDouble(tline[6]));
-					_hashExpected.put(tline[0], lExpected);
+				if(!tline[6].equals("nan")){
+					if (_hashExpected.containsKey(tline[0])){
+						ArrayList<Double> lExpected =  _hashExpected.get(tline[0]);
+						lExpected.add(Double.parseDouble(tline[6]));
+						_hashExpected.put(tline[0], lExpected);
+					}else {
+						ArrayList<Double> lExpected =  new ArrayList<Double>();
+						lExpected.add(Double.parseDouble(tline[6]));
+						_hashExpected.put(tline[0], lExpected);
+					}
 				}else {
-					ArrayList<Double> lExpected =  new ArrayList<Double>();
-					lExpected.add(Double.parseDouble(tline[6]));
-					_hashExpected.put(tline[0], lExpected);
+					double value =0;
+					if (_hashExpected.containsKey(tline[0])){
+						ArrayList<Double> lExpected =  _hashExpected.get(tline[0]);
+						lExpected.add(value);
+						_hashExpected.put(tline[0], lExpected);
+					}else {
+						ArrayList<Double> lExpected =  new ArrayList<Double>();
+						lExpected.add(value);
+						_hashExpected.put(tline[0], lExpected);
+					}
 				}
-				
 			}
 	}
 	br.close();
