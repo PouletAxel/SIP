@@ -466,7 +466,6 @@ public class Hic_main {
 	public static boolean testTools(String pathTools, int first, int second, int third) {
 		Runtime runtime = Runtime.getRuntime();
 		String cmd = pathTools+" --version";
-		//System.out.println(cmd);
 		Process process;
 		try {
 			process = runtime.exec(cmd);
@@ -483,11 +482,9 @@ public class Hic_main {
 		System.out.println(_logError);
 		_logError = "";
 		if(tline.length > 0){
-			if(tline[tline.length-1].endsWith("dev"))
-				return false;
 			tline = tline[tline.length-1].split("\\.");
 			tline[2] = tline[2].replace("\n", "");
-			if(Integer.parseInt(tline[0]) >= first && Integer.parseInt(tline[1]) >= second && Integer.parseInt(tline[2]) >= third)
+			if(Integer.parseInt(tline[0]) >= first && Integer.parseInt(tline[1]) >= second) //&& Integer.parseInt(tline[2]) >= third)
 				return true;
 			else
 				return false;

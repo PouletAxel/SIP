@@ -26,6 +26,7 @@ public class CoolerExpected {
 	private HashMap<String, ArrayList<Double>> _hashExpected = new HashMap<String,ArrayList<Double>>();
 	private int _cpu;
 	
+	
 	public CoolerExpected(String cooltools, String coolFile, int resolution, int imageSize, int cpu){
 		_coolTools = cooltools;
 		this._resolution = resolution;
@@ -48,55 +49,38 @@ public class CoolerExpected {
 		int exitValue=1;
 		Runtime runtime = Runtime.getRuntime();
 		String cmd = this._coolTools+" compute-expected "+_coolFile+" -p "+_cpu+" --drop-diags 0 -o "+expected;
-		System.out.println(cmd);
 		this._log = this._log+"\n"+expected+"\t"+cmd;
 		Process process;
+		System.out.println("Start cooltools compute-expected");
 		try {
 			process = runtime.exec(cmd);
-		
 			new ReturnFlux(process.getInputStream()).start();
 			new ReturnFlux(process.getErrorStream()).start();
 			exitValue=process.waitFor();
-		
-			
-			BufferedReader br = Files.newBufferedReader(Paths.get(expected), StandardCharsets.UTF_8);
-			String line = br.readLine();
-			for (line = null; (line = br.readLine()) != null;){
-				String [] tline = line.split("\t");
-				if(Integer.parseInt(tline[1]) < this._imgSize) {
-					if(!tline[5].equals("nan")){
-						if (_hashExpected.containsKey(tline[0])){
-							ArrayList<Double> lExpected =  _hashExpected.get(tline[0]);
-							lExpected.add(Double.parseDouble(tline[5]));// 6 with version 0.4.0 
-							_hashExpected.put(tline[0], lExpected);
-						}else {
-							ArrayList<Double> lExpected =  new ArrayList<Double>();
-							lExpected.add(Double.parseDouble(tline[5]));
-							_hashExpected.put(tline[0], lExpected);
-						}
-					}else {
-						double value =0;
-						if (_hashExpected.containsKey(tline[0])){
-							ArrayList<Double> lExpected =  _hashExpected.get(tline[0]);
-							lExpected.add(value);
-							_hashExpected.put(tline[0], lExpected);
-						}else {
-							ArrayList<Double> lExpected =  new ArrayList<Double>();
-							lExpected.add(value);
-							_hashExpected.put(tline[0], lExpected);
-						}
-					}
-					
+			if(_logError.contains("Error") && _logError.contains("--drop-diags")){
+				runtime = Runtime.getRuntime();
+				_logError ="";
+				System.out.println(_logError);
+				cmd = this._coolTools+" compute-expected "+_coolFile+" -p "+_cpu+" --ignore-diags 0 -o "+expected;
+				System.out.println(cmd);
+				process = runtime.exec(cmd);
+				
+				new ReturnFlux(process.getInputStream()).start();
+				new ReturnFlux(process.getErrorStream()).start();
+				exitValue=process.waitFor();
+				
+				if(_logError.contains("Error")){
+					System.out.println(_logError);
+					System.out.println("cooltools error !!!!");
+					System.exit(0);
 				}
-		}
-		br.close();
+			}
+			this._expected =  expected;
+			this.parseExpectedFile();
 		} catch (IOException | InterruptedException e) {
 		e.printStackTrace();
 		}
-		if(_logError!=""){
-			System.out.println(_logError);
-			System.exit(0);
-		}
+		
 		return exitValue==0;
 	}
 	
@@ -108,14 +92,14 @@ public class CoolerExpected {
 		for (line = null; (line = br.readLine()) != null;){
 			String [] tline = line.split("\t");
 			if(Integer.parseInt(tline[1]) < this._imgSize) {
-				if(!tline[5].equals("nan")){
+				if(!tline[tline.length-1].equals("nan")){
 					if (_hashExpected.containsKey(tline[0])){
 						ArrayList<Double> lExpected =  _hashExpected.get(tline[0]);
-						lExpected.add(Double.parseDouble(tline[5]));
+						lExpected.add(Double.parseDouble(tline[tline.length-1]));
 						_hashExpected.put(tline[0], lExpected);
 					}else {
 						ArrayList<Double> lExpected =  new ArrayList<Double>();
-						lExpected.add(Double.parseDouble(tline[5]));
+						lExpected.add(Double.parseDouble(tline[tline.length-1]));
 						_hashExpected.put(tline[0], lExpected);
 					}
 				}else {
