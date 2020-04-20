@@ -1,12 +1,16 @@
 package test;
 import java.io.BufferedReader;
-
+import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-
+import java.util.ArrayList;
 import java.util.HashMap;
+
+import multiProcesing.ProcessHicDumpData;
+import process.MultiResProcess;
+import utils.SIPObject;
 
 
 
@@ -27,17 +31,17 @@ public class TestCallLoopsHicFile{
 	
 	@SuppressWarnings("unused")
 	public static void main(String[] args) throws IOException, InterruptedException {
-		String output= "/home/plop/Desktop/testChr1Ter";
+		String output= "/home/plop/Desktop/21";
 		//output= "/home/plop/Bureau/SIPpaper/chr1/testNewNew";
 		
-		String input = "/home/plop/Desktop/SIP/GM12878_combined_30.hic";
+		String input = "https://hicfiles.s3.amazonaws.com/hiseq/imr90/in-situ/combined.hic";
 		//input =  "/home/plop/Bureau/SIPpaper/hicFileIer_0.hic"; //"https://hicfiles.s3.amazonaws.com/hiseq/gm12878/in-situ/combined_30.hic"; //";
 		//String output= "/home/plop/Bureau/DataSetImageHiC/Hichip_H3k4me1";
 		//String input= "/home/plop/Bureau/DataSetImageHiC/Hichip_H3k4me1/NT_H3K4me1_2Reps.cis18797450.allValidPairs.hic";
 		//HumanGenomeHg19/chr2.size");
 		//readChrSizeFile("/home/plop/Documents/Genome/HumanGenomeHg19/hg19_withoutChr.sizes");
 		//chrsize = readChrSizeFile("/home/plop/Documents/Genome/mammals/HumanGenomeHg19/chr1.size");
-		/*String fileChr = "/home/plop/Desktop/w_hg19.sizes";
+		String fileChr = "/home/plop/Desktop/w_hg19.sizes";
 		HashMap<String,Integer> chrsize = readChrSizeFile(fileChr);
 		String juiceBoxTools = "/home/plop/Tools/juicer_tools_1.13.02.jar";
 		int matrixSize = 2000;
@@ -80,12 +84,12 @@ public class TestCallLoopsHicFile{
 			processDumpData.go(input, sip, chrsize, juiceBoxTools, juiceBoXNormalisation,cpu);
 			
 			MultiResProcess multi = new MultiResProcess(sip, cpu, keepTif,fileChr);
-			multi.run();*/
-			String cooler = "/home/plop/anaconda3/bin/cooler";
-			String cooltools = "/home/plop/anaconda3/bin/cooltools";
+			multi.run();
+			//String cooler = "/home/plop/anaconda3/bin/cooler";
+			//String cooltools = "/home/plop/anaconda3/bin/cooltools";
 		
 		    
-			System.out.println("End "+testTools(cooltools,0,3,0));
+			//System.out.println("End "+testTools(cooltools,0,3,0));
 		}
 		
 		/**

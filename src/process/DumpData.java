@@ -222,7 +222,7 @@ public class DumpData {
 				BufferedReader br = new BufferedReader(reader);
 				String line=null;
 				while ( (line = br.readLine()) != null) {
-					if(line.contains("WARN")== false) _logError = _logError+line+"\n";
+					if(line.contains("WARN")== false && line.contains("INFO")== false) _logError = _logError+line+"\n";
 				}
 			}
 			catch (IOException ioe){

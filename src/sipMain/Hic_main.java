@@ -212,14 +212,15 @@ public class Hic_main {
 			}
 		}
 		File f = new File(_input);
-		if(f.exists()==false){
+			
+		if(f.exists()==false &&  _input.startsWith("https")==false){
 				System.out.println(_input+" doesn't existed !!! \n\n");
 				System.out.println(_doc);
 				return;
 		}
 		
 		f = new File(_chrSizeFile);
-		if(f.exists()==false){
+		if(f.exists()==false ){
 				System.out.println(_chrSizeFile+" doesn't existed !!! \n\n");
 				System.out.println(_doc);
 				return;
