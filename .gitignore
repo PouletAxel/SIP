@@ -1,4 +1,8 @@
 /bin/
 /test/
 /utils/
+.idea
+.project
+.directory
+.classpath
 /target/
