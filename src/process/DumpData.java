@@ -52,7 +52,6 @@ public class DumpData {
 	 * @param juiceboxTools: String: path of juicertoolsBox
 	 * @param hicFile: String: path to the HiC file
 	 * @param norm: String: type of normalisation
-	 * @param resolution: int: resolution of the bins 
 	 */
 	public DumpData(String juiceboxTools,String hicFile, String norm) {
 		this._juiceBoxTools = juiceboxTools;
@@ -84,7 +83,7 @@ public class DumpData {
 		catch (IOException e) {	e.printStackTrace();}
 		catch (InterruptedException e) {e.printStackTrace();}
 		observedMExpected(obs,output,resolution);
-		if(_logError!=""){
+		if(_logError.contains("Exception")) {
 			System.out.println(_logError);
 			System.exit(0);
 		}
@@ -144,6 +143,7 @@ public class DumpData {
 		Runtime runtime = Runtime.getRuntime();
 		String expected = output.replaceAll(".txt", "_expected.txt");
 		String cmd = "java"+" -jar "+this._juiceBoxTools+" dump expected "+this._normalisation+" "+this._hicFile+" "+chr+" BP "+resolution+" "+expected;
+		//System.out.println(cmd);
 		this._log = this._log+"\n"+expected+"\t"+cmd;
 		Process process;
 		try {
@@ -163,7 +163,7 @@ public class DumpData {
 		} catch (IOException | InterruptedException e) {
 			e.printStackTrace();
 		}
-		if(_logError!=""){
+		if(_logError.contains("Exception")){
 			System.out.println(_logError);
 			System.exit(0);
 		}
@@ -189,10 +189,30 @@ public class DumpData {
 		new ReturnFlux(process.getErrorStream()).start();
 		process.getOutputStream();
 		exitValue=process.waitFor();
-		if(_logError!=""){
+		if(_logError!="" &&  _logError.contains("Exception") == false){
+			System.out.println("VC vector not find, SIP is using "+this._normalisation+" for "+ chr+"\n"+_logError);
+			runtime = Runtime.getRuntime();
+			_logError ="";
+			cmd =  "java"+" -jar "+this._juiceBoxTools+" dump norm "+this._normalisation+" "+this._hicFile+" "+chr+" BP "+resolution+" "+output;
+			//System.out.println(cmd);
+			process = runtime.exec(cmd);
+
+			new ReturnFlux(process.getInputStream()).start();
+			new ReturnFlux(process.getErrorStream()).start();
+			exitValue=process.waitFor();
+
+			if(_logError.contains("Exception")){
+				System.out.println(_logError);
+				System.out.println("juicer tool error !!!! "+ chr+" "+cmd);
+				System.exit(0);
+			}
+		}else if ( _logError.contains("Exception")){
 			System.out.println(_logError);
+			System.out.println("juicer tool error !!!! "+ chr+" "+cmd);
 			System.exit(0);
+
 		}
+		//System.out.println(_logError);
 		return exitValue==0;
 	}
 	

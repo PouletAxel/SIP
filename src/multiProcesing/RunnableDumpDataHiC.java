@@ -67,8 +67,8 @@ public class RunnableDumpDataHiC extends Thread implements Runnable{
 			_step = matrixSize/2;
 			String nameRes = String.valueOf(res);
 			nameRes = nameRes.replace("000", "");
-			nameRes = nameRes+"kb"; 
-			String outdir = this._outdir+File.separator+nameRes+File.separator+this._chrName+File.separator;
+			nameRes = nameRes+"kb";
+			String outdir = this._outdir+nameRes+File.separator+this._chrName+File.separator;
 			File file = new File(outdir);
 			if (file.exists()==false) file.mkdirs();
 			int step = this._step*res;
@@ -76,7 +76,7 @@ public class RunnableDumpDataHiC extends Thread implements Runnable{
 			String test = this._chrName+":0:"+j;
 			String name = outdir+this._chrName+"_0_"+j+".txt";
 			this._dumpData.getExpected(test,name,res);
-			String normOutput = this._outdir+File.separator+nameRes+File.separator+"normVector";
+			String normOutput = this._outdir+nameRes+File.separator+"normVector";
 			file = new File(normOutput);
 			if (file.exists()==false) file.mkdir();
 			try {
@@ -89,10 +89,6 @@ public class RunnableDumpDataHiC extends Thread implements Runnable{
 					name = outdir+this._chrName+"_"+i+"_"+end+".txt";
 					System.out.println("start dump "+this._chrName+" size "+this._chrSize+" dump "+dump+" res "+ nameRes);
 					juicerTools = this._dumpData.dumpObservedMExpected(dump,name,res);
-					if (juicerTools == false){
-						System.out.print(dump+" "+"\n"+juicerTools+"\n");
-						System.exit(0);
-					}		
 				if(j+step > this._chrSize && j < this._chrSize){
 					j= this._chrSize;
 					i+=step;
@@ -100,10 +96,7 @@ public class RunnableDumpDataHiC extends Thread implements Runnable{
 					name = outdir+this._chrName+"_"+i+"_"+j+".txt";
 					System.out.println("start dump "+this._chrName+" size "+this._chrSize+" dump "+dump+" res "+ nameRes);
 					juicerTools = this._dumpData.dumpObservedMExpected(dump,name,res);
-					if (juicerTools == false){
-						System.out.print(dump+" "+"\n"+juicerTools+"\n");
-						System.exit(0);
-					}
+
 				}
 			}
 			System.out.println("##### End dump "+this._chrName+" "+nameRes);
