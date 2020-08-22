@@ -71,6 +71,39 @@ public class CoordinatesCorrection {
 	}
 
 	/**
+	 * For loop inter chromosomal
+	 * @param temp
+	 * @param rawImageName
+	 * @return
+	 */
+	public HashMap<String,Loop> imageToGenomeCoordinate(HashMap<String,Loop> temp, String rawImageName) {
+		//4_0_49999999_6_0_49999999.tif
+		HashMap<String, Loop> data = new HashMap<>();
+		String[] chrCoord = rawImageName.split("_");
+		int chr1Start = Integer.parseInt(chrCoord[1]);
+		int chr2Start = Integer.parseInt(chrCoord[4]);
+		int x;
+		int y;
+		Set<String> key = temp.keySet();
+		Iterator<String> it = key.iterator();
+		while (it.hasNext()) {
+			Loop loop = temp.get(it.next());
+			x = loop.getX();
+			y = loop.getY();
+			int resolution = loop.getResolution();
+			int a = (x * resolution) + chr1Start;
+			int a_end = a + resolution;
+			int b = (y * resolution) + chr2Start;
+			;
+			int b_end = b + resolution;
+			String newName = loop.getChr() + "\t" + loop.getChr2() + a + "\t" + b;
+			loop.setCoordinates(a, a_end, b, b_end);
+			loop.setName(newName);
+			data.put(newName, loop);
+		}
+		return data;
+	}
+	/**
 	 * getter of m_data
 	 * @return HashMap of loops
 	 */

@@ -130,7 +130,55 @@ public class TupleFileToImage {
 		}
 		img.setProcessor(ip);
 	}
-	
+
+	/**
+	 *
+	 * @param file
+	 * @param matrixSize
+	 * @param resolution
+	 * @return
+	 */
+	public static ImagePlus readTupleFileInter(String file, int matrixSize, int resolution){
+		System.out.println("plop");
+		ImagePlus img = new ImagePlus();
+		BufferedReader br;
+		FloatProcessor pRaw = new FloatProcessor(matrixSize, matrixSize);
+		String[] tfile = file.split("_");
+		//4_0_191154275_6_0_171115066
+		int numImageX = Integer.parseInt(tfile[tfile.length-5])/(matrixSize*resolution);
+		int numImageY = Integer.parseInt(tfile[tfile.length-2])/(matrixSize*resolution);
+		try {
+			pRaw.abs();
+			br = new BufferedReader(new FileReader(file));
+			StringBuilder sb = new StringBuilder();
+			String line = br.readLine();
+			while (line != null){
+				sb.append(line);
+				String[] parts = line.split("\\t");
+				float raw = 0;
+
+				if(!(parts[2].equals("NAN"))){
+					raw =Float.parseFloat(parts[2]);
+					if (raw < 0) raw = 0;
+				}
+
+				int correctionX = numImageX*matrixSize*resolution;
+				int correctionY = numImageY*matrixSize*resolution;
+				int i = (Integer.parseInt(parts[0]) - correctionX)/resolution;
+				int j = (Integer.parseInt(parts[1]) - correctionY)/resolution;
+				if(i < matrixSize && j< matrixSize){
+					pRaw.setf(i, j, raw);
+				}
+				sb.append(System.lineSeparator());
+				line = br.readLine();
+			}
+			br.close();
+		} catch (IOException e) { e.printStackTrace();}
+		img.setProcessor(pRaw);
+		return img;
+	}
+
+
 	/**
 	 * Compute the standard deviation of the pixel non zero values of m_img 
 	 * @param mean average value in m_img

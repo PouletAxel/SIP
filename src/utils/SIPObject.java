@@ -75,6 +75,7 @@ public class SIPObject {
 	/**
 	 * SIPObject constructor
 	 * 
+	 *
 	 * @param output
 	 * @param chrSize
 	 * @param gauss
@@ -89,7 +90,7 @@ public class SIPObject {
 	 * @param listFactor
 	 * @param fdr
 	 * @param isProcessed
-	 * @param isHichip
+	 * @param rfdr
 	 */
 	public SIPObject(String output, HashMap<String, Integer> chrSize, double gauss, double min,
 			double max, int resolution, double saturatedPixel, int thresholdMax,
@@ -133,7 +134,7 @@ public class SIPObject {
 	 * @param listFactor
 	 * @param fdr
 	 * @param isProcessed
-	 * @param isHichip
+	 * @param rfdr
 	 */
 	public SIPObject(String input, String output, HashMap<String, Integer> chrSize, double gauss, double min,
 			double max, int resolution, double saturatedPixel, int thresholdMax,

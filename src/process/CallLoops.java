@@ -155,8 +155,9 @@ public class CallLoops {
 	/**
 	 * Make Image 
 	 * 
-	 * @param file path 
-	 * @return ImagePlus with oMe  value
+	 *
+	 * @param readFile
+	 * @return
 	 */
 	private ImagePlus doImage(TupleFileToImage readFile){	
 		String file = readFile.getInputFile();

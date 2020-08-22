@@ -21,6 +21,8 @@ public class FindMaxima{
 	private ImagePlus _imgNorm;
 	/**	 name of the chromosome*/
 	private String _chr;
+	/**	 name of the chromosome2*/
+	private String _chr2;
 	/**	 Image fileterred with min, max and gaussian filter*/
 	private ImagePlus _imgFilter;
 	/**	binary image pixel white = the maxima detected*/
@@ -50,19 +52,33 @@ public class FindMaxima{
 		this._diagSize = diag;
 		this._resolution = resolution;
 	}
-	
-	
+
 	/**
-	 * Method to find loops in oMe image, and fill the loop collection.
-	 * 
-	 * @param hichip
-	 * @param index int index of the image
-	 * @param nbZero int nb zero allowed around the loop
-	 * @param raw ImagePlus raw image
-	 * @param val int background value of the image
-	 * @param factor
+	 *
+	 * @param imgFilter
+	 * @param chr1
+	 * @param chr2
+	 * @param noiseTolerance
+	 * @param resolution
+	 */
+	public FindMaxima( ImagePlus imgFilter, String chr1,String chr2, double noiseTolerance, int resolution){
+		this._imgFilter = imgFilter;
+		this._noiseTolerance = noiseTolerance;
+		this._chr2 = chr2;
+		this._chr = chr1;
+		this._resolution = resolution;
+	}
+
+
+	/**
+	 *
+	 * @param index
+	 * @param nbZero
+	 * @param raw
+	 * @param val
 	 * @return
 	 */
+
 	public HashMap<String,Loop> findloop(int index, int nbZero, ImagePlus raw, float val){
 		run(nbZero, raw, val);
 		ArrayList<String> temp = this.getMaxima();
@@ -95,6 +111,49 @@ public class FindMaxima{
 		//System.out.println("after filter ################# "+raw.getTitle()+"  "+data.size());
 		return data;
 	}
+
+	/**
+	 *
+	 * @param nbZero
+	 * @param raw
+	 * @param val
+	 * @return
+	 */
+
+	public HashMap<String,Loop> findloopInter( int nbZero, ImagePlus raw, float val){
+		runInter(nbZero, raw, val);
+		ArrayList<String> temp = this.getMaxima();
+		ImageProcessor ipRaw = raw.getProcessor();
+		HashMap<String,Loop>  data = new HashMap<>();
+		this._imgNorm = raw;
+		//System.out.println("size raw maxima !!!!!!!!!!!!!! "+raw.getTitle()+"  "+temp.size());
+		for(int j = 0; j < temp.size();++j){
+			String[] parts = temp.get(j).split("\\t");
+			int x = Integer.parseInt(parts[0]);
+			int y = Integer.parseInt(parts[1]);
+			String name= this._chr+"\t"+this._chr2+"\t"+temp.get(j);
+			float avg = average(x,y);
+			float std = standardDeviation(x,y,avg);
+			int nbOfZero = detectNbOfZero(x,y,raw,ipRaw.getf(x, y));
+			//if(avg > 1.45 && ipRaw.getf(x, y) >= 1.85){ // filter on the loop value and region value
+				DecayAnalysis da = new DecayAnalysis(raw,x,y);
+				float n1 =da.getNeighbourhood1();
+				float n2 =da.getNeighbourhood2();
+				//if(n1 < n2 && n1 >= 0.15 && n2 >= 0.25){ // filter on the neighborood for hic datatset
+					Loop maxima = new Loop(temp.get(j),x,y,this._chr,this._chr2,avg,std,ipRaw.getf(x, y));
+					maxima.setNeigbhoord1(n1);
+					maxima.setNeigbhoord2(n2);
+					maxima.setResolution(this._resolution);
+					maxima.setNbOfZero(nbOfZero);
+					//System.out.println(_resolution+" "+maxima.getResolution());
+					maxima.setMatrixSize(raw.getWidth());
+					data.put(name, maxima);
+				//}
+			//}
+		}
+		//System.out.println("after filter ################# "+raw.getTitle()+"  "+data.size());
+		return data;
+	}
 		
 	/**
 	 * Detect maxima with the oMe or observed methods, call the different methods 
@@ -113,6 +172,42 @@ public class FindMaxima{
 		this.removedCloseMaxima();
 		this.correctMaxima();
 		this.removeMaximaCloseToZero(nbZero,rawImage, backgroundValue);
+	}
+
+
+	/**
+	 *
+	 * @param nbZero
+	 * @param rawImage
+	 * @param backgroundValue
+	 */
+	private void runInter(int nbZero, ImagePlus rawImage, float backgroundValue){
+		ImagePlus temp = this._imgFilter.duplicate();
+		ImageProcessor ip = temp.getProcessor();
+		MaximumFinder mf = new MaximumFinder();
+		ByteProcessor bp = mf.findMaxima(ip, this._noiseTolerance, MaximumFinder.SINGLE_POINTS, true);
+		this._imgResu.setProcessor(bp);
+		//this.removedCloseMaxima();
+		//this.correctMaxima();
+		//this.removeMaximaCloseToZero(nbZero,rawImage, backgroundValue);
+	}
+
+	
+	private int detectNbOfZero(int x, int y, ImagePlus rawImage, float val){
+		int w = this._imgResu.getWidth();
+		int h = this._imgResu.getHeight();
+		ImageProcessor ipResu = this._imgResu.getProcessor();
+		ImageProcessor ip = rawImage.getProcessor();
+		int nbZero = 0;
+		for(int i = x - 2; i <= x+2; ++i) {
+			for (int j = y-2; j <= y+2; ++j) {
+				if(ip.getf(i,j) <= 1) {
+					nbZero++;
+					System.out.println("yup");
+				}
+			}
+		}
+		return nbZero;
 	}
 	
 	/**
