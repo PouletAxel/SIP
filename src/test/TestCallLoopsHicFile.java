@@ -8,7 +8,7 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import multiProcesing.ProcessHicDumpData;
+import multiProcesing.ProcessDumpData;
 import process.MultiResProcess;
 import utils.SIPObject;
 
@@ -80,7 +80,7 @@ public class TestCallLoopsHicFile{
 			
 			SIPObject sip = new SIPObject(output, chrsize, gauss, min, max, resolution, saturatedPixel, thresholdMax, diagSize, matrixSize, nbZero,factor,0.01,keepTif,false);
 			sip.setIsGui(false);
-			ProcessHicDumpData processDumpData = new ProcessHicDumpData();
+			ProcessDumpData processDumpData = new ProcessDumpData();
 			processDumpData.go(input, sip, chrsize, juiceBoxTools, juiceBoXNormalisation,cpu);
 			
 			MultiResProcess multi = new MultiResProcess(sip, cpu, keepTif,fileChr);

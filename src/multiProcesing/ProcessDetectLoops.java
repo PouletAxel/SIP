@@ -3,6 +3,7 @@ import java.io.File;
 import java.util.Iterator;
 
 import gui.Progress;
+import utils.SIPInter;
 import utils.SIPObject;
 
 import java.util.concurrent.Executors;
@@ -19,12 +20,6 @@ import java.util.concurrent.TimeUnit;
  */
 public class ProcessDetectLoops{
 	
-	/**int: number of processus*/
-	static int _nbLance = 0;
-	/** boolean: if true continue the process else take a break*/
-	static boolean _continuer;
-	/** */
-	static int _indice = 0;
 	/** progress bar if gui is true*/
 	private Progress _p;
 
@@ -70,7 +65,43 @@ public class ProcessDetectLoops{
 		if(sip.isGui())	_p.dispose();
 		
 	}
-	
+
+	/**
+	 *
+	 * @param sipInter
+	 * @param nbCPU
+	 * @param delImage
+	 * @param resuFile
+	 * @param resName
+	 * @throws InterruptedException
+	 */
+	public void go(SIPInter sipInter, int nbCPU, boolean delImage, String resuFile, String resName) throws InterruptedException {
+		ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(nbCPU);
+		Iterator<String> chrName = sipInter.getChrSizeHashMap().keySet().iterator();
+		if(sipInter.isProcessed()) {
+			boolean isCool = isProcessedMcool(sipInter.getOutputDir()+resName+File.separator+"normVector");
+			sipInter.setIsCooler(isCool);
+		}
+		while(chrName.hasNext()){
+			String chr = chrName.next();
+			RunnableDetectInterLoops task =  new RunnableDetectInterLoops(resuFile, chr, sipInter, delImage);
+			executor.execute(task);
+		}
+		executor.shutdown();
+		int nb = 0;
+		if(sipInter.isGui()){
+			_p = new Progress(resName+" Loops Detection step",sipInter.getChrSizeHashMap().size()+1);
+			_p._bar.setValue(nb);
+		}
+		while (!executor.awaitTermination(30, TimeUnit.SECONDS)) {
+			if (nb != executor.getCompletedTaskCount()) {
+				nb = (int) executor.getCompletedTaskCount();
+				if(sipInter.isGui()) _p._bar.setValue(nb);
+			}
+		}
+		if(sipInter.isGui())	_p.dispose();
+
+	}
 	/**
 	 * 
 	 * @param dirToTest
@@ -78,9 +109,7 @@ public class ProcessDetectLoops{
 	 */
 	 private boolean isProcessedMcool(String dirToTest) {
 		 File test = new File (dirToTest);
-		 if (test.exists() == false) 
-				 return true;
-		 else 
-			 return false;
+		 boolean b = !test.exists();
+		 return b;
 	 }
 }

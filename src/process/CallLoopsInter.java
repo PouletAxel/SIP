@@ -8,6 +8,9 @@ import ij.process.ImageProcessor;
 
 public class CallLoopsInter {
 
+    void CallLoopsInter(){
+
+    }
 
     /**
      * Save the image file
@@ -15,7 +18,7 @@ public class CallLoopsInter {
      * @param imagePlusInput image to save
      * @param pathFile path to save the image
      */
-    public static ImagePlus imgDiff(ImagePlus imagePlusInput, String pathFile){
+    public ImagePlus imgDiff(ImagePlus imagePlusInput, String pathFile){
         GaussianBlur gb = new GaussianBlur();
         ImageProcessor ip = imagePlusInput.getProcessor();
         gb.blurGaussian(ip, 2);

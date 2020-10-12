@@ -1,17 +1,12 @@
 package test;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import multiProcesing.ProcessCoolerDumpData;
-import multiProcesing.ProcessHicDumpData;
-import process.CoolerDumpData;
 import process.MultiResProcess;
-import utils.CoolerExpected;
 import utils.SIPObject;
 @SuppressWarnings("unused")
 public class TestCoolFormat {

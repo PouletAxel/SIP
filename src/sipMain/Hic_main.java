@@ -14,7 +14,7 @@ import javax.swing.JOptionPane;
 
 import gui.GuiAnalysis;
 import multiProcesing.ProcessCoolerDumpData;
-import multiProcesing.ProcessHicDumpData;
+import multiProcesing.ProcessDumpData;
 import process.MultiResProcess;
 import utils.SIPObject;
 
@@ -244,7 +244,7 @@ public class Hic_main {
 			sip = new SIPObject(_output, _chrSize, _gauss, _min, _max, _resolution, _saturatedPixel,
 					_thresholdMax, _diagSize, _matrixSize, _nbZero, _factor,_fdr, _isProcessed,_isDroso);
 			sip.setIsGui(_gui);
-			ProcessHicDumpData processDumpData = new ProcessHicDumpData();
+			ProcessDumpData processDumpData = new ProcessDumpData();
 			processDumpData.go(_input, sip, _chrSize, _juiceBoxTools, _juiceBoXNormalisation, _cpu);
 			System.out.println("########### End of the dump Step");
 		}else if(_isCool){

@@ -1,25 +1,13 @@
 package test;
 
-import ij.ImagePlus;
-import ij.io.FileSaver;
-import ij.plugin.filter.GaussianBlur;
-import ij.plugin.filter.MaximumFinder;
-import ij.process.ByteProcessor;
-import ij.process.FloatProcessor;
-import ij.process.ImageProcessor;
-import process.DumpInterChromosomal;
-import utils.CoordinatesCorrection;
-import utils.FindMaxima;
-import utils.Loop;
+import multiProcesing.ProcessDumpData;
+import utils.SIPInter;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Set;
 
 public class TestInter {
 
@@ -48,71 +36,13 @@ public class TestInter {
         factor.add(5);
         boolean keepTif = false;
         int cpu = 1;
+        SIPInter sipInter = new SIPInter(output, chrsize, gauss, min, max, resolution, saturatedPixel, thresholdMax, matrixSize, nbZero,keepTif);
+        ProcessDumpData process = new ProcessDumpData();
+        process.go(input,sipInter,chrsize,juicerTools,norm,2);
 
-        //for (int i = 0; i < 1; ++i){
-            //for(int j = i+1; j < 2; ++j){
-                String chrName1 = _chr.get(3);
-                String chrName2 = _chr.get(5);
-                int chrSize1 = chrsize.get(chrName1);
-                int chrSize2 = chrsize.get(chrName2);
-                int step = matrixSize;
-                String nameRes = String.valueOf(resolution);
-                nameRes = nameRes.replace("000", "");
-                nameRes = nameRes+"kb";
-                String outdir = output+nameRes+ File.separator+chrName1+"_"+chrName2+File.separator;
-                File file = new File(outdir);
-                if (file.exists()==false) file.mkdirs();
-                step = step*resolution;
-                DumpInterChromosomal dumpInter = new DumpInterChromosomal(juicerTools,input, norm);
-                    System.out.println("start dump "+chrName1+" size "+chrSize1+" "+chrName2+" size "+chrSize2+" res "+ nameRes);
-                    int endChr1 = matrixSize*resolution;
-                    if(endChr1 > chrSize1) endChr1 = chrSize1;
 
-                    for(int startChr1 = 0 ; endChr1-1 <= chrSize1; startChr1+=step,endChr1+=step){
-                        int endChr2 = matrixSize*resolution;
-                        if(endChr2 > chrSize2) endChr2 = chrSize2;
-                        int end1 =endChr1-1;
-                        String dump1 = chrName1+":"+startChr1+":"+end1;
-                        for(int startChr2 = 0 ; endChr2-1 <= chrSize2; startChr2+=step,endChr2+=step) {
-                            int end2 =endChr2-1;
-                            String dump2 = chrName2+":"+startChr2+":"+end2;
-                            String name = outdir + chrName1 +"_" + startChr1 + "_" + end1 +"_" +chrName2 +"_" + startChr2 + "_" + end2 + ".txt";
-                            //System.out.println("\tstart dump " + chrName1 + " " + chrName2 + " dump " + dump1 +" "+ dump2 + " res " + nameRes);
-                            dumpInter.dumpObserved(dump1, dump2, name, resolution);
-                            if (endChr2 + step > chrSize2 && endChr2 < chrSize2) {
-                                endChr2 = chrSize2-1;
-                                startChr2 += step;
-                                dump2 = chrName2+":"+startChr2+":"+endChr2;
-                                name = outdir + chrName1 +"_" + startChr1 + "_" + end1 +"_" +chrName2 +"_" + startChr2 + "_" + endChr2 + ".txt";
-                                //System.out.println("\tstart dump " + chrName1 + " " + chrName2 + " dump " + dump1 +" "+ dump2 + " res " + nameRes);
-                                dumpInter.dumpObserved(dump1, dump2, name, resolution);
-                            }
-                        }
-                        if (endChr1 + step > chrSize1 && endChr1 < chrSize1) {
-                            endChr1 = chrSize1-1;
-                            startChr1 += step;
-                            dump1 = chrName1+":"+startChr1+":"+endChr1;
-                            endChr2 = matrixSize*resolution;
-                            for(int startChr2 = 0 ; endChr2-1 <= chrSize2; startChr2+=step,endChr2+=step) {
-                                int end2 =endChr2-1;
-                                String dump2 = chrName2+":"+startChr2+":"+end2;
-                                String name = outdir + chrName1 +"_" + startChr1 + "_" + endChr1 +"_" +chrName2 +"_" + startChr2 + "_" + end2 + ".txt";
-                                //System.out.println("\tstart dump " + chrName1 + " " + chrName2 + " dump " + dump1 +" "+ dump2 + " res " + nameRes);
-                                dumpInter.dumpObserved(dump1, dump2, name, resolution);
-                                if (endChr2 + step > chrSize2 && endChr2 < chrSize2) {
-                                    endChr2 = chrSize2-1;
-                                    startChr2 += step;
-                                    dump2 = chrName2+":"+startChr2+":"+endChr2;
-                                    name = outdir + chrName1 +"_" + startChr1 + "_" + endChr1 +"_" +chrName2 +"_" + startChr2 + "_" + endChr2 + ".txt";
-                                   // System.out.println("\tstart dump " + chrName1 + " " + chrName2 + " dump " + dump1 +" "+ dump2 + " res " + nameRes);
-                                    dumpInter.dumpObserved(dump1, dump2, name, resolution);
-                                }
-                            }
-                        }
-                    }
-                    //System.out.println("##### End dump "+chrName1+" "+chrName2+" "+nameRes);
-          //  }
-        //}
+
+      /*
 
         File folder = new File(outdir);
         File[] listOfFiles = folder.listFiles();
@@ -139,7 +69,7 @@ public class TestInter {
                             +loop.getStd()+"\t"+loop.getValue()+"\t"+loop.getNbOfZero());
                 }
             }
-        }
+        }*/
         System.out.println("end");
 
     }
@@ -170,11 +100,5 @@ public class TestInter {
         br.close();
         return  chrSize;
     }
-
-
-
-
-
-
 
 }

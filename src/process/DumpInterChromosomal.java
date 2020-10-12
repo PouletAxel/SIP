@@ -5,6 +5,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
+/**
+ *
+ */
 public class DumpInterChromosomal {
 
     private String _juiceBoxTools;
@@ -13,6 +16,12 @@ public class DumpInterChromosomal {
     private String _log = "";
     private String _logError = "";
 
+    /**
+     *
+     * @param juiceboxTools
+     * @param hicFile
+     * @param norm
+     */
     public DumpInterChromosomal(String juiceboxTools,String hicFile, String norm) {
         this._juiceBoxTools = juiceboxTools;
         this._normalisation = norm;
@@ -20,6 +29,15 @@ public class DumpInterChromosomal {
     }
 
 
+    /**
+     *
+     * @param chr1
+     * @param chr2
+     * @param obs
+     * @param resolution
+     * @return
+     * @throws IOException
+     */
     public boolean dumpObserved(String chr1, String chr2, String obs, int resolution) throws IOException {
         int exitValue=1;
         Runtime runtime = Runtime.getRuntime();
