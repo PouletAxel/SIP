@@ -42,34 +42,6 @@ public class TestInter {
 
 
 
-      /*
-
-        File folder = new File(outdir);
-        File[] listOfFiles = folder.listFiles();
-        //System.out.println(outdir+" !!!!!!!!!!!!!!!!!!!!!!!!!!!!!" + listOfFiles.length);
-        for (int i = 0; i<listOfFiles.length; ++i) {
-            String fileName = listOfFiles[i].toString();
-            if(fileName.contains("txt")) {
-                ImagePlus img = readTupleFile(fileName, matrixSize, resolution);
-                String imgPath = fileName;
-                String [] name = fileName.split(File.separator);
-                imgPath = imgPath.replace("txt", "tif");
-                //System.out.println(imgPath);
-                saveFile(img, imgPath);
-                ImagePlus imageDiff = imgDiff(img,imgPath);
-                FindMaxima findMaxima = new FindMaxima( imageDiff, chrName1,chrName2, 20, resolution);
-                HashMap<String, Loop> hloop =   imageToGenomeCoordinate(findMaxima.findloopInter(5,img,3) , name[name.length-1]);
-                Set<String> key = hloop.keySet();
-                Iterator<String> it = key.iterator();
-                while (it.hasNext()) {
-                    Loop loop = hloop.get(it.next());
-                    ArrayList<Integer> coord = loop.getCoordinates();
-                    System.out.println(loop.getChr()+"\t"+coord.get(0)+"\t"+coord.get(1)+"\t"+loop.getChr2()+"\t"+coord.get(2)+"\t"+coord.get(3)+"\t0,0,0"
-                            +"\t"+loop.getPaScoreAvg()+"\t"+loop.getRegionalPaScoreAvg()+"\t"+loop.getNeigbhoord1()+"\t"+loop.getNeigbhoord2()+"\t"+loop.getAvg()+"\t"
-                            +loop.getStd()+"\t"+loop.getValue()+"\t"+loop.getNbOfZero());
-                }
-            }
-        }*/
         System.out.println("end");
 
     }

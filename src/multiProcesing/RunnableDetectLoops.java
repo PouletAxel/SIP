@@ -33,11 +33,12 @@ public class RunnableDetectLoops extends Thread implements Runnable{
 	/**
 	 * Construtor, initialize all the variables  of interest
 	 * 
+	 *
 	 * @param chr
-	 * @param callLoops
 	 * @param resuFile
 	 * @param sip
-	 * @param normVector
+	 * @param normVectorFile
+	 * @param delFile
 	 */
 	public RunnableDetectLoops (String chr, String resuFile, SIPObject sip, String normVectorFile, boolean delFile){
 		this._sip = sip;

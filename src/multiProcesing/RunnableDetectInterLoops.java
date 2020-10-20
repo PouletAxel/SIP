@@ -35,8 +35,6 @@ public class RunnableDetectInterLoops extends Thread implements Runnable {
     /**
      * norn vector table for the chr of interest
      */
-    private HashMap<Integer, String> _normVector = new HashMap<Integer, String>();
-
 
     /**
      * Construtor, initialize all the variables  of interest

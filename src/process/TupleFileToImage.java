@@ -133,23 +133,20 @@ public class TupleFileToImage {
 
 	/**
 	 *
-	 * @param file
-	 * @param matrixSize
-	 * @param resolution
 	 * @return
 	 */
-	public static ImagePlus readTupleFileInter(String file, int matrixSize, int resolution){
+	public ImagePlus readTupleFileInter(){
 		System.out.println("plop");
 		ImagePlus img = new ImagePlus();
 		BufferedReader br;
-		FloatProcessor pRaw = new FloatProcessor(matrixSize, matrixSize);
-		String[] tfile = file.split("_");
+		FloatProcessor pRaw = new FloatProcessor(_size, _size);
+		String[] tfile = _file.split("_");
 		//4_0_191154275_6_0_171115066
-		int numImageX = Integer.parseInt(tfile[tfile.length-5])/(matrixSize*resolution);
-		int numImageY = Integer.parseInt(tfile[tfile.length-2])/(matrixSize*resolution);
+		int numImageX = Integer.parseInt(tfile[tfile.length-5])/(_size*_resolution);
+		int numImageY = Integer.parseInt(tfile[tfile.length-2])/(_size*_resolution);
 		try {
 			pRaw.abs();
-			br = new BufferedReader(new FileReader(file));
+			br = new BufferedReader(new FileReader(_file));
 			StringBuilder sb = new StringBuilder();
 			String line = br.readLine();
 			while (line != null){
@@ -162,11 +159,11 @@ public class TupleFileToImage {
 					if (raw < 0) raw = 0;
 				}
 
-				int correctionX = numImageX*matrixSize*resolution;
-				int correctionY = numImageY*matrixSize*resolution;
-				int i = (Integer.parseInt(parts[0]) - correctionX)/resolution;
-				int j = (Integer.parseInt(parts[1]) - correctionY)/resolution;
-				if(i < matrixSize && j< matrixSize){
+				int correctionX = numImageX*_size*_resolution;
+				int correctionY = numImageY*_size*_resolution;
+				int i = (Integer.parseInt(parts[0]) - correctionX)/_resolution;
+				int j = (Integer.parseInt(parts[1]) - correctionY)/_resolution;
+				if(i < _size && j< _size){
 					pRaw.setf(i, j, raw);
 				}
 				sb.append(System.lineSeparator());

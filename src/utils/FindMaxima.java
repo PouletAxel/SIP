@@ -192,7 +192,15 @@ public class FindMaxima{
 		//this.removeMaximaCloseToZero(nbZero,rawImage, backgroundValue);
 	}
 
-	
+
+	/**
+	 *
+	 * @param x
+	 * @param y
+	 * @param rawImage
+	 * @param val
+	 * @return
+	 */
 	private int detectNbOfZero(int x, int y, ImagePlus rawImage, float val){
 		int w = this._imgResu.getWidth();
 		int h = this._imgResu.getHeight();
