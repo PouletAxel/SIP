@@ -105,7 +105,7 @@ public class ProcessDumpData {
 		int nb = 0;
 
 		if(sipInter.isGui()){
-			_p = new Progress("Loop Detection step",sipInter.getChrSizeHashMap().size()+1);
+			_p = new Progress("Loop Detection step",sipInter.getChrSize().size()+1);
 			_p._bar.setValue(nb);
 		}
 		while (!executor.awaitTermination(30, TimeUnit.SECONDS)) {

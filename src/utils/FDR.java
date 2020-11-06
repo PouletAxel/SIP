@@ -37,11 +37,13 @@ public class FDR {
 		while (it.hasNext()) {
 			String loopName = it.next();
 			Loop loop = data.get(loopName);
-						
+
+
 			float dubFDR = loop.getPaScoreAvgFDR();
 			float dubFDR2 = loop.getPaScoreAvgFDR2();
 			float dubFDR3 = loop.getPaScoreAvgFDR3();
-				
+
+
 			if(dubFDR > 0)  myFDRvals.add(dubFDR);
 			if(dubFDR2 > 0) myFDRvals.add(dubFDR2);
 			if(dubFDR3 > 0) myFDRvals.add(dubFDR3);

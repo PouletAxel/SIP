@@ -1,8 +1,10 @@
 package multiProcesing;
 import java.io.File;
+import java.util.HashMap;
 import java.util.Iterator;
 
 import gui.Progress;
+import process.DumpInterChromosomal;
 import utils.SIPInter;
 import utils.SIPObject;
 
@@ -77,20 +79,29 @@ public class ProcessDetectLoops{
 	 */
 	public void go(SIPInter sipInter, int nbCPU, boolean delImage, String resuFile, String resName) throws InterruptedException {
 		ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(nbCPU);
-		Iterator<String> chrName = sipInter.getChrSizeHashMap().keySet().iterator();
-		if(sipInter.isProcessed()) {
-			boolean isCool = isProcessedMcool(sipInter.getOutputDir()+resName+File.separator+"normVector");
-			sipInter.setIsCooler(isCool);
+		HashMap<String,Integer> chrSize = sipInter.getChrSize();
+		Object [] chrName = chrSize.keySet().toArray();
+
+		System.out.println(sipInter.getOutputDir());
+		File outDir = new File(sipInter.getOutputDir());
+		if (!outDir.exists()) outDir.mkdir();
+		for(int i = 0; i < chrName.length;++i){
+			String chr1 = chrName[i].toString();
+			for(int j = i+1; j < chrName.length;++j){
+				String chr2 = chrName[j].toString();
+				int size1 = chrSize.get(chr1);
+				int size2 = chrSize.get(chr2);
+				System.out.println(chr1+"\t"+size1+"\t"+chr2+"\t"+size2);
+				RunnableDetectInterLoops task =  new RunnableDetectInterLoops(chr1, chr2, resuFile, sipInter, delImage);
+				executor.execute(task);
+			}
 		}
-		while(chrName.hasNext()){
-			String chr = chrName.next();
-			RunnableDetectInterLoops task =  new RunnableDetectInterLoops(resuFile, chr, sipInter, delImage);
-			executor.execute(task);
-		}
+
 		executor.shutdown();
 		int nb = 0;
+
 		if(sipInter.isGui()){
-			_p = new Progress(resName+" Loops Detection step",sipInter.getChrSizeHashMap().size()+1);
+			_p = new Progress("Loop Detection step",sipInter.getChrSize().size()+1);
 			_p._bar.setValue(nb);
 		}
 		while (!executor.awaitTermination(30, TimeUnit.SECONDS)) {

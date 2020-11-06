@@ -136,7 +136,6 @@ public class TupleFileToImage {
 	 * @return
 	 */
 	public ImagePlus readTupleFileInter(){
-		System.out.println("plop");
 		ImagePlus img = new ImagePlus();
 		BufferedReader br;
 		FloatProcessor pRaw = new FloatProcessor(_size, _size);

@@ -213,7 +213,7 @@ public class Hic_main {
 		}
 		File f = new File(_input);
 			
-		if(f.exists()==false &&  _input.startsWith("https")==false){
+		if(!f.exists() && !_input.startsWith("https")){
 				System.out.println(_input+" doesn't existed !!! \n\n");
 				System.out.println(_doc);
 				return;
@@ -231,7 +231,7 @@ public class Hic_main {
 		readChrSizeFile(_chrSizeFile);
 		if(_isHic){
 			f = new File(_juiceBoxTools);
-			if(f.exists()==false){
+			if(!f.exists()){
 				System.out.println(_juiceBoxTools+" doesn't existed !!! \n\n");
 				System.out.println(_doc);
 				return;
@@ -249,18 +249,18 @@ public class Hic_main {
 			System.out.println("########### End of the dump Step");
 		}else if(_isCool){
 			f = new File(_cooltools);
-			if(f.exists()==false){
+			if(!f.exists()){
 				System.out.println(_cooltools+" doesn't existed or wrong path !!! \n\n");
 				System.out.println(_doc);
 				return;
 			}
 			f = new File(_cooler);
-			if(f.exists()==false){
+			if(!f.exists()){
 				System.out.println(_cooler+" doesn't existed or wrong path !!! \n\n");
 				System.out.println(_doc);
 				return;
 			}
-			if( testTools(_cooltools,0,3,0) == false || testTools(_cooler,0,8,6) == false) {
+			if(!testTools(_cooltools, 0, 3, 0) || !testTools(_cooler, 0, 8, 6)) {
 				System.out.println( _cooltools +" or" + _cooler+" is not the good version for SIP (it needs cooltools version >= 0.3.0 and cooler version >= 0.8.6) !!! \n\n");
 				System.out.println(_doc);
 				if(_gui){

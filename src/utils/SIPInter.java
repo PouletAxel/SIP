@@ -19,20 +19,19 @@ public class SIPInter{
     private String _output;
     /** Strength of the gaussian filter*/
     private double _gauss;
-    /** Strength of the min filter*/
-    private double _min;
-    /** Strength of the max filter*/
-    private double _max;
-    /** % of staurated pixel after enhance contrast*/
-    private double _saturatedPixel;
+
+    private double _fdr;
+    private double _medianAP;
+    private double _medianAPReg;
+
     /** Image size*/
     private int _matrixSize;
     /** Resolution of the bin dump in base*/
     private int _resolution;
     /** Threshold for the maxima detection*/
-    private int _thresholdMaxima;
+    private double _thresholdMaxima;
     /** HashMap of the chr size, the key = chr name, value = size of chr*/
-    private HashMap<String,Integer> _chrSize;
+    private HashMap<String,Integer> _chrSize = new HashMap<>();
     /** Size of the step to process each chr (step = matrixSize/2)*/
     private int _step;
     /** Number of pixel = 0 allowed around the loop*/
@@ -45,23 +44,131 @@ public class SIPInter{
     /** */
     private boolean _keepTif;
 
-    public SIPInter(String output, HashMap<String, Integer> chrsize, double gauss, double min, double max, int resolution,
-                    double saturatedPixel, int thresholdMax, int matrixSize, int nbZero, boolean keepTif) {
+    /**
+     *
+     *  constructor for hic file
+     *
+     * @param output
+     * @param chrsize
+     * @param gauss
+     * @param resolution
+     * @param thresholdMax
+     * @param matrixSize
+     * @param nbZero
+     * @param keepTif
+     * @param fdr
+     * @throws IOException
+     */
+    public SIPInter(String output,String chrsize, double gauss,  int resolution, double thresholdMax, int matrixSize, int nbZero, boolean keepTif,double fdr) throws IOException {
 
         this._output = output;
-        this._chrSize = chrsize;
+        setChrSize(chrsize);
         this._gauss = gauss;
-        this._min = min;
-        this._max = max;
         this._resolution = resolution;
-        this._saturatedPixel = saturatedPixel;
+         this._thresholdMaxima = thresholdMax;
+        this._matrixSize = matrixSize;
+        this._nbZero = nbZero;
+        this._keepTif = keepTif;
+        _fdr = fdr;
+    }
+
+    /**
+     *  constructor for processed data
+     *
+     * @param output
+     * @param chrsize
+     * @param gauss
+     * @param resolution
+     * @param thresholdMax
+     * @param matrixSize
+     * @param nbZero
+     * @param keepTif
+     */
+    public SIPInter(String input,String output,String chrsize, double gauss, int resolution,
+                 double thresholdMax, int matrixSize, int nbZero, boolean keepTif, double fdr) throws IOException {
+
+        this._input = input;
+        this._output = output;
+        this._gauss = gauss;
+        setChrSize(chrsize);
+        this._resolution = resolution;
         this._thresholdMaxima = thresholdMax;
         this._matrixSize = matrixSize;
         this._nbZero = nbZero;
         this._keepTif = keepTif;
+        _fdr = fdr;
 
     }
 
+    /**
+     *
+     * @param pathFile
+     * @param hLoop
+     * @param first
+     * @throws IOException
+     */
+    public void writeResu(String pathFile, HashMap<String,Loop> hLoop, boolean first) throws IOException {
+        FDR fdrDetection = new FDR ();
+        fdrDetection.run(this._fdr, hLoop);
+        double RFDRcutoff = fdrDetection.getRFDRcutoff();
+        double FDRcutoff = fdrDetection.getFDRcutoff();
+        System.out.println("Filtering value at "+this._fdr+" FDR is "+FDRcutoff+" APscore and "+RFDRcutoff+" RegionalAPscore\n");
+        BufferedWriter writer;
+        if(first) writer = new BufferedWriter(new FileWriter(new File(pathFile), true));
+        else{
+            writer = new BufferedWriter(new FileWriter(new File(pathFile)));
+            writer.write("chromosome1\tx1\tx2\tchromosome2\ty1\ty2\tcolor\tAPScoreAvg\tAPRegScoreAvg\tAvg_diffMaxNeighbour_1\tAvg_diffMaxNeighbour_2\tavg\tstd\tvalue\tvalueDiff\tnbOfZero\tProbabilityofEnrichment\n");
+        }
+
+        if(hLoop.size()>0) {
+            Set<String> key = hLoop.keySet();
+            Iterator<String> it = key.iterator();
+            while (it.hasNext()) {
+                Loop loop = hLoop.get(it.next());
+                ArrayList<Integer> coord = loop.getCoordinates();
+                if (loop.getPaScoreAvg() > FDRcutoff && loop.getRegionalPaScoreAvg() > RFDRcutoff && loop.getValueDiff() > 1.3 && loop.getValue() >= 8) {
+                    writer.write(loop.getChr() + "\t" + coord.get(0) + "\t" + coord.get(1) + "\t" + loop.getChr2() + "\t" + coord.get(2) + "\t" + coord.get(3) + "\t0,0,0"
+                            + "\t" + loop.getPaScoreAvg() + "\t" + loop.getRegionalPaScoreAvg() + "\t" + loop.getNeigbhoord1() + "\t" + loop.getNeigbhoord2() + "\t" + loop.getAvg() + "\t"
+                            + loop.getStd() + "\t" + loop.getValue() + "\t" +loop.getValueDiff()  + "\t" + loop.getNbOfZero() +"\t"+loop.getPaScoreAvgdev()+"\n");
+                }
+            }
+        }
+        writer.close();
+    }
+
+    /**
+     *
+     * @return
+     */
+    private void median(HashMap<String,Loop> data, double fdrCutoff){
+        Set<String> key = data.keySet();
+        Iterator<String> it = key.iterator();
+        ArrayList<Float> n1 = new ArrayList<Float> ();
+        ArrayList<Float> n2 = new ArrayList<Float> ();
+        int nb = 0;
+        while (it.hasNext()){
+            String name = it.next();
+            Loop loop = data.get(name);
+            if(loop.getPaScoreAvg()> 1.2 && loop.getPaScoreAvg() > 1 && loop.getPaScoreAvg() > fdrCutoff && loop.getPaScoreAvgdev() > .9){
+                n1.add(loop.getPaScoreAvg());
+                n2.add(loop.getRegionalPaScoreAvg());
+                nb++;
+            }
+        }
+        if(nb>0){
+            n1.sort(Comparator.naturalOrder());
+            n2.sort(Comparator.naturalOrder());
+            double pos1 = Math.floor((n1.size() - 1.0) / 2.0);
+            double pos2 = Math.ceil((n1.size() - 1.0) / 2.0);
+            if (pos1 == pos2 ) 	_medianAP = n1.get((int)pos1);
+            else _medianAP = (n1.get((int)pos1) + n1.get((int)pos2)) / 2.0 ;
+            pos1 = Math.floor((n2.size() - 1.0) / 2.0);
+            pos2 = Math.ceil((n2.size() - 1.0) / 2.0);
+            if (pos1 == pos2 ) 	_medianAPReg = n2.get((int)pos1);
+            else _medianAPReg = (n2.get((int)pos1) + n2.get((int)pos2)) / 2.0 ;
+           // System.out.println("AP\t"+_medianAP+"\nAPREG\t"+_medianAPReg);
+        }
+    }
 
     /**
      * Getter of the input dir
@@ -113,41 +220,6 @@ public class SIPInter{
     public void setGauss(double gauss){ this._gauss = gauss; }
 
 
-    /**
-     * Getter of the min filter strength
-     * @return double strength of the min filter
-     */
-    public double getMin(){ return this._min;}
-
-    /**
-     * Setter of the min filter strength
-     * @param min double min
-     */
-    public void setMin(double min){ this._min = min;}
-
-    /**
-     * Getter of the max filter strength
-     * @return double max filter
-     */
-    public double getMax(){	return this._max; }
-
-    /**
-     * Setter of the min filter strength
-     * @param max double max
-     */
-    public void setMax(double max){	this._max = max;}
-
-    /**
-     * Getter % of saturated pixel for the contrast enhancement
-     * @return double percentage of saturated
-     */
-    public double getSaturatedPixel(){ return this._saturatedPixel; }
-
-    /**
-     * Setter % of saturated pixel for the contrast enhancement
-     * @param saturatedPixel double saturatedPixel
-     */
-    public void setSaturatedPixel(double saturatedPixel){ this._saturatedPixel = saturatedPixel; }
 
     /**
      * Getter of resolution of the bin
@@ -177,7 +249,7 @@ public class SIPInter{
      * Getter of threshold for the detection of the regional maxima
      * @return int threshold
      */
-    public int getThresholdMaxima(){ return _thresholdMaxima;}
+    public double getThresholdMaxima(){ return _thresholdMaxima;}
     /**
      * Setter of threshold for the detection of the maxima
      * @param thresholdMaxima int new threshold
@@ -235,11 +307,36 @@ public class SIPInter{
      */
     public void setIsGui(boolean isGui) { this._isGui = isGui;}
 
+
     /**
-     * getter of  _chrSize
-     * @return  HashMap<String,Integer>
+     *
+     * @param chrSizeFile
+     * @return
+     * @throws IOException
      */
-    public HashMap<String,Integer> getChrSizeHashMap(){return this._chrSize;}
+    public void  setChrSize(String chrSizeFile) throws IOException{
+        BufferedReader br = new BufferedReader(new FileReader(chrSizeFile));
+        StringBuilder sb = new StringBuilder();
+        String line = br.readLine();
+        while (line != null){
+            sb.append(line);
+            String[] parts = line.split("\\t");
+            String chr = parts[0];
+            int size = Integer.parseInt(parts[1]);
+            _chrSize.put(chr, size);
+            sb.append(System.lineSeparator());
+            line = br.readLine();
+        }
+        br.close();
+    }
+
+    /**
+     * \
+     * @return
+     */
+    public HashMap<String, Integer> getChrSize() {
+        return _chrSize;
+    }
 }
 
 

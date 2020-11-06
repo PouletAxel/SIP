@@ -3,8 +3,10 @@ package utils;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import ij.IJ;
 import ij.ImagePlus;
 import ij.io.FileSaver;
+import ij.plugin.filter.GaussianBlur;
 import ij.plugin.filter.MaximumFinder;
 import ij.process.ByteProcessor;
 import ij.process.ImageProcessor;
@@ -33,6 +35,7 @@ public class FindMaxima{
 	private int _diagSize =-1;
 	/**	 Resolution of the image in base*/
 	private int _resolution = -1;
+	private double _gaussianFilterRadius;
 
 	
 	/**
@@ -61,12 +64,13 @@ public class FindMaxima{
 	 * @param noiseTolerance
 	 * @param resolution
 	 */
-	public FindMaxima( ImagePlus imgFilter, String chr1,String chr2, double noiseTolerance, int resolution){
+	public FindMaxima( ImagePlus imgFilter, String chr1,String chr2, double noiseTolerance, int resolution, double gaussian){
 		this._imgFilter = imgFilter;
 		this._noiseTolerance = noiseTolerance;
 		this._chr2 = chr2;
 		this._chr = chr1;
 		this._resolution = resolution;
+		this._gaussianFilterRadius = gaussian;
 	}
 
 
@@ -113,19 +117,17 @@ public class FindMaxima{
 	}
 
 	/**
+	 * @param
 	 *
-	 * @param nbZero
-	 * @param raw
-	 * @param val
-	 * @return
 	 */
+	public HashMap<String,Loop> findLoopInter(String pathRaw){
 
-	public HashMap<String,Loop> findloopInter( int nbZero, ImagePlus raw, float val){
-		runInter(nbZero, raw, val);
+		ImagePlus raw = IJ.openImage(pathRaw);
+		ImageProcessor ipFilter = _imgFilter.getProcessor();
+		runInter(raw);
 		ArrayList<String> temp = this.getMaxima();
 		ImageProcessor ipRaw = raw.getProcessor();
 		HashMap<String,Loop>  data = new HashMap<>();
-		this._imgNorm = raw;
 		//System.out.println("size raw maxima !!!!!!!!!!!!!! "+raw.getTitle()+"  "+temp.size());
 		for(int j = 0; j < temp.size();++j){
 			String[] parts = temp.get(j).split("\\t");
@@ -134,22 +136,22 @@ public class FindMaxima{
 			String name= this._chr+"\t"+this._chr2+"\t"+temp.get(j);
 			float avg = average(x,y);
 			float std = standardDeviation(x,y,avg);
-			int nbOfZero = detectNbOfZero(x,y,raw,ipRaw.getf(x, y));
-			//if(avg > 1.45 && ipRaw.getf(x, y) >= 1.85){ // filter on the loop value and region value
+			int nbOfZero = detectNbOfZero(x,y,ipRaw.getf(x, y));
+			if(nbOfZero <= 3){ // filter on the loop value and region value
 				DecayAnalysis da = new DecayAnalysis(raw,x,y);
 				float n1 =da.getNeighbourhood1();
 				float n2 =da.getNeighbourhood2();
-				//if(n1 < n2 && n1 >= 0.15 && n2 >= 0.25){ // filter on the neighborood for hic datatset
+					if(n2>n1 && n1 >= 0 && n2 >= 0){ // filter on the neighborood for hic datatset
 					Loop maxima = new Loop(temp.get(j),x,y,this._chr,this._chr2,avg,std,ipRaw.getf(x, y));
+					maxima.setValueDiff(ipFilter.getf(x,y));
 					maxima.setNeigbhoord1(n1);
 					maxima.setNeigbhoord2(n2);
 					maxima.setResolution(this._resolution);
 					maxima.setNbOfZero(nbOfZero);
-					//System.out.println(_resolution+" "+maxima.getResolution());
 					maxima.setMatrixSize(raw.getWidth());
 					data.put(name, maxima);
-				//}
-			//}
+				}
+			}
 		}
 		//System.out.println("after filter ################# "+raw.getTitle()+"  "+data.size());
 		return data;
@@ -165,7 +167,7 @@ public class FindMaxima{
 	private void run(int nbZero, ImagePlus rawImage, float backgroundValue){
 		ImagePlus temp = this._imgFilter.duplicate();
 		ImageProcessor ip = temp.getProcessor();
-		MaximumFinder mf = new MaximumFinder(); 
+		MaximumFinder mf = new MaximumFinder();
 		ByteProcessor bp = mf.findMaxima(ip, this._noiseTolerance, MaximumFinder.SINGLE_POINTS, true);
 		this._imgResu.setProcessor(bp);
 		this.putLoopLowerTriangle();
@@ -177,18 +179,18 @@ public class FindMaxima{
 
 	/**
 	 *
-	 * @param nbZero
-	 * @param rawImage
-	 * @param backgroundValue
 	 */
-	private void runInter(int nbZero, ImagePlus rawImage, float backgroundValue){
+	private void runInter(ImagePlus rawImage){
 		ImagePlus temp = this._imgFilter.duplicate();
 		ImageProcessor ip = temp.getProcessor();
+		GaussianBlur gb = new GaussianBlur();
+		gb.blurGaussian(ip, this._gaussianFilterRadius);
 		MaximumFinder mf = new MaximumFinder();
 		ByteProcessor bp = mf.findMaxima(ip, this._noiseTolerance, MaximumFinder.SINGLE_POINTS, true);
 		this._imgResu.setProcessor(bp);
+		this._imgNorm = rawImage;
 		//this.removedCloseMaxima();
-		//this.correctMaxima();
+		this.correctMaxima();
 		//this.removeMaximaCloseToZero(nbZero,rawImage, backgroundValue);
 	}
 
@@ -197,21 +199,23 @@ public class FindMaxima{
 	 *
 	 * @param x
 	 * @param y
-	 * @param rawImage
 	 * @param val
 	 * @return
 	 */
-	private int detectNbOfZero(int x, int y, ImagePlus rawImage, float val){
-		int w = this._imgResu.getWidth();
-		int h = this._imgResu.getHeight();
-		ImageProcessor ipResu = this._imgResu.getProcessor();
-		ImageProcessor ip = rawImage.getProcessor();
-		int nbZero = 0;
-		for(int i = x - 2; i <= x+2; ++i) {
-			for (int j = y-2; j <= y+2; ++j) {
-				if(ip.getf(i,j) <= 1) {
-					nbZero++;
-					System.out.println("yup");
+	private int detectNbOfZero(int x, int y, float val){
+		int w = this._imgNorm.getWidth();
+		int h = this._imgNorm.getHeight();
+		ImageProcessor ip = _imgNorm.getProcessor();
+		int nbZero = -1;
+		if(x >= 3 && x <= w-3 && y >= 3 && y <= h-3) {
+			nbZero = 0;
+			for (int i = x - 2; i <= x + 2; ++i) {
+				for (int j = y - 2; j <= y + 2; ++j) {
+					if (ip.getf(i, j) <= 1) {
+						nbZero++;
+					} else if (Double.isNaN(ip.getf(i, j))) {
+						nbZero++;
+					}
 				}
 			}
 		}
@@ -341,7 +345,9 @@ public class FindMaxima{
 		for(int i = x-1; i <= x+1; ++i){
 			for(int j = y-1; j <= y+1; ++j){
 				if(i < ip.getWidth() && i>0 && j < ip.getWidth() && j > 0){
-					sum +=ip.getf(i, j);
+					if(	Double.isNaN(ip.getf(i, j))){
+						sum +=0;
+					}else{	sum +=ip.getf(i, j);}
 					++nb;
 				}
 			}
@@ -366,7 +372,9 @@ public class FindMaxima{
 		for(int i = x-1; i <= x+1; ++i){
 			for(int j = y-1; j <= y+1; ++j){
 				if(i < ip.getWidth() && i>0 && j < ip.getWidth() && j > 0){
-					semc += (ip.getf(i, j)-avg)*(ip.getf(i, j)-avg);
+					if(	Double.isNaN(ip.getf(i, j))){
+						semc += (0-avg)*(0-avg);
+					}else{	semc += (ip.getf(i, j)-avg)*(ip.getf(i, j)-avg);}
 					++nb;
 				}
 			}	

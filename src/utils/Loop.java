@@ -48,6 +48,8 @@ public class Loop {
 	private float _avg = -1;
 	/** Value of the loop*/
 	private float _peakValue = -1;
+	/** Value of the loop*/
+	private float _peakValueDiff = -1;
 	/** Standard deviation value of the neighbourhood 9.*/
 	private float _std = -1;
 	/** FDR score 1*/
@@ -255,6 +257,11 @@ public class Loop {
 	 */
 	public float getValue(){ return this._peakValue; }
 	/**
+	 * Getter of the loop(x,y) value
+	 * @return double loop value
+	 */
+	public float getValueDiff(){ return this._peakValueDiff; }
+	/**
 	 * Getter of the n 8 average value 
 	 * @return double average of n 8 average
 	 */
@@ -302,6 +309,11 @@ public class Loop {
 	 * @return
 	 */
 	public float getPaScoreAvgdev(){	return this._paScoreAvgdev; }
+	/**
+	 *
+	 * @return
+	 */
+	public void setValueDiff(float diff){ this._peakValueDiff = diff; }
 
 	/**
 	 *	Setter  of the peak analysis loop score

@@ -78,7 +78,6 @@ public class CoordinatesCorrection {
 	 */
 	public HashMap<String,Loop> imageToGenomeCoordinate(HashMap<String,Loop> temp, String rawImageName) {
 		//4_0_49999999_6_0_49999999.tif
-		HashMap<String, Loop> data = new HashMap<>();
 		String[] chrCoord = rawImageName.split("_");
 		int chr1Start = Integer.parseInt(chrCoord[1]);
 		int chr2Start = Integer.parseInt(chrCoord[4]);
@@ -99,9 +98,9 @@ public class CoordinatesCorrection {
 			String newName = loop.getChr() + "\t" + loop.getChr2() + a + "\t" + b;
 			loop.setCoordinates(a, a_end, b, b_end);
 			loop.setName(newName);
-			data.put(newName, loop);
+			_data.put(newName, loop);
 		}
-		return data;
+		return _data;
 	}
 	/**
 	 * getter of m_data
