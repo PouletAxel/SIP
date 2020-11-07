@@ -7,7 +7,7 @@ import java.io.IOException;
 import java.util.HashMap;
 
 /**
- * Runnable class for loops detcetion
+ * Runnable class for loops detection
  * 
  * @author axel poulet
  *
@@ -25,20 +25,20 @@ public class RunnableDetectLoops extends Thread implements Runnable{
 	private boolean _delImages = true;
 	/** norn vector table for the chr of interest*/
 	private HashMap<Integer, String> _normVector = new HashMap<Integer, String> ();
-	/** */
-	private String _normvectorFile;
+	/** path of Normalized vector from juicer tools dump for each chr by SIP*/
+	private String _normVectorFile;
 	
 	
 
 	/**
-	 * Construtor, initialize all the variables  of interest
+	 * Constructor, initialize all the variables needed for runnableDetectLoop, for hic file
 	 * 
 	 *
-	 * @param chr
-	 * @param resuFile
-	 * @param sip
-	 * @param normVectorFile
-	 * @param delFile
+	 * @param chr String chromosome name
+	 * @param resuFile path to the result file
+	 * @param sip SIPObject
+	 * @param normVectorFile path to normalized vector
+	 * @param delFile boolean if true delete all the tif file at the end of the process
 	 */
 	public RunnableDetectLoops (String chr, String resuFile, SIPObject sip, String normVectorFile, boolean delFile){
 		this._sip = sip;
@@ -47,15 +47,16 @@ public class RunnableDetectLoops extends Thread implements Runnable{
 		this._resuFile = resuFile;
 		this._normVector = sip.getNormValueFilter(normVectorFile);
 		this._delImages = delFile;
-		this._normvectorFile = normVectorFile; 
+		this._normVectorFile = normVectorFile;
 	}
 
 	/**
+	 * Constructor, initialize all the variables needed for runnableDetectLoop, for mcool file
 	 *
-	 * @param chr
-	 * @param resuFile
-	 * @param sip
-	 * @param delFile
+	 * @param chr String chromosome name
+	 * @param resuFile path to the result file
+	 * @param sip SIPObject
+	 * @param delFile boolean if true delete all the tif file at the end of the process
 	 */
 	public RunnableDetectLoops (String chr, String resuFile, SIPObject sip, boolean delFile){
 		this._sip = sip;
@@ -77,20 +78,23 @@ public class RunnableDetectLoops extends Thread implements Runnable{
 		HashMap<String, Loop> data = new HashMap<String, Loop> ();
 		if (this._sip.isProcessed()) dir = this._sip.getInputDir()+resName+File.separator+this._chr+File.separator;
 		try {
-			File[] listOfFiles = _sip.fillList(dir);
+			File folder = new File(dir);
+			File[] listOfFiles = folder.listFiles();
+
 			System.out.println(dir);
 			if (listOfFiles.length == 0) System.out.println("!!!!!!!!!! dumped directory of chromosome"+this._chr+" empty");
 			else{
 				File file = new File(this._resuFile);
-				if(_sip.isCooler() == false) {
-					System.out.println(_normvectorFile+"normVector end loading file: "+_chr+".norm "+resName);
+				if(!_sip.isCooler()) {
+					System.out.println(_normVectorFile +"normVector end loading file: "+_chr+".norm "+resName);
 				}
 				data = this._callLoops.detectLoops(listOfFiles,this._chr,this._normVector);
 				synchronized(this) {
 					if (file.length() == 0)	_sip.saveFile(this._resuFile,data,false);
 					else this._sip.saveFile(this._resuFile,data, true);
 				}
-				listOfFiles = _sip.fillList(dir);
+				folder = new File(dir);
+				listOfFiles = folder.listFiles();
 				if(_delImages){
 					System.out.println("Deleting image file for "+_chr);
 					for(int i = 0; i < listOfFiles.length;++i) {

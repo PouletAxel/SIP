@@ -23,17 +23,13 @@ public class TupleFileToImage {
 	/** Image results */
 	private ImagePlus _imgNorm = new ImagePlus();
 	/** Path of the tuple file*/
-	private String _file = "";
+	private String _file;
 	/** Size of the matrix*/
-	private int _size = 0 ;
+	private int _size;
 	/**	 Resolution of the image in base*/
-	private int _resolution = 0 ;
+	private int _resolution;
 	/** Step to process the whole chromosme*/
 	private int _step ;
-	/** Image value average*/
-	private float _avg = 0;
-	/** Image standard deviation */
-	private float _std = 0;
 	/** number of pixe == 0 */
 	private int _noZeroPixel = 0;
 	
@@ -53,9 +49,8 @@ public class TupleFileToImage {
 	
 	
 	/**
-	 * Method to make the image with an input tuple file return the image results
-	 *  
-	 * @return ImagePlus results
+	 * Method to make the image with an input tuple file from intra chromosomal process
+	 *
 	 */
 	public void readTupleFile(){
 		BufferedReader br;
@@ -119,21 +114,23 @@ public class TupleFileToImage {
 				}
 			}
 		}
-		_avg = sum/_noZeroPixel;
-		_std = std(_avg,img);
+		/** Image value average*/
+		float _avg = sum / _noZeroPixel;
+		/** Image standard deviation */
+		float _std = std(_avg, img);
 		for(int i = 0; i < ip.getWidth(); ++i){
 			for(int j = 0; j < ip.getWidth(); ++j){
 				float a = ip.getf(i, j);
-				if (Math.abs(j-i) <= 2 && a >= _avg+_std*2)
-					ip.setf(i,j,_avg);
+				if (Math.abs(j-i) <= 2 && a >= _avg + _std *2)
+					ip.setf(i,j, _avg);
 			}
 		}
 		img.setProcessor(ip);
 	}
 
 	/**
-	 *
-	 * @return
+	 * Method to make the image with an input tuple file from inter chromosomal process
+	 * @return ImagePlus
 	 */
 	public ImagePlus readTupleFileInter(){
 		ImagePlus img = new ImagePlus();
@@ -213,15 +210,5 @@ public class TupleFileToImage {
 	 * @return ImagePlus normalized image
 	 */
 	public ImagePlus getNormImage(){return this._imgNorm;}
-	
-	/**
-	 * setter for the raw Image		
-	 * @param img ImagePlus
-	 */
-	public void setRawImage(ImagePlus img){this._img = img;}
-	/**
-	 * setter of the normalized image
-	 * @param img ImagePLus
-	 */
-	public void setNormImage(ImagePlus img){this._imgNorm = img;}
+
 }

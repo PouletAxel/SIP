@@ -33,18 +33,12 @@ public class CallLoopsInter {
 
     /**
      * Detect loops methods
-     * detect the loops at two different resolution, initial resolution + 2 fold bigger
-     * call the loops first in the smaller resolution
-     * then making image with bigger resolution and fill no Zero list
-     * faire un gros for deguelasse por passer les faceteur de grossissement seulement si listDefacteur > 1.
-     * make and save image at two differents resolution (m_resolution and m_resolution*2)
-     * if there is a lot pixel at zero in the images adapt the threshold for the maxima detection
      *
-     * @param fileList
-     * @param chrName1
-     * @param chrName2
-     * @return
-     * @throws IOException
+     * @param fileList list with tuple file
+     * @param chrName1 name of chr 1
+     * @param chrName2 name of chr 2
+     * @return HashMap name loop => Loop Object
+     * @throws IOException exception
      */
     public HashMap<String, Loop> detectLoops(File[] fileList, String chrName1, String chrName2){
         CoordinatesCorrection coord = new CoordinatesCorrection();
@@ -74,12 +68,15 @@ public class CallLoopsInter {
         return hLoop;
     }
 
-        /**
-         * Save the image file
-         *
-         * @param imagePlusInput image to save
-         * @param pathFile path to save the image
-         */
+    /**
+     * Create and save the diff image.
+     * for each pixel compute the new value computing the average subtraction between the pixel of interest and all
+     * pixel inside the neighbor 3
+     *
+     * @param imagePlusInput imagePlus raw
+     * @param pathFile path to the imagePlus raw
+     * @return  the diff ImagePlus
+     */
     private ImagePlus imgDiff(ImagePlus imagePlusInput, String pathFile){
         GaussianBlur gb = new GaussianBlur();
         ImageProcessor ip = imagePlusInput.getProcessor();
@@ -99,7 +96,6 @@ public class CallLoopsInter {
                         }
                     }
                 }
-                //if(sum < 0 ) sum = 0;
                 pRaw.setf(i,j,sum/48);
             }
         }

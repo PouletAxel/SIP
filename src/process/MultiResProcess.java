@@ -21,22 +21,20 @@ import utils.Loop;
 import utils.SIPObject;
 
 /**
- * 
+ * Class allowing the multi resolution loop calling
+ *
  * @author axel poulet
  *
  */
 public class MultiResProcess {
 
+	/** SIP object*/
 	private SIPObject _sip;
-	/**
-	 * 
-	 */
+	/** number of cpu */
 	private int _nbCpu;
-	/**
-	 * 
-	 */
+	/** boolean delImage*/
 	private boolean _delImage;
-	
+	/** doc */
 	private String _doc = ("#SIP Version 1 run with java 8\n"
 				+ "\nUsage:\n"
 				+ "\thic <hicFile> <chrSizeFile> <Output> <juicerToolsPath> [options]\n"
@@ -75,14 +73,16 @@ public class MultiResProcess {
 				+ "M. Jordan Rowley\n"
 				+ "\tDepartment of Genetics, Cell Biology and Anatomy, University of Nebraska Medical Center Omaha,NE 68198-5805\n"
 				+ "\nContact: pouletaxel@gmail.com OR jordan.rowley@unmc.edu");
-	
+	/** path to chr size file*/
 	private String _chrFile;
+
 	/**
-	 * 
-	 * @param sip
-	 * @param cpu
-	 * @param delImage
-	 * @param chrSizeFile
+	 * Constructor
+	 *
+	 * @param sip SIPObject
+	 * @param cpu number of cpu
+	 * @param delImage delete image boolean
+	 * @param chrSizeFile path of chrSize file
 	 */
 	public MultiResProcess(SIPObject sip, int cpu, boolean delImage, String chrSizeFile) {
 		this._nbCpu = cpu;
@@ -92,17 +92,20 @@ public class MultiResProcess {
 	}
 	
 	/**
-	 * @throws InterruptedException 
-	 * @throws IOException 
+	 *
+	 * for each resolution used run the same process to otain the loop at the resolution of interest
+	 * at each resolution the input parameters will be adapted to the resolution used
+	 * @throws InterruptedException exception
+	 * @throws IOException exception
 	 * 
 	 */
 	public void run() throws InterruptedException, IOException{
 		ArrayList<Integer> listFactor = this._sip.getListFactor();
 		ArrayList<String> listOfFile = new ArrayList<String>();
 		File outDir = new File(_sip.getOutputDir());
-		if (outDir.exists()==false) outDir.mkdir();
+		if (!outDir.exists()) outDir.mkdir();
 		if (_sip.isProcessed()){
-			if(this.testDir()==false){
+			if(!this.testDir()){
 				if(_sip.isGui()) {
 					JOptionPane.showMessageDialog(null,"Resolution problem", "Enable to find all the directories needed for SIP (-factor option)", JOptionPane.ERROR_MESSAGE);
 				}
@@ -111,6 +114,7 @@ public class MultiResProcess {
 				System.exit(0);
 			}
 		}
+
 		for(int indexFact = 0; indexFact < listFactor.size(); ++indexFact) {
 			int res = this._sip.getResolution()*listFactor.get(indexFact);
 			String resName = String.valueOf(res);
@@ -133,7 +137,7 @@ public class MultiResProcess {
 				}
 				sipTmp.setChrSizeHashMap(this._sip.getChrSizeHashMap());
 				sipTmp.setIsGui(_sip.isGui());
-				sipTmp.setDiagSize(this._sip.getDiagSize());
+				sipTmp.setDiagonalSize(this._sip.getDiagonalSize());
 				sipTmp.setGauss(this._sip.getGauss()/listFactor.get(indexFact));
 				sipTmp.setMatrixSize((int)(this._sip.getMatrixSize()/listFactor.get(indexFact)));
 				sipTmp.setResolution(res);
@@ -159,8 +163,8 @@ public class MultiResProcess {
 	}
 	
 	/**
-	 * 
-	 * @return
+	 * test the data organization
+	 * @return boolean if yes the dir of interest is existing
 	 */
 	private boolean testDir(){
 		String input = _sip.getInputDir();
@@ -170,7 +174,7 @@ public class MultiResProcess {
 			String resName = String.valueOf(res);
 			resName = resName.replace("000", "")+"kb";
 			File inputDir = new File(input+resName);
-			if(inputDir.exists()== false) {
+			if(!inputDir.exists()) {
 				return false;
 			}
 		}
@@ -178,17 +182,19 @@ public class MultiResProcess {
 	}
 
 	/**
-	 * 
-	 * @param listOfFile
-	 * @throws IOException
+	 * merge loops from different resolution
+	 * test if loops are present at different resolution if yes keep this one at  smaller resolution
+	 *
+	 * @param listOfFile list of of llops file
+	 * @throws IOException exception
 	 */
 	private void mergedFile(ArrayList<String> listOfFile) throws IOException{
-		HashMap<String,Integer> chrsize = readChrIndex(this._chrFile);
-		Set<String> key = chrsize.keySet();
-		ArrayList <HashMap<String,Loop>> data = new ArrayList <HashMap<String,Loop>>();
+		HashMap<String,Integer> chrSize = readChrIndex(this._chrFile);
+		Set<String> key = chrSize.keySet();
+		ArrayList <HashMap<String,Loop>> arrayListLoop = new ArrayList <HashMap<String,Loop>>();
 		for (int i = 0; i < key.size();++i) {
-			HashMap<String,Loop> plop = new HashMap<String,Loop>();
-			data.add(plop);
+			HashMap<String,Loop> loopHashMap = new HashMap<String,Loop>();
+			arrayListLoop.add(loopHashMap);
 		}
 			
 		BufferedReader br = new BufferedReader(new FileReader(listOfFile.get(0)));
@@ -201,10 +207,10 @@ public class MultiResProcess {
 			sb.append(line);
 			Loop loop = new Loop(line);
 			String chr = loop.getChr();
-			int index = chrsize.get(chr);
-			HashMap<String,Loop> plop = data.get(index);
-			plop.put(line, loop);
-			data.set(index, plop);
+			int index = chrSize.get(chr);
+			HashMap<String,Loop> loopHashMap = arrayListLoop.get(index);
+			loopHashMap.put(line, loop);
+			arrayListLoop.set(index, loopHashMap);
 			sb.append(System.lineSeparator());
 			line = br.readLine();
 		}
@@ -219,11 +225,11 @@ public class MultiResProcess {
 			while (line != null){
 				Loop loop = new Loop(line);
 				String chr = loop.getChr();
-				int index = chrsize.get(chr);
-				HashMap<String,Loop> plop = data.get(index);
-				if(compareLoop(plop,loop)){
-					plop.put(line,loop);
-					data.set(index, plop);
+				int index = chrSize.get(chr);
+				HashMap<String,Loop> loopHashMap = arrayListLoop.get(index);
+				if(compareLoop(loopHashMap,loop)){
+					loopHashMap.put(line,loop);
+					arrayListLoop.set(index, loopHashMap);
 				}
 				sb.append(System.lineSeparator());
 				line = br.readLine();
@@ -234,9 +240,9 @@ public class MultiResProcess {
 		BufferedWriter writer;
 		writer = new BufferedWriter(new FileWriter(new File(_sip.getOutputDir()+"finalLoops.txt")));
 		writer.write(title+"\n");
-		for (int i = 0; i < data.size();++i){
-			HashMap<String,Loop> plop = data.get(i);
-			Set<String> keyBis = plop.keySet();
+		for (int i = 0; i < arrayListLoop.size();++i){
+			HashMap<String,Loop> loopHashMap = arrayListLoop.get(i);
+			Set<String> keyBis = loopHashMap.keySet();
 			List<String> output = keyBis.stream().collect(Collectors.toList());
 			for (int j = 0; j < output.size();++j){
 				writer.write(output.get(j)+"\n");
@@ -247,24 +253,25 @@ public class MultiResProcess {
 		
 		
 	/**
-	 * 
-	 * @param plop
-	 * @param a
-	 * @return
+	 * test if the loop is existing at other resolution, if yes keep it if it is the smaller reolution
+	 *
+	 * @param loopHashMap hashmap loop name => Loop object
+	 * @param loopOfInterest Loop to test
+	 * @return boolean true or false
 	 */
-	private  boolean compareLoop(HashMap<String,Loop> plop, Loop a) {
-		Set<String> key = plop.keySet();
+	private  boolean compareLoop(HashMap<String,Loop> loopHashMap, Loop loopOfInterest) {
+		Set<String> key = loopHashMap.keySet();
 		Iterator<String> it = key.iterator();
 		while (it.hasNext()){
 			String loopName = it.next();
-			Loop loop = plop.get(loopName);
+			Loop loop = loopHashMap.get(loopName);
 			int xEnd = loop.getCoordinates().get(1);
 			int yEnd = loop.getCoordinates().get(3);
-			int xtest = a.getCoordinates().get(0);
-			int xtestEnd = a.getCoordinates().get(1);
+			int xtest = loopOfInterest.getCoordinates().get(0);
+			int xtestEnd = loopOfInterest.getCoordinates().get(1);
 			int res = xtestEnd-xtest;
-			int ytest = a.getCoordinates().get(2);
-			int ytestEnd = a.getCoordinates().get(3);
+			int ytest = loopOfInterest.getCoordinates().get(2);
+			int ytestEnd = loopOfInterest.getCoordinates().get(3);
 			xtest = xtest-res*2;
 			xtestEnd = xtestEnd+res*2;
 			ytest = ytest-res*2;
@@ -278,10 +285,10 @@ public class MultiResProcess {
 	
 
 	/**
-	 * 
-	 * @param chrSizeFile
-	 * @return
-	 * @throws IOException
+	 * Read chr index file and return HashMap of chr name and size
+	 * @param chrSizeFile path to the chr size file
+	 * @return hashMap chrName => chrSize
+	 * @throws IOException exception
 	 */
 	private HashMap<String, Integer> readChrIndex( String chrSizeFile) throws IOException{
 		HashMap<String,Integer> chrSize =  new HashMap<String,Integer>();

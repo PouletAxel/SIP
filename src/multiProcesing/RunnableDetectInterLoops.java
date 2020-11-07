@@ -9,39 +9,34 @@ import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 
-
+/**
+ *  runnable class for inter loops detection
+ *
+ */
 public class RunnableDetectInterLoops extends Thread implements Runnable {
 
-    /**
-     * SIP object containing all the parameter for the loops detection
-     */
+    /*** SIP object containing all the parameter for the loops detection */
     private SIPInter _sipInter;
-    /**
-     * CallLoops object
-     */
+    /** CallLoops object */
     private CallLoopsInter _callLoopsInter;
-    /**
-     * String results file
-     */
+    /** String results file */
     private String _resuFile;
-    /**
-     * String name of the chr
-     */
+    /** String name of the chr1 */
     private String _chr1;
-   /**
-    *
-    */
+   /** String chr name 2  */
     private String _chr2;
-    /**
-     * String name of the chr
-     */
+    /**String name of the chr*/
     private boolean _delImages = true;
-    /**
-     * norn vector table for the chr of interest
-     */
+
 
     /**
-     * Construtor, initialize all the variables  of interest
+     *  Construtor, initialize all the variables  of interest
+     *
+     * @param chr1 chr1 name
+     * @param chr2 chr2 name
+     * @param resuFile path output file
+     * @param sip SIPInter object
+     * @param delFile boolean if true delete all tif file.
      */
     public RunnableDetectInterLoops(String chr1, String chr2, String resuFile, SIPInter sip,  boolean delFile) {
         this._sipInter = sip;

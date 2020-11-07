@@ -51,7 +51,7 @@ public class CoordinatesCorrection {
 			String newName = loop.getChr()+"\t"+a+"\t"+b;
 			if(a!=b && Math.abs(a-b) > diagSize){
 				if (x > 1 && y > 1 && y < imageSize-2 && x < imageSize-2){
-					if(this._data.containsKey(newName) == false){
+					if(!this._data.containsKey(newName)){
 						loop.setCoordinates(a, a_end, b, b_end);
 						loop.setName(newName);
 						//System.out.println(newName+" "+resolution+" "+step+" "+index+" "+x);
@@ -72,9 +72,9 @@ public class CoordinatesCorrection {
 
 	/**
 	 * For loop inter chromosomal
-	 * @param temp
-	 * @param rawImageName
-	 * @return
+	 * @param temp hashMap name loop > loop object
+	 * @param rawImageName  raw image name
+	 * @return HashMAp with new coordinate
 	 */
 	public HashMap<String,Loop> imageToGenomeCoordinate(HashMap<String,Loop> temp, String rawImageName) {
 		//4_0_49999999_6_0_49999999.tif
@@ -110,7 +110,7 @@ public class CoordinatesCorrection {
 	
 	/**
 	 * setter of m_data
-	 * @param data 
+	 * @param data setter loops hashMAp
 	 */
 	public void setData(HashMap<String,Loop> data){ this._data = data;}
 }

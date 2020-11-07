@@ -16,9 +16,8 @@ public class FilterLoops {
 	
 	
 	/**
-	 * Constructor 
-	 * @param resolution
-	 * @param normVector
+	 * Constructor
+	 * @param resolution loop resolution
 	 */
 	public FilterLoops(int resolution){
 		this._resolution = resolution;

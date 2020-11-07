@@ -19,11 +19,8 @@ public class SIPInter{
     private String _output;
     /** Strength of the gaussian filter*/
     private double _gauss;
-
+    /** double fdr value choose by the user*/
     private double _fdr;
-    private double _medianAP;
-    private double _medianAPReg;
-
     /** Image size*/
     private int _matrixSize;
     /** Resolution of the bin dump in base*/
@@ -40,6 +37,7 @@ public class SIPInter{
     private boolean _isProcessed;
     /** if is gui analysis*/
     private boolean _isGui;
+    /** if data set is mcool format*/
     private boolean _isCooler;
     /** */
     private boolean _keepTif;
@@ -48,16 +46,16 @@ public class SIPInter{
      *
      *  constructor for hic file
      *
-     * @param output
-     * @param chrsize
-     * @param gauss
-     * @param resolution
-     * @param thresholdMax
-     * @param matrixSize
-     * @param nbZero
-     * @param keepTif
-     * @param fdr
-     * @throws IOException
+     * @param output output path
+     * @param chrsize chr size path
+     * @param gauss gaussian filter strength
+     * @param resolution bins size
+     * @param thresholdMax threshold value for loops detection
+     * @param matrixSize image size
+     * @param nbZero nb of zero allowed around a loop
+     * @param keepTif true to keep image creat by SIP
+     * @param fdr fdr value for the final loops filter
+     * @throws IOException exception
      */
     public SIPInter(String output,String chrsize, double gauss,  int resolution, double thresholdMax, int matrixSize, int nbZero, boolean keepTif,double fdr) throws IOException {
 
@@ -75,14 +73,17 @@ public class SIPInter{
     /**
      *  constructor for processed data
      *
-     * @param output
-     * @param chrsize
-     * @param gauss
-     * @param resolution
-     * @param thresholdMax
-     * @param matrixSize
-     * @param nbZero
-     * @param keepTif
+     * @param input input file with SIP file
+     * @param output output path
+     * @param chrsize chr size path
+     * @param gauss gaussian filter strength
+     * @param resolution bins size
+     * @param thresholdMax threshold value for loops detection
+     * @param matrixSize image size
+     * @param nbZero nb of zero allowed around a loop
+     * @param keepTif true to keep image creat by SIP
+     * @param fdr fdr value for the final loops filter
+     * @throws IOException exception
      */
     public SIPInter(String input,String output,String chrsize, double gauss, int resolution,
                  double thresholdMax, int matrixSize, int nbZero, boolean keepTif, double fdr) throws IOException {
@@ -101,17 +102,17 @@ public class SIPInter{
     }
 
     /**
-     *
-     * @param pathFile
-     * @param hLoop
-     * @param first
-     * @throws IOException
+     * Write detected loops after filtering via the fdr value
+     * @param pathFile path for the output file
+     * @param hLoop hashmap loopsName => Loop object
+     * @param first boolean if true it is the first results so need to write the header
+     * @throws IOException exception
      */
     public void writeResu(String pathFile, HashMap<String,Loop> hLoop, boolean first) throws IOException {
-        FDR fdrDetection = new FDR ();
-        fdrDetection.run(this._fdr, hLoop);
-        double RFDRcutoff = fdrDetection.getRFDRcutoff();
-        double FDRcutoff = fdrDetection.getFDRcutoff();
+        FDR fdrDetection = new FDR (this._fdr, hLoop);
+        fdrDetection.run();
+        double RFDRcutoff = fdrDetection.getRFDRCutoff();
+        double FDRcutoff = fdrDetection.getFDRCutoff();
         System.out.println("Filtering value at "+this._fdr+" FDR is "+FDRcutoff+" APscore and "+RFDRcutoff+" RegionalAPscore\n");
         BufferedWriter writer;
         if(first) writer = new BufferedWriter(new FileWriter(new File(pathFile), true));
@@ -136,39 +137,7 @@ public class SIPInter{
         writer.close();
     }
 
-    /**
-     *
-     * @return
-     */
-    private void median(HashMap<String,Loop> data, double fdrCutoff){
-        Set<String> key = data.keySet();
-        Iterator<String> it = key.iterator();
-        ArrayList<Float> n1 = new ArrayList<Float> ();
-        ArrayList<Float> n2 = new ArrayList<Float> ();
-        int nb = 0;
-        while (it.hasNext()){
-            String name = it.next();
-            Loop loop = data.get(name);
-            if(loop.getPaScoreAvg()> 1.2 && loop.getPaScoreAvg() > 1 && loop.getPaScoreAvg() > fdrCutoff && loop.getPaScoreAvgdev() > .9){
-                n1.add(loop.getPaScoreAvg());
-                n2.add(loop.getRegionalPaScoreAvg());
-                nb++;
-            }
-        }
-        if(nb>0){
-            n1.sort(Comparator.naturalOrder());
-            n2.sort(Comparator.naturalOrder());
-            double pos1 = Math.floor((n1.size() - 1.0) / 2.0);
-            double pos2 = Math.ceil((n1.size() - 1.0) / 2.0);
-            if (pos1 == pos2 ) 	_medianAP = n1.get((int)pos1);
-            else _medianAP = (n1.get((int)pos1) + n1.get((int)pos2)) / 2.0 ;
-            pos1 = Math.floor((n2.size() - 1.0) / 2.0);
-            pos2 = Math.ceil((n2.size() - 1.0) / 2.0);
-            if (pos1 == pos2 ) 	_medianAPReg = n2.get((int)pos1);
-            else _medianAPReg = (n2.get((int)pos1) + n2.get((int)pos2)) / 2.0 ;
-           // System.out.println("AP\t"+_medianAP+"\nAPREG\t"+_medianAPReg);
-        }
-    }
+
 
     /**
      * Getter of the input dir
@@ -308,35 +277,41 @@ public class SIPInter{
     public void setIsGui(boolean isGui) { this._isGui = isGui;}
 
 
+
     /**
+     *  Initialize chrSize hashMap
      *
-     * @param chrSizeFile
-     * @return
-     * @throws IOException
+     * @param chrSizeFile path to the chrFile
      */
-    public void  setChrSize(String chrSizeFile) throws IOException{
-        BufferedReader br = new BufferedReader(new FileReader(chrSizeFile));
-        StringBuilder sb = new StringBuilder();
-        String line = br.readLine();
-        while (line != null){
-            sb.append(line);
-            String[] parts = line.split("\\t");
-            String chr = parts[0];
-            int size = Integer.parseInt(parts[1]);
-            _chrSize.put(chr, size);
-            sb.append(System.lineSeparator());
-            line = br.readLine();
+    public void  setChrSize(String chrSizeFile) {
+        BufferedReader br = null;
+        try {
+            br = new BufferedReader(new FileReader(chrSizeFile));
+            StringBuilder sb = new StringBuilder();
+            String line = br.readLine();
+            while (line != null){
+                sb.append(line);
+                String[] parts = line.split("\\t");
+                String chr = parts[0];
+                int size = Integer.parseInt(parts[1]);
+                _chrSize.put(chr, size);
+                sb.append(System.lineSeparator());
+                line = br.readLine();
+            }
+            br.close();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-        br.close();
     }
 
     /**
-     * \
-     * @return
+     * getter chrSize
+     * @return hashMap of chrName => size
      */
     public HashMap<String, Integer> getChrSize() {
         return _chrSize;
     }
+
 }
 
 

@@ -26,26 +26,31 @@ public class ProcessCoolerDumpData {
 	private Progress _p;
 	
 	/**
-	 * 
+	 * Constructor
 	 */
 	public ProcessCoolerDumpData(){ }
 		
 	/**
-	 *  * run the processing on different cpu, if all cpu are running, take break else run a new one.
-	 * 
-	 * @param hicFile
-	 * @param sip
-	 * @param chrSize
-	 * @param juiceBoxTools
-	 * @param normJuiceBox
-	 * @param nbCPU
-	 * @throws InterruptedException
+	 * run the processing on different cpu, if all cpu are running, take break else run a new one.
+	 *for each chromosome the normalized data and expected data will be dump via cooler and cooltool.
+	 * the SIP are produce in this step allowing later, the creation of the images and the loops calling step.
+	 *
+	 * if gui is true a progress bar will pop up.
+	 *
+	 *
+	 * @param coolTools String coolTools path
+	 * @param cooler String cooler path
+	 * @param sip SIPObject
+	 * @param coolFile path mcool file
+	 * @param chrSize hashMap chr name => chrSize
+	 * @param nbCPU number of cpu
+	 * @throws InterruptedException exception
 	 */
 	public void go(String coolTools, String cooler, SIPObject sip, String coolFile, HashMap<String,Integer> chrSize,int nbCPU) throws InterruptedException {
 		ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(nbCPU);
 		Iterator<String> chrName = chrSize.keySet().iterator();
 		File outDir = new File(sip.getOutputDir());
-		if (outDir.exists()==false) outDir.mkdir();
+		if (!outDir.exists()) outDir.mkdir();
 		
 		ArrayList<Integer> listFactor = sip.getListFactor();
 		for(int indexFact = 0; indexFact < listFactor.size(); ++indexFact) {
@@ -88,6 +93,5 @@ public class ProcessCoolerDumpData {
 				if(name.contains(".expected"))  listOfFiles[i].delete();
 		}
 		if(sip.isGui())	_p.dispose();
-		
 	}
 }

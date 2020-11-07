@@ -10,6 +10,9 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+/**
+ *
+ */
 public class CoolerExpected {
 	
 	/** String to stock the error if need of juicerbox_tools*/
@@ -17,16 +20,28 @@ public class CoolerExpected {
 	/** String for the log*/
 	private String _log = "";
 	/** path to the hic file or url link*/
-	private String _coolFile = "";
+	private String _coolFile;
 	/** List of doucle to stock the expected vector*/
-	private int _resolution = 0;
-	private int _imgSize = 0;
+	private int _resolution ;
+	/** */
+	private int _imgSize;
+	/** */
 	private String _expected;
-	private String _coolTools = "";
+	/** */
+	private String _coolTools;
+	/** */
 	private HashMap<String, ArrayList<Double>> _hashExpected = new HashMap<String,ArrayList<Double>>();
+	/** */
 	private int _cpu;
-	
-	
+
+	/**
+	 *
+	 * @param cooltools
+	 * @param coolFile
+	 * @param resolution
+	 * @param imageSize
+	 * @param cpu
+	 */
 	public CoolerExpected(String cooltools, String coolFile, int resolution, int imageSize, int cpu){
 		_coolTools = cooltools;
 		this._resolution = resolution;
@@ -34,15 +49,20 @@ public class CoolerExpected {
 		this._coolFile = coolFile+"::/resolutions/"+this._resolution;
 		_cpu = cpu;
 	}
-	
+
+	/**
+	 *
+	 * @param expectedFile
+	 * @param imageSize
+	 */
 	public CoolerExpected(String expectedFile,  int imageSize){
 		this._imgSize = imageSize;
 		this._expected = expectedFile;
 	}
+
 	/**
-	 * 
-	 * @param output
-	 * @param resolution
+	 *
+	 * @param expected
 	 * @return
 	 */
 	public boolean dumpExpected(String expected){
@@ -83,9 +103,12 @@ public class CoolerExpected {
 		
 		return exitValue==0;
 	}
-	
-	
-	
+
+
+	/**
+	 *
+	 * @throws IOException
+	 */
 	public void parseExpectedFile() throws IOException {
 		BufferedReader br = Files.newBufferedReader(Paths.get(_expected), StandardCharsets.UTF_8);
 		String line = br.readLine();
@@ -122,34 +145,16 @@ public class CoolerExpected {
 	/**
 	 * getter of the expected matrix. 
 	 * 
-	 * @param chr: String name of the chromosme
-	 * @param output: path to the output
-	 * @throws IOException 
+	 * @param chr: String name of the chromosome
+	 * @return arrayList of double => vector of expected value
+	 * @throws IOException exception
 	 */
 	public ArrayList<Double> getExpected(String chr) throws IOException{
 		return this._hashExpected.get(chr);
 		
 	}
 	
-	
-	
-	/**
-	 * getter of the logerror file if necessary
-	 * 
-	 * @return return the String with the error
-	 */
-	public String getLogError(){ return this._logError;}
-	
-	/**
-	 * getter of the log info if necessary 
-	 * @return return a String with the log info
-	 */
-	public String getLog(){	return this._log;}
-	/**
-	 * Class to run command line in java
-	 * @author axel poulet
-	 *
-	 */
+
 	public class ReturnFlux extends Thread {  
 
 		/**  Flux to redirect  */
@@ -160,7 +165,7 @@ public class CoolerExpected {
 		 * @param flux
 		 *  flux to redirect
 		 */
-		public ReturnFlux(InputStream flux){this._flux = flux; }
+		private ReturnFlux(InputStream flux){this._flux = flux; }
 		
 		/**
 		 * 
@@ -171,7 +176,7 @@ public class CoolerExpected {
 				BufferedReader br = new BufferedReader(reader);
 				String line=null;
 				while ( (line = br.readLine()) != null) {
-					if(line.contains("WARN")== false) _logError = _logError+line+"\n";
+					if(!line.contains("WARN")) _logError = _logError+line+"\n";
 				}
 			}
 			catch (IOException ioe){

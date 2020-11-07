@@ -10,14 +10,21 @@ import java.io.IOException;
  *
  */
 public class RunnableDumpInterChromoData extends Thread implements Runnable{
-
+    /** path outdir */
     private String _outDir;
+    /** chr1 name */
     private String _chr1;
+    /** chr2 name*/
     private String _chr2;
+    /** size chr1*/
     private int _sizeChr1;
+    /** size chr2 */
     private int _sizeChr2;
+    /** Object DumpInterChromosomal*/
     private DumpInterChromosomal _dumpInter;
+    /** bin size*/
     private int _resolution;
+    /** image size*/
     private int _matrixSize;
 
     /**

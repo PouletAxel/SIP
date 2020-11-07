@@ -31,10 +31,10 @@ public class CallLoops {
 	private double _min;
 	/** Strength of the max filter*/
 	private double _max;
-	/** % of staurated pixel after enhance contrast*/
+	/** % of saturated pixel after enhance contrast*/
 	private double _saturatedPixel;
 	/** Image size*/
-	private int _matrixSize = 0;
+	private int _matrixSize;
 	/** Resolution of the bin dump in base*/
 	private int _resolution;
 	/** Threshold for the maxima detection*/
@@ -48,8 +48,9 @@ public class CallLoops {
 	/**	 struturing element for the MM method used (MorpholibJ)*/
 	private Strel _strel = Strel.Shape.SQUARE.fromRadius(40);
 	/**	 image background value*/
-	private float _backgroudValue = (float) 0.25;
-	private boolean _isCooler = false;
+	private float _backgroudValue;
+	/** boolean if true => mcool file in input */
+	private boolean _isCooler;
 
 	/**
 	 * Constructor
@@ -64,10 +65,11 @@ public class CallLoops {
 		this._matrixSize = sip.getMatrixSize();
 		this._resolution = sip.getResolution();
 		this._thresholdMaxima = sip.getThresholdMaxima();
-		this._diagSize = sip.getDiagSize();
+		this._diagSize = sip.getDiagonalSize();
 		this._step = sip.getStep();
 		this._nbZero = sip.getNbZero();
 		this._isCooler = sip.isCooler();
+		_backgroudValue = (float) 0.25;
 		//System.out.println("gauss:"+this._gauss+" min:"+this._min+" max:"+_max+" sat:"+_saturatedPixel+
 		//" matrix:"+_matrixSize+" res:"+_resolution+" thresh:"+_thresholdMaxima+" diag:"+_diagSize+
 		//" step:"+_step+" nbZero:"+_nbZero);
@@ -81,11 +83,11 @@ public class CallLoops {
 	 * faire un gros for deguelasse por passer les faceteur de grossissement seulement si listDefacteur > 1.
 	 * make and save image at two differents resolution (m_resolution and m_resolution*2)
 	 * if there is a lot pixel at zero in the images adapt the threshold for the maxima detection
-	 * @param fileList
-	 * @param chr
-	 * @param normVector
-	 * @return
-	 * @throws IOException
+	 * @param fileList list of File
+	 * @param chr chr name
+	 * @param normVector hashMap normVector containing biased coordinate
+	 * @return HashMap loop name => Loop Object
+	 * @throws IOException exception
 	 */
 	public HashMap<String, Loop> detectLoops(File[] fileList, String chr,HashMap<Integer,String> normVector) throws IOException{	
 		CoordinatesCorrection coord = new CoordinatesCorrection();
@@ -153,11 +155,11 @@ public class CallLoops {
 	
 
 	/**
-	 * Make Image 
+	 * Make Image from tuple file give in input via the TupleFileToImage Object
 	 * 
 	 *
-	 * @param readFile
-	 * @return
+	 * @param readFile TupleFileToImage object
+	 * @return ImagePlus
 	 */
 	private ImagePlus doImage(TupleFileToImage readFile){	
 		String file = readFile.getInputFile();
@@ -175,7 +177,7 @@ public class CallLoops {
 	 * @param imagePlusInput image to save
 	 * @param pathFile path to save the image
 	 */	
-	public void saveFile ( ImagePlus imagePlusInput, String pathFile){
+	private void saveFile ( ImagePlus imagePlusInput, String pathFile){
 		FileSaver fileSaver = new FileSaver(imagePlusInput);
 	    fileSaver.saveAsTiff(pathFile);
 	}

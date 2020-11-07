@@ -4,7 +4,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 
 import gui.Progress;
-import process.DumpInterChromosomal;
 import utils.SIPInter;
 import utils.SIPObject;
 
@@ -14,8 +13,8 @@ import java.util.concurrent.TimeUnit;
 
 
 /**
- * multi thread class
- * Construct all the RunnableDetectLoops Object and run them sequencily with the available processors
+ * multi thread class for the SIP loop calling step
+ *
  * 
  * @author axel poulet
  *
@@ -28,7 +27,17 @@ public class ProcessDetectLoops{
 	/**	 */
 	public ProcessDetectLoops(){ }
 
-	
+
+	/**
+	 * multiprocessing method for SIP intra chromosomal interaction
+	 *
+	 * @param sip SIPObject
+	 * @param nbCPU nb of cpu
+	 * @param delImage boolean if true del all the tif file
+	 * @param resuFile path to results file
+	 * @param resName name of the resolution used
+	 * @throws InterruptedException exception
+	 */
 	public void go(SIPObject sip,int nbCPU, boolean delImage, String resuFile,String resName) throws InterruptedException { 
 		ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(nbCPU);
 		Iterator<String> chrName = sip.getChrSizeHashMap().keySet().iterator();
@@ -69,15 +78,15 @@ public class ProcessDetectLoops{
 	}
 
 	/**
-	 *
-	 * @param sipInter
-	 * @param nbCPU
-	 * @param delImage
-	 * @param resuFile
-	 * @param resName
-	 * @throws InterruptedException
+	 * multiprocessing  for sip on inter-chromosomal interaction
+	 * for each couple of chromosome, RunnableDetectInterLoop is call.
+	 * @param sipInter SIPInter object
+	 * @param nbCPU number of cpu
+	 * @param delImage boolean if true del all the tif file
+	 * @param resuFile path to results file
+	 * @throws InterruptedException exception
 	 */
-	public void go(SIPInter sipInter, int nbCPU, boolean delImage, String resuFile, String resName) throws InterruptedException {
+	public void go(SIPInter sipInter, int nbCPU, boolean delImage, String resuFile) throws InterruptedException {
 		ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(nbCPU);
 		HashMap<String,Integer> chrSize = sipInter.getChrSize();
 		Object [] chrName = chrSize.keySet().toArray();
@@ -115,8 +124,8 @@ public class ProcessDetectLoops{
 	}
 	/**
 	 * 
-	 * @param dirToTest
-	 * @return
+	 * @param dirToTest path to test if it is existing
+	 * @return boolean
 	 */
 	 private boolean isProcessedMcool(String dirToTest) {
 		 File test = new File (dirToTest);

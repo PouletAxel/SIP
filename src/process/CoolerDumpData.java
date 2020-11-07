@@ -12,6 +12,12 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 
+/**
+ * dump data contained in mcool file via cooler tools
+ *
+ * https://github.com/open2c/cooler
+ * Abdennur, N., and Mirny, L. (2019). Cooler: scalable storage for Hi-C data and other genomically labeled arrays. Bioinformatics. doi: 10.1093/bioinformatics/btz540.
+ */
 public class CoolerDumpData {
 
 	
@@ -20,20 +26,18 @@ public class CoolerDumpData {
 	/** String for the log*/
 	private String _log = "";
 	/** path to the hic file or url link*/
-	private String _coolFile = "";
+	private String _coolFile;
 	/** List of doucle to stock the expected vector*/
 	private ArrayList<Double> _lExpected =  new ArrayList<Double>();
+	/** path to cooler tools*/
+	private String _cooler ;
 
-	private String _cooler = "";
-	
-	
+
 	/**
 	 * Constructor of this class to iniatilise the different variables
-	 * 
-	 * @param juiceboxTools: String: path of juicertoolsBox
-	 * @param hicFile: String: path to the HiC file
-	 * @param norm: String: type of normalisation
-	 * @param resolution: int: resolution of the bins 
+	 *
+	 * @param cooler path to cooler bin
+	 * @param coolFile path of mcool file
 	 */
 	public CoolerDumpData(String cooler, String coolFile) {
 		this._coolFile = coolFile;
@@ -44,8 +48,8 @@ public class CoolerDumpData {
 	 * 
 	 * @param chr: String for the name of teh chromosome
 	 * @param output: String path of the output
-	 * @return
-	 * @throws IOException
+	 * @return boolean
+	 * @throws IOException exception
 	 */
 	public boolean dumpObservedMExpected(String chr, String output, int resolution) throws IOException{
 		int exitValue=1;
@@ -62,8 +66,7 @@ public class CoolerDumpData {
 			new ReturnFlux(process.getErrorStream()).start();
 			exitValue=process.waitFor();		
 		}
-		catch (IOException e) {	e.printStackTrace();}
-		catch (InterruptedException e) {e.printStackTrace();}
+		catch (IOException | InterruptedException e) {	e.printStackTrace();}
 		if(_logError!=""){
 			System.out.println(_logError);
 			System.exit(0);
@@ -79,7 +82,8 @@ public class CoolerDumpData {
 	 * 
 	 * @param obs: String path with the file of the observed value
 	 * @param chr: name of the chr
-	 * @throws IOException
+	 * @param resolution resolution of interest
+	 * @throws IOException exception
 	 */
 	private void observedMExpected(String obs, String chr, int resolution) throws IOException{
 		BufferedReader br = Files.newBufferedReader(Paths.get(obs), StandardCharsets.UTF_8);
@@ -100,21 +104,15 @@ public class CoolerDumpData {
 		writer.close();
 		br.close();
 	}
-	
-	public void setExpected( ArrayList<Double> lExpected) {this._lExpected = lExpected;}
 
 	/**
-	 * getter of the logerror file if necessary
-	 * 
-	 * @return return the String with the error
+	 * setter for expected vector
+	 *
+	 * @param lExpected list of expected value
 	 */
-	public String getLogError(){ return this._logError;}
-	
-	/**
-	 * getter of the log info if necessary 
-	 * @return return a String with the log info
-	 */
-	public String getLog(){	return this._log;}
+	public void setExpected( ArrayList<Double> lExpected) {this._lExpected = lExpected;}
+
+
 	/**
 	 * Class to run command line in java
 	 * @author axel poulet
@@ -130,7 +128,7 @@ public class CoolerDumpData {
 		 * @param flux
 		 *  flux to redirect
 		 */
-		public ReturnFlux(InputStream flux){this._flux = flux; }
+		private ReturnFlux(InputStream flux){this._flux = flux; }
 		
 		/**
 		 * 
@@ -141,7 +139,7 @@ public class CoolerDumpData {
 				BufferedReader br = new BufferedReader(reader);
 				String line=null;
 				while ( (line = br.readLine()) != null) {
-					if(line.contains("WARN")== false) _logError = _logError+line+"\n";
+					if(!line.contains("WARN")) _logError = _logError+line+"\n";
 				}
 			}
 			catch (IOException ioe){
