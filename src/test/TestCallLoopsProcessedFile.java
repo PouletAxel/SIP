@@ -1,12 +1,9 @@
 package test;
-import java.io.BufferedReader;
-import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 
-import process.MultiResProcess;
-import utils.SIPObject;
+import utils.MultiResProcess;
+import sip.SIPIntra;
 
 /**
  * Test of calling loops on processed files
@@ -41,8 +38,7 @@ public class TestCallLoopsProcessedFile {
 		//factor.add(5);
 		//SIP_HiC_v1.3.6.jar hic SIP/Kc_allcombined.hic SIP/armsizes.txt SIP/Droso/ ../Tools/juicer_tools_1.13.02.jar 
 		String chrSizeFile = "/home/plop/Desktop/w_hg19.sizes";
-		HashMap<String,Integer> chrsize = readChrSizeFile(chrSizeFile);
-		SIPObject sip = new SIPObject(input,output, chrsize, gauss, min, max, resolution, saturatedPixel, thresholdMax, diagSize, matrixSize, nbZero,factor,0.01,true,false);
+		SIPIntra sip = new SIPIntra(input,output, chrSizeFile, gauss, min, max, resolution, saturatedPixel, thresholdMax, diagSize, matrixSize, nbZero,factor,0.01,true,false);
 		sip.setIsGui(false);
 		int cpu = 2;
 		System.out.println("Processed Data\n");
@@ -67,28 +63,4 @@ public class TestCallLoopsProcessedFile {
 		System.out.println("End");
 	}
 			
-	/**
-	 * 
-	 * @param chrSizeFile
-	 * @return 
-	 * @throws IOException
-	 */
-	private static HashMap<String, Integer> readChrSizeFile( String chrSizeFile) throws IOException{
-		HashMap<String,Integer> chrSize =  new HashMap<String,Integer>();
-		BufferedReader br = new BufferedReader(new FileReader(chrSizeFile));
-		StringBuilder sb = new StringBuilder();
-		String line = br.readLine();
-		while (line != null){
-			sb.append(line);
-			String[] parts = line.split("\\t");				
-			String chr = parts[0]; 
-			int size = Integer.parseInt(parts[1]);
-			
-			chrSize.put(chr, size);
-			sb.append(System.lineSeparator());
-			line = br.readLine();
-		}
-		br.close();
-		return  chrSize;
-	} 
-}	
+}

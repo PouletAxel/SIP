@@ -1,5 +1,5 @@
 package multiProcesing;
-import process.DumpData;
+import dumpProcessing.DumpData;
 
 import java.io.File;
 import java.io.IOException;

@@ -1,17 +1,14 @@
 package test;
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.HashMap;
 
 import multiProcesing.ProcessDumpData;
-import process.MultiResProcess;
-import utils.SIPObject;
-
+import utils.MultiResProcess;
+import sip.SIPIntra;
 
 
 /**
@@ -42,7 +39,6 @@ public class TestCallLoopsHicFile{
 		//readChrSizeFile("/home/plop/Documents/Genome/HumanGenomeHg19/hg19_withoutChr.sizes");
 		//chrsize = readChrSizeFile("/home/plop/Documents/Genome/mammals/HumanGenomeHg19/chr1.size");
 		String fileChr = "/home/plop/Desktop/SIP/Erics/hg19_chromSizes.txt";
-		HashMap<String,Integer> chrsize = readChrSizeFile(fileChr);
 		String juiceBoxTools = "/home/plop/Tools/juicer_tools_1.19.02.jar";
 		int matrixSize = 2000;
 		int resolution = 10000;
@@ -78,10 +74,10 @@ public class TestCallLoopsHicFile{
 			File file = new File(output);
 			if (file.exists()==false){file.mkdir();}
 			
-			SIPObject sip = new SIPObject(output, chrsize, gauss, min, max, resolution, saturatedPixel, thresholdMax, diagSize, matrixSize, nbZero,factor,0.01,keepTif,false);
+			SIPIntra sip = new SIPIntra(output, fileChr, gauss, min, max, resolution, saturatedPixel, thresholdMax, diagSize, matrixSize, nbZero,factor,0.01,keepTif,false);
 			sip.setIsGui(false);
 			ProcessDumpData processDumpData = new ProcessDumpData();
-			processDumpData.go(input, sip, chrsize, juiceBoxTools, juiceBoXNormalisation,cpu);
+			processDumpData.go(input, sip, juiceBoxTools, juiceBoXNormalisation,cpu);
 			
 			MultiResProcess multi = new MultiResProcess(sip, cpu, keepTif,fileChr);
 			multi.run();
@@ -92,29 +88,7 @@ public class TestCallLoopsHicFile{
 			//System.out.println("End "+testTools(cooltools,0,3,0));
 		}
 		
-		/**
-		 * 
-		 * @param chrSizeFile
-		 * @throws IOException
-		 */
-	@SuppressWarnings("unused")
-	private static HashMap<String, Integer> readChrSizeFile( String chrSizeFile) throws IOException{
-		HashMap<String,Integer> chrSize =  new HashMap<String,Integer>();
-		BufferedReader br = new BufferedReader(new FileReader(chrSizeFile));
-		StringBuilder sb = new StringBuilder();
-		String line = br.readLine();
-		while (line != null){
-			sb.append(line);
-			String[] parts = line.split("\\t");				
-			String chr = parts[0]; 
-			int size = Integer.parseInt(parts[1]);
-			chrSize.put(chr, size);
-			sb.append(System.lineSeparator());
-			line = br.readLine();
-		}
-		br.close();
-		return  chrSize;
-	} 
+
 	
 	public static boolean testTools(String pathTools, int first, int second, int third) {
 		Runtime runtime = Runtime.getRuntime();

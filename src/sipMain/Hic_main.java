@@ -2,21 +2,19 @@ package sipMain;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.HashMap;
 
 import javax.swing.JOptionPane;
 
 import gui.GuiAnalysis;
 import multiProcesing.ProcessCoolerDumpData;
 import multiProcesing.ProcessDumpData;
-import process.MultiResProcess;
-import utils.SIPObject;
+import utils.MultiResProcess;
+import sip.SIPIntra;
 
 /**
  * 
@@ -71,7 +69,7 @@ public class Hic_main {
 	/** if true run only image Processing step*/
 	private static boolean _isProcessed = false;
 	/** hash map stocking in key the name of the chr and in value the size*/
-	private static HashMap<String,Integer> _chrSize =  new HashMap<String,Integer>();
+//	private static HashMap<String,Integer> _chrSize =  new HashMap<String,Integer>();
 	/** path to the chromosome size file */
 	private static String _chrSizeFile;
 	/**boolean is true supress all the image created*/
@@ -83,45 +81,8 @@ public class Hic_main {
 	/**boolean is true supress all the image created*/
 	private static boolean _gui = false;
 	private static String _logError = "";
-	/**String for the documentation*/
-	private static String _doc = ("#SIP Version 1 run with java 8\n"
-			+ "\nUsage:\n"
-			+ "\thic <hicFile> <chrSizeFile> <Output> <juicerToolsPath> [options]\n"
-			+ "\tcool <mcoolFile> <chrSizeFile> <Output> <cooltoolsPath> <coolerPath> [options]\n"
-			+ "\tprocessed <Directory with processed data> <chrSizeFile> <Output> [options]\n"
-			+ "\nParameters:\n"
-			+ "\t chrSizeFile: path to the chr size file, with the same name of the chr as in the hic file (i.e. chr1 does not match Chr1 or 1)\n"
-			+ "\t-res: resolution in bp (default 5000 bp)\n"
-			+ "\t-mat: matrix size to use for each chunk of the chromosome (default 2000 bins)\n"
-			+ "\t-d: diagonal size in bins, remove the maxima found at this size (eg: a size of 2 at 5000 bp resolution removes all maxima"
-			+ " detected at a distance inferior or equal to 10kb) (default 6 bins).\n"
-			+ "\t-g: Gaussian filter: smoothing factor to reduce noise during primary maxima detection (default 1.5)\n"
-			+ "\t-cpu: Number of CPU used for SIP processing (default 1)\n"
-			+ "\t-factor: Multiple resolutions can be specified using:\n"
-			+ "\t\t-factor 1: run only for the input res (default)\n"
-			+ "\t\t-factor 2: res and res*2\n"
-			+ "\t\t-factor 3: res and res*5\n"
-			+ "\t\t-factor 4: res, res*2 and res*5\n"
-			+ "\t-max: Maximum filter: increases the region of high intensity (default 2)\n"
-			+ "\t-min: Minimum filter: removes the isolated high value (default 2)\n"
-			+ "\t-sat: % of saturated pixel: enhances the contrast in the image (default 0.01)\n"
-			+ "\t-t Threshold for loops detection (default 2800)\n"
-			+ "\t-nbZero: number of zeros: number of pixels equal to zero that are allowed in the 24 pixels surrounding the detected maxima (default 6)\n"
-			+ "\t-norm: <NONE/VC/VC_SQRT/KR> (default KR)\n"
-			+ "\t-del: true or false, whether not to delete tif files used for loop detection (default true)\n"
-			+ "\t-fdr: Empirical FDR value for filtering based on random sites (default 0.01)\n"
-			+ "\t-isDroso: default false, if true apply extra filter to help detect loops similar to those found in D. mel cells\n"
-			+ "\t-h, --help print help\n"
-			+ "\nCommand line eg:\n"
-			+ "\tjava -jar SIP_HiC.jar processed inputDirectory pathToChromosome.size OutputDir .... paramaters\n"
-			+ "\tjava -jar SIP_HiC.jar hic inputDirectory pathToChromosome.size OutputDir juicer_tools.jar\n"
-			+ "\nAuthors:\n"
-			+ "Axel Poulet\n"
-			+ "\tDepartment of Molecular, Cellular  and Developmental Biology Yale University 165 Prospect St\n"
-			+ "\tNew Haven, CT 06511, USA\n"
-			+ "M. Jordan Rowley\n"
-			+ "\tDepartment of Genetics, Cell Biology and Anatomy, University of Nebraska Medical Center Omaha,NE 68198-5805\n"
-			+ "\nContact: pouletaxel@gmail.com OR jordan.rowley@unmc.edu");
+
+
 			
 	/**
 	 * Main function to run all the process, can be run with gui or in command line.
@@ -129,14 +90,14 @@ public class Hic_main {
 	 * With zero parameter only java -jar SIP.jar  => gui
 	 * With more than 5 paramter => command line mode
 	 * 
-	 * @param args
-	 * @throws IOException 
-	 * @throws InterruptedException 
+	 * @param args table with parameters for command line
+	 * @throws IOException  exception
+	 * @throws InterruptedException exception
 	 */
 	public static void main(String[] args) throws IOException, InterruptedException {
 		_factor.add(1);
 		if (args.length >= 1 && args.length < 4){
-			System.out.println(_doc);
+			SIPIntra.docError();
 			System.exit(0);
 		}else if(args.length >= 4){
 			if (args[0].equals("hic") || args[0].equals("processed") || args[0].equals("cool")){
@@ -160,7 +121,7 @@ public class Hic_main {
 				}
 			}else{
 				System.out.println(args[0]+" not defined\n");
-				System.out.println(_doc);
+				SIPIntra.docError();
 				return;
 			}
 						
@@ -215,25 +176,24 @@ public class Hic_main {
 			
 		if(!f.exists() && !_input.startsWith("https")){
 				System.out.println(_input+" doesn't existed !!! \n\n");
-				System.out.println(_doc);
+				SIPIntra.docError();
 				return;
 		}
 		
 		f = new File(_chrSizeFile);
-		if(f.exists()==false ){
+		if(!f.exists()){
 				System.out.println(_chrSizeFile+" doesn't existed !!! \n\n");
-				System.out.println(_doc);
+				SIPIntra.docError();
 				return;
 		}
 
 		
-		SIPObject sip;
-		readChrSizeFile(_chrSizeFile);
+		SIPIntra sip;
 		if(_isHic){
 			f = new File(_juiceBoxTools);
 			if(!f.exists()){
 				System.out.println(_juiceBoxTools+" doesn't existed !!! \n\n");
-				System.out.println(_doc);
+				SIPIntra.docError();
 				return;
 			}
 			System.out.println("hic mode: \n"+ "input: "+_input+"\n"+ "output: "+_output+"\n"+ "juiceBox: "+_juiceBoxTools+"\n"+ "norm: "+ _juiceBoXNormalisation+"\n"
@@ -241,28 +201,28 @@ public class Hic_main {
 					+ "saturated pixel: "+_saturatedPixel+"\n"+ "threshold: "+_thresholdMax+"\n"+ "number of zero :"+_nbZero+"\n"+ "factor "+ _factOption+"\n"+ "fdr "+_fdr+"\n"
 					+ "del "+_delImages+"\n"+ "cpu "+ _cpu+"\n-isDroso "+_isDroso+"\n");
 			
-			sip = new SIPObject(_output, _chrSize, _gauss, _min, _max, _resolution, _saturatedPixel,
+			sip = new SIPIntra(_output, _chrSizeFile, _gauss, _min, _max, _resolution, _saturatedPixel,
 					_thresholdMax, _diagSize, _matrixSize, _nbZero, _factor,_fdr, _isProcessed,_isDroso);
 			sip.setIsGui(_gui);
 			ProcessDumpData processDumpData = new ProcessDumpData();
-			processDumpData.go(_input, sip, _chrSize, _juiceBoxTools, _juiceBoXNormalisation, _cpu);
+			processDumpData.go(_input, sip, _juiceBoxTools, _juiceBoXNormalisation, _cpu);
 			System.out.println("########### End of the dump Step");
 		}else if(_isCool){
 			f = new File(_cooltools);
 			if(!f.exists()){
 				System.out.println(_cooltools+" doesn't existed or wrong path !!! \n\n");
-				System.out.println(_doc);
+				SIPIntra.docError();
 				return;
 			}
 			f = new File(_cooler);
 			if(!f.exists()){
 				System.out.println(_cooler+" doesn't existed or wrong path !!! \n\n");
-				System.out.println(_doc);
+				SIPIntra.docError();
 				return;
 			}
 			if(!testTools(_cooltools, 0, 3, 0) || !testTools(_cooler, 0, 8, 6)) {
 				System.out.println( _cooltools +" or" + _cooler+" is not the good version for SIP (it needs cooltools version >= 0.3.0 and cooler version >= 0.8.6) !!! \n\n");
-				System.out.println(_doc);
+				SIPIntra.docError();
 				if(_gui){
 					JOptionPane.showMessageDialog(null, "Error SIP program", _cooltools +" or" + _cooler+" is not the good version for SIP (it needs cooltools version >= 0.3.0 and cooler version >= 0.8.6) !!!"
 							 , JOptionPane.ERROR_MESSAGE);
@@ -273,11 +233,11 @@ public class Hic_main {
 					+ "gauss: "+_gauss+"\n"+ "min: "+_min+"\n"+ "max: "+_max+"\n"+ "matrix size: "+_matrixSize+"\n"+ "diag size: "+_diagSize+"\n"+ "resolution: "+_resolution+"\n"
 					+ "saturated pixel: "+_saturatedPixel+"\n"+ "threshold: "+_thresholdMax+"\n"+ "number of zero :"+_nbZero+"\n"+ "factor "+ _factOption+"\n"+ "fdr "+_fdr+"\n"
 					+ "del "+_delImages+"\n"+ "cpu "+ _cpu+"\n-isDroso "+_isDroso+"\n");
-			sip = new SIPObject(_output, _chrSize, _gauss, _min, _max, _resolution, _saturatedPixel, _thresholdMax, _diagSize, _matrixSize, _nbZero, _factor,_fdr, _isProcessed,_isDroso);
+			sip = new SIPIntra(_output, _chrSizeFile, _gauss, _min, _max, _resolution, _saturatedPixel, _thresholdMax, _diagSize, _matrixSize, _nbZero, _factor,_fdr, _isProcessed,_isDroso);
 			sip.setIsCooler(_isCool);
 
 			ProcessCoolerDumpData processDumpData = new ProcessCoolerDumpData();
-			processDumpData.go(_cooltools, _cooler, sip, _input, _chrSize,_cpu);
+			processDumpData.go(_cooltools, _cooler, sip, _input, _cpu);
 			
 			}else{
 			System.out.println("processed mode:\n"+ "input: "+_input+"\n"+ "output: "+_output+"\n"+ "juiceBox: "+_juiceBoxTools+"\n"
@@ -286,7 +246,7 @@ public class Hic_main {
 					+ "isHic: "+_isHic+"\n"	+ "isProcessed: "+_isProcessed+"\n"+ "number of zero:"+_nbZero+"\n"+ "factor "+ _factOption+"\n"+ "fdr "+_fdr+ "\n"
 					+ "del "+_delImages+"\n"+"cpu "+ _cpu+"\n-isDroso "+_isDroso+"\n");
 			
-			sip = new SIPObject(_input,_output, _chrSize, _gauss, _min, _max, _resolution, _saturatedPixel, _thresholdMax,
+			sip = new SIPIntra(_input,_output, _chrSizeFile, _gauss, _min, _max, _resolution, _saturatedPixel, _thresholdMax,
 					_diagSize, _matrixSize, _nbZero,_factor,_fdr,_isProcessed, _isDroso);
 			sip.setIsGui(_gui);
 		}
@@ -319,28 +279,7 @@ public class Hic_main {
 		}
 		System.out.println("End of SIP loops are available in "+_output);
 	}
-	
-	/**
-	 * Run the input file and stock the info of name chr and their size in hashmap
-	 * @param chrSizeFile path chr size file
-	 * @throws IOException if file does't exist
-	 */
-	private static void readChrSizeFile( String chrSizeFile) throws IOException{
-		BufferedReader br = new BufferedReader(new FileReader(chrSizeFile));
-		StringBuilder sb = new StringBuilder();
-		String line = br.readLine();
-		while (line != null){
-			sb.append(line);
-			String[] parts = line.split("\\t");				
-			String chr = parts[0]; 
-			int size = Integer.parseInt(parts[1]);
-			_chrSize.put(chr, size);
-			sb.append(System.lineSeparator());
-			line = br.readLine();
-		}
-		br.close();
-	} 
-	
+
 	/**
 	 * -res: resolution in bases (default 5000 bases)
 	 * -mat: matrix size in bins (default 2000 bins)
@@ -386,7 +325,7 @@ public class Hic_main {
 						catch(NumberFormatException e){ returnError("-cpu",args[i+1],"int");}
 						if(_cpu > Runtime.getRuntime().availableProcessors() || _cpu <= 0){
 							System.out.println("the number of CPU "+ _cpu+" is superior of the server/computer' cpu "+Runtime.getRuntime().availableProcessors()+"\n");
-							System.out.println(_doc);
+							SIPIntra.docError();
 							System.exit(0);
 						}
 				}else if(args[i].equals("-nbZero")){
@@ -417,7 +356,7 @@ public class Hic_main {
 						_juiceBoXNormalisation = args[i+1];
 					}else{
 						System.out.println("-norm = "+args[i+1]+", not defined\n");
-						System.out.println(_doc);
+						SIPIntra.docError();
 						System.exit(0);
 					}
 				}else if(args[i].equals("-del")){
@@ -427,7 +366,7 @@ public class Hic_main {
 						_delImages = false;
 					else{
 						System.out.println("-del = "+args[i+1]+", not defined\n");
-						System.out.println(_doc);
+						SIPIntra.docError();
 						System.exit(0);
 					}
 				}else if(args[i].equals("-isDroso")){
@@ -437,12 +376,12 @@ public class Hic_main {
 						_isDroso = false;
 					else{
 						System.out.println("-_isDroso = "+args[i+1]+", not defined\n");
-						System.out.println(_doc);
+						SIPIntra.docError();
 						System.exit(0);
 					}
 				}else{
 					System.out.println(args[i]+" doesn't existed\n");
-					System.out.println(_doc);
+					SIPIntra.docError();
 					System.exit(0);
 				}
 			}
@@ -458,7 +397,7 @@ public class Hic_main {
 	 */
 	private static void returnError(String param, String value, String type){
 		System.out.println(param+" has to be an integer "+value+" can't be convert in "+type+"\n");
-		System.out.println(_doc);
+		SIPIntra.docError();
 		System.exit(0);
 	}
 	

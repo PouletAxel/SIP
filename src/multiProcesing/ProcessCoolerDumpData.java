@@ -9,9 +9,9 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import gui.Progress;
-import process.CoolerDumpData;
-import utils.CoolerExpected;
-import utils.SIPObject;
+import dumpProcessing.CoolerDumpData;
+import dumpProcessing.CoolerExpected;
+import sip.SIPIntra;
 
 /**
  * multi thread class dumping the data via juicertoolsbox.jar 
@@ -40,13 +40,13 @@ public class ProcessCoolerDumpData {
 	 *
 	 * @param coolTools String coolTools path
 	 * @param cooler String cooler path
-	 * @param sip SIPObject
+	 * @param sip SIPIntra
 	 * @param coolFile path mcool file
-	 * @param chrSize hashMap chr name => chrSize
 	 * @param nbCPU number of cpu
 	 * @throws InterruptedException exception
 	 */
-	public void go(String coolTools, String cooler, SIPObject sip, String coolFile, HashMap<String,Integer> chrSize,int nbCPU) throws InterruptedException {
+	public void go(String coolTools, String cooler, SIPIntra sip, String coolFile,  int nbCPU) throws InterruptedException {
+		HashMap<String,Integer> chrSize= sip.getChrSizeHashMap();
 		ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(nbCPU);
 		Iterator<String> chrName = chrSize.keySet().iterator();
 		File outDir = new File(sip.getOutputDir());

@@ -1,4 +1,7 @@
-package utils;
+package sip;
+
+import utils.FDR;
+import loops.Loop;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -26,62 +29,38 @@ import java.util.Set;
  * @author axel poulet
  *
  */
-public class SIPObject {
-	/** String path of the input data*/
-	private String _input;
-	/** Path of the output file*/
-	private String _output;
-	/** Strength of the gaussian filter*/
-	private double _gauss;
-	/** Strength of the min filter*/
+public class SIPIntra extends SIPObject {
+
 	private double _min;
 	/** Strength of the max filter*/
 	private double _max;
 	/** % of staurated pixel after enhance contrast*/
 	private double _saturatedPixel;
-	/** Image size*/
-	private int _matrixSize = 0;
-	/** Resolution of the bin dump in base*/
-	private int _resolution;
-	/** Threshold for the maxima detection*/
-	private int _thresholdMaxima;
-	/** HashMap of the chr size, the key = chr name, value = size of chr*/
-	private HashMap<String,Integer> _chrSize =  new HashMap<String,Integer>();
+
 	/** Diage size to removed maxima close to diagonal*/
 	private int _diagonalSize;
 	/** Size of the step to process each chr (step = matrixSize/2)*/
 	private int _step;
-	/** Number of pixel = 0 allowed around the loop*/
-	private int _nbZero = -1;
 	/** list of the image resolution to find loop*/
 	private ArrayList<Integer> _listFactor = new ArrayList<Integer>();
-	/** fdr value */
-	private double _fdr;
-	/** is processed booelan*/
-	private boolean _isProcessed = false;
-	/** if is gui analysis*/
-	private boolean _isGui = false;
 	/** if true regional fdr will be not used*/
 	private boolean _isDroso = false;
 	/** median of loop AP score */
 	private double _medianAP = 0;
 	/** median of loop regional AP score */
 	private double _medianAPReg = 0;
-	/** true is mcool input*/
-	private boolean _isCooler = false;
 
 
 	/**
 	 *
 	 */
-	public SIPObject() { }
+	public SIPIntra()  { }
 
 	/**
-	 * SIPObject constructor for hic or mcool file
+	 * SIPIntra constructor for hic or mcool file
 	 * 
 	 *
 	 * @param output path file with the file created by the first step of SIP
-	 * @param chrSize hashMap name chr => chr size
 	 * @param gauss gaussian filter strength
 	 * @param min minimum filter strength
 	 * @param max maximum filter strength
@@ -96,33 +75,26 @@ public class SIPObject {
 	 * @param isProcessed true if processed SIP data input else false
 	 * @param rFDR false if it isn't drosophila input
 	 */
-	public SIPObject(String output, HashMap<String, Integer> chrSize, double gauss, double min,
-			double max, int resolution, double saturatedPixel, int thresholdMax,
-			int diagonalSize, int matrixSize, int nbZero,ArrayList<Integer> listFactor,
-			double fdr, boolean isProcessed, boolean rFDR) {
-		if(!output.endsWith(File.separator))
-			output = output+File.separator;
-		this._output = output;
-		this._input = output;
-		this._chrSize = chrSize;
-		this._gauss = gauss;
+	public SIPIntra(String output, String chrFile, double gauss, double min,
+					double max, int resolution, double saturatedPixel, int thresholdMax,
+					int diagonalSize, int matrixSize, int nbZero, ArrayList<Integer> listFactor,
+					double fdr, boolean isProcessed, boolean rFDR) {
+
+		super( output, output,  gauss, resolution, thresholdMax, matrixSize, nbZero,  fdr, chrFile);
+
+
+
 		this._min = min;
 		this._max = max;
-		this._matrixSize = matrixSize;
-		this._resolution = resolution;
 		this._saturatedPixel = saturatedPixel;
-		this._thresholdMaxima = thresholdMax;
 		this._diagonalSize = diagonalSize;
 		this._step = matrixSize/2;
-		this._nbZero = nbZero;
 		this._listFactor = listFactor;
-		this._fdr = fdr;
-		this._isProcessed = isProcessed;
 		this._isDroso = rFDR;
 	}
 
 	/**
-	 * SIPObject constructor for processed SIP data
+	 * SIPIntra constructor for processed SIP data
 	 *
 	 * @param input path file with the file created by the first step of SIP
 	 * @param output  path file for the results
@@ -141,30 +113,21 @@ public class SIPObject {
 	 * @param isProcessed true if processed SIP data input else false
 	 * @param rFDR false if it isn't drosophila input
 	 */
-	public SIPObject(String input, String output, HashMap<String, Integer> chrSize, double gauss, double min,
-			double max, int resolution, double saturatedPixel, int thresholdMax,
-			int diagonalSize, int matrixSize, int nbZero,ArrayList<Integer> listFactor,
-			double fdr, boolean isProcessed, boolean rFDR) {
-		if(!output.endsWith(File.separator))
-			output = output+File.separator;
-		if(!input.endsWith(File.separator))
-			input = input+File.separator;
-		this._output = output;
-		this._input = input;
-		this._chrSize = chrSize;
-		this._gauss = gauss;
+	public SIPIntra(String input, String output, String chrSize, double gauss, double min,
+					double max, int resolution, double saturatedPixel, int thresholdMax,
+					int diagonalSize, int matrixSize, int nbZero, ArrayList<Integer> listFactor,
+					double fdr, boolean isProcessed, boolean rFDR) {
+
+		super( output, output,  gauss, resolution, thresholdMax, matrixSize, nbZero,  fdr, chrSize);
+
+
 		this._min = min;
 		this._max = max;
-		this._matrixSize = matrixSize;
-		this._resolution = resolution;
 		this._saturatedPixel = saturatedPixel;
-		this._thresholdMaxima = thresholdMax;
 		this._diagonalSize = diagonalSize;
 		this._step = matrixSize/2;
-		this._nbZero = nbZero;
 		this._listFactor = listFactor;
-		this._fdr = fdr;
-		this._isProcessed = isProcessed;
+		this._listFactor = listFactor;
 		this._isDroso = rFDR;
 	}
 	
@@ -177,15 +140,17 @@ public class SIPObject {
 	 * @param data hashMap loop name => Loop object
 	 * @throws IOException exception
 	 */
-	public void saveFile(String pathFile, HashMap<String,Loop> data, boolean first) throws IOException{
-		FDR fdrDetection = new FDR (this._fdr, data);
+	public void saveFile(String pathFile, HashMap<String, Loop> data, boolean first) throws IOException{
+		double fdr = this.getFdr();
+		FDR fdrDetection = new FDR (fdr, data);
+
 		fdrDetection.run();
 		double RFDRcutoff = fdrDetection.getRFDRCutoff();
 		double FDRcutoff = fdrDetection.getFDRCutoff();
 		boolean supToTen = false;
 		if(this._isDroso){ 
 			median(data,FDRcutoff);
-			System.out.println("Filtering value at "+this._fdr+" FDR is "+FDRcutoff+" APscore ");
+			System.out.println("Filtering value at "+fdr+" FDR is "+FDRcutoff+" APscore ");
 			if(_medianAPReg > 10){
 				supToTen = true;
 				 _medianAPReg = _medianAPReg/4;
@@ -193,7 +158,7 @@ public class SIPObject {
 			}
 		}
 		else 
-			System.out.println("Filtering value at "+this._fdr+" FDR is "+FDRcutoff+" APscore and "+RFDRcutoff+" RegionalAPscore\n");
+			System.out.println("Filtering value at "+fdr+" FDR is "+FDRcutoff+" APscore and "+RFDRcutoff+" RegionalAPscore\n");
 		BufferedWriter writer;
 		if(first) writer = new BufferedWriter(new FileWriter(new File(pathFile), true));
 		else{
@@ -257,7 +222,7 @@ public class SIPObject {
 			while (line != null){
 				sb.append(line);
 				if((line.equals("NaN")|| line.equals("NAN") || line.equals("nan") || line.equals("na")  || Double.parseDouble(line) < 0.30)){
-					vector.put(lineNumber*this._resolution, "plop");
+					vector.put(lineNumber*this.getResolution(), "plop");
 				}
 				++lineNumber;
 				sb.append(System.lineSeparator());
@@ -305,30 +270,6 @@ public class SIPObject {
 		}
 	}
 
-	/**
-	 * getter of fdr parameter
-	 * @return fdr value
-	 */
-	public double getFdr() { return	this._fdr; }
-
-	/**
-	 * setter of fdr value
-	 * @param fdr new fdr value
-	 *
-	 */
-	public void setFdr(double fdr) { this._fdr = fdr; }
-	/**
-	 * Getter of the input dir
-	 * @return path of the input dir
-	 */
-	public String getInputDir(){ return this._input; }
-	
-	/**
-	 * Getter of the matrix size
-	 * @return the size of the image
-	 */
-	public int getMatrixSize(){ return this._matrixSize; }
-
 	
 	/**
 	 * Getter of step 
@@ -336,35 +277,7 @@ public class SIPObject {
 	 */
 	public int getStep(){ return this._step;}
 	
-	/**
-	 * Setter of the path of the input directory
-	 * @param inputDir String of the input directory
-	 */
-	public void setInputDir(String inputDir){ this._input = inputDir; }
 
-	/**
-	 * Getter of the path of the output directory
-	 * @return path 
-	 */
-	public String getOutputDir(){ return this._output; }
-
-	/**
-	 * Setter of the path of the output directory
-	 * @param outputDir path of output directory
-	 */
-	public void setOutputDir(String outputDir){	this._output = outputDir;}
-
-	/**
-	 * Getter of the gaussian blur strength
-	 * @return double gaussian filter strength
-	 */
-	public double getGauss(){ return this._gauss; }
-	
-	/**
-	 * Setter of the gaussian blur strength
-	 * @param gauss new gaussian filter strength
-	 */
-	public void setGauss(double gauss){ this._gauss = gauss; }
 	
 	/**
 	 * Getter of diagonalSize
@@ -413,23 +326,7 @@ public class SIPObject {
 	 */
 	public void setSaturatedPixel(double saturatedPixel){ this._saturatedPixel = saturatedPixel; }
 
-	/**
-	 * Getter of resolution of the bin 
-	 * @return bin size
-	 */
-	public int getResolution(){	return this._resolution;}
-	
-	/**
-	 * Setter of resolution of the bin 
-	 * @param resolution bin size
-	 */
-	public void setResolution(int resolution){	this._resolution = resolution;}
 
-	/**
-	 * Setter of size of the matrix 
-	 * @param size image size
-	 */
-	public void setMatrixSize(int size){ this._matrixSize = size; }
 	
 	/**
 	 * setter step between image 
@@ -437,30 +334,7 @@ public class SIPObject {
 	 */
 	public void setStep(int step){ this._step = step;}
 	
-	/**
-	 * Getter of threshold for the loop detection
-	 * @return threshold
-	 */
-	public int getThresholdMaxima(){ return _thresholdMaxima;}
-	/**
-	 * Setter of threshold for the detection of the maxima
-	 * @param thresholdMaxima threshold
-	 */
-	public void setThresholdMaxima(int thresholdMaxima) { this._thresholdMaxima = thresholdMaxima;}
 
-
-	/**
-	 * Getter of getNbZero 
-	 * @return int nb of zero allowed around the loops
-	 */
-	public int getNbZero(){ return this._nbZero;}
-
-	/**
-	 * setter of nb of zero
-	 * @param nbZero int nb of zero allowed around the loops
-	 */
-	public void setNbZero(int nbZero){ this._nbZero = nbZero;}
-	
 	/**
 	 * Getter of list of integer for multi resolution loop calling
 	 * @return list of integer
@@ -479,55 +353,9 @@ public class SIPObject {
 	 */
 	public void setIsDroso(boolean droso){	this._isDroso = droso;}
 
-	/**
-	 * getter of chrSize hashMap
-	 * @return hashMap chr name => chr size
-	 */
-	public HashMap<String,Integer> getChrSizeHashMap(){return this._chrSize;}
 
-	/**
-	 * setter
-	 * @param chrSize  hashMap chr name => chr size
-	 */
-	public void setChrSizeHashMap(HashMap<String,Integer> chrSize){this._chrSize = chrSize;}
+
+
 	
-	/**
-	 * getter boolean isProcessed
-	 * true input is SIP processed dat
-	 * @return boolean
-	 */
-	public boolean isProcessed() { return _isProcessed;}
 
-	/**
-	 * setter boolean isProcessed
-	 * @param isProcessed boolean
-	 */
-	public void setIsProcessed(boolean isProcessed) { this._isProcessed = isProcessed;}
-	
-	/**
-	 * getter isCooler
-	 * true: input is mcool dataset
-	 * @return boolean
-	 */
-	public boolean isCooler() { return _isCooler;}
-
-	/**
-	 * setter isCooler
-	 * @param cool boolean
-	 */
-	public void setIsCooler(boolean cool) { this._isCooler = cool;}
-
-	/**
-	 * getter isGui
-	 * true: program run with GUI
-	 * @return boolean
-	 */
-	public boolean isGui() { return _isGui;}
-
-	/**
-	 * setter isGui
-	 * @param _isGui boolean
-	 */
-
-	public void setIsGui(boolean _isGui) { this._isGui = _isGui;}
 }

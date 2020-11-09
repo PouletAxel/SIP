@@ -1,5 +1,7 @@
 package utils;
 
+import loops.Loop;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -22,7 +24,7 @@ public class FDR {
 	/** fdr value*/
 	private double _fdr;
 	/** hashmap of loop loopName=> Loop object*/
-	private HashMap<String,Loop> _data;
+	private HashMap<String, Loop> _data;
 
 	/**
 	 * Constructor

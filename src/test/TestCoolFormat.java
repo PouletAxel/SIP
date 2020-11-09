@@ -1,13 +1,10 @@
 package test;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 
-import process.MultiResProcess;
-import utils.SIPObject;
+import utils.MultiResProcess;
+import sip.SIPIntra;
 @SuppressWarnings("unused")
 public class TestCoolFormat {
 	
@@ -20,7 +17,7 @@ public class TestCoolFormat {
 		String fileChr = "/home/plop/Desktop/w_hg19.sizes";
 		String cooler = "/home/plop/anaconda3/bin/cooler";
 		String cooltools = "/home/plop/anaconda3/bin/cooltools";
-		HashMap<String,Integer> chrsize = readChrSizeFile(fileChr);
+
 		int resolution = 5000;
 		int matrixSize = 2000;
 		//CoolerExpected expected = new CoolerExpected(input,  resolution, matrixSize);
@@ -45,14 +42,14 @@ public class TestCoolFormat {
 		boolean keepTif = false;
 		int cpu = 1;
 				
-		SIPObject sip = new SIPObject(input,output, chrsize, gauss, min, max, resolution, saturatedPixel, thresholdMax, diagSize, matrixSize, nbZero,factor,0.03,keepTif,false);
+		SIPIntra sip = new SIPIntra(input,output, fileChr, gauss, min, max, resolution, saturatedPixel, thresholdMax, diagSize, matrixSize, nbZero,factor,0.03,keepTif,false);
 		sip.setIsGui(false);
 		sip.setIsCooler(true);
 		sip.setIsProcessed(true);
 		
 
 		//ProcessCoolerDumpData processDumpData = new ProcessCoolerDumpData();
-	//	 go(String coolTools, String cooler, SIPObject sip, String coolFile, HashMap<String,Integer> chrSize,int nbCPU)
+	//	 go(String coolTools, String cooler, SIPIntra sip, String coolFile, HashMap<String,Integer> chrSize,int nbCPU)
 		//processDumpData.go(cooltools, cooler, sip, input, chrsize,2);
 		MultiResProcess multi = new MultiResProcess(sip, cpu, keepTif,fileChr);
 		multi.run();
@@ -61,27 +58,5 @@ public class TestCoolFormat {
 		
 	}
 	
-	/**
-	 * 
-	 * @param chrSizeFile
-	 * @return
-	 * @throws IOException
-	 */
-	private static HashMap<String, Integer> readChrSizeFile( String chrSizeFile) throws IOException{
-		HashMap<String,Integer> chrSize =  new HashMap<String,Integer>();
-		BufferedReader br = new BufferedReader(new FileReader(chrSizeFile));
-		StringBuilder sb = new StringBuilder();
-		String line = br.readLine();
-		while (line != null){
-			sb.append(line);
-			String[] parts = line.split("\\t");				
-			String chr = parts[0]; 
-			int size = Integer.parseInt(parts[1]);
-			chrSize.put(chr, size);
-			sb.append(System.lineSeparator());
-			line = br.readLine();
-		}
-		br.close();
-		return  chrSize;
-	} 
+
 }

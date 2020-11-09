@@ -6,6 +6,7 @@ import java.util.Iterator;
 import java.util.Set;
 import ij.ImagePlus;
 import ij.process.ImageProcessor;
+import loops.Loop;
 
 /**
  * Peak analysis score. 
@@ -17,7 +18,7 @@ public class PeakAnalysisScore {
 	/** Raw image of the matrix*/
 	private ImagePlus _imgRaw = new ImagePlus();
 	/** HashMap of object loops*/
-	private HashMap<String,Loop> _data = new HashMap<String,Loop>();
+	private HashMap<String, Loop> _data = new HashMap<String,Loop>();
 	/** ImageProcessor of the raw ImagePlus*/
 	private ImageProcessor _ipRaw;
 		

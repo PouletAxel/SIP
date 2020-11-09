@@ -8,10 +8,10 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import gui.Progress;
-import process.DumpData;
-import process.DumpInterChromosomal;
-import utils.SIPInter;
-import utils.SIPObject;
+import dumpProcessing.DumpData;
+import dumpProcessing.DumpInterChromosomal;
+import sip.SIPInter;
+import sip.SIPIntra;
 
 
 /**
@@ -35,14 +35,14 @@ public class ProcessDumpData {
 	 *  run SiP for intra chr loops
 	 *
 	 * @param hicFile Sting input file path
-	 * @param sip SIPObject with all the paramters needed
-	 * @param chrSize HashMap<String,Integer>  Name and size of chr
+	 * @param sip SIPIntra with all the paramters needed
 	 * @param juiceBoxTools juicerTools.jar path
 	 * @param normJuiceBox String normalization method
 	 * @param nbCPU int nb cpu
 	 * @throws InterruptedException exception
 	 */
-	public void go(String hicFile, SIPObject sip, HashMap<String,Integer> chrSize, String juiceBoxTools, String normJuiceBox,int nbCPU) throws InterruptedException {
+	public void go(String hicFile, SIPIntra sip, String juiceBoxTools, String normJuiceBox, int nbCPU) throws InterruptedException {
+		HashMap<String,Integer> chrSize = sip.getChrSizeHashMap();
 		ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(nbCPU);
 		Iterator<String> chrName = chrSize.keySet().iterator();
 		File outDir = new File(sip.getOutputDir());
@@ -74,14 +74,14 @@ public class ProcessDumpData {
 	 *
 	 * @param hicFile Sting input file path
 	 * @param sipInter SIPInter object with all the parameters needed
-	 * @param chrSize HashMap<String,Integer>  Name and size of chr
 	 * @param juiceBoxTools juicerTools.jar path
 	 * @param normJuiceBox String normalization method
 	 * @param nbCPU int nb cpu
 	 * @throws InterruptedException exception
 	 */
-	public void go(String hicFile, SIPInter sipInter, HashMap<String,Integer> chrSize, String juiceBoxTools, String normJuiceBox, int nbCPU) throws InterruptedException {
+	public void go(String hicFile, SIPInter sipInter, String juiceBoxTools, String normJuiceBox, int nbCPU) throws InterruptedException {
 		ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(nbCPU);
+		HashMap<String,Integer> chrSize = sipInter.getChrSizeHashMap();
 		Object [] chrName = chrSize.keySet().toArray();
 
 		System.out.println(sipInter.getOutputDir());
@@ -105,7 +105,7 @@ public class ProcessDumpData {
 		int nb = 0;
 
 		if(sipInter.isGui()){
-			_p = new Progress("Loop Detection step",sipInter.getChrSize().size()+1);
+			_p = new Progress("Loop Detection step",sipInter.getChrSizeHashMap().size()+1);
 			_p._bar.setValue(nb);
 		}
 		while (!executor.awaitTermination(30, TimeUnit.SECONDS)) {

@@ -1,7 +1,7 @@
 package multiProcesing;
-import process.CallLoops;
-import utils.SIPObject;
-import utils.Loop;
+import loops.CallLoops;
+import sip.SIPIntra;
+import loops.Loop;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
@@ -14,7 +14,7 @@ import java.util.HashMap;
  */
 public class RunnableDetectLoops extends Thread implements Runnable{
 	/** SIP object containing all the parameter for the loops detection*/
-	private SIPObject _sip;
+	private SIPIntra _sip;
 	/** CallLoops object */
 	private CallLoops _callLoops;
 	/** String results file*/
@@ -36,11 +36,11 @@ public class RunnableDetectLoops extends Thread implements Runnable{
 	 *
 	 * @param chr String chromosome name
 	 * @param resuFile path to the result file
-	 * @param sip SIPObject
+	 * @param sip SIPIntra
 	 * @param normVectorFile path to normalized vector
 	 * @param delFile boolean if true delete all the tif file at the end of the process
 	 */
-	public RunnableDetectLoops (String chr, String resuFile, SIPObject sip, String normVectorFile, boolean delFile){
+	public RunnableDetectLoops (String chr, String resuFile, SIPIntra sip, String normVectorFile, boolean delFile){
 		this._sip = sip;
 		this._callLoops = new CallLoops(sip);
 		this._chr= chr;
@@ -55,10 +55,10 @@ public class RunnableDetectLoops extends Thread implements Runnable{
 	 *
 	 * @param chr String chromosome name
 	 * @param resuFile path to the result file
-	 * @param sip SIPObject
+	 * @param sip SIPIntra
 	 * @param delFile boolean if true delete all the tif file at the end of the process
 	 */
-	public RunnableDetectLoops (String chr, String resuFile, SIPObject sip, boolean delFile){
+	public RunnableDetectLoops (String chr, String resuFile, SIPIntra sip, boolean delFile){
 		this._sip = sip;
 		this._callLoops = new CallLoops(sip);
 		this._chr= chr;
@@ -68,7 +68,7 @@ public class RunnableDetectLoops extends Thread implements Runnable{
 	
 	/**
 	 * Run all the process for loops detection by chr using the objet CallLoops and then save loops in 
-	 * txt file with SIPObject via he method saveFile
+	 * txt file with SIPIntra via he method saveFile
 	 * 
 	 */
 	public void run(){

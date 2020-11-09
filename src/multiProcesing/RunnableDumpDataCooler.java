@@ -4,8 +4,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import process.CoolerDumpData;
-import utils.CoolerExpected;
+import dumpProcessing.CoolerDumpData;
+import dumpProcessing.CoolerExpected;
 
 /**
  * 

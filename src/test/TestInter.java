@@ -1,7 +1,7 @@
 package test;
 
 import multiProcesing.ProcessDetectLoops;
-import utils.SIPInter;
+import sip.SIPInter;
 
 import java.io.IOException;
 import java.util.ArrayList;

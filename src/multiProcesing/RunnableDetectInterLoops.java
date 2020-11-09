@@ -1,8 +1,8 @@
 package multiProcesing;
 
-import process.CallLoopsInter;
-import utils.Loop;
-import utils.SIPInter;
+import loops.CallLoopsInter;
+import loops.Loop;
+import sip.SIPInter;
 
 
 import java.io.File;
@@ -52,7 +52,7 @@ public class RunnableDetectInterLoops extends Thread implements Runnable {
 
     /**
      * Run all the process for loops detection by chr using the objet CallLoops and then save loops in
-     * txt file with SIPObject via he method saveFile
+     * txt file with SIPIntra via he method saveFile
      */
     public void run() {
         String resName = String.valueOf(this._sipInter.getResolution());

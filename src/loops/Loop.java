@@ -1,4 +1,4 @@
-package utils;
+package loops;
 
 import java.util.ArrayList;
 
@@ -93,12 +93,12 @@ public class Loop {
 
 	 /**
 	 * Loop constructor
-	 * @param name
-	 * @param x
-	 * @param y
-	 * @param chr
-	 * @param value
-	 * @param resolution
+	 * @param name String name of the loop
+	 * @param x int x coordinate
+	 * @param y int y coordinate
+	 * @param chr String Chromosme name
+	 * @param value loop value
+	 * @param resolution loop resolution
 	 */
 	public Loop(String name, int x, int y, String chr, float value, int resolution){
 		this.setName(name);
@@ -134,7 +134,7 @@ public class Loop {
 	 * @param name String name of the loop
 	 * @param x int x coordinate
 	 * @param y int y coordinate
-	 * @param chr String Chromosme name
+	 * @param chr String Chromosome name
 	 * @param avg float Average
 	 * @param std float Standard deviation
 	 * @param value float
@@ -163,34 +163,6 @@ public class Loop {
 	 */
 	public void setName(String name){ this._name = name;}
 	
-	
-	/**
-	 * Setter of the name loop
-	 *
-	 * @return
-	 */
-	public String loopToString(){
-	String loop = _chr+"\t"+_name+"\t"+_x+"\t"+_y+"\t"+ _resolution+"\t"+_matrixSize+"\t"+ _diagSize+"\t"+
-			_xEnd+"\t"+ _yEnd+"\t"+_neigbhoord1+"\t"+_paScoreAvg+"\t"+_paScoreAvgdev+"\t"+_paScoreMed
-			+"\t"+_neigbhoord2+"\t"+_regPaScoreMed+"\t"+_regPaScoreAvg+"\t"+_avg+"\t"+_peakValue
-			+"\t"+_std+"\t"+_paScoreFDR+"\t"+_regPaScoreFDR+"\t"+_paScoreFDR2+"\t"+_regPaScoreFDR2+"\t"
-			+_paScoreFDR3+"\t"+_regPaScoreFDR3;
-	return loop;
-	}
-
-	/**
-	 * Setter of the name loop
-	 *
-	 * @return
-	 */
-	public String loopToStringInter(){
-		String loop = _chr+"\t"+_chr2+"\t"+_name+"\t"+_x+"\t"+_y+"\t"+ _resolution+"\t"+_matrixSize+"\t"+ _diagSize+"\t"+
-				_xEnd+"\t"+ _yEnd+"\t"+_neigbhoord1+"\t"+_paScoreAvg+"\t"+_paScoreAvgdev+"\t"+_paScoreMed
-				+"\t"+_neigbhoord2+"\t"+_regPaScoreMed+"\t"+_regPaScoreAvg+"\t"+_avg+"\t"+_peakValue
-				+"\t"+_std+"\t"+_paScoreFDR+"\t"+_regPaScoreFDR+"\t"+_paScoreFDR2+"\t"+_regPaScoreFDR2+"\t"
-				+_paScoreFDR3+"\t"+_regPaScoreFDR3;
-		return loop;
-	}
 
 	/**
 	 * Getter of the x coordinate
@@ -368,17 +340,7 @@ public class Loop {
 		return listCoord;
 	}
 	
-	/**
-	 * 
-	 * @return
-	 */
-	public float getRegionalPaScoreMed(){ return this._regPaScoreMed; }
 
-	/**
-	 * 
-	 * @param m_RpaScore
-	 */
-	public void setRegionalPaScoreMed(float m_RpaScore){ this._regPaScoreMed = m_RpaScore; }
 
 	/**
 	 * Getter of regional peak analysis score 
@@ -404,11 +366,6 @@ public class Loop {
 	 */
 	public String getChr2(){ return this._chr2; }
 
-	/**
-	 * Setter of the avg of th n 8 
-	 * @param avg double 
-	 */
-	public void setAvg(float avg) { this._avg=avg; }
 
 	/**
 	 * 

@@ -1,5 +1,7 @@
 package utils;
 
+import loops.Loop;
+
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Set;
@@ -16,7 +18,7 @@ import java.util.Set;
 public class CoordinatesCorrection {
 
 	/** HashMap of the loops with new coordinates*/
-	private HashMap<String,Loop> _data = new HashMap<String,Loop>();
+	private HashMap<String, Loop> _data = new HashMap<String,Loop>();
 	
 	/**
 	 * 

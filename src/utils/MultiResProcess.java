@@ -1,4 +1,4 @@
-package process;
+package utils;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -17,8 +17,8 @@ import javax.swing.JOptionPane;
 
 
 import multiProcesing.ProcessDetectLoops;
-import utils.Loop;
-import utils.SIPObject;
+import loops.Loop;
+import sip.SIPIntra;
 
 /**
  * Class allowing the multi resolution loop calling
@@ -29,62 +29,24 @@ import utils.SIPObject;
 public class MultiResProcess {
 
 	/** SIP object*/
-	private SIPObject _sip;
+	private SIPIntra _sip;
 	/** number of cpu */
 	private int _nbCpu;
 	/** boolean delImage*/
 	private boolean _delImage;
-	/** doc */
-	private String _doc = ("#SIP Version 1 run with java 8\n"
-				+ "\nUsage:\n"
-				+ "\thic <hicFile> <chrSizeFile> <Output> <juicerToolsPath> [options]\n"
-				+ "\tcool <mcoolFile> <chrSizeFile> <Output> <cooltoolsPath> <coolerPath> [options]\n"
-				+ "\tprocessed <Directory with processed data> <chrSizeFile> <Output> [options]\n"
-				+ "\nParameters:\n"
-				+ "\t chrSizeFile: path to the chr size file, with the same name of the chr as in the hic file (i.e. chr1 does not match Chr1 or 1)\n"
-				+ "\t-res: resolution in bp (default 5000 bp)\n"
-				+ "\t-mat: matrix size to use for each chunk of the chromosome (default 2000 bins)\n"
-				+ "\t-d: diagonal size in bins, remove the maxima found at this size (eg: a size of 2 at 5000 bp resolution removes all maxima"
-				+ " detected at a distance inferior or equal to 10kb) (default 6 bins).\n"
-				+ "\t-g: Gaussian filter: smoothing factor to reduce noise during primary maxima detection (default 1.5)\n"
-				+ "\t-cpu: Number of CPU used for SIP processing (default 1)\n"
-				+ "\t-factor: Multiple resolutions can be specified using:\n"
-				+ "\t\t-factor 1: run only for the input res (default)\n"
-				+ "\t\t-factor 2: res and res*2\n"
-				+ "\t\t-factor 3: res and res*5\n"
-				+ "\t\t-factor 4: res, res*2 and res*5\n"
-				+ "\t-max: Maximum filter: increases the region of high intensity (default 2)\n"
-				+ "\t-min: Minimum filter: removes the isolated high value (default 2)\n"
-				+ "\t-sat: % of saturated pixel: enhances the contrast in the image (default 0.01)\n"
-				+ "\t-t Threshold for loops detection (default 2800)\n"
-				+ "\t-nbZero: number of zeros: number of pixels equal to zero that are allowed in the 24 pixels surrounding the detected maxima (default 6)\n"
-				+ "\t-norm: <NONE/VC/VC_SQRT/KR> (default KR)\n"
-				+ "\t-del: true or false, whether not to delete tif files used for loop detection (default true)\n"
-				+ "\t-fdr: Empirical FDR value for filtering based on random sites (default 0.01)\n"
-				+ "\t-isDroso: default false, if true apply extra filter to help detect loops similar to those found in D. mel cells\n"
-				+ "\t-h, --help print help\n"
-				+ "\nCommand line eg:\n"
-				+ "\tjava -jar SIP_HiC.jar processed inputDirectory pathToChromosome.size OutputDir .... paramaters\n"
-				+ "\tjava -jar SIP_HiC.jar hic inputDirectory pathToChromosome.size OutputDir juicer_tools.jar\n"
-				+ "\nAuthors:\n"
-				+ "Axel Poulet\n"
-				+ "\tDepartment of Molecular, Cellular  and Developmental Biology Yale University 165 Prospect St\n"
-				+ "\tNew Haven, CT 06511, USA\n"
-				+ "M. Jordan Rowley\n"
-				+ "\tDepartment of Genetics, Cell Biology and Anatomy, University of Nebraska Medical Center Omaha,NE 68198-5805\n"
-				+ "\nContact: pouletaxel@gmail.com OR jordan.rowley@unmc.edu");
+
 	/** path to chr size file*/
 	private String _chrFile;
 
 	/**
 	 * Constructor
 	 *
-	 * @param sip SIPObject
+	 * @param sip SIPIntra
 	 * @param cpu number of cpu
 	 * @param delImage delete image boolean
 	 * @param chrSizeFile path of chrSize file
 	 */
-	public MultiResProcess(SIPObject sip, int cpu, boolean delImage, String chrSizeFile) {
+	public MultiResProcess(SIPIntra sip, int cpu, boolean delImage, String chrSizeFile) {
 		this._nbCpu = cpu;
 		this._sip = sip;
 		this._delImage = delImage;
@@ -110,7 +72,7 @@ public class MultiResProcess {
 					JOptionPane.showMessageDialog(null,"Resolution problem", "Enable to find all the directories needed for SIP (-factor option)", JOptionPane.ERROR_MESSAGE);
 				}
 				System.out.println("!!!! It is missing one or several directories for factor paramter\n");
-				System.out.println(_doc);
+				SIPIntra.docError();
 				System.exit(0);
 			}
 		}
@@ -124,7 +86,7 @@ public class MultiResProcess {
 			File file = new File(resuFile);
 			if(file.exists()) 
 				file.delete();
-			SIPObject sipTmp = new SIPObject ();
+			SIPIntra sipTmp = new SIPIntra();
 			if(indexFact == 0) {
 				ProcessDetectLoops processDetectloops = new ProcessDetectLoops();
 				processDetectloops.go(this._sip, this._nbCpu,this._delImage,resuFile,resName);

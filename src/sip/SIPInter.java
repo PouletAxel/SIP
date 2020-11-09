@@ -1,4 +1,7 @@
-package utils;
+package sip;
+
+import utils.FDR;
+import loops.Loop;
 
 import java.io.*;
 import java.util.*;
@@ -10,7 +13,7 @@ import java.util.*;
  *
  */
 
-public class SIPInter{
+public class SIPInter  extends SIPObject {
 
 
     /** String path of the input data*/
@@ -58,16 +61,8 @@ public class SIPInter{
      * @throws IOException exception
      */
     public SIPInter(String output,String chrsize, double gauss,  int resolution, double thresholdMax, int matrixSize, int nbZero, boolean keepTif,double fdr) throws IOException {
+        super(output, gauss, resolution, thresholdMax,matrixSize, nbZero,  fdr, keepTif,chrsize) ;
 
-        this._output = output;
-        setChrSize(chrsize);
-        this._gauss = gauss;
-        this._resolution = resolution;
-         this._thresholdMaxima = thresholdMax;
-        this._matrixSize = matrixSize;
-        this._nbZero = nbZero;
-        this._keepTif = keepTif;
-        _fdr = fdr;
     }
 
     /**
@@ -108,7 +103,7 @@ public class SIPInter{
      * @param first boolean if true it is the first results so need to write the header
      * @throws IOException exception
      */
-    public void writeResu(String pathFile, HashMap<String,Loop> hLoop, boolean first) throws IOException {
+    public void writeResu(String pathFile, HashMap<String, Loop> hLoop, boolean first) throws IOException {
         FDR fdrDetection = new FDR (this._fdr, hLoop);
         fdrDetection.run();
         double RFDRcutoff = fdrDetection.getRFDRCutoff();
@@ -276,41 +271,6 @@ public class SIPInter{
      */
     public void setIsGui(boolean isGui) { this._isGui = isGui;}
 
-
-
-    /**
-     *  Initialize chrSize hashMap
-     *
-     * @param chrSizeFile path to the chrFile
-     */
-    public void  setChrSize(String chrSizeFile) {
-        BufferedReader br = null;
-        try {
-            br = new BufferedReader(new FileReader(chrSizeFile));
-            StringBuilder sb = new StringBuilder();
-            String line = br.readLine();
-            while (line != null){
-                sb.append(line);
-                String[] parts = line.split("\\t");
-                String chr = parts[0];
-                int size = Integer.parseInt(parts[1]);
-                _chrSize.put(chr, size);
-                sb.append(System.lineSeparator());
-                line = br.readLine();
-            }
-            br.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    /**
-     * getter chrSize
-     * @return hashMap of chrName => size
-     */
-    public HashMap<String, Integer> getChrSize() {
-        return _chrSize;
-    }
 
 }
 

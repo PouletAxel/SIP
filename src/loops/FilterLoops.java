@@ -1,4 +1,4 @@
-package utils;
+package loops;
 
 import java.util.ArrayList;
 import java.util.HashMap;

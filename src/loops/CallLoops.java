@@ -1,4 +1,4 @@
-package process;
+package loops;
 
 import java.io.File;
 import java.io.IOException;
@@ -9,13 +9,8 @@ import ij.ImagePlus;
 import ij.io.FileSaver;
 import inra.ijpb.morphology.Morphology;
 import inra.ijpb.morphology.Strel;
-import utils.CoordinatesCorrection;
-import utils.FilterLoops;
-import utils.FindMaxima;
-import utils.SIPObject;
-import utils.ImageProcessingMethod;
-import utils.Loop;
-import utils.PeakAnalysisScore;
+import sip.SIPIntra;
+import utils.*;
 
 /**
  * Class with all the methods to call the reginal maxima in the images and filter and write the output loops file list
@@ -38,7 +33,7 @@ public class CallLoops {
 	/** Resolution of the bin dump in base*/
 	private int _resolution;
 	/** Threshold for the maxima detection*/
-	private int _thresholdMaxima;
+	private double _thresholdMaxima;
 	/** Diage size to removed maxima close to diagonal*/
 	private int _diagSize;
 	/** Size of the step to process each chr (step = matrixSize/2)*/
@@ -57,7 +52,7 @@ public class CallLoops {
 	 *  
 	 * @param sip SIPOject
 	 */
-	public CallLoops(SIPObject sip){
+	public CallLoops(SIPIntra sip){
 		this._gauss = sip.getGauss();
 		this._min = sip.getMin();
 		this._max= sip.getMax();
@@ -106,7 +101,7 @@ public class CallLoops {
 				imageProcessing(imgFilter,fileList[i].toString(), m);
 				imgRaw.getTitle().replaceAll(".tif", "_N.tif");
 				ImagePlus imgNorm = IJ.openImage(imgRaw.getTitle().replaceAll(".tif", "_N.tif"));
-				int thresh = this._thresholdMaxima;
+				double thresh = this._thresholdMaxima;
 				double pixelPercent = 100*tuple.getNbZero()/(this._matrixSize*this._matrixSize);
 				if(pixelPercent < 7)  
 					thresh =  _thresholdMaxima/5;

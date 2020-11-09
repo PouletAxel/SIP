@@ -73,30 +73,11 @@ public class ImageProcessingMethod{
 	public void runMin(double min){	
 		this._rF.rank(this._ip, min, RankFilters.MIN);
 	}
-	
-	
-	/**
-	 * White "tophat" method to enhance the light structure
-	 * 
-	 */
-	public void topHat(){
-		GaussianBlur gb = new GaussianBlur();
-		gb.blurGaussian(this._ip, this._gaussianFilterRadius);
-		this._rF.rank(this._ip, this._minFilterRadius, RankFilters.MIN);
-		this._rF.rank(this._ip, this._maxFilterRadius, RankFilters.MAX);
-		this._rF.rank(this._ip, this._maxFilterRadius, RankFilters.MAX);
-		this._rF.rank(this._ip, this._minFilterRadius, RankFilters.MIN);
-	}
-	
-	/**
-	 * Getter of the image filtered
-	 * @return ImagePlus image filtered
-	 */
-	public ImagePlus getImg(){ return _img;}
+
 	
 	/**
 	 * Setter of the raw image
-	 * @param _img raw Image
+	 * @param img raw Image
 	 */
 	public void setImg(ImagePlus img){ this._img = img;}
 	
@@ -112,9 +93,9 @@ public class ImageProcessingMethod{
 
 	/**
 	 * 
-	 * @param m_min
+	 * @param max max filter strength
 	 */
-	public void runMax(double m_max) {
-		_rF.rank(_ip, m_max, RankFilters.MAX);
+	public void runMax(double max) {
+		_rF.rank(_ip, max, RankFilters.MAX);
 	}
 }

@@ -4,8 +4,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 
 import gui.Progress;
-import utils.SIPInter;
-import utils.SIPObject;
+import sip.SIPInter;
+import sip.SIPIntra;
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -31,14 +31,14 @@ public class ProcessDetectLoops{
 	/**
 	 * multiprocessing method for SIP intra chromosomal interaction
 	 *
-	 * @param sip SIPObject
+	 * @param sip SIPIntra
 	 * @param nbCPU nb of cpu
 	 * @param delImage boolean if true del all the tif file
 	 * @param resuFile path to results file
 	 * @param resName name of the resolution used
 	 * @throws InterruptedException exception
 	 */
-	public void go(SIPObject sip,int nbCPU, boolean delImage, String resuFile,String resName) throws InterruptedException { 
+	public void go(SIPIntra sip, int nbCPU, boolean delImage, String resuFile, String resName) throws InterruptedException {
 		ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(nbCPU);
 		Iterator<String> chrName = sip.getChrSizeHashMap().keySet().iterator();
 		if(sip.isProcessed()) {
@@ -88,7 +88,7 @@ public class ProcessDetectLoops{
 	 */
 	public void go(SIPInter sipInter, int nbCPU, boolean delImage, String resuFile) throws InterruptedException {
 		ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(nbCPU);
-		HashMap<String,Integer> chrSize = sipInter.getChrSize();
+		HashMap<String,Integer> chrSize = sipInter.getChrSizeHashMap();
 		Object [] chrName = chrSize.keySet().toArray();
 
 		System.out.println(sipInter.getOutputDir());
@@ -110,7 +110,7 @@ public class ProcessDetectLoops{
 		int nb = 0;
 
 		if(sipInter.isGui()){
-			_p = new Progress("Loop Detection step",sipInter.getChrSize().size()+1);
+			_p = new Progress("Loop Detection step",sipInter.getChrSizeHashMap().size()+1);
 			_p._bar.setValue(nb);
 		}
 		while (!executor.awaitTermination(30, TimeUnit.SECONDS)) {

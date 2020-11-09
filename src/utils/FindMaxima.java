@@ -10,6 +10,7 @@ import ij.plugin.filter.GaussianBlur;
 import ij.plugin.filter.MaximumFinder;
 import ij.process.ByteProcessor;
 import ij.process.ImageProcessor;
+import loops.Loop;
 
 /**
  * Detection of regional maxima in image. Return the HashMap<String,Loop>, the loop can be corrected. 
@@ -30,64 +31,73 @@ public class FindMaxima{
 	/**	binary image pixel white = the maxima detected*/
 	private ImagePlus _imgResu = new ImagePlus();
 	/**	 threshold for the imageJ class MaximumFinder, this class is call to detecte the maxima */
-	private double _noiseTolerance =-1;
+	private double _thresholdMaxima;
 	/**	diagonal size in bin*/
-	private int _diagSize =-1;
+	private int _diagonalSize;
 	/**	 Resolution of the image in base*/
-	private int _resolution = -1;
-	private double _gaussianFilterRadius;
+	private int _resolution;
+	/** gaussian Filter strength*/
+	private double _gaussian;
 
 	
 	/**
-	 * Constructor of FindMaxima
+	 * Constructor of FindMaxima for intra chromosomal method
+	 *
 	 * @param img ImagePlus raw image
 	 * @param imgFilter ImagePlus filtered image
 	 * @param chr String chromosome
-	 * @param noiseTolerance double threshold to detect maxima
-	 * @param diag int the size of the diagonal
+	 * @param thresholdMaxima double threshold to detect maxima
+	 * @param diagonalSize int the size of the diagonal
 	 * @param resolution int size of the pixel in base
 	 */
-	public FindMaxima(ImagePlus img, ImagePlus imgFilter, String chr, double noiseTolerance, int diag, int resolution){
+	public FindMaxima(ImagePlus img, ImagePlus imgFilter, String chr, double thresholdMaxima, int diagonalSize, int resolution){
 		this._imgNorm =  img;
 		this._imgFilter = imgFilter;
-		this._noiseTolerance = noiseTolerance;
+		this._thresholdMaxima = thresholdMaxima;
 		this._chr = chr;
-		this._diagSize = diag;
+		this._diagonalSize = diagonalSize;
 		this._resolution = resolution;
 	}
 
 	/**
-	 *
-	 * @param imgFilter
-	 * @param chr1
-	 * @param chr2
-	 * @param noiseTolerance
-	 * @param resolution
+	 * Constructor of FindMaxima for inter chromosomal method
+	 * @param imgDiff ImagePlus image diff
+	 * @param chr1 chr1 name
+	 * @param chr2 chr2 name
+	 * @param thresholdMaxima  double threshold to detect maxima
+	 * @param resolution int size of the pixel in base
+	 * @param gaussian gaussian filter strength
 	 */
-	public FindMaxima( ImagePlus imgFilter, String chr1,String chr2, double noiseTolerance, int resolution, double gaussian){
-		this._imgFilter = imgFilter;
-		this._noiseTolerance = noiseTolerance;
+	public FindMaxima( ImagePlus imgDiff, String chr1,String chr2, double thresholdMaxima, int resolution, double gaussian){
+		this._imgFilter = imgDiff;
+		this._thresholdMaxima = thresholdMaxima;
 		this._chr2 = chr2;
 		this._chr = chr1;
 		this._resolution = resolution;
-		this._gaussianFilterRadius = gaussian;
+		this._gaussian = gaussian;
 	}
 
 
 	/**
+	 * findLoop for intra chromosomal interaction
+	 * call ImageJ findMaxima method
+	 * filter loops with low value in oMe image and normalize image
+	 * if the loops didn't possess a decay => suppress
+	 * Loop correction: => avoid overlapping loops, correct also the coordinate if higher value pixel is in the loops
+	 * neighbor
 	 *
-	 * @param index
-	 * @param nbZero
-	 * @param raw
-	 * @param val
-	 * @return
+	 * @param index image index
+	 * @param nbZero	nb zeor allowe around the loop
+	 * @param raw ImagePlus raw image
+	 * @param val value used as min in the image
+	 * @return HashMap loop loop name => Loop object
 	 */
 
-	public HashMap<String,Loop> findloop(int index, int nbZero, ImagePlus raw, float val){
+	public HashMap<String, Loop> findloop(int index, int nbZero, ImagePlus raw, float val){
 		run(nbZero, raw, val);
 		ArrayList<String> temp = this.getMaxima();
 		ImageProcessor ipN = this._imgNorm.getProcessor();
-		HashMap<String,Loop>  data = new HashMap<String,Loop>(); 
+		HashMap<String,Loop>  data = new HashMap<String,Loop>();
 		//System.out.println("size raw maxima !!!!!!!!!!!!!! "+raw.getTitle()+"  "+temp.size());
 		for(int j = 0; j < temp.size();++j){
 			String[] parts = temp.get(j).split("\\t");
@@ -99,14 +109,14 @@ public class FindMaxima{
 			if(avg > 1.45 && ipN.getf(x, y) >= 1.85){ // filter on the loop value and region value
 				DecayAnalysis da = new DecayAnalysis(this._imgNorm,x,y);
 				float n1 =da.getNeighbourhood1();
-				float n2 =da.getNeighbourhood2();	
+				float n2 =da.getNeighbourhood2();
 				if(n1 < n2 && n1 >= 0.15 && n2 >= 0.25){ // filter on the neighborood for hic datatset
 					Loop maxima = new Loop(temp.get(j),x,y,this._chr,avg,std,ipN.getf(x, y));
 					maxima.setNeigbhoord1(n1);
 					maxima.setNeigbhoord2(n2);
 					maxima.setResolution(this._resolution);
 					//System.out.println(_resolution+" "+maxima.getResolution());
-					maxima.setDiagSize(this._diagSize);
+					maxima.setDiagSize(this._diagonalSize);
 					maxima.setMatrixSize(this._imgNorm.getWidth());
 					data.put(name, maxima);
 				}
@@ -117,8 +127,14 @@ public class FindMaxima{
 	}
 
 	/**
-	 * @param
-	 *
+	 * findLoop for inter chromosomal interaction
+	 * call ImageJ findMaxima method
+	 * filter loops with more than the nb of zero allowed in its neighbor
+	 * if the loops didn't possess a decay => suppress
+	 * Loop correction:  correct also the coordinate if higher value pixel is in the loops
+	 * neighbor
+	 * @param pathRaw path to the raw image
+	 * @return HashMap loop loop name => Loop object
 	 */
 	public HashMap<String,Loop> findLoopInter(String pathRaw){
 
@@ -156,7 +172,7 @@ public class FindMaxima{
 		//System.out.println("after filter ################# "+raw.getTitle()+"  "+data.size());
 		return data;
 	}
-		
+
 	/**
 	 * Detect maxima with the oMe or observed methods, call the different methods 
 	 * to detect the maxima and correct them. 
@@ -168,7 +184,7 @@ public class FindMaxima{
 		ImagePlus temp = this._imgFilter.duplicate();
 		ImageProcessor ip = temp.getProcessor();
 		MaximumFinder mf = new MaximumFinder();
-		ByteProcessor bp = mf.findMaxima(ip, this._noiseTolerance, MaximumFinder.SINGLE_POINTS, true);
+		ByteProcessor bp = mf.findMaxima(ip, this._thresholdMaxima, MaximumFinder.SINGLE_POINTS, true);
 		this._imgResu.setProcessor(bp);
 		this.putLoopLowerTriangle();
 		this.removedCloseMaxima();
@@ -178,20 +194,20 @@ public class FindMaxima{
 
 
 	/**
-	 *
+	 * Detect maxima with the oMe or observed methods, call the different methods
+	 * 	to detect the maxima and correct them.
+	 * @param rawImage ImagePlus raw image
 	 */
 	private void runInter(ImagePlus rawImage){
 		ImagePlus temp = this._imgFilter.duplicate();
 		ImageProcessor ip = temp.getProcessor();
 		GaussianBlur gb = new GaussianBlur();
-		gb.blurGaussian(ip, this._gaussianFilterRadius);
+		gb.blurGaussian(ip, this._gaussian);
 		MaximumFinder mf = new MaximumFinder();
-		ByteProcessor bp = mf.findMaxima(ip, this._noiseTolerance, MaximumFinder.SINGLE_POINTS, true);
+		ByteProcessor bp = mf.findMaxima(ip, this._thresholdMaxima, MaximumFinder.SINGLE_POINTS, true);
 		this._imgResu.setProcessor(bp);
 		this._imgNorm = rawImage;
-		//this.removedCloseMaxima();
 		this.correctMaxima();
-		//this.removeMaximaCloseToZero(nbZero,rawImage, backgroundValue);
 	}
 
 
@@ -232,6 +248,9 @@ public class FindMaxima{
 	    fileSaver.saveAsTiff(pathFile);
 	}
 
+	/**
+	 *
+	 */
 	private void putLoopLowerTriangle() {
 		ImageProcessor ipMaxima = this._imgResu.getProcessor();
 		int w = ipMaxima.getWidth();
@@ -402,7 +421,7 @@ public class FindMaxima{
 			for(int j= 2;j< h-2;++j){
 				if(ipResu.getPixel(i, j) > 0){
 					int thresh = nbZero;
-					if (j-i <= this._diagSize+2)
+					if (j-i <= this._diagonalSize +2)
 						thresh = thresh+1;
 					int nb = 0;
 					for(int ii = i-2; ii <= i+2; ++ii){
@@ -420,10 +439,4 @@ public class FindMaxima{
 		}
 		this._imgResu.setProcessor(ipResu);
 	}
-	
-	/**
-	 * Setter of the noise tolerance parameter 
-	 * @param n int the value of the new noiseTolerance
-	 */
-	public void setNoiseTolerance( int n){ this._noiseTolerance = n;}
 }

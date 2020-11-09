@@ -1,6 +1,6 @@
 package multiProcesing;
 
-import process.DumpInterChromosomal;
+import dumpProcessing.DumpInterChromosomal;
 
 import java.io.File;
 import java.io.IOException;

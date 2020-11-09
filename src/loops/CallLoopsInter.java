@@ -1,11 +1,15 @@
-package process;
+package loops;
 
 import ij.ImagePlus;
 import ij.io.FileSaver;
 import ij.plugin.filter.GaussianBlur;
 import ij.process.FloatProcessor;
 import ij.process.ImageProcessor;
-import utils.*;
+import sip.SIPInter;
+import utils.CoordinatesCorrection;
+import utils.FindMaxima;
+import utils.PeakAnalysisScore;
+import utils.TupleFileToImage;
 
 import java.io.File;
 import java.io.IOException;
