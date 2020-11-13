@@ -1,6 +1,8 @@
 package cli;
 import org.apache.commons.cli.*;
 
+import java.io.File;
+
 public class CLISipOption {
 
     Options _options= new Options();
@@ -90,12 +92,43 @@ public class CLISipOption {
         this._options.addOption(_interOrIntra);
         try {
             _cmd = parser.parse(this._options, args);
+
         }
         catch (ParseException  exp){
             System.out.println(exp.getMessage()+"\n");
             System.out.println(getHelperInfos());
             System.exit(1);
          }
+        this.testParam();
+    }
+
+    private void testParam(){
+        String input = _cmd.getOptionValue("input");
+        String output = _cmd.getOptionValue("output");
+        String chrSizeFile = _cmd.getOptionValue("chrSize");
+        File file = new File(input);
+
+        if(!file.exists() && !input.startsWith("https")){
+            System.out.println("-i "+input+"doesn't existed !!! \n\n");
+            System.out.println(getHelperInfos());
+            System.exit(1);
+        }
+
+        file = new File(output);
+        if(!file.exists()){
+            System.out.println("-o "+output+"doesn't existed !!! \n\n");
+            System.out.println(getHelperInfos());
+            System.exit(1);
+        }
+
+        file = new File(chrSizeFile);
+        if(!file.exists()){
+            System.out.println("-c "+chrSizeFile+"doesn't existed !!! \n\n");
+            System.out.println(getHelperInfos());
+            System.exit(1);
+        }
+
+        String inter ;
     }
 
     /**
@@ -106,13 +139,13 @@ public class CLISipOption {
             return "More details :\n" +
                     "java -jar SIPHiC"+_Jversion+".jar hic --help \n" +
                     "or \n"+
-                    "java -jar NucleusJ_2-"+_Jversion+".jar cool -h or --help\n"+
+                    "java -jar SIPHiC-"+_Jversion+".jar cool -h or --help\n"+
                     "or \n" +
-                    "java -jar NucleusJ_2-"+_Jversion+".jar cool -h or --help \n" +
+                    "java -jar SIPHiC-"+_Jversion+".jar processed -h or --help \n" +
                     "\n\nCommand line eg:\n" +
-                    "\tjava -jar SIP_HiC.jar hic <hicFile> <chrSizeFile> <Output> <juicerToolsPath> [options]\n" +
-                    "\tjava -jar SIP_HiC.jar cool <mcoolFile> <chrSizeFile> <Output> <cooltoolsPath> <coolerPath> [options]\n" +
-                    "\tjava -jar SIP_HiC.jar processed <Directory with processed data> <chrSizeFile> <Output> [options]\n" +
+                    "\tjava -jar SIP_HiC.jar hic -i hicFile -c chrSizeFile -o Output -j juicerTool [options]\n" +
+                    "\tjava -jar SIP_HiC.jar cool -i mcoolFile -c chrSizeFile -o Output -cooltools cooltoolsPath -cooler coolerPath [options]\n" +
+                    "\tjava -jar SIP_HiC.jar processed  -i PathDirectoryWithProcessedData -c chrSizeFile -o Output [options]\n" +
                     "\nAuthors:\n" +
                     "Axel Poulet\n" +
                     "\tDepartment of Molecular, Cellular  and Developmental Biology Yale University 165 Prospect St\n" +
@@ -120,7 +153,7 @@ public class CLISipOption {
                     "\nM. Jordan Rowley\n" +
                     "\tDepartment of Genetics, Cell Biology and Anatomy, University of Nebraska Medical Center Omaha,NE 68198-5805\n" +
                     "\nContact: pouletaxel@gmail.com OR jordan.rowley@unmc.edu\n";
-        }
+    }
 
 
 

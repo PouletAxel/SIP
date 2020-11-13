@@ -16,7 +16,7 @@ public class CLIOptionHiC extends CLISipOption{
         this._options.addOption(Option.builder("j").longOpt("juicerTool").required()
                 .type(String.class).desc("Path to juicerTool.jar\n").numberOfArgs(1).build());
 
-        this._options.addOption(Option.builder("n").longOpt("norm").required()
+        this._options.addOption(Option.builder("n").longOpt("norm")
                 .type(String.class).desc(" <NONE/VC/VC_SQRT/KR> (default KR)\n").numberOfArgs(1).build());
 
 
