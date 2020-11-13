@@ -36,7 +36,6 @@ public class SIPIntra extends SIPObject {
 	private double _max;
 	/** % of staurated pixel after enhance contrast*/
 	private double _saturatedPixel;
-
 	/** Diage size to removed maxima close to diagonal*/
 	private int _diagonalSize;
 	/** Size of the step to process each chr (step = matrixSize/2)*/
@@ -110,15 +109,13 @@ public class SIPIntra extends SIPObject {
 	 * @param nbZero number of zero allowed around loops
 	 * @param listFactor multi resolution calling loops used this list of factor
 	 * @param fdr fdr value for final loops filtering
-	 * @param isProcessed true if processed SIP data input else false
-	 * @param rFDR false if it isn't drosophila input
 	 */
 	public SIPIntra(String input, String output, String chrSize, double gauss, double min,
 					double max, int resolution, double saturatedPixel, int thresholdMax,
 					int diagonalSize, int matrixSize, int nbZero, ArrayList<Integer> listFactor,
-					double fdr, boolean isProcessed, boolean rFDR) {
+					double fdr) {
 
-		super( output, output,  gauss, resolution, thresholdMax, matrixSize, nbZero,  fdr, chrSize);
+		super( input, output,  gauss, resolution, thresholdMax, matrixSize, nbZero,  fdr, chrSize);
 
 
 		this._min = min;
@@ -127,8 +124,7 @@ public class SIPIntra extends SIPObject {
 		this._diagonalSize = diagonalSize;
 		this._step = matrixSize/2;
 		this._listFactor = listFactor;
-		this._listFactor = listFactor;
-		this._isDroso = rFDR;
+
 	}
 	
 	

@@ -58,7 +58,7 @@ public class SIPObject {
      * @param nbZero
      * @param fdr
      */
-    public SIPObject (String input, String output, double gauss, int resolution, int thresholdMax, int matrixSize, int nbZero,  double fdr, String chrSizeFile){
+    public SIPObject (String input, String output, double gauss, int resolution, double thresholdMax, int matrixSize, int nbZero,  double fdr, String chrSizeFile){
         if(!output.endsWith(File.separator))  output = output+File.separator;
         if(!input.endsWith(File.separator))   input = input+File.separator;
         this._input = input;
@@ -272,8 +272,9 @@ public class SIPObject {
                 + "\t-isDroso: default false, if true apply extra filter to help detect loops similar to those found in D. mel cells\n"
                 + "\t-h, --help print help\n"
                 + "\nCommand line eg:\n"
-                + "\tjava -jar SIP_HiC.jar processed inputDirectory pathToChromosome.size OutputDir .... paramaters\n"
-                + "\tjava -jar SIP_HiC.jar hic inputDirectory pathToChromosome.size OutputDir juicer_tools.jar\n"
+                + "\tjava -jar SIP_HiC.jar hic <hicFile> <chrSizeFile> <Output> <juicerToolsPath> [options]\n"
+                + "\tjava -jar SIP_HiC.jar cool <mcoolFile> <chrSizeFile> <Output> <cooltoolsPath> <coolerPath> [options]\n"
+                + "\tjava -jar SIP_HiC.jar processed <Directory with processed data> <chrSizeFile> <Output> [options]\n"
                 + "\nAuthors:\n"
                 + "Axel Poulet\n"
                 + "\tDepartment of Molecular, Cellular  and Developmental Biology Yale University 165 Prospect St\n"
@@ -324,4 +325,11 @@ public class SIPObject {
         }
     }
 
+    /**
+     *
+     * @param keepTif
+     */
+    public void setIsKeepTif(boolean keepTif) {
+        this._keepTif = keepTif;
+    }
 }

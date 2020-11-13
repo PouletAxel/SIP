@@ -38,8 +38,10 @@ public class TestCallLoopsProcessedFile {
 		//factor.add(5);
 		//SIP_HiC_v1.3.6.jar hic SIP/Kc_allcombined.hic SIP/armsizes.txt SIP/Droso/ ../Tools/juicer_tools_1.13.02.jar 
 		String chrSizeFile = "/home/plop/Desktop/w_hg19.sizes";
-		SIPIntra sip = new SIPIntra(input,output, chrSizeFile, gauss, min, max, resolution, saturatedPixel, thresholdMax, diagSize, matrixSize, nbZero,factor,0.01,true,false);
+		SIPIntra sip = new SIPIntra(input,output, chrSizeFile, gauss, min, max, resolution, saturatedPixel, thresholdMax, diagSize, matrixSize, nbZero,factor,0.01);
 		sip.setIsGui(false);
+		sip.setIsDroso(false);
+		sip.setIsProcessed(true);
 		int cpu = 2;
 		System.out.println("Processed Data\n");
 		System.out.println("input "+input+"\n"

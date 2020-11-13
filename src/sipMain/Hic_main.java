@@ -10,9 +10,13 @@ import java.util.ArrayList;
 
 import javax.swing.JOptionPane;
 
+import cli.CLISipOption;
 import gui.GuiAnalysis;
 import multiProcesing.ProcessCoolerDumpData;
 import multiProcesing.ProcessDumpData;
+import process.HiC;
+import process.MCool;
+import process.Processed;
 import utils.MultiResProcess;
 import sip.SIPIntra;
 
@@ -95,13 +99,24 @@ public class Hic_main {
 	 * @throws InterruptedException exception
 	 */
 	public static void main(String[] args) throws IOException, InterruptedException {
+
+
+
 		_factor.add(1);
-		if (args.length >= 1 && args.length < 4){
-			SIPIntra.docError();
-			System.exit(0);
-		}else if(args.length >= 4){
-			if (args[0].equals("hic") || args[0].equals("processed") || args[0].equals("cool")){
-				_input = args[1];
+		if(args.length >= 1) {
+			if (args[0].equals("hic")) {
+				HiC hic = new HiC(args);
+
+			} else if (args[0].equals("processed")) {
+				Processed processed = new Processed(args);
+			} else if (args[0].equals("cool")) {
+				MCool mCool = new MCool(args);
+
+			} else {
+				System.out.println(CLISipOption.getHelperInfos());
+			}
+		}
+/*				_input = args[1];
 				_output = args[3];
 				_chrSizeFile = args[2];	
 				if (args[0].equals("hic")){
@@ -119,11 +134,6 @@ public class Hic_main {
 					_cooltools = args[4];
 					readOption(args,6);
 				}
-			}else{
-				System.out.println(args[0]+" not defined\n");
-				SIPIntra.docError();
-				return;
-			}
 						
 		}else{////////////////////////////////////////GUI parameter initialisation
 			GuiAnalysis gui = new GuiAnalysis();
@@ -247,7 +257,9 @@ public class Hic_main {
 					+ "del "+_delImages+"\n"+"cpu "+ _cpu+"\n-isDroso "+_isDroso+"\n");
 			
 			sip = new SIPIntra(_input,_output, _chrSizeFile, _gauss, _min, _max, _resolution, _saturatedPixel, _thresholdMax,
-					_diagSize, _matrixSize, _nbZero,_factor,_fdr,_isProcessed, _isDroso);
+					_diagSize, _matrixSize, _nbZero,_factor,_fdr);
+			sip.setIsDroso(_isDroso);
+			sip.setIsProcessed(_isProcessed);
 			sip.setIsGui(_gui);
 		}
 		System.out.println("Start loop detction step");
@@ -277,7 +289,7 @@ public class Hic_main {
 		if(_gui){
 			JOptionPane.showMessageDialog(null,"Results available: "+_output , "End of SIP program", JOptionPane.INFORMATION_MESSAGE);
 		}
-		System.out.println("End of SIP loops are available in "+_output);
+		System.out.println("End of SIP loops are available in "+_output);*/
 	}
 
 	/**

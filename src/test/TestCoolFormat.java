@@ -42,10 +42,12 @@ public class TestCoolFormat {
 		boolean keepTif = false;
 		int cpu = 1;
 				
-		SIPIntra sip = new SIPIntra(input,output, fileChr, gauss, min, max, resolution, saturatedPixel, thresholdMax, diagSize, matrixSize, nbZero,factor,0.03,keepTif,false);
+		SIPIntra sip = new SIPIntra(input,output, fileChr, gauss, min, max, resolution, saturatedPixel, thresholdMax, diagSize, matrixSize, nbZero,factor,0.03);
 		sip.setIsGui(false);
 		sip.setIsCooler(true);
 		sip.setIsProcessed(true);
+		sip.setIsDroso(false);
+		sip.setIsKeepTif(keepTif);
 		
 
 		//ProcessCoolerDumpData processDumpData = new ProcessCoolerDumpData();

@@ -19,11 +19,10 @@ public class TestInter {
         int resolution = 100000;
         int matrixSize = 500;
         double gauss = 1;
-        double min = 2;
-        double max = 2;
+
         int nbZero = 6;
         double thresholdMax = 0.9;
-        double saturatedPixel = 0.01;
+
 
         boolean keepTif = true;
         int cpu = 2;

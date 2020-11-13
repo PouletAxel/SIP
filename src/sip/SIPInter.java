@@ -16,41 +16,12 @@ import java.util.*;
 public class SIPInter  extends SIPObject {
 
 
-    /** String path of the input data*/
-    private String _input;
-    /** Path of the output file*/
-    private String _output;
-    /** Strength of the gaussian filter*/
-    private double _gauss;
-    /** double fdr value choose by the user*/
-    private double _fdr;
-    /** Image size*/
-    private int _matrixSize;
-    /** Resolution of the bin dump in base*/
-    private int _resolution;
-    /** Threshold for the maxima detection*/
-    private double _thresholdMaxima;
-    /** HashMap of the chr size, the key = chr name, value = size of chr*/
-    private HashMap<String,Integer> _chrSize = new HashMap<>();
-    /** Size of the step to process each chr (step = matrixSize/2)*/
-    private int _step;
-    /** Number of pixel = 0 allowed around the loop*/
-    private int _nbZero;
-    /** is processed booelan*/
-    private boolean _isProcessed;
-    /** if is gui analysis*/
-    private boolean _isGui;
-    /** if data set is mcool format*/
-    private boolean _isCooler;
-    /** */
-    private boolean _keepTif;
-
     /**
      *
      *  constructor for hic file
      *
      * @param output output path
-     * @param chrsize chr size path
+     * @param chrSize chr size path
      * @param gauss gaussian filter strength
      * @param resolution bins size
      * @param thresholdMax threshold value for loops detection
@@ -60,8 +31,8 @@ public class SIPInter  extends SIPObject {
      * @param fdr fdr value for the final loops filter
      * @throws IOException exception
      */
-    public SIPInter(String output,String chrsize, double gauss,  int resolution, double thresholdMax, int matrixSize, int nbZero, boolean keepTif,double fdr) throws IOException {
-        super(output, gauss, resolution, thresholdMax,matrixSize, nbZero,  fdr, keepTif,chrsize) ;
+    public SIPInter(String output,String chrSize, double gauss,  int resolution, double thresholdMax, int matrixSize, int nbZero, boolean keepTif,double fdr) throws IOException {
+        super(output, gauss, resolution, thresholdMax,matrixSize, nbZero,  fdr, keepTif,chrSize) ;
 
     }
 
@@ -70,7 +41,7 @@ public class SIPInter  extends SIPObject {
      *
      * @param input input file with SIP file
      * @param output output path
-     * @param chrsize chr size path
+     * @param chrSize chr size path
      * @param gauss gaussian filter strength
      * @param resolution bins size
      * @param thresholdMax threshold value for loops detection
@@ -80,19 +51,11 @@ public class SIPInter  extends SIPObject {
      * @param fdr fdr value for the final loops filter
      * @throws IOException exception
      */
-    public SIPInter(String input,String output,String chrsize, double gauss, int resolution,
-                 double thresholdMax, int matrixSize, int nbZero, boolean keepTif, double fdr) throws IOException {
+    public SIPInter(String input,String output,String chrSize, double gauss, int resolution,
+                 double thresholdMax, int matrixSize, int nbZero, boolean keepTif, double fdr){
 
-        this._input = input;
-        this._output = output;
-        this._gauss = gauss;
-        setChrSize(chrsize);
-        this._resolution = resolution;
-        this._thresholdMaxima = thresholdMax;
-        this._matrixSize = matrixSize;
-        this._nbZero = nbZero;
-        this._keepTif = keepTif;
-        _fdr = fdr;
+        super(input, output,  gauss, resolution, thresholdMax, matrixSize, nbZero,  fdr, chrSize);
+
 
     }
 
@@ -104,11 +67,12 @@ public class SIPInter  extends SIPObject {
      * @throws IOException exception
      */
     public void writeResu(String pathFile, HashMap<String, Loop> hLoop, boolean first) throws IOException {
-        FDR fdrDetection = new FDR (this._fdr, hLoop);
+        double fdr = this.getFdr();
+        FDR fdrDetection = new FDR (fdr, hLoop);
         fdrDetection.run();
         double RFDRcutoff = fdrDetection.getRFDRCutoff();
         double FDRcutoff = fdrDetection.getFDRCutoff();
-        System.out.println("Filtering value at "+this._fdr+" FDR is "+FDRcutoff+" APscore and "+RFDRcutoff+" RegionalAPscore\n");
+        System.out.println("Filtering value at "+fdr+" FDR is "+FDRcutoff+" APscore and "+RFDRcutoff+" RegionalAPscore\n");
         BufferedWriter writer;
         if(first) writer = new BufferedWriter(new FileWriter(new File(pathFile), true));
         else{
@@ -131,147 +95,6 @@ public class SIPInter  extends SIPObject {
         }
         writer.close();
     }
-
-
-
-    /**
-     * Getter of the input dir
-     * @return path of the input dir
-     */
-    public String getInputDir(){ return this._input; }
-
-    /**
-     * Getter of the matrix size
-     * @return the size of the image
-     */
-    public int getMatrixSize(){ return this._matrixSize; }
-
-
-    /**
-     * Getter of step
-     * @return the step
-     */
-    public int getStep(){ return this._step;}
-
-    /**
-     * Setter of the path of the input directory
-     * @param inputDir String of the input directory
-     */
-    public void setInputDir(String inputDir){ this._input = inputDir; }
-
-    /**
-     * Getter of the path of the output directory
-     * @return path
-     */
-    public String getOutputDir(){ return this._output; }
-
-    /**
-     * Setter of the path of the output directory
-     * @param outputDir String new path for the output directory
-     */
-    public void setOutputDir(String outputDir){	this._output = outputDir;}
-
-    /**
-     * Getter of the gaussian blur strength
-     * @return double gaussian
-     */
-    public double getGauss(){ return this._gauss; }
-
-    /**
-     * Setter of the gaussian blur strength
-     * @param gauss double
-     */
-    public void setGauss(double gauss){ this._gauss = gauss; }
-
-
-
-    /**
-     * Getter of resolution of the bin
-     * @return int resolution of the image
-     */
-    public int getResolution(){	return this._resolution;}
-
-    /**
-     * Setter of resolution of the bin
-     * @param resolution int new resolution
-     */
-    public void setResolution(int resolution){	this._resolution = resolution;}
-
-    /**
-     * Setter of size of the matrix
-     * @param size int new size of the matrix
-     */
-    public void setMatrixSize(int size){ this._matrixSize = size; }
-
-    /**
-     * setter step between image
-     * @param step int step
-     */
-    public void setStep(int step){ this._step = step;}
-
-    /**
-     * Getter of threshold for the detection of the regional maxima
-     * @return int threshold
-     */
-    public double getThresholdMaxima(){ return _thresholdMaxima;}
-    /**
-     * Setter of threshold for the detection of the maxima
-     * @param thresholdMaxima int new threshold
-     */
-    public void setThresholdMaxima(int thresholdMaxima) { this._thresholdMaxima = thresholdMaxima;}
-
-
-    /**
-     * Getter of NbZero
-     * @return int nb of zero
-     */
-    public int getNbZero(){ return this._nbZero;}
-
-    /**
-     * Setter of nbZero
-     * @param nbZero int new nb of zero
-     */
-    public void setNbZero(int nbZero){ this._nbZero = nbZero;}
-
-
-
-    /**
-     * Getter is isProcessed
-     * @return boolean
-     */
-    public boolean isProcessed() { return _isProcessed;}
-
-    /**
-     * setter isProcessed
-     * @param isProcessed boolean
-     */
-    public void setIsProcessed(boolean isProcessed) { this._isProcessed = isProcessed;}
-
-    /**
-     *getter is cooler
-     * @return boolean isCooler
-     */
-    public boolean isCooler() { return _isCooler;}
-
-    /**
-     * Setter isCooler
-     * @param cool boolean
-     */
-    public void setIsCooler(boolean cool) { this._isCooler = cool;}
-
-    /**
-     * getter isGui
-     * @return boolean
-     */
-    public boolean isGui() { return _isGui;}
-
-    /**
-     * setter is gui
-     * @param isGui  boolean
-     */
-    public void setIsGui(boolean isGui) { this._isGui = isGui;}
-
-
 }
 
 
