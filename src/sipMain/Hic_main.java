@@ -98,7 +98,7 @@ public class Hic_main {
 	 * @throws IOException  exception
 	 * @throws InterruptedException exception
 	 */
-	public static void main(String[] args) throws IOException, InterruptedException {
+	public static void main(String[] args) throws Exception {
 
 
 
@@ -106,6 +106,7 @@ public class Hic_main {
 		if(args.length >= 1) {
 			if (args[0].equals("hic")) {
 				HiC hic = new HiC(args);
+				hic.run();
 
 			} else if (args[0].equals("processed")) {
 				Processed processed = new Processed(args);
