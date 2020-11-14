@@ -100,23 +100,44 @@ public class Hic_main {
 	 */
 	public static void main(String[] args) throws Exception {
 
+		/*CLI */
 
-
-		_factor.add(1);
 		if(args.length >= 1) {
 			if (args[0].equals("hic")) {
 				HiC hic = new HiC(args);
 				hic.run();
 
-			} else if (args[0].equals("processed")) {
+			}else if (args[0].equals("processed")) {
 				Processed processed = new Processed(args);
-			} else if (args[0].equals("cool")) {
+			}else if (args[0].equals("cool")) {
 				MCool mCool = new MCool(args);
 
-			} else {
+			}else {
 				System.out.println(CLISipOption.getHelperInfos());
 			}
 		}
+		/*GUI */
+		else{
+			GuiAnalysis gui = new GuiAnalysis();
+			while( gui.isShowing()){
+				try {Thread.sleep(1);}
+				catch (InterruptedException e) {e.printStackTrace();}
+			}
+			if (gui.isStart()){
+				if(gui.isHic()) {
+					HiC hic = new HiC(gui);
+					hic.run();
+				}else if(gui.isCool()){
+
+				}else if(gui.isProcessed()){
+
+				}
+			}else {
+				System.out.println("SIP closed: if you want the help: -h");
+				return;
+			}
+		}
+
 /*				_input = args[1];
 				_output = args[3];
 				_chrSizeFile = args[2];	
@@ -147,7 +168,7 @@ public class Hic_main {
 				_isCool = gui.isCool();
 				_chrSizeFile = gui.getChrSizeFile();
 				_output = gui.getOutputDir();
-				_input = gui.getRawDataDir();
+				_input = gui.getInput();
 				_matrixSize = gui.getMatrixSize();
 				_diagSize = gui.getDiagSize();
 				_resolution = gui.getResolution();
@@ -157,8 +178,8 @@ public class Hic_main {
 				_min = gui.getMin();
 				_isDroso= gui.isDroso();
 				_nbZero = gui.getNbZero();
-				_saturatedPixel = gui.getEnhanceSignal();
-				_thresholdMax = gui.getNoiseTolerance();
+				_saturatedPixel = gui.getSaturatedPixell();
+				_thresholdMax = gui.getThresholdMaxima();
 				_fdr = gui.getFDR();
 				_cpu = gui.getNbCpu();
 				if(gui.getFactorChoice() == 2){
@@ -171,7 +192,7 @@ public class Hic_main {
 				}
 				_isHic  = gui.isHic();
 				_isProcessed = gui.isProcessed();
-				_juiceBoxTools = gui.getJuiceBox();
+				_juiceBoxTools = gui.getJuicerTool();
 				_cooltools = gui.getCooltools();
 				_cooler = gui.getCooler();
 				

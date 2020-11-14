@@ -31,18 +31,18 @@ public class TestGui {
 		if (gui.isStart()){
 			System.out.println("test");
 			String output = gui.getOutputDir();
-			String input = gui.getRawDataDir();
+			String input = gui.getInput();
 			int matrixSize = gui.getMatrixSize();
 			int diagSize = gui.getDiagSize();
 			int resolution = gui.getResolution();
 			double gauss = gui.getGaussian();
 			double max = gui.getMax();
 			double min = gui.getMin();
-			double saturatedPixel = gui.getEnhanceSignal();
-			int thresholdMax = gui.getNoiseTolerance();
+			double saturatedPixel = gui.getSaturatedPixell();
+			int thresholdMax = gui.getThresholdMaxima();
 			boolean isHic  = gui.isHic();
 			boolean isProcessed = gui.isProcessed();
-			String juiceBoxTools = gui.getJuiceBox();
+			String juiceBoxTools = gui.getJuicerTool();
 			String juiceBoXNormalisation = "KR";
 			if(gui.isNONE()) juiceBoXNormalisation = "NONE";
 			else if (gui.isVC()) juiceBoXNormalisation = "VC";

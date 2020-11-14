@@ -33,9 +33,9 @@ public class GuiAnalysis extends JFrame{
 	/** */
 	private Container _container;
 	/** */
-	private JButton _jbWorkDir = new JButton("Output directory");
+	private JButton _jbOutputDir = new JButton("Output directory");
 	/** */
-	private JButton _jbRawData = new JButton("Data (.hic, .mcool or SIP)");
+	private JButton _jbInputDir = new JButton("Data (.hic, .mcool or SIP)");
 	/** */
 	private JButton _jbChrSize = new JButton("Chr size file");
 	/** */
@@ -82,6 +82,15 @@ public class GuiAnalysis extends JFrame{
     private JRadioButton _jrbVC = new JRadioButton("VC");
     /** */
     private JRadioButton _jrbVC_sqrt = new JRadioButton("VC SQRT");
+
+	/** */
+	private ButtonGroup _bIntraOrInter = new ButtonGroup();
+    /** */
+	private JRadioButton _jrbIntra = new JRadioButton("Intra");
+	/** */
+	private JRadioButton _jrbInter = new JRadioButton("Inter");
+
+
     /** */
 	private JFormattedTextField _jtfMatrixSize = new JFormattedTextField(Number.class);
 	/** */
@@ -95,11 +104,11 @@ public class GuiAnalysis extends JFrame{
     /** */
     private JFormattedTextField _jtfMax =  new JFormattedTextField(Number.class);
     /** */
-    private JFormattedTextField _jtfEnhanceContrast =  new JFormattedTextField(Number.class);
+    private JFormattedTextField _jtfSaturatedPixel =  new JFormattedTextField(Number.class);
     /** */
     private JFormattedTextField _jtfNbZero =  new JFormattedTextField(Number.class);
     /** */
-    private JFormattedTextField _jtfNoiseTolerance =  new JFormattedTextField(Number.class);
+    private JFormattedTextField _jtfThresholdMaxima =  new JFormattedTextField(Number.class);
     /** */
     private boolean _start = false;
     /** */
@@ -234,7 +243,7 @@ public class GuiAnalysis extends JFrame{
 		label.setFont(new java.awt.Font("arial",2,11));
 		this._container.add(label, new GridBagConstraints(
 	   		0, 1, 0, 0, 0.0, 0.0, GridBagConstraints.NORTHWEST,
-	   		GridBagConstraints.NONE, new Insets(133, 20, 0, 0), 0, 0
+	   		GridBagConstraints.NONE, new Insets(138, 20, 0, 0), 0, 0
 	   	));
 	   	
 		this._bNorm.add(this._jrbNone);
@@ -247,59 +256,59 @@ public class GuiAnalysis extends JFrame{
 		this._jrbVC_sqrt.setFont(new java.awt.Font("arial",2,11));
 		this._container.add(this._jrbNone,new GridBagConstraints(
 	   		0, 1, 0, 0, 0.0, 0.0, GridBagConstraints.NORTHWEST,
-			GridBagConstraints.NONE, new Insets(130, 220, 0, 0), 0, 0
+			GridBagConstraints.NONE, new Insets(135, 220, 0, 0), 0, 0
 		));
 		this._container.add(this._jrbKR,new GridBagConstraints(
 	   		0, 1, 0, 0,  0.0, 0.0, GridBagConstraints.NORTHWEST,
-			GridBagConstraints.NONE,new Insets(130, 290, 0, 0), 0, 0
+			GridBagConstraints.NONE,new Insets(135, 290, 0, 0), 0, 0
 		));
 		
 		this._container.add(this._jrbVC, new GridBagConstraints(
 			0,1, 0, 0, 0.0, 0.0,GridBagConstraints.NORTHWEST,
-			GridBagConstraints.NONE, new Insets(130, 340, 0, 0), 0, 0
+			GridBagConstraints.NONE, new Insets(135, 340, 0, 0), 0, 0
 		));
 	   	
 		this._container.add(this._jrbVC_sqrt, new GridBagConstraints(
 			0,1, 0, 0, 0.0, 0.0,GridBagConstraints.NORTHWEST,
-			GridBagConstraints.NONE, new Insets(130, 390, 0, 0), 0, 0
+			GridBagConstraints.NONE, new Insets(135, 390, 0, 0), 0, 0
 		));
 		this._jrbKR.setSelected(true);
 		
 /////////////////////////////////////////////////////////////////////////		
 		label = new JLabel();
-		label.setText("Data and Output directories : ");
+		label.setText("Input and Output directories : ");
 		label.setFont(new java.awt.Font("arial",1,12));
 		this._container.add( label, new GridBagConstraints(
 	   		0, 1, 0, 0, 0.0, 0.0, GridBagConstraints.NORTHWEST,
-	   		GridBagConstraints.NONE, new Insets(150, 10, 0, 0), 0, 0
+	   		GridBagConstraints.NONE, new Insets(155, 10, 0, 0), 0, 0
 	   	));
 	   	
-		this._jbRawData.setPreferredSize(new java.awt.Dimension(150, 21));
-		this._jbRawData.setFont(new java.awt.Font("arial",2,10));
-		this._container.add ( this._jbRawData, new GridBagConstraints(
+		this._jbInputDir.setPreferredSize(new java.awt.Dimension(150, 21));
+		this._jbInputDir.setFont(new java.awt.Font("arial",2,10));
+		this._container.add ( this._jbInputDir, new GridBagConstraints(
 	   		0, 1, 0, 0, 0.0, 0.0, GridBagConstraints.NORTHWEST, 
-	   		GridBagConstraints.NONE, new Insets(165, 20, 0, 0), 0, 0
+	   		GridBagConstraints.NONE, new Insets(175, 20, 0, 0), 0, 0
 	   	));
 	   	
 		this._jtfRawData.setPreferredSize(new java.awt.Dimension(280, 21));
 		this._jtfRawData.setFont(new java.awt.Font("arial",2,10));
 		this._container.add(this._jtfRawData, new GridBagConstraints(
 			0, 1, 0, 0, 0.0, 0.0, GridBagConstraints.NORTHWEST,
-			GridBagConstraints.NONE, new Insets(165, 190, 0, 0),0, 0
+			GridBagConstraints.NONE, new Insets(175, 190, 0, 0),0, 0
 		));
 		
-		this._jbWorkDir.setPreferredSize(new java.awt.Dimension(150, 21));
-		this._jbWorkDir.setFont(new java.awt.Font("arial",2,10));
-		this._container.add(this._jbWorkDir, new GridBagConstraints(
+		this._jbOutputDir.setPreferredSize(new java.awt.Dimension(150, 21));
+		this._jbOutputDir.setFont(new java.awt.Font("arial",2,10));
+		this._container.add(this._jbOutputDir, new GridBagConstraints(
 	   		0, 1, 0, 0, 0.0, 0.0,GridBagConstraints.NORTHWEST,
-	   		GridBagConstraints.NONE, new Insets(195, 20, 0, 0), 0, 0
+	   		GridBagConstraints.NONE, new Insets(205, 20, 0, 0), 0, 0
 	   	));
 	  
 		this._jtfWorkDir.setPreferredSize(new java.awt.Dimension(280, 21));
 		this._jtfWorkDir.setFont(new java.awt.Font("arial",2,10));	
 		this._container.add( this._jtfWorkDir, new GridBagConstraints(
 			0, 1, 0, 0, 0.0, 0.0, GridBagConstraints.NORTHWEST,
-			GridBagConstraints.NONE, new Insets(195, 190, 0, 0), 0, 0
+			GridBagConstraints.NONE, new Insets(205, 190, 0, 0), 0, 0
 		));
 		
 		//////////////////////////////////////
@@ -308,7 +317,7 @@ public class GuiAnalysis extends JFrame{
 		label.setFont(new java.awt.Font("arial",1,12));
 		this._container.add (label, new GridBagConstraints(
 	   		0, 1, 0, 0, 0.0, 0.0, GridBagConstraints.NORTHWEST,
-	   		GridBagConstraints.NONE, new Insets(225, 10, 0, 0), 0, 0
+	   		GridBagConstraints.NONE, new Insets(235, 10, 0, 0), 0, 0
 	   	));
 		this._container.setLayout (gridBagLayout);
 	   	label = new JLabel();
@@ -316,29 +325,29 @@ public class GuiAnalysis extends JFrame{
 	   	label.setFont(new java.awt.Font("arial",2,11));
 	   	this._container.add( label, new GridBagConstraints(
 			0, 1, 0, 0, 0.0, 0.0, GridBagConstraints.NORTHWEST,
-			GridBagConstraints.NONE, new Insets(245, 20, 0, 0), 0, 0
+			GridBagConstraints.NONE, new Insets(258, 20, 0, 0), 0, 0
 		));
 	   	this._jtfMatrixSize.setText("2000");
 	   	this._jtfMatrixSize.setPreferredSize(new java.awt.Dimension(60, 21));
 	   	this._jtfMatrixSize.setFont(new java.awt.Font("arial",2,11));
 	   	this._container.add( this._jtfMatrixSize, new GridBagConstraints(
 			0, 1, 0, 0, 0.0, 0.0,  GridBagConstraints.NORTHWEST, 
-			GridBagConstraints.NONE, new Insets(243, 170, 0, 0), 0, 0
+			GridBagConstraints.NONE, new Insets(260, 170, 0, 0), 0, 0
 		));
 	   	this._container.setLayout (gridBagLayout);
 	   	label = new JLabel();
-	 	label.setText("Diag size (in bins):");
+	 	label.setText("Diagonal size (in bins):");
 	 	label.setFont(new java.awt.Font("arial",2,11));
 	 	this._container.add(label, new GridBagConstraints(
 			0, 1, 0, 0, 0.0, 0.0, GridBagConstraints.NORTHWEST,
-			GridBagConstraints.NONE, new Insets(270, 20, 0, 0), 0, 0
+			GridBagConstraints.NONE, new Insets(283, 20, 0, 0), 0, 0
 		));
 	 	this._jtfDiagSize.setText("5");
 	 	this._jtfDiagSize.setPreferredSize(new java.awt.Dimension(60, 21));
 	 	this._jtfDiagSize.setFont(new java.awt.Font("arial",2,11));
 	 	this._container.add( this._jtfDiagSize, new GridBagConstraints(
 			0, 1, 0, 0, 0.0, 0.0,  GridBagConstraints.NORTHWEST, 
-			GridBagConstraints.NONE, new Insets(268, 170, 0, 0), 0, 0
+			GridBagConstraints.NONE, new Insets(285, 170, 0, 0), 0, 0
 		));
 		
 		label = new JLabel();
@@ -346,7 +355,7 @@ public class GuiAnalysis extends JFrame{
 		label.setFont(new java.awt.Font("arial",2,11));
 		this._container.add( label, new GridBagConstraints(
 			0, 1, 0, 0, 0.0, 0.0, GridBagConstraints.NORTHWEST,
-			GridBagConstraints.NONE, new Insets(295, 20, 0, 0), 0, 0
+			GridBagConstraints.NONE, new Insets(308, 20, 0, 0), 0, 0
 		));
 		
 		this._jtfResolution.setText("5000");
@@ -354,24 +363,25 @@ public class GuiAnalysis extends JFrame{
 		this._jtfResolution.setFont(new java.awt.Font("arial",2,11));
 		this._container.add( this._jtfResolution, new GridBagConstraints(
 			0, 1, 0, 0, 0.0, 0.0, GridBagConstraints.NORTHWEST,
-			GridBagConstraints.NONE, new Insets(293, 170, 0, 0), 0, 0
+			GridBagConstraints.NONE, new Insets(310, 170, 0, 0), 0, 0
 		));
 		
 		label = new JLabel();
-		label.setText("<html> Multi resolution loop calling:</html>");
+		label.setText("Multi resolution loop calling:");
+		label.setFont(new java.awt.Font("arial",1,12));
 		this._container.add(label,new GridBagConstraints(
 			0, 1, 0, 0, 0.0, 0.0, GridBagConstraints.NORTHWEST,
-			GridBagConstraints.NONE, new Insets(225, 250, 0, 0), 0, 0
+			GridBagConstraints.NONE, new Insets(235, 250, 0, 0), 0, 0
 		));
 		this._checkbox2.setFont(new java.awt.Font("arial",2,12));
 		this._container.add(this._checkbox2,new GridBagConstraints(
 				0, 1, 0, 0, 0.0, 0.0, GridBagConstraints.NORTHWEST,
-				GridBagConstraints.NONE, new Insets(250, 300, 0, 0), 0, 0
+				GridBagConstraints.NONE, new Insets(260, 300, 0, 0), 0, 0
 		));
 		this._checkbox5.setFont(new java.awt.Font("arial",2,12));
 		this._container.add(this._checkbox5,new GridBagConstraints(
 			0, 1, 0, 0,  0.0, 0.0, GridBagConstraints.NORTHWEST,
-			GridBagConstraints.NONE,new Insets(270, 300, 0, 0), 0, 0
+			GridBagConstraints.NONE,new Insets(280, 300, 0, 0), 0, 0
 		));
 		
 		////////////////////////////////////////////////////////////////////////////////
@@ -432,10 +442,10 @@ public class GuiAnalysis extends JFrame{
 			GridBagConstraints.NONE, new Insets(130, 230, 0, 0), 0, 0
 		));
 			
-	 	this._jtfNoiseTolerance.setText("2800");
-	 	this._jtfNoiseTolerance.setPreferredSize(new java.awt.Dimension(60, 21));
-	 	this._jtfNoiseTolerance.setFont(new java.awt.Font("arial",2,11));
-	 	this._container.add( this._jtfNoiseTolerance, new GridBagConstraints(
+	 	this._jtfThresholdMaxima.setText("2800");
+	 	this._jtfThresholdMaxima.setPreferredSize(new java.awt.Dimension(60, 21));
+	 	this._jtfThresholdMaxima.setFont(new java.awt.Font("arial",2,11));
+	 	this._container.add( this._jtfThresholdMaxima, new GridBagConstraints(
 			0, 2, 0, 0, 0.0, 0.0,  GridBagConstraints.NORTHWEST, 
 			GridBagConstraints.NONE, new Insets(127, 430, 0, 0), 0, 0
 		));
@@ -473,17 +483,17 @@ public class GuiAnalysis extends JFrame{
 		));
 	   	
 		label = new JLabel();
-		label.setText("% of satured pixel:");
+		label.setText("% of saturated pixel:");
 		label.setFont(new java.awt.Font("arial",2,11));
 		this._container.add( label, new GridBagConstraints(
 			0, 2, 0, 0, 0.0, 0.0, GridBagConstraints.NORTHWEST,
 			GridBagConstraints.NONE, new Insets(190, 20, 0, 0), 0, 0
 		));
 			
-		this._jtfEnhanceContrast.setText("0.01");
-		this._jtfEnhanceContrast.setPreferredSize(new java.awt.Dimension(60, 21));
-		this._jtfEnhanceContrast.setFont(new java.awt.Font("arial",2,11));
-		this._container.add( this._jtfEnhanceContrast, new GridBagConstraints(
+		this._jtfSaturatedPixel.setText("0.01");
+		this._jtfSaturatedPixel.setPreferredSize(new java.awt.Dimension(60, 21));
+		this._jtfSaturatedPixel.setFont(new java.awt.Font("arial",2,11));
+		this._container.add( this._jtfSaturatedPixel, new GridBagConstraints(
 			0, 2, 0, 0, 0.0, 0.0,  GridBagConstraints.NORTHWEST, 
 			GridBagConstraints.NONE, new Insets(187, 150, 0, 0), 0, 0
 		));
@@ -521,24 +531,48 @@ public class GuiAnalysis extends JFrame{
 		));
 		
 		label = new JLabel();
-		label.setText("If is droso or like droso HiC map:");
+		label.setText("If it is D. mel or like D. mel HiC map:");
 		label.setFont(new java.awt.Font("arial",1,12));
 		this._container.add(label, new GridBagConstraints(
 	   		0, 2, 0, 0, 0.0, 0.0, GridBagConstraints.NORTHWEST,
-	   		GridBagConstraints.NONE, new Insets(250, 10, 0, 0), 0, 0
+	   		GridBagConstraints.NONE, new Insets(245, 10, 0, 0), 0, 0
 	   	));
 		
 		
 		this._jCbIsDroso.setFont(new java.awt.Font("arial",2,11));
 		this._container.add(this._jCbIsDroso,new GridBagConstraints(
 			0, 2, 0, 0,  0.0, 0.0, GridBagConstraints.NORTHWEST,
-			GridBagConstraints.NONE,new Insets(268, 20, 0, 0), 0, 0
+			GridBagConstraints.NONE,new Insets(242, 230, 0, 0), 0, 0
 		));
-		
+
+
+		label = new JLabel();
+		label.setText("Type of loops (inter or intra chromosomal):");
+		label.setFont(new java.awt.Font("arial",1,12));
+		this._container.add(label, new GridBagConstraints(
+				0, 2, 0, 0, 0.0, 0.0, GridBagConstraints.NORTHWEST,
+				GridBagConstraints.NONE, new Insets(285, 10, 0, 0), 0, 0
+		));
+
+		this._bIntraOrInter.add(this._jrbInter);
+		this._bIntraOrInter.add(this._jrbIntra);
+		this._jrbInter.setFont(new java.awt.Font("arial",2,12));
+		this._jrbIntra.setFont(new java.awt.Font("arial",2,12));
+
+		this._container.add(this._jrbIntra,new GridBagConstraints(
+				0, 2, 0, 0, 0.0, 0.0, GridBagConstraints.NORTHWEST,
+				GridBagConstraints.NONE, new Insets(282, 270, 0, 0), 0, 0
+		));
+		this._container.add(this._jrbInter,new GridBagConstraints(
+				0, 2, 0, 0,  0.0, 0.0, GridBagConstraints.NORTHWEST,
+				GridBagConstraints.NONE,new Insets(282, 340, 0, 0), 0, 0
+		));
+		this._jrbIntra.setSelected(true);
+
 		this._checkboxDeleteTif.setFont(new java.awt.Font("arial",1,12));
 		this._container.add(this._checkboxDeleteTif,new GridBagConstraints(
 			0, 2, 0, 0,  0.0, 0.0, GridBagConstraints.NORTHWEST,
-			GridBagConstraints.NONE,new Insets(330, 10, 0, 0), 0, 0
+			GridBagConstraints.NONE,new Insets(325, 260, 0, 0), 0, 0
 		));
 			
 		label = new JLabel();
@@ -546,14 +580,14 @@ public class GuiAnalysis extends JFrame{
 		label.setFont(new java.awt.Font("arial",1,12));
 		this._container.add( label, new GridBagConstraints(
 			0, 2, 0, 0, 0.0, 0.0, GridBagConstraints.NORTHWEST,
-			GridBagConstraints.NONE, new Insets(300, 10, 0, 0), 0, 0
+			GridBagConstraints.NONE, new Insets(330, 10, 0, 0), 0, 0
 		));
 			
 		this._jtfCpu.setText("1");
 		this._jtfCpu.setPreferredSize(new java.awt.Dimension(60, 21));
 		this._container.add( this._jtfCpu, new GridBagConstraints(
 			0, 2, 0, 0, 0.0, 0.0,  GridBagConstraints.NORTHWEST, 
-			GridBagConstraints.NONE, new Insets(298, 140, 0, 0), 0, 0
+			GridBagConstraints.NONE, new Insets(328, 140, 0, 0), 0, 0
 		));
 	   	
 		this._jbStart.setPreferredSize(new java.awt.Dimension(120, 21));
@@ -572,8 +606,10 @@ public class GuiAnalysis extends JFrame{
 	  	this._jrbHic.addActionListener(hic);
 	  	this._jrbProcessed.addActionListener(hic);
 	  	this._jrbCool.addActionListener(hic);
+		this._jrbInter.addActionListener(hic);
+		this._jrbIntra.addActionListener(hic);
 	  	WorkDirectoryListener wdListener = new WorkDirectoryListener();
-	  	this._jbWorkDir.addActionListener(wdListener);
+	  	this._jbOutputDir.addActionListener(wdListener);
 		FileListener chr = new FileListener(this._jtfChrSize);
 		this._jbChrSize.addActionListener(chr);
 	  	FileListener juice = new FileListener(this._jtfBoxTools);
@@ -583,7 +619,7 @@ public class GuiAnalysis extends JFrame{
 	 	FileListener cooltools = new FileListener(this._jtfCoolTools);
 	  	this._jbCoolTools.addActionListener(cooltools);
 	  	RawDataDirectoryListener ddListener = new RawDataDirectoryListener(this,this._jtfRawData);
-	  	this._jbRawData.addActionListener(ddListener);
+	  	this._jbInputDir.addActionListener(ddListener);
 	  	QuitListener quitListener = new QuitListener(this);
 	  	this._jbQuit.addActionListener(quitListener);
 	   	StartListener startListener = new StartListener(this);
@@ -649,8 +685,8 @@ public class GuiAnalysis extends JFrame{
 	 *  
 	 * @return double 
 	 */
-	public double getEnhanceSignal(){
-		String x = this._jtfEnhanceContrast.getText();
+	public double getSaturatedPixell(){
+		String x = this._jtfSaturatedPixel.getText();
 		return Double.parseDouble(x.replaceAll(",", "."));
 	}
 	
@@ -670,8 +706,8 @@ public class GuiAnalysis extends JFrame{
 	 * threshold for the regional maxima detection
 	 * @return int 
 	 */
-	public int getNoiseTolerance(){
-		String x = this._jtfNoiseTolerance.getText();
+	public int getThresholdMaxima(){
+		String x = this._jtfThresholdMaxima.getText();
 		return Integer.parseInt(x.replaceAll(",", "."));
 	}
 	/**
@@ -703,7 +739,7 @@ public class GuiAnalysis extends JFrame{
 	 * getter of the input path (hic file or SIP)
 	 * @return String input path
 	 */
-	public String getRawDataDir(){	return this._jtfRawData.getText();}
+	public String getInput(){	return this._jtfRawData.getText();}
 	
 	/**
 	 * getter of the chrSize file path
@@ -715,7 +751,7 @@ public class GuiAnalysis extends JFrame{
 	 * getter of the juicerToolsBox.jar path
 	 * @return String path
 	 */
-	public String getJuiceBox(){ return this._jtfBoxTools.getText();}
+	public String getJuicerTool(){ return this._jtfBoxTools.getText();}
 	
 	/**
 	 * getter of the juicerToolsBox.jar path
@@ -751,6 +787,16 @@ public class GuiAnalysis extends JFrame{
 	 * @return
 	 */
 	public boolean isHic(){ return this._jrbHic.isSelected();}
+	/**
+	 *
+	 * @return
+	 */
+	public boolean isInter(){ return this._jrbInter.isSelected();}
+	/**
+	 *
+	 * @return
+	 */
+	public boolean isIntra(){ return this._jrbIntra.isSelected();}
 	
 	/**
 	 * 
@@ -824,57 +870,111 @@ public class GuiAnalysis extends JFrame{
 		 * @param gui
 		 */
 		public  RBHicListener (GuiAnalysis gui){ _gui = gui; }
-		
+
+		/**
+		 *
+		 */
+		private void changeInter(){
+			_gui._jtfThresholdMaxima.setText("0.01");
+			_gui._jtfFdr.setText("0.025");
+			_gui._jtfResolution.setText("100000");
+			_gui._jtfMatrixSize.setText("500");
+			_gui._jtfGaussian.setText("1");
+			_gui._jtfMax.setEditable(false);
+			_gui._jtfMin.setEditable(false);
+			_gui._jtfSaturatedPixel.setEditable(false);
+			_gui._jtfDiagSize.setEditable(false);
+			_gui._jtfSaturatedPixel.setEditable(false);
+			_gui._checkbox2.setEnabled(false);
+			_gui._checkbox5.setEnabled(false);
+			_gui._jCbIsDroso.setEnabled(false);
+		}
+
+		/**
+		 *
+		 */
+		private void changeIntra(){
+			_gui._jtfThresholdMaxima.setText("2800");
+			_gui._jtfFdr.setText("0.001");
+			_gui._jtfResolution.setText("5000");
+			_gui._jtfMatrixSize.setText("2000");
+			_gui._jtfGaussian.setText("1.5");
+			_gui._jtfMax.setEditable(true);
+			_gui._jtfMin.setEditable(true);
+			_gui._jtfSaturatedPixel.setEditable(true);
+			_gui._jtfDiagSize.setEditable(true);
+			_gui._jtfSaturatedPixel.setEditable(true);
+			_gui._checkbox2.setEnabled(true);
+			_gui._checkbox5.setEnabled(true);
+			_gui._jCbIsDroso.setEnabled(true);
+		}
+
+		/**
+		 *
+		 */
+		private void changeHic(){
+			_gui._jrbInter.setEnabled(true);
+			_gui._jrbIntra.setEnabled(true);
+			if(_gui.isIntra())changeIntra();
+			else if(_gui.isInter()) changeInter();
+			_gui._jrbVC_sqrt.setEnabled(true);
+			_gui._jrbVC.setEnabled(true);
+			_gui._jrbNone.setEnabled(true);
+			_gui._jrbKR.setEnabled(true);
+			_gui._jtfBoxTools.setEnabled(true);
+			_gui._jbBoxTools.setEnabled(true);
+			_gui._jtfCoolTools.setEnabled(false);
+			_gui._jbCoolTools.setEnabled(false);
+			_gui._jtfCooler.setEnabled(false);
+			_gui._jbCooler.setEnabled(false);
+		}
+
+		private void changeProcessed(){
+			_gui._jrbInter.setEnabled(true);
+			_gui._jrbIntra.setEnabled(true);
+			if(_gui.isIntra())changeIntra();
+			else if(_gui.isInter()) changeInter();
+			_gui._jrbVC_sqrt.setEnabled(false);
+			_gui._jrbVC.setEnabled(false);
+			_gui._jrbNone.setEnabled(false);
+			_gui._jrbKR.setEnabled(false);
+			_gui._jtfBoxTools.setEnabled(false);
+			_gui._jbBoxTools.setEnabled(false);
+			_gui._jtfCoolTools.setEnabled(false);
+			_gui._jbCoolTools.setEnabled(false);
+			_gui._jtfCooler.setEnabled(false);
+			_gui._jbCooler.setEnabled(false);
+		}
+
+		private void changeCool(){
+			_gui._jrbIntra.isSelected();
+			_gui._jrbInter.setEnabled(false);
+			_gui._jrbIntra.setEnabled(false);
+
+			changeIntra();
+			_gui._jrbVC_sqrt.setEnabled(false);
+			_gui._jrbVC.setEnabled(false);
+			_gui._jrbNone.setEnabled(false);
+			_gui._jrbKR.setEnabled(false);
+			_gui._jtfBoxTools.setEnabled(false);
+			_gui._jbBoxTools.setEnabled(false);
+			_gui._jtfCoolTools.setEnabled(true);
+			_gui._jbCoolTools.setEnabled(true);
+			_gui._jtfCooler.setEnabled(true);
+			_gui._jbCooler.setEnabled(true);
+		}
+
 		/**
 		 * manage the access of the different gui element on function of the paramter choose
 		 */
 		public void actionPerformed(ActionEvent actionEvent){
-			if (_gui.isHic()){
-				_gui._jrbVC_sqrt.setEnabled(true);
-	        	_gui._jrbVC.setEnabled(true);
-	        	_gui._jrbNone.setEnabled(true);
-	        	_gui._jrbKR.setEnabled(true);
-	        	_gui._jtfBoxTools.setEnabled(true);
-	        	_gui._jbBoxTools.setEnabled(true);
-	        	_gui._jtfMax.setEditable(true);
-        		_gui._jtfMin.setEditable(true);
-        		_gui._jtfEnhanceContrast.setEditable(true);
-	        	_gui._jtfCoolTools.setEnabled(false);
-	        	_gui._jbCoolTools.setEnabled(false);
-	        	_gui._jtfCooler.setEnabled(false);
-	        	_gui._jbCooler.setEnabled(false);
-	        }else if(_gui.isProcessed()){
-	        	_gui._jrbVC_sqrt.setEnabled(false);
-	        	_gui._jrbVC.setEnabled(false);
-	        	_gui._jrbNone.setEnabled(false);
-	        	_gui._jrbKR.setEnabled(false);
-	        	_gui._jtfBoxTools.setEnabled(false);
-	        	_gui._jbBoxTools.setEnabled(false);
-	        	_gui._jtfCoolTools.setEnabled(false);
-	        	_gui._jbCoolTools.setEnabled(false);
-	        	_gui._jtfCooler.setEnabled(false);
-	        	_gui._jbCooler.setEnabled(false);
-	        	_gui._jtfMax.setEditable(true);
-	        	_gui._jtfNbZero.setEnabled(true);
-	        	_gui._jtfMin.setEditable(true);
-	        	_gui._jtfEnhanceContrast.setEditable(true);
-	        }else if(_gui.isCool()){
-	        	_gui._jrbVC_sqrt.setEnabled(false);
-	        	_gui._jrbVC.setEnabled(false);
-	        	_gui._jrbNone.setEnabled(false);
-	        	_gui._jrbKR.setEnabled(false);
-	        	_gui._jtfBoxTools.setEnabled(false);
-	        	_gui._jbBoxTools.setEnabled(false);
-	        	_gui._jtfCoolTools.setEnabled(true);
-	        	_gui._jbCoolTools.setEnabled(true);
-	        	_gui._jtfCooler.setEnabled(true);
-	        	_gui._jbCooler.setEnabled(true);
-	        	_gui._jtfMax.setEditable(true);
-	        	_gui._jtfNbZero.setEnabled(true);
-	        	_gui._jtfMin.setEditable(true);
-	        	_gui._jtfEnhanceContrast.setEditable(true);
-	        	
-	        }
+			if (_gui.isHic()) {
+				changeHic();
+			}else if(_gui.isProcessed()){
+				changeProcessed();
+	        }else if(_gui.isCool()) {
+				changeCool();
+			}
 	    }
 	}
 	
@@ -907,11 +1007,11 @@ public class GuiAnalysis extends JFrame{
 					null,"You did not choose a Juicer_box_tools.jar path",
 					"Error", JOptionPane.ERROR_MESSAGE
 				);
-			}else if(_gui._jtfDiagSize.getText().matches("[a-zA-Z]") || _gui._jtfEnhanceContrast.getText().matches("[a-zA-Z]") ||
+			}else if(_gui._jtfDiagSize.getText().matches("[a-zA-Z]") || _gui._jtfSaturatedPixel.getText().matches("[a-zA-Z]") ||
 					_gui._jtfGaussian.getText().matches("[a-zA-Z]") || _gui._jtfMatrixSize.getText().matches("[a-zA-Z]") ||
 					_gui._jtfMax.getText().matches("[a-zA-Z]") || _gui._jtfMin.getText().matches("[a-zA-Z]") ||
 					_gui._jtfResolution.getText().matches("[a-zA-Z]") || _gui._jtfNbZero.getText().matches("[a-zA-Z]") ||
-					_gui._jtfNoiseTolerance.getText().matches("[a-zA-Z]")|| _gui._jtfCpu.getText().matches("[a-zA-Z]")){
+					_gui._jtfThresholdMaxima.getText().matches("[a-zA-Z]")|| _gui._jtfCpu.getText().matches("[a-zA-Z]")){
 					JOptionPane.showMessageDialog(
 						null, "some alphabetic character detected in integer or float paramters",
 						"Error", JOptionPane.ERROR_MESSAGE
