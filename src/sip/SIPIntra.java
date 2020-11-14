@@ -75,7 +75,7 @@ public class SIPIntra extends SIPObject {
 	 * @param rFDR false if it isn't drosophila input
 	 */
 	public SIPIntra(String output, String chrFile, double gauss, double min,
-					double max, int resolution, double saturatedPixel, int thresholdMax,
+					double max, int resolution, double saturatedPixel, double thresholdMax,
 					int diagonalSize, int matrixSize, int nbZero, ArrayList<Integer> listFactor,
 					double fdr, boolean isProcessed, boolean rFDR) {
 
@@ -111,7 +111,7 @@ public class SIPIntra extends SIPObject {
 	 * @param fdr fdr value for final loops filtering
 	 */
 	public SIPIntra(String input, String output, String chrSize, double gauss, double min,
-					double max, int resolution, double saturatedPixel, int thresholdMax,
+					double max, int resolution, double saturatedPixel, double thresholdMax,
 					int diagonalSize, int matrixSize, int nbZero, ArrayList<Integer> listFactor,
 					double fdr) {
 

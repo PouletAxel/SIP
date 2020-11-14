@@ -20,7 +20,7 @@ public class CLISipOption {
     private Option _resolution = Option.builder("r").longOpt("resolution")
             .type(Number.class).desc("Resolution in bp (default 5000 bp)\n")
             .numberOfArgs(1).build();
-    private Option _sizeImage = Option.builder("m").longOpt("matrix")
+    private Option _sizeImage = Option.builder("ms").longOpt("matrixSize")
             .type(Number.class).desc("Matrix size to use for each chunk of the chromosome (default 2000 bins)\n")
             .numberOfArgs(1).build();
     private Option _cpu = Option.builder("cpu")
@@ -77,10 +77,13 @@ public class CLISipOption {
      */
     public CLISipOption(String[] args)throws Exception  {
         CommandLineParser parser= new DefaultParser();
-
+        /*required parameters*/
         this._options.addOption(_inputFolder);
         this._options.addOption(_outputFolder);
         this._options.addOption(_chrSize);
+        this._options.addOption(_interOrIntra);
+
+        /*optional parameters*/
         this._options.addOption(_resolution);
         this._options.addOption(_deleteImage);
         this._options.addOption(_fdr);
@@ -89,9 +92,10 @@ public class CLISipOption {
         this._options.addOption(_cpu);
         this._options.addOption(_gaussianStrength);
         this._options.addOption(_threshold);
-        this._options.addOption(_interOrIntra);
+
         try {
             _cmd = parser.parse(this._options, args);
+            this.testParam();
 
         }
         catch (ParseException  exp){
@@ -99,9 +103,11 @@ public class CLISipOption {
             System.out.println(getHelperInfos());
             System.exit(1);
          }
-        this.testParam();
     }
 
+    /**
+     *
+     */
     private void testParam(){
         String input = _cmd.getOptionValue("input");
         String output = _cmd.getOptionValue("output");
@@ -109,26 +115,41 @@ public class CLISipOption {
         File file = new File(input);
 
         if(!file.exists() && !input.startsWith("https")){
-            System.out.println("-i "+input+"doesn't existed !!! \n\n");
+            System.out.println("-i "+input+" => this file doesn't existed !!! \n\n");
             System.out.println(getHelperInfos());
             System.exit(1);
         }
 
         file = new File(output);
         if(!file.exists()){
-            System.out.println("-o "+output+"doesn't existed !!! \n\n");
+            System.out.println("-o "+output+" => this file doesn't existed !!! \n\n");
             System.out.println(getHelperInfos());
             System.exit(1);
         }
 
         file = new File(chrSizeFile);
         if(!file.exists()){
-            System.out.println("-c "+chrSizeFile+"doesn't existed !!! \n\n");
+            System.out.println("-c "+chrSizeFile+" => this file doesn't existed !!! \n\n");
             System.out.println(getHelperInfos());
             System.exit(1);
         }
 
-        String inter ;
+        String inter = _cmd.getOptionValue("tl");
+        if(!inter.equals("inter") && !inter.equals("intra")){
+            System.out.println("-tl "+inter+", wrong value, choose inter or intra !!! \n\n");
+            System.out.println(getHelperInfos());
+            System.exit(1);
+        }
+
+        if(_cmd.hasOption("resolution")){
+            int res = Integer.parseInt(_cmd.getOptionValue("resolution"));
+            if(res <= 0 ){
+                System.out.println("-r "+res+", resolution need to be a >= 0 !!! \n\n");
+                System.out.println(getHelperInfos());
+                System.exit(1);
+
+            }
+        }
     }
 
     /**
@@ -143,9 +164,9 @@ public class CLISipOption {
                     "or \n" +
                     "java -jar SIPHiC-"+_Jversion+".jar processed -h or --help \n" +
                     "\n\nCommand line eg:\n" +
-                    "\tjava -jar SIP_HiC.jar hic -i hicFile -c chrSizeFile -o Output -j juicerTool [options]\n" +
-                    "\tjava -jar SIP_HiC.jar cool -i mcoolFile -c chrSizeFile -o Output -cooltools cooltoolsPath -cooler coolerPath [options]\n" +
-                    "\tjava -jar SIP_HiC.jar processed  -i PathDirectoryWithProcessedData -c chrSizeFile -o Output [options]\n" +
+                    "\tjava -jar SIP_HiC.jar hic -i hicFile -c chrSizeFile -o Output -j juicerTool -tl inter [options]\n" +
+                    "\tjava -jar SIP_HiC.jar cool -i mcoolFile -c chrSizeFile -o Output -cooltools cooltoolsPath -cooler coolerPath -tl inter [options]\n" +
+                    "\tjava -jar SIP_HiC.jar processed  -i PathDirectoryWithProcessedData -c chrSizeFile -o Output -tl inter [options]\n" +
                     "\nAuthors:\n" +
                     "Axel Poulet\n" +
                     "\tDepartment of Molecular, Cellular  and Developmental Biology Yale University 165 Prospect St\n" +
