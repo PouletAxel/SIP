@@ -34,8 +34,7 @@ public class HiC {
     private String _output;
     /** */
     private String _chrSizeFile;
-    /** */
-    private String _juicerNorm = "KR";
+
     /** */
     private int _nbZero = 6;
     /** */
@@ -49,6 +48,7 @@ public class HiC {
     /** */
     private GuiAnalysis _guiAnalysis;
 
+
     String _log;
 
     /**
@@ -61,9 +61,6 @@ public class HiC {
         String [] argsSubset = Arrays.copyOfRange(args, 1, args.length);
         CLIOptionHiC cli = new CLIOptionHiC(argsSubset);
         _cmd = cli.getCommandLine();
-        OptionalParamaterCheck opt = new OptionalParamaterCheck(_cmd);
-        opt.testOptionalParametersValueCommons();
-        opt.testOptionalParametersValueIntra();
         _input = _cmd.getOptionValue("input");
         _output = _cmd.getOptionValue("output");
         _log = _output+File.separator+"log.txt";
@@ -89,6 +86,7 @@ public class HiC {
         String juicerTool;
         String interOrIntra;
         String allParam;
+        String juicerNorm = "KR";
         BufferedWriter writer = new BufferedWriter(new FileWriter(new File(_log)));
         ProcessDumpData processDumpData = new ProcessDumpData();
 
@@ -97,9 +95,9 @@ public class HiC {
             if(this._guiAnalysis.isInter())  interOrIntra = "inter";
             else  interOrIntra = "intra";
             _chrSizeFile = this._guiAnalysis.getChrSizeFile();
-            if(this._guiAnalysis.isNONE()) _juicerNorm = "NONE";
-            else if (this._guiAnalysis.isVC()) _juicerNorm = "VC";
-            else if (this._guiAnalysis.isVC_SQRT()) _juicerNorm = "VC_SQRT";
+            if(this._guiAnalysis.isNONE()) juicerNorm = "NONE";
+            else if (this._guiAnalysis.isVC()) juicerNorm = "VC";
+            else if (this._guiAnalysis.isVC_SQRT()) juicerNorm = "VC_SQRT";
             _nbZero = this._guiAnalysis.getNbZero();
             _delImages = this._guiAnalysis.isDeletTif();
             _cpu = this._guiAnalysis.getNbCpu();
@@ -109,13 +107,13 @@ public class HiC {
             interOrIntra = _cmd.getOptionValue("lt");
             _chrSizeFile = _cmd.getOptionValue("chrSize");
             /* common optional parameters */
-            if (_cmd.hasOption("norm")) _juicerNorm = _cmd.getOptionValue("norm");
+            if (_cmd.hasOption("norm")) juicerNorm = _cmd.getOptionValue("norm");
             if (_cmd.hasOption("nbZero")) _nbZero = Integer.parseInt(_cmd.getOptionValue("nbZero"));
             if (_cmd.hasOption("delete"))_delImages = Boolean.parseBoolean(_cmd.getOptionValue("delImages"));
             if (_cmd.hasOption("cpu")) _cpu = Integer.parseInt(_cmd.getOptionValue("cpu"));
         }
-
-
+        ParametersCheck paramaterCheck = new ParametersCheck(_input, _output, _chrSizeFile, interOrIntra);
+        paramaterCheck.testHiCOption(juicerTool, juicerNorm);
 
         if(interOrIntra.equals("intra")){
             /* Param spe intra chromosomal loop*/
@@ -126,7 +124,7 @@ public class HiC {
                     "input: "+_input+"\n" +
                     "output: "+_output+"\n"+
                     "juiceBox: "+juicerTool+"\n"+
-                    "norm: "+_juicerNorm+"\n" +
+                    "norm: "+juicerNorm+"\n" +
                     "inter or intra chromosomal: "+interOrIntra+"\n" +
                     "gauss: "+this._sipIntra.getGauss()+"\n"+
                     "min: "+this._sipIntra.getMin()+"\n"+
@@ -145,7 +143,8 @@ public class HiC {
 
             System.out.println("########### Starting dump Step inter chromosomal interactions");
 
-            processDumpData.go(_input, _sipIntra, juicerTool, _juicerNorm, _cpu);
+            paramaterCheck.testCommonParametersValidity(_sipIntra);
+            processDumpData.go(_input, _sipIntra, juicerTool, juicerNorm, _cpu);
             System.out.println("########### End of the dump step\n");
 
             System.out.println("########### Start loop detection\n");
@@ -161,7 +160,7 @@ public class HiC {
                 "input: "+_input+"\n" +
                    "output: "+_output+"\n"+
                     "juiceBox: "+juicerTool+"\n"+
-                    "norm: "+_juicerNorm+"\n" +
+                    "norm: "+juicerNorm+"\n" +
                     "inter or intra chromosomal: "+interOrIntra+"\n" +
                     "gauss: "+this._sipInter.getGauss()+"\n"+
                     "matrix size: "+this._sipInter.getMatrixSize()+"\n"+
@@ -171,7 +170,7 @@ public class HiC {
                     "fdr "+this._sipInter.getFdr()+"\n"+
                     "delete images "+_delImages+"\n"+
                     "cpu "+ _cpu+"\n";
-            processDumpData.go(_input,_sipInter,juicerTool,_juicerNorm,_cpu);
+            processDumpData.go(_input,_sipInter,juicerTool,juicerNorm,_cpu);
 
             String loopFileRes = _sipInter.getOutputDir()+"finalLoops.txt";
 
@@ -250,7 +249,7 @@ public class HiC {
      *
      *
      */
-    private void setSipInter(){
+    private void setSipInter() throws IOException {
         double gauss = 1;
         int matrixSize = 500;
         double thresholdMax = 0.01;
@@ -271,6 +270,7 @@ public class HiC {
             if (_cmd.hasOption("resolution")) resolution = Integer.parseInt(_cmd.getOptionValue("resolution"));
         }
 
-        _sipInter = new SIPInter(_input, _output, _chrSizeFile, gauss, resolution,  thresholdMax, matrixSize, _nbZero, _delImages, fdr);
+        _sipInter = new SIPInter(_output, _chrSizeFile, gauss, resolution,  thresholdMax, matrixSize, _nbZero, _delImages, fdr);
+
     }
 }

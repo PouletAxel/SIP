@@ -1,56 +1,73 @@
 package cli;
 import org.apache.commons.cli.*;
 
-import java.io.File;
-
+/**
+ *
+ */
 public class CLISipOption {
 
+    /** */
     Options _options= new Options();
+    /** */
     CommandLine  _cmd;
-
+    /** */
     private Option _inputFolder= Option.builder("i").longOpt("input").required()
             .type(String.class).desc("Path to input .hic, .mcool or SIP folder containing processed data\n")
             .numberOfArgs(1).build();
+    /** */
     private Option _outputFolder= Option.builder("o").longOpt("output").required()
             .type(String.class).desc("Path to output folder for SIP's files \n")
             .numberOfArgs(1).build();
+    /** */
     private Option _chrSize = Option.builder("c").longOpt("chrSize").required()
             .type(String.class).desc("Path to the chr size file, with the same name of the chr as in the hic file (i.e. chr1 does not match Chr1 or 1).\n")
             .numberOfArgs(1).build();
+    /** */
     private Option _resolution = Option.builder("r").longOpt("resolution")
             .type(Number.class).desc("Resolution in bp (default 5000 bp)\n")
             .numberOfArgs(1).build();
+    /** */
     private Option _sizeImage = Option.builder("ms").longOpt("matrixSize")
             .type(Number.class).desc("Matrix size to use for each chunk of the chromosome (default 2000 bins)\n")
             .numberOfArgs(1).build();
+    /** */
     private Option _cpu = Option.builder("cpu")
             .type(Number.class).desc("Number of CPU used for SIP processing (default 1)\n")
             .numberOfArgs(1).build();
+    /** */
     private Option _gaussianStrength = Option.builder("g").longOpt("gaussian")
             .type(Number.class).desc("Gaussian filter: smoothing factor to reduce noise during primary maxima detection (default 1.5)\n")
             .numberOfArgs(1).build();
+    /** */
     private Option _threshold = Option.builder("t").longOpt("threshold")
             .type(Number.class).desc("Threshold for loops detection (default 2800)\n")
             .numberOfArgs(1).build();
+    /** */
     private Option _nbZero = Option.builder("nbZero")
             .type(Number.class).desc("Number of zeros: number of pixels equal to zero that are allowed in the 24 pixels surrounding the detected maxima (default 6)\n")
             .numberOfArgs(1).build();
+    /** */
     private Option _fdr = Option.builder("fdr")
             .type(Number.class).desc("Empirical FDR value for filtering based on random sites (default 0.01)\n")
             .numberOfArgs(1).build();
+    /** */
     private Option _deleteImage = Option.builder("d").longOpt("delete")
             .type(boolean.class).desc("Delete tif files used for loop detection (default true)\n")
             .build();
+    /** */
     private Option _interOrIntra = Option.builder("lt").longOpt("loopsType").required()
             .type(String.class).desc("(inter or intra), call loops inter chromosomal or intra chromosomal loops\n")
             .build();
+    /** */
     private Option _isDroso = Option.builder("isDroso")
             .type(boolean.class).desc("Default false, if true apply extra filter to help detect loops similar to those found in D. mel cells\n")
             .build();
+    /** */
     private Option _diagonal = Option.builder("d").longOpt("diagonal")
             .type(Number.class).desc("diagonal size in bins, remove the maxima found at this size (eg: a size of 2 at 5000 bp resolution removes all maxima\n" +
                     " detected at a distance inferior or equal to 10kb) (default 6 bins).\n")
             .numberOfArgs(1).build();
+    /** */
     private Option _factor = Option.builder("f").longOpt("factor")
             .type(Number.class).desc(" Multiple resolutions can be specified using:\n" +
                     "\t\t-factor 1: run only for the input res (default)\n" +
@@ -59,16 +76,20 @@ public class CLISipOption {
                     "\t\t-factor 4: res, res*2 and res*5\n")
             .numberOfArgs(1).build();
 
+    /** */
     private Option _min = Option.builder("min").longOpt("minimum")
             .type(Number.class).desc("Minimum filter strength  (default 2)\n")
             .numberOfArgs(1).build();
+    /** */
     private Option _max = Option.builder("max").longOpt("maximum")
             .type(Number.class).desc("Maximum filter strength (default 2)\n")
             .numberOfArgs(1).build();
+    /** */
     private Option _saturated = Option.builder("sat").longOpt("saturated")
             .type(Number.class).desc("% of saturated pixel: enhances the contrast in the image (default 0.01)\n")
             .numberOfArgs(1).build();
 
+    /** */
     private static String _Jversion ="1.6.1";
     /**
      *
@@ -95,8 +116,6 @@ public class CLISipOption {
 
         try {
             _cmd = parser.parse(this._options, args);
-            this.testParam();
-
         }
         catch (ParseException  exp){
             System.out.println(exp.getMessage()+"\n");
@@ -105,52 +124,6 @@ public class CLISipOption {
          }
     }
 
-    /**
-     *
-     */
-    private void testParam(){
-        String input = _cmd.getOptionValue("input");
-        String output = _cmd.getOptionValue("output");
-        String chrSizeFile = _cmd.getOptionValue("chrSize");
-        File file = new File(input);
-
-        if(!file.exists() && !input.startsWith("https")){
-            System.out.println("-i "+input+" => this file doesn't existed !!! \n\n");
-            System.out.println(getHelperInfos());
-            System.exit(1);
-        }
-
-        file = new File(output);
-        if(!file.exists()){
-            System.out.println("-o "+output+" => this file doesn't existed !!! \n\n");
-            System.out.println(getHelperInfos());
-            System.exit(1);
-        }
-
-        file = new File(chrSizeFile);
-        if(!file.exists()){
-            System.out.println("-c "+chrSizeFile+" => this file doesn't existed !!! \n\n");
-            System.out.println(getHelperInfos());
-            System.exit(1);
-        }
-
-        String inter = _cmd.getOptionValue("tl");
-        if(!inter.equals("inter") && !inter.equals("intra")){
-            System.out.println("-tl "+inter+", wrong value, choose inter or intra !!! \n\n");
-            System.out.println(getHelperInfos());
-            System.exit(1);
-        }
-
-        if(_cmd.hasOption("resolution")){
-            int res = Integer.parseInt(_cmd.getOptionValue("resolution"));
-            if(res <= 0 ){
-                System.out.println("-r "+res+", resolution need to be a >= 0 !!! \n\n");
-                System.out.println(getHelperInfos());
-                System.exit(1);
-
-            }
-        }
-    }
 
     /**
      *

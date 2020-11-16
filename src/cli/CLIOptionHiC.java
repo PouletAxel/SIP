@@ -31,7 +31,6 @@ public class CLIOptionHiC extends CLISipOption{
         }
         try {
             _commandLine = parser.parse(this._options, args);
-            testParam();
         }
         catch (ParseException exp){
             System.out.println(exp.getMessage()+"\n");
@@ -41,28 +40,6 @@ public class CLIOptionHiC extends CLISipOption{
 
     }
 
-    private void testParam(){
-
-
-
-        if (_cmd.hasOption("norm")) {
-           String juicerNorm = _cmd.getOptionValue("norm");
-            if (!juicerNorm.equals("KR") && !juicerNorm.equals("NONE") && !juicerNorm.equals("VC") && !juicerNorm.equals("VC_SQRT")) {
-                System.out.println("-norm = "+juicerNorm+", not defined for SIP, available norm: KR,NONE.VC,VC_SQRT\n Check the presence of this norm method in your hic file\n");
-                //helper hic
-                System.exit(0);
-            }
-        }
-
-        String juicerTools = _cmd.getOptionValue("juicerTool");
-        File file = new File(juicerTools);
-        if(!file.exists()){
-            System.out.println("-j "+juicerTools+" => this file doesn't existed !!! \n\n");
-            System.out.println(getHelperInfos());
-            System.exit(1);
-        }
-
-    }
 
     /**
      *
