@@ -38,7 +38,7 @@ public class TestGui {
 			double gauss = gui.getGaussian();
 			double max = gui.getMax();
 			double min = gui.getMin();
-			double saturatedPixel = gui.getSaturatedPixell();
+			double saturatedPixel = gui.getSaturatedPixel();
 			int thresholdMax = gui.getThresholdMaxima();
 			boolean isHic  = gui.isHic();
 			boolean isProcessed = gui.isProcessed();
@@ -58,17 +58,18 @@ public class TestGui {
 				System.out.println("hic mode:\ninput: "+input+"\noutput: "+output+"\njuiceBox: "+juiceBoxTools+"\nnorm: "+ juiceBoXNormalisation+"\ngauss: "+gauss+"\n"
 						+ "min: "+min+"\nmax: "+max+"\nmatrix size: "+matrixSize+"\ndiag size: "+diagSize+"\nresolution: "+resolution+"\nsaturated pixel: "+saturatedPixel
 						+"\nthreshold: "+thresholdMax+"\n number of zero:"+nbZero+"\n ");
-				sip = new SIPIntra(output, chrSize, gauss, min, max, resolution, saturatedPixel, thresholdMax, diagSize, matrixSize, nbZero,factor,0.01,gui.isProcessed(),false);
+				sip = new SIPIntra(output, chrSize, gauss, min, max, resolution, saturatedPixel, thresholdMax, diagSize, matrixSize, nbZero,factor,0.01,false,true,2);
 				sip.setIsGui(true);
 				ProcessDumpData processDumpData = new ProcessDumpData();
-				processDumpData.go(input, sip, juiceBoxTools, juiceBoXNormalisation,gui.getNbCpu());
+				processDumpData.go(input, sip, juiceBoxTools, juiceBoXNormalisation);
 			}else{
 				System.out.println("processed mode:\ninput: "+input+"\noutput: "+output+"\njuiceBox: "+juiceBoxTools+"\nnorm: "+ juiceBoXNormalisation+"\ngauss: "+gauss
 						+"\nmin: "+min+"\nmax: "+max+"\nmatrix size: "+matrixSize+"\ndiag size: "+diagSize+"\nresolution: "+resolution+"\nsaturated pixel: "+saturatedPixel
 						+"\nthreshold: "+thresholdMax+"\nisHic: "+isHic+"\nisProcessed: "+isProcessed+"\n number of zero:"
 						+nbZero+"\n");
-				sip = new SIPIntra(input,output, chrSize, gauss, min, max, resolution, saturatedPixel, thresholdMax, diagSize, matrixSize, nbZero,factor,0.01);
-				sip.setIsDroso(false);
+				sip = new SIPIntra(input,output, chrSize, gauss, min, max, resolution, saturatedPixel, thresholdMax,
+						diagSize, matrixSize, nbZero,factor,0.01,false, true ,2);
+
 				sip.setIsProcessed(gui.isProcessed());
 				sip.setIsGui(true);
 			}

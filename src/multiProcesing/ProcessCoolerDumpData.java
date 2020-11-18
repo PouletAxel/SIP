@@ -42,12 +42,11 @@ public class ProcessCoolerDumpData {
 	 * @param cooler String cooler path
 	 * @param sip SIPIntra
 	 * @param coolFile path mcool file
-	 * @param nbCPU number of cpu
 	 * @throws InterruptedException exception
 	 */
-	public void go(String coolTools, String cooler, SIPIntra sip, String coolFile,  int nbCPU) throws InterruptedException {
+	public void go(String coolTools, String cooler, SIPIntra sip, String coolFile) throws InterruptedException {
 		HashMap<String,Integer> chrSize= sip.getChrSizeHashMap();
-		ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(nbCPU);
+		ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(sip.getCpu());
 		Iterator<String> chrName = chrSize.keySet().iterator();
 		File outDir = new File(sip.getOutputDir());
 		if (!outDir.exists()) outDir.mkdir();
@@ -57,7 +56,7 @@ public class ProcessCoolerDumpData {
 			
 			int res = sip.getResolution()*listFactor.get(indexFact);
 			int matrixSize = sip.getMatrixSize()/listFactor.get(indexFact);
-			CoolerExpected expected = new CoolerExpected(coolTools,coolFile,  res, matrixSize, nbCPU);
+			CoolerExpected expected = new CoolerExpected(coolTools,coolFile,  res, matrixSize,sip.getCpu());
 			String nameRes = String.valueOf(res);
 			nameRes = nameRes.replace("000", "");
 			nameRes = nameRes+"kb"; 

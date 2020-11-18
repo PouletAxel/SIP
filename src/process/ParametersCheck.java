@@ -2,6 +2,7 @@ package process;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.HelpFormatter;
+import sip.SIPInter;
 import sip.SIPIntra;
 import sip.SIPObject;
 
@@ -56,41 +57,49 @@ public class ParametersCheck {
     /**
      *
      */
-    public void testCommonParametersValidity(SIPObject sip){
+    public void optionalParametersValidity(SIPObject sip){
 
-
-       /*if(_cmd.hasOption("resolution")){
-            int res = Integer.parseInt(_cmd.getOptionValue("resolution"));
-            if(res <= 0 ){
-                System.out.println("-r "+res+", resolution need to be a >= 0 !!! \n\n");
-                System.out.println(getHelperInfos());
-                System.exit(1);
-
-            }
+        if(sip.getResolution() <= 0 ){
+            System.out.println("-r "+sip.getResolution()+", resolution need to be a >= 0 !!! \n\n");
+            System.out.println(getHelperInfos());
+            System.exit(1);
         }
 
-        int nbZero = sip.getNbZero();
-            if (nbZero > 24|| nbZero < 0) {
-                System.out.println("\n-nbZero"+ nbZero+" value invalid: choose an integer value between 0 and 24\n");
+
+        if (sip.getNbZero() > 24|| sip.getNbZero() < 0) {
+            System.out.println("\n-nbZero"+ sip.getNbZero() +" value invalid: choose an integer value between 0 and 24\n");
                 //erreur mettre l'aide et stopper le prog.
-
                 System.exit(0);
             }
 
-
-        boolean delImages = true;
-        if (_cmd.hasOption("delete"))  delImages = Boolean.parseBoolean(_cmd.getOptionValue("delImages"));
-
-        int cpu = 1;
-        if (_cmd.hasOption("cpu")){
-            cpu = Integer.parseInt(_cmd.getOptionValue("cpu"));
-            if(cpu > Runtime.getRuntime().availableProcessors() || cpu <= 0){
-                System.out.println("\nThe number of CPU "+ cpu+" is superior of the server/computer' cpu "+Runtime.getRuntime().availableProcessors()+"\n");
-
+        if(sip.getCpu() > Runtime.getRuntime().availableProcessors() || sip.getCpu() <= 0){
+                System.out.println("\n-cpu "+ sip.getCpu() +" is superior to server/computer' cpu "+Runtime.getRuntime().availableProcessors()+"\n");
                 System.exit(0);
-            }
         }
-        */
+
+        if(sip.getFdr() < 0 ){
+            System.out.println("-fdr "+sip.getFdr()+", fdr need to be a >= 0 !!! \n\n");
+            System.out.println(getHelperInfos());
+            System.exit(1);
+        }
+
+        if(sip.getMatrixSize() < 0 ){
+            System.out.println("-ms "+sip.getMatrixSize()+", matrix size need to be a > 0 !!! \n\n");
+            System.out.println(getHelperInfos());
+            System.exit(1);
+        }
+
+        if(sip.getGauss() < 0 ){
+            System.out.println("-g "+sip.getGauss()+", gaussian strength filter need to be a > 0 !!! \n\n");
+            System.out.println(getHelperInfos());
+            System.exit(1);
+        }
+
+        if(sip.getThresholdMaxima() < 0 ){
+            System.out.println("-t "+sip.getThresholdMaxima()+", threshold for loops detection need to be a > 0 !!! \n\n");
+            System.out.println(getHelperInfos());
+            System.exit(1);
+        }
     }
 
     /**
@@ -111,6 +120,21 @@ public class ParametersCheck {
             //helper hic
             System.exit(0);
         }
+    }
+
+    /**
+     *
+     */
+    public void speOption(SIPIntra sipIntra){
+
+    }
+
+    /**
+     *
+     */
+    public void speOption(SIPInter sipInter){
+
+
     }
 
     /**

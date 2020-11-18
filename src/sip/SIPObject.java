@@ -41,11 +41,12 @@ public class SIPObject {
     /** if data set is mcool format*/
     private boolean _isCooler;
     /** */
-    private boolean _keepTif;
+    private boolean _delImage;
     /** HashMap of the chr size, the key = chr name, value = size of chr*/
     private HashMap<String,Integer> _chrSizeHashMap =  new HashMap<String,Integer>();
     /** */
     private String _chrSizeFile;
+    private int _cpu;
 
     /**
      *
@@ -58,7 +59,8 @@ public class SIPObject {
      * @param nbZero
      * @param fdr
      */
-    public SIPObject (String input, String output, double gauss, int resolution, double thresholdMax, int matrixSize, int nbZero,  double fdr, String chrSizeFile){
+    public SIPObject (String input, String output, double gauss, int resolution, double thresholdMax, int matrixSize, int nbZero,  double fdr, String chrSizeFile,
+                      boolean delTif, int cpu){
         if(!output.endsWith(File.separator))  output = output+File.separator;
         if(!input.endsWith(File.separator))   input = input+File.separator;
         this._input = input;
@@ -71,6 +73,8 @@ public class SIPObject {
         this._fdr = fdr;
         this._chrSizeFile = chrSizeFile;
         setChrSize(this._chrSizeFile);
+        this._delImage = delTif;
+        this._cpu = cpu;
     }
 
     /**
@@ -82,9 +86,9 @@ public class SIPObject {
      * @param matrixSize
      * @param nbZero
      * @param fdr
-     * @param keepTif
      */
-    public SIPObject ( String output, double gauss, int resolution, double thresholdMax, int matrixSize, int nbZero,  double fdr,boolean keepTif, String chrSizeFile ){
+    public SIPObject ( String output, double gauss, int resolution, double thresholdMax, int matrixSize, int nbZero,  double fdr, String chrSizeFile,
+          boolean delTif, int cpu){
 
         this._output = output;
         this._gauss = gauss;
@@ -92,10 +96,11 @@ public class SIPObject {
         this._thresholdMaxima = thresholdMax;
         this._matrixSize = matrixSize;
         this._nbZero = nbZero;
-        this._keepTif = keepTif;
         _fdr = fdr;
         this._chrSizeFile = chrSizeFile;
         setChrSize(this._chrSizeFile);
+        this._delImage = delTif;
+        this._cpu = cpu;
 
 
 
@@ -104,6 +109,27 @@ public class SIPObject {
     public SIPObject(){
 
     }
+
+
+    /**
+     * getter of cpu parameter
+     * @return nb of cpu
+     */
+    public String getChrSizeFile() { return	this._chrSizeFile; }
+
+    /**
+     * getter of cpu parameter
+     * @return nb of cpu
+     */
+    public int getCpu() { return	this._cpu; }
+
+    /**
+     * setter of cpu number
+     * @param cpu number
+     *
+     */
+    public void setCpu(int cpu) { this._cpu = cpu; }
+
 
 
     /**
@@ -329,7 +355,8 @@ public class SIPObject {
      *
      * @param keepTif
      */
-    public void setIsKeepTif(boolean keepTif) {
-        this._keepTif = keepTif;
+    public void setDelImage(boolean keepTif) {
+        this._delImage = keepTif;
     }
+    public boolean isDelImage() { return _delImage; }
 }

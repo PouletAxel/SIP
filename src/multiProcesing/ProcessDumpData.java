@@ -38,12 +38,11 @@ public class ProcessDumpData {
 	 * @param sip SIPIntra with all the paramters needed
 	 * @param juiceBoxTools juicerTools.jar path
 	 * @param normJuiceBox String normalization method
-	 * @param nbCPU int nb cpu
 	 * @throws InterruptedException exception
 	 */
-	public void go(String hicFile, SIPIntra sip, String juiceBoxTools, String normJuiceBox, int nbCPU) throws InterruptedException {
+	public void go(String hicFile, SIPIntra sip, String juiceBoxTools, String normJuiceBox) throws InterruptedException {
 		HashMap<String,Integer> chrSize = sip.getChrSizeHashMap();
-		ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(nbCPU);
+		ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(sip.getCpu());
 		Iterator<String> chrName = chrSize.keySet().iterator();
 		File outDir = new File(sip.getOutputDir());
 		if (!outDir.exists()) outDir.mkdir();
@@ -76,11 +75,10 @@ public class ProcessDumpData {
 	 * @param sipInter SIPInter object with all the parameters needed
 	 * @param juiceBoxTools juicerTools.jar path
 	 * @param normJuiceBox String normalization method
-	 * @param nbCPU int nb cpu
 	 * @throws InterruptedException exception
 	 */
-	public void go(String hicFile, SIPInter sipInter, String juiceBoxTools, String normJuiceBox, int nbCPU) throws InterruptedException {
-		ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(nbCPU);
+	public void go(String hicFile, SIPInter sipInter, String juiceBoxTools, String normJuiceBox) throws InterruptedException {
+		ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(sipInter.getCpu());
 		HashMap<String,Integer> chrSize = sipInter.getChrSizeHashMap();
 		Object [] chrName = chrSize.keySet().toArray();
 

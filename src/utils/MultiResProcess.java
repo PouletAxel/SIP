@@ -30,10 +30,7 @@ public class MultiResProcess {
 
 	/** SIP object*/
 	private SIPIntra _sip;
-	/** number of cpu */
-	private int _nbCpu;
-	/** boolean delImage*/
-	private boolean _delImage;
+
 
 	/** path to chr size file*/
 	private String _chrFile;
@@ -42,14 +39,10 @@ public class MultiResProcess {
 	 * Constructor
 	 *
 	 * @param sip SIPIntra
-	 * @param cpu number of cpu
-	 * @param delImage delete image boolean
 	 * @param chrSizeFile path of chrSize file
 	 */
-	public MultiResProcess(SIPIntra sip, int cpu, boolean delImage, String chrSizeFile) {
-		this._nbCpu = cpu;
+	public MultiResProcess(SIPIntra sip, String chrSizeFile) {
 		this._sip = sip;
-		this._delImage = delImage;
 		this._chrFile = chrSizeFile;
 	}
 	
@@ -86,35 +79,32 @@ public class MultiResProcess {
 			File file = new File(resuFile);
 			if(file.exists()) 
 				file.delete();
-			SIPIntra sipTmp = new SIPIntra();
 			if(indexFact == 0) {
 				ProcessDetectLoops processDetectloops = new ProcessDetectLoops();
-				processDetectloops.go(this._sip, this._nbCpu,this._delImage,resuFile,resName);
+				processDetectloops.go(this._sip, resuFile,resName);
 			}else {
-				sipTmp.setInputDir(_sip.getOutputDir());
-				sipTmp.setOutputDir(_sip.getOutputDir());
+
+				int matrixSizeTpm =  (int)(this._sip.getMatrixSize()/listFactor.get(indexFact));
+				double gaussTpm = this._sip.getGauss()/listFactor.get(indexFact);
+				SIPIntra sipTmp = new SIPIntra(_sip.getOutputDir(), _sip.getChrSizeFile(), gaussTpm,
+						_sip.getMin(), _sip.getMax(), res, _sip.getSaturatedPixel(),_sip.getThresholdMaxima(),
+						_sip.getDiagonalSize(), matrixSizeTpm, _sip.getNbZero(), _sip.getListFactor(),
+						_sip.getFdr(), _sip.isDroso(), _sip.isDelImage(), _sip.getCpu());
+
 				if(this._sip.isProcessed()) {
-					sipTmp.setInputDir(_sip.getInputDir());
-					sipTmp.setOutputDir(_sip.getOutputDir());
+					sipTmp = new SIPIntra(_sip.getInputDir(),_sip.getOutputDir(),   _sip.getChrSizeFile(), gaussTpm,
+							_sip.getMin(), _sip.getMax(), res, _sip.getSaturatedPixel(),_sip.getThresholdMaxima(),
+							_sip.getDiagonalSize(), matrixSizeTpm, _sip.getNbZero(), _sip.getListFactor(),
+							_sip.getFdr(), _sip.isDroso(), _sip.isDelImage(), _sip.getCpu());
 				}
-				sipTmp.setChrSizeHashMap(this._sip.getChrSizeHashMap());
 				sipTmp.setIsGui(_sip.isGui());
-				sipTmp.setDiagonalSize(this._sip.getDiagonalSize());
-				sipTmp.setGauss(this._sip.getGauss()/listFactor.get(indexFact));
-				sipTmp.setMatrixSize((int)(this._sip.getMatrixSize()/listFactor.get(indexFact)));
-				sipTmp.setResolution(res);
 				sipTmp.setStep(this._sip.getStep()/listFactor.get(indexFact));
-				sipTmp.setMax(_sip.getMax());
-				sipTmp.setMin(_sip.getMin());
-				sipTmp.setSaturatedPixel(_sip.getSaturatedPixel());
-				sipTmp.setThresholdMaxima(_sip.getThresholdMaxima());
-				sipTmp.setNbZero(_sip.getNbZero());
 				sipTmp.setIsProcessed(_sip.isProcessed());
 				sipTmp.setFdr(_sip.getFdr());
-				sipTmp.setIsDroso(_sip.isDroso());
 				sipTmp.setIsCooler(_sip.isCooler());
+
 				ProcessDetectLoops processDetectloops = new ProcessDetectLoops();
-				processDetectloops.go(sipTmp, this._nbCpu,this._delImage,resuFile,resName);
+				processDetectloops.go(sipTmp,resuFile,resName);
 			}
 		}
 		if(listOfFile.size() > 1) {

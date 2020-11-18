@@ -27,12 +27,12 @@ public class SIPInter  extends SIPObject {
      * @param thresholdMax threshold value for loops detection
      * @param matrixSize image size
      * @param nbZero nb of zero allowed around a loop
-     * @param keepTif true to keep image creat by SIP
      * @param fdr fdr value for the final loops filter
      * @throws IOException exception
      */
-    public SIPInter(String output,String chrSize, double gauss,  int resolution, double thresholdMax, int matrixSize, int nbZero, boolean keepTif,double fdr) throws IOException {
-        super(output, gauss, resolution, thresholdMax,matrixSize, nbZero,  fdr, keepTif,chrSize) ;
+    public SIPInter(String output,String chrSize, double gauss,  int resolution, double thresholdMax, int matrixSize, int nbZero,double fdr,
+      boolean delTif, int cpu) throws IOException {
+        super(output, gauss, resolution, thresholdMax,matrixSize, nbZero,  fdr,chrSize, delTif, cpu) ;
 
     }
 
@@ -47,14 +47,13 @@ public class SIPInter  extends SIPObject {
      * @param thresholdMax threshold value for loops detection
      * @param matrixSize image size
      * @param nbZero nb of zero allowed around a loop
-     * @param keepTif true to keep image creat by SIP
      * @param fdr fdr value for the final loops filter
      * @throws IOException exception
      */
     public SIPInter(String input,String output,String chrSize, double gauss, int resolution,
-                 double thresholdMax, int matrixSize, int nbZero, boolean keepTif, double fdr){
+                 double thresholdMax, int matrixSize, int nbZero, double fdr,   boolean delTif, int cpu){
 
-        super(input, output,  gauss, resolution, thresholdMax, matrixSize, nbZero,  fdr, chrSize);
+        super(input, output,  gauss, resolution, thresholdMax, matrixSize, nbZero,  fdr, chrSize, delTif, cpu);
 
 
     }

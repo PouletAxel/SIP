@@ -32,14 +32,12 @@ public class ProcessDetectLoops{
 	 * multiprocessing method for SIP intra chromosomal interaction
 	 *
 	 * @param sip SIPIntra
-	 * @param nbCPU nb of cpu
-	 * @param delImage boolean if true del all the tif file
 	 * @param resuFile path to results file
 	 * @param resName name of the resolution used
 	 * @throws InterruptedException exception
 	 */
-	public void go(SIPIntra sip, int nbCPU, boolean delImage, String resuFile, String resName) throws InterruptedException {
-		ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(nbCPU);
+	public void go(SIPIntra sip,  String resuFile, String resName) throws InterruptedException {
+		ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(sip.getCpu());
 		Iterator<String> chrName = sip.getChrSizeHashMap().keySet().iterator();
 		if(sip.isProcessed()) {
 			boolean isCool = isProcessedMcool(sip.getOutputDir()+resName+File.separator+"normVector");
@@ -49,7 +47,7 @@ public class ProcessDetectLoops{
 		while(chrName.hasNext()){
 			String chr = chrName.next();
 			if(sip.isCooler()){
-				RunnableDetectLoops task =  new RunnableDetectLoops(chr, resuFile, sip, delImage);
+				RunnableDetectLoops task =  new RunnableDetectLoops(chr, resuFile, sip);
 				executor.execute(task);	
 				
 			}else {
@@ -57,7 +55,7 @@ public class ProcessDetectLoops{
 				if (sip.isProcessed()){
 					normFile = sip.getInputDir()+resName+File.separator+"normVector"+File.separator+chr+".norm";
 				}
-				RunnableDetectLoops task =  new RunnableDetectLoops(chr, resuFile, sip,normFile, delImage);
+				RunnableDetectLoops task =  new RunnableDetectLoops(chr, resuFile, sip,normFile);
 				executor.execute(task);	
 			}
 		}
@@ -101,7 +99,7 @@ public class ProcessDetectLoops{
 				int size1 = chrSize.get(chr1);
 				int size2 = chrSize.get(chr2);
 				System.out.println(chr1+"\t"+size1+"\t"+chr2+"\t"+size2);
-				RunnableDetectInterLoops task =  new RunnableDetectInterLoops(chr1, chr2, resuFile, sipInter, delImage);
+				RunnableDetectInterLoops task =  new RunnableDetectInterLoops(chr1, chr2, resuFile, sipInter);
 				executor.execute(task);
 			}
 		}

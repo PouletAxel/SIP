@@ -25,8 +25,6 @@ public class RunnableDetectInterLoops extends Thread implements Runnable {
     private String _chr1;
    /** String chr name 2  */
     private String _chr2;
-    /**String name of the chr*/
-    private boolean _delImages = true;
 
 
     /**
@@ -36,15 +34,13 @@ public class RunnableDetectInterLoops extends Thread implements Runnable {
      * @param chr2 chr2 name
      * @param resuFile path output file
      * @param sip SIPInter object
-     * @param delFile boolean if true delete all tif file.
      */
-    public RunnableDetectInterLoops(String chr1, String chr2, String resuFile, SIPInter sip,  boolean delFile) {
+    public RunnableDetectInterLoops(String chr1, String chr2, String resuFile, SIPInter sip) {
         this._sipInter = sip;
         this._callLoopsInter = new CallLoopsInter(_sipInter);
         this._chr1 = chr1;
         this._chr2 = chr2;
         this._resuFile = resuFile;
-        this._delImages = delFile;
     }
 
 
@@ -78,7 +74,7 @@ public class RunnableDetectInterLoops extends Thread implements Runnable {
                 }
                 folder = new File(dir);
                listOfFiles = folder.listFiles();
-                if(_delImages){
+                if(_sipInter.isDelImage()){
                     System.out.println("Deleting image file for "+_chr1+"_"+_chr2);
                     for(int i = 0; i < listOfFiles.length;++i) {
                         String name = listOfFiles[i].toString();

@@ -21,8 +21,6 @@ public class RunnableDetectLoops extends Thread implements Runnable{
 	private String _resuFile;
 	/** String name of the chr*/
 	private String _chr;
-	/** String name of the chr*/
-	private boolean _delImages = true;
 	/** norn vector table for the chr of interest*/
 	private HashMap<Integer, String> _normVector = new HashMap<Integer, String> ();
 	/** path of Normalized vector from juicer tools dump for each chr by SIP*/
@@ -38,15 +36,14 @@ public class RunnableDetectLoops extends Thread implements Runnable{
 	 * @param resuFile path to the result file
 	 * @param sip SIPIntra
 	 * @param normVectorFile path to normalized vector
-	 * @param delFile boolean if true delete all the tif file at the end of the process
+	 *
 	 */
-	public RunnableDetectLoops (String chr, String resuFile, SIPIntra sip, String normVectorFile, boolean delFile){
+	public RunnableDetectLoops (String chr, String resuFile, SIPIntra sip, String normVectorFile){
 		this._sip = sip;
 		this._callLoops = new CallLoops(sip);
 		this._chr= chr;
 		this._resuFile = resuFile;
 		this._normVector = sip.getNormValueFilter(normVectorFile);
-		this._delImages = delFile;
 		this._normVectorFile = normVectorFile;
 	}
 
@@ -56,14 +53,13 @@ public class RunnableDetectLoops extends Thread implements Runnable{
 	 * @param chr String chromosome name
 	 * @param resuFile path to the result file
 	 * @param sip SIPIntra
-	 * @param delFile boolean if true delete all the tif file at the end of the process
+	 *
 	 */
-	public RunnableDetectLoops (String chr, String resuFile, SIPIntra sip, boolean delFile){
+	public RunnableDetectLoops (String chr, String resuFile, SIPIntra sip){
 		this._sip = sip;
 		this._callLoops = new CallLoops(sip);
 		this._chr= chr;
 		this._resuFile = resuFile;
-		this._delImages = delFile;
 	}
 	
 	/**
@@ -95,7 +91,7 @@ public class RunnableDetectLoops extends Thread implements Runnable{
 				}
 				folder = new File(dir);
 				listOfFiles = folder.listFiles();
-				if(_delImages){
+				if(_sip.isDelImage()){
 					System.out.println("Deleting image file for "+_chr);
 					for(int i = 0; i < listOfFiles.length;++i) {
 						String name = listOfFiles[i].toString();

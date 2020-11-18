@@ -38,9 +38,9 @@ public class TestCallLoopsProcessedFile {
 		//factor.add(5);
 		//SIP_HiC_v1.3.6.jar hic SIP/Kc_allcombined.hic SIP/armsizes.txt SIP/Droso/ ../Tools/juicer_tools_1.13.02.jar 
 		String chrSizeFile = "/home/plop/Desktop/w_hg19.sizes";
-		SIPIntra sip = new SIPIntra(input,output, chrSizeFile, gauss, min, max, resolution, saturatedPixel, thresholdMax, diagSize, matrixSize, nbZero,factor,0.01);
+		SIPIntra sip = new SIPIntra(input,output, chrSizeFile, gauss, min, max, resolution, saturatedPixel,
+				thresholdMax, diagSize, matrixSize, nbZero,factor,0.01,false,true,2);
 		sip.setIsGui(false);
-		sip.setIsDroso(false);
 		sip.setIsProcessed(true);
 		int cpu = 2;
 		System.out.println("Processed Data\n");
@@ -56,7 +56,7 @@ public class TestCallLoopsProcessedFile {
 			+ "threshold "+thresholdMax+"\n"
 			+ "isProcessed "+sip.isProcessed()+"\n");		
 		System.out.println("ahhhhhhhhhhhhh\n");
-		MultiResProcess multi = new MultiResProcess(sip, cpu, false,chrSizeFile);
+		MultiResProcess multi = new MultiResProcess(sip, chrSizeFile);
 		multi.run();
 		//ProcessDetectLoops processDetectloops = new ProcessDetectLoops();
 		//processDetectloops.go(sip, 2,false);

@@ -26,7 +26,7 @@ public class TestInter {
 
         boolean keepTif = true;
         int cpu = 2;
-        SIPInter sipInter = new SIPInter(input, output, fileChr, gauss, resolution,  thresholdMax, matrixSize, nbZero,keepTif,0.025);
+        SIPInter sipInter = new SIPInter(input, output, fileChr, gauss, resolution,  thresholdMax, matrixSize, nbZero,0.025,keepTif,cpu);
        //ProcessDumpData process = new ProcessDumpData();
        //process.go(input,sipInter,chrsize,juicerTools,norm,2);
 

@@ -42,18 +42,20 @@ public class TestCoolFormat {
 		boolean keepTif = false;
 		int cpu = 1;
 				
-		SIPIntra sip = new SIPIntra(input,output, fileChr, gauss, min, max, resolution, saturatedPixel, thresholdMax, diagSize, matrixSize, nbZero,factor,0.03);
+		SIPIntra sip = new SIPIntra(input,output, fileChr, gauss, min, max, resolution, saturatedPixel, thresholdMax,
+				diagSize, matrixSize, nbZero,factor,0.03,false,keepTif,cpu);
+
 		sip.setIsGui(false);
 		sip.setIsCooler(true);
 		sip.setIsProcessed(true);
-		sip.setIsDroso(false);
-		sip.setIsKeepTif(keepTif);
+
+
 		
 
 		//ProcessCoolerDumpData processDumpData = new ProcessCoolerDumpData();
 	//	 go(String coolTools, String cooler, SIPIntra sip, String coolFile, HashMap<String,Integer> chrSize,int nbCPU)
 		//processDumpData.go(cooltools, cooler, sip, input, chrsize,2);
-		MultiResProcess multi = new MultiResProcess(sip, cpu, keepTif,fileChr);
+		MultiResProcess multi = new MultiResProcess(sip,fileChr);
 		multi.run();
 		
 		System.out.println("end");

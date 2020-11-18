@@ -685,7 +685,7 @@ public class GuiAnalysis extends JFrame{
 	 *  
 	 * @return double 
 	 */
-	public double getSaturatedPixell(){
+	public double getSaturatedPixel(){
 		String x = this._jtfSaturatedPixel.getText();
 		return Double.parseDouble(x.replaceAll(",", "."));
 	}

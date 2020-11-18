@@ -74,12 +74,12 @@ public class TestCallLoopsHicFile{
 			File file = new File(output);
 			if (file.exists()==false){file.mkdir();}
 			
-			SIPIntra sip = new SIPIntra(output, fileChr, gauss, min, max, resolution, saturatedPixel, thresholdMax, diagSize, matrixSize, nbZero,factor,0.01,keepTif,false);
+			SIPIntra sip = new SIPIntra(output, fileChr, gauss, min, max, resolution, saturatedPixel, thresholdMax, diagSize, matrixSize, nbZero,factor,0.01,false, keepTif,cpu );
 			sip.setIsGui(false);
 			ProcessDumpData processDumpData = new ProcessDumpData();
-			processDumpData.go(input, sip, juiceBoxTools, juiceBoXNormalisation,cpu);
+			processDumpData.go(input, sip, juiceBoxTools, juiceBoXNormalisation);
 			
-			MultiResProcess multi = new MultiResProcess(sip, cpu, keepTif,fileChr);
+			MultiResProcess multi = new MultiResProcess(sip, fileChr);
 			multi.run();
 			//String cooler = "/home/plop/anaconda3/bin/cooler";
 			//String cooltools = "/home/plop/anaconda3/bin/cooltools";

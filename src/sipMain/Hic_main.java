@@ -178,7 +178,7 @@ public class Hic_main {
 				_min = gui.getMin();
 				_isDroso= gui.isDroso();
 				_nbZero = gui.getNbZero();
-				_saturatedPixel = gui.getSaturatedPixell();
+				_saturatedPixel = gui.getSaturatedPixel();
 				_thresholdMax = gui.getThresholdMaxima();
 				_fdr = gui.getFDR();
 				_cpu = gui.getNbCpu();
