@@ -3,6 +3,7 @@ package process;
 
 import cli.CLIOptionHiC;
 import gui.GuiAnalysis;
+import multiProcesing.ProcessCoolerDumpData;
 import multiProcesing.ProcessDetectLoops;
 import multiProcesing.ProcessDumpData;
 import org.apache.commons.cli.CommandLine;
@@ -19,8 +20,8 @@ import java.util.Arrays;
 /**
  *
  */
-public class HiC {
-     /** */
+public class Cool {
+    /** */
     private SIPIntra _sipIntra;
     /** */
     private SIPInter _sipInter;
@@ -45,13 +46,13 @@ public class HiC {
     /** */
     private GuiAnalysis _guiAnalysis;
     /** */
-    private String _juicerTool;
+    private String _coolTool;
     /** */
     private String _interOrIntra;
     /** */
     private ParametersCheck _parameterCheck;
     /** */
-    private  String _juicerNorm;
+    private  String _cooler;
     /** */
     String _log;
 
@@ -60,7 +61,7 @@ public class HiC {
      * @param args
      * @throws Exception
      */
-    public HiC(String args []){
+    public Cool(String args []){
         _isGui = false;
         String [] argsSubset = Arrays.copyOfRange(args, 1, args.length);
         CLIOptionHiC cli = new CLIOptionHiC(argsSubset);
@@ -68,7 +69,6 @@ public class HiC {
         _input = _cmd.getOptionValue("input");
         _output = _cmd.getOptionValue("output");
         _log = _output+File.separator+"log.txt";
-        _juicerNorm = "KR";
         _delImages = true;
         _nbZero = 6;
         _cpu = 1;
@@ -78,13 +78,12 @@ public class HiC {
      *
      * @param guiAnalysis
      */
-    public HiC(GuiAnalysis guiAnalysis ){
+    public Cool(GuiAnalysis guiAnalysis ){
         _isGui = true;
         _guiAnalysis = guiAnalysis;
         _input =  this._guiAnalysis.getInput();
         _output = this._guiAnalysis.getOutputDir();
         _log = _output+File.separator+"log.txt";
-        _juicerNorm = "KR";
         _delImages = true;
         _nbZero = 6;
         _cpu = 1;
@@ -104,29 +103,28 @@ public class HiC {
         BufferedWriter writer = new BufferedWriter(new FileWriter(new File(_log)));
 
         if(_isGui) {
-            _juicerTool = this._guiAnalysis.getJuicerTool();
+            _cooler = this._guiAnalysis.getCooler();
             if(this._guiAnalysis.isInter())  _interOrIntra = "inter";
             else  _interOrIntra = "intra";
             _chrSizeFile = this._guiAnalysis.getChrSizeFile();
-            if(this._guiAnalysis.isNONE()) _juicerNorm = "NONE";
-            else if (this._guiAnalysis.isVC()) _juicerNorm = "VC";
-            else if (this._guiAnalysis.isVC_SQRT()) _juicerNorm = "VC_SQRT";
+            _coolTool = this._guiAnalysis.getCooltools();
             _nbZero = this._guiAnalysis.getNbZero();
             _delImages = this._guiAnalysis.isDeletTif();
             _cpu = this._guiAnalysis.getNbCpu();
         }else {
             /* common required parameters*/
-            _juicerTool = _cmd.getOptionValue("_juicerTool");
+
+            _cooler = _cmd.getOptionValue("cooler");
+            _coolTool = _cmd.getOptionValue("coolTool");
             _interOrIntra = _cmd.getOptionValue("lt");
             _chrSizeFile = _cmd.getOptionValue("chrSize");
             /* common optional parameters */
-            if (_cmd.hasOption("norm")) _juicerNorm = _cmd.getOptionValue("norm");
             if (_cmd.hasOption("nbZero")) _nbZero = Integer.parseInt(_cmd.getOptionValue("nbZero"));
             if (_cmd.hasOption("delete"))_delImages = Boolean.parseBoolean(_cmd.getOptionValue("delImages"));
             if (_cmd.hasOption("cpu")) _cpu = Integer.parseInt(_cmd.getOptionValue("cpu"));
         }
         _parameterCheck = new ParametersCheck(_input, _output, _chrSizeFile, _interOrIntra);
-        _parameterCheck.testHiCOption(_juicerTool, _juicerNorm);
+        _parameterCheck.testCoolOption(_coolTool, _cooler, _isGui);
 
         if(_interOrIntra.equals("intra"))
             allParam = runIntra();
@@ -156,12 +154,12 @@ public class HiC {
         _sipIntra.setIsProcessed(false);
         _sipIntra.setIsCooler(false);
 
-       ProcessDumpData processDumpData = new ProcessDumpData();
-       String allParam = "SIPHiC hic: \n" +
+        ProcessCoolerDumpData processDumpData = new ProcessCoolerDumpData();
+        String allParam = "SIPHiC hic: \n" +
                 "input: "+_input+"\n" +
                 "output: "+_output+"\n"+
-                "juiceBox: "+ _juicerTool +"\n"+
-                "norm: "+ _juicerNorm +"\n" +
+                "cooler: "+ _cooler +"\n"+
+                "coolTool: "+ _coolTool +"\n" +
                 "inter or intra chromosomal: "+ _interOrIntra +"\n" +
                 "gauss: "+this._sipIntra.getGauss()+"\n"+
                 "min: "+this._sipIntra.getMin()+"\n"+
@@ -182,7 +180,8 @@ public class HiC {
 
         _parameterCheck.optionalParametersValidity(_sipIntra);
         _parameterCheck.speOption(_sipIntra);
-        processDumpData.go(_input, _sipIntra, _juicerTool, _juicerNorm);
+
+        processDumpData.go(_coolTool,_cooler, _sipIntra, _input);
         System.out.println("########### End of the dump step\n");
 
         System.out.println("########### Start loop detection\n");
@@ -198,7 +197,9 @@ public class HiC {
      * @throws IOException
      */
     private String runInter() throws IOException, InterruptedException {
-        ProcessDumpData processDumpData = new ProcessDumpData();
+       System.out.println("PAS finis de dev\n");
+       //TODO inter chromosomal loop with cool option
+        /*ProcessDumpData processDumpData = new ProcessDumpData();
 
         this.setSipInter();
         _sipInter.setIsGui(_isGui);
@@ -228,8 +229,8 @@ public class HiC {
 
         ProcessDetectLoops detectLoops = new ProcessDetectLoops();
         detectLoops.go(_sipInter, _cpu, _delImages, loopFileRes);
-
-        return allParam;
+        */
+        return "plopi";
 
     }
 
@@ -265,8 +266,8 @@ public class HiC {
             _parameterCheck.checkFactor(factorParam);
         }
 
-       _sipIntra = new SIPIntra(_output, _chrSizeFile, gauss, min, max, resolution, saturatedPixel,
-                             thresholdMax, diagSize, matrixSize, _nbZero, factorParam, fdr, isDroso,_delImages, _cpu);
+        _sipIntra = new SIPIntra(_output, _chrSizeFile, gauss, min, max, resolution, saturatedPixel,
+                thresholdMax, diagSize, matrixSize, _nbZero, factorParam, fdr, isDroso,_delImages, _cpu);
     }
     /**
      *
@@ -274,10 +275,10 @@ public class HiC {
      */
     private void setSipIntraGUI(){
 
-          _sipIntra = new SIPIntra(_output, _chrSizeFile, _guiAnalysis.getGaussian(), _guiAnalysis.getMin(),
-               _guiAnalysis.getMax(), _guiAnalysis.getResolution(), _guiAnalysis.getSaturatedPixel(),
-               _guiAnalysis.getThresholdMaxima(), _guiAnalysis.getDiagSize(), _guiAnalysis.getMatrixSize(),
-               _nbZero, _guiAnalysis.getFactorChoice(), _guiAnalysis.getFDR(), _guiAnalysis.isDroso(),_delImages, _cpu);
+        _sipIntra = new SIPIntra(_output, _chrSizeFile, _guiAnalysis.getGaussian(), _guiAnalysis.getMin(),
+                _guiAnalysis.getMax(), _guiAnalysis.getResolution(), _guiAnalysis.getSaturatedPixel(),
+                _guiAnalysis.getThresholdMaxima(), _guiAnalysis.getDiagSize(), _guiAnalysis.getMatrixSize(),
+                _nbZero, _guiAnalysis.getFactorChoice(), _guiAnalysis.getFDR(), _guiAnalysis.isDroso(),_delImages, _cpu);
 
 
     }

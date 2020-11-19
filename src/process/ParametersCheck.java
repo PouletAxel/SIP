@@ -5,6 +5,7 @@ import cli.CLIHelper;
 import sip.SIPIntra;
 import sip.SIPObject;
 
+import javax.swing.*;
 import java.io.*;
 
 
@@ -87,6 +88,40 @@ public class ParametersCheck {
             System.out.println("Parameter value error !!!!\n-tl "+interOrIntra+", wrong value, choose inter or intra !!! \n\n");
 
         }
+    }
+
+    /**
+     *
+     * @param coolTool
+     * @param cooler
+     * @param isGui
+     */
+    public  void testCoolOption(String coolTool, String cooler,boolean isGui){
+
+       File f = new File(coolTool);
+        if(!f.exists()){
+            System.out.println("File problem !!!!\n-coolTool "+coolTool+" doesn't existed or wrong path !!! \n\n");
+            CLIHelper.CmdHelpCool();
+        }
+
+        f = new File(cooler);
+        if(!f.exists()){
+            System.out.println("File problem !!!!\n-cooler "+cooler+" doesn't existed or wrong path !!! \n\n");
+            CLIHelper.CmdHelpCool();
+        }
+
+        if(!testTools(coolTool, 0, 3, 0) || !testTools(cooler, 0, 8, 6)) {
+            System.out.println("Versioning problem !!!!\n"+coolTool +
+                    " or" + cooler + " version is not the good one for SIP (it needs cooltool version >= 0.3.0 and " +
+                    "cooler version >= 0.8.6) !!! \n\n");
+            CLIHelper.CmdHelpCool();
+            if (isGui) {
+                JOptionPane.showMessageDialog(null, "Error SIP program", coolTool + " or" + cooler + "version is not the good one" +
+                                " for SIP (it needs cooltools version >= 0.3.0 and cooler version >= 0.8.6) !!!"
+                        , JOptionPane.ERROR_MESSAGE);
+            }
+        }
+
     }
 
     /**
@@ -186,6 +221,9 @@ public class ParametersCheck {
             return false;
     }
 
+    /**
+     *
+     */
     public class ReturnFlux extends Thread {
 
         /**  Flux to redirect  */
@@ -207,7 +245,7 @@ public class ParametersCheck {
                 BufferedReader br = new BufferedReader(reader);
                 String line=null;
                 while ( (line = br.readLine()) != null) {
-                    if(line.contains("WARN")== false) _logError = _logError+line+"\n";
+                    if(!line.contains("WARN")) _logError = _logError+line+"\n";
                 }
             }
             catch (IOException ioe){

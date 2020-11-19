@@ -35,8 +35,8 @@ public class CLIOptionCool extends CLIOptionProcessed {
         this._options.addOption(_saturated);
         this._options.addOption(_isDroso);
 
-        this._options.addOption(Option.builder("cooltools").longOpt("cooltools").required()
-                .type(String.class).desc("Path to cooltools bin\n").numberOfArgs(1).build());
+        this._options.addOption(Option.builder("coolTool").longOpt("coolTool").required()
+                .type(String.class).desc("Path to coolTool bin\n").numberOfArgs(1).build());
 
         this._options.addOption(Option.builder("cooler").longOpt("cooler").required()
                 .type(String.class).desc("Path to cooler bin\n").numberOfArgs(1).build());
