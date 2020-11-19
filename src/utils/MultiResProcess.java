@@ -88,19 +88,18 @@ public class MultiResProcess {
 				double gaussTpm = this._sip.getGauss()/listFactor.get(indexFact);
 				SIPIntra sipTmp = new SIPIntra(_sip.getOutputDir(), _sip.getChrSizeFile(), gaussTpm,
 						_sip.getMin(), _sip.getMax(), res, _sip.getSaturatedPixel(),_sip.getThresholdMaxima(),
-						_sip.getDiagonalSize(), matrixSizeTpm, _sip.getNbZero(), _sip.getListFactor(),
+						_sip.getDiagonalSize(), matrixSizeTpm, _sip.getNbZero(), _sip.getFactor(),
 						_sip.getFdr(), _sip.isDroso(), _sip.isDelImage(), _sip.getCpu());
 
 				if(this._sip.isProcessed()) {
 					sipTmp = new SIPIntra(_sip.getInputDir(),_sip.getOutputDir(),   _sip.getChrSizeFile(), gaussTpm,
 							_sip.getMin(), _sip.getMax(), res, _sip.getSaturatedPixel(),_sip.getThresholdMaxima(),
-							_sip.getDiagonalSize(), matrixSizeTpm, _sip.getNbZero(), _sip.getListFactor(),
+							_sip.getDiagonalSize(), matrixSizeTpm, _sip.getNbZero(), _sip.getFactor(),
 							_sip.getFdr(), _sip.isDroso(), _sip.isDelImage(), _sip.getCpu());
 				}
 				sipTmp.setIsGui(_sip.isGui());
 				sipTmp.setStep(this._sip.getStep()/listFactor.get(indexFact));
 				sipTmp.setIsProcessed(_sip.isProcessed());
-				sipTmp.setFdr(_sip.getFdr());
 				sipTmp.setIsCooler(_sip.isCooler());
 
 				ProcessDetectLoops processDetectloops = new ProcessDetectLoops();

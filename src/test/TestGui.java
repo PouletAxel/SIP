@@ -48,9 +48,8 @@ public class TestGui {
 			else if (gui.isVC()) juiceBoXNormalisation = "VC";
 			else if (gui.isVC_SQRT()) juiceBoXNormalisation = "VC_SQRT";	
 			int nbZero = gui.getNbZero();
-			 
-			ArrayList<Integer> factor = new ArrayList<Integer>();
-			factor.add(1);
+
+			int factor = 1;
 			//factor.add(2);
 			String chrSize = gui.getChrSizeFile();
 			

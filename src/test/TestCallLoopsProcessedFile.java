@@ -32,8 +32,8 @@ public class TestCallLoopsProcessedFile {
 		double max = 2;//1.5;
 		double saturatedPixel = 0.01;//0.005;
 		//boolean keepTif = false;
-		ArrayList<Integer> factor = new ArrayList<Integer>();
-		factor.add(1);
+
+		int factor = 1;
 		//factor.add(2);
 		//factor.add(5);
 		//SIP_HiC_v1.3.6.jar hic SIP/Kc_allcombined.hic SIP/armsizes.txt SIP/Droso/ ../Tools/juicer_tools_1.13.02.jar 

@@ -1,23 +1,15 @@
 package sipMain;
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 
-import javax.swing.JOptionPane;
-
-import cli.CLISipOption;
+import cli.CLIHelper;
 import gui.GuiAnalysis;
-import multiProcesing.ProcessCoolerDumpData;
-import multiProcesing.ProcessDumpData;
 import process.HiC;
 import process.MCool;
 import process.Processed;
-import utils.MultiResProcess;
 import sip.SIPIntra;
 
 /**
@@ -104,6 +96,10 @@ public class Hic_main {
 
 		if(args.length >= 1) {
 			if (args[0].equals("hic")) {
+				if(args[1].equals("-h") || args[1].equals("--help")){
+
+
+				}
 				HiC hic = new HiC(args);
 				hic.run();
 
@@ -113,7 +109,8 @@ public class Hic_main {
 				MCool mCool = new MCool(args);
 
 			}else {
-				System.out.println(CLISipOption.getHelperInfos());
+				System.out.println(CLIHelper.getHelperInfos()+"\n"+CLIHelper.getAuthors());
+				return;
 			}
 		}
 		/*GUI */

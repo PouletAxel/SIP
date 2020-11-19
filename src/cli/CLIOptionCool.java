@@ -2,11 +2,18 @@ package cli;
 
 import org.apache.commons.cli.*;
 
-public class CLIOptionHiC extends CLIOptionProcessed {
-
-
-
-    public CLIOptionHiC(String [] args){
+/**
+ *
+ */
+public class CLIOptionCool extends CLIOptionProcessed {
+    /** */
+    private CommandLine _commandLine;
+    /**
+     *
+     * @param args
+     * @throws Exception
+     */
+    public CLIOptionCool(String [] args){
         this._options.addOption(_inputFolder);
         this._options.addOption(_outputFolder);
         this._options.addOption(_chrSize);
@@ -27,22 +34,25 @@ public class CLIOptionHiC extends CLIOptionProcessed {
         this._options.addOption(_min);
         this._options.addOption(_saturated);
         this._options.addOption(_isDroso);
-        this._options.addOption(Option.builder("j").longOpt("juicerTool").required()
-                .type(String.class).desc("Path to juicerTool.jar\n").numberOfArgs(1).build());
 
-        this._options.addOption(Option.builder("n").longOpt("norm")
-                .type(String.class).desc("\n<NONE/VC/VC_SQRT/KR> (default KR)\n").numberOfArgs(1).build());
+        this._options.addOption(Option.builder("cooltools").longOpt("cooltools").required()
+                .type(String.class).desc("Path to cooltools bin\n").numberOfArgs(1).build());
 
-       try {
-           this._cmd = this._parser.parse(this._options, args,true);
+        this._options.addOption(Option.builder("cooler").longOpt("cooler").required()
+                .type(String.class).desc("Path to cooler bin\n").numberOfArgs(1).build());
+
+
+        try {
+            _commandLine = _parser.parse(this._options, args);
         }
-        catch (ParseException exp){
+        catch (ParseException  exp){
             System.out.println(exp.getMessage()+"\n");
-           // System.out.println(getHelperInfos());
+            System.out.println(CLIHelper.getHelperInfos()+"\n"+CLIHelper.getAuthors());
             System.exit(1);
         }
 
     }
+
 
 
     /**
@@ -60,4 +70,5 @@ public class CLIOptionHiC extends CLIOptionProcessed {
     public Options getOptions() {
         return _options;
     }
+
 }

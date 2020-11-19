@@ -51,8 +51,8 @@ public class TestCallLoopsHicFile{
 		String juiceBoXNormalisation = "KR";
 		double saturatedPixel = 0.01;
 		
-		ArrayList<Integer> factor = new ArrayList<Integer>();
-		factor.add(1);
+
+		int factor = 1;
 		//factor.add(2);
 		//factor.add(5);
 		boolean keepTif = true;
@@ -72,7 +72,7 @@ public class TestCallLoopsHicFile{
 				+ "threshold "+thresholdMax+"\n");
 			
 			File file = new File(output);
-			if (file.exists()==false){file.mkdir();}
+			if (!file.exists()){file.mkdir();}
 			
 			SIPIntra sip = new SIPIntra(output, fileChr, gauss, min, max, resolution, saturatedPixel, thresholdMax, diagSize, matrixSize, nbZero,factor,0.01,false, keepTif,cpu );
 			sip.setIsGui(false);

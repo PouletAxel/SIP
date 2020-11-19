@@ -44,8 +44,6 @@ public class HiC {
     /** */
     private boolean _isGui;
     /** */
-    private int _factorParam;
-    /** */
     private GuiAnalysis _guiAnalysis;
     /** */
     private String _juicerTool;
@@ -75,7 +73,6 @@ public class HiC {
         _delImages = true;
         _nbZero = 6;
         _cpu = 1;
-        _factorParam = 1;
     }
 
     /**
@@ -92,7 +89,6 @@ public class HiC {
         _delImages = true;
         _nbZero = 6;
         _cpu = 1;
-        _factorParam = 1;
     }
     /**
      *
@@ -177,7 +173,7 @@ public class HiC {
                 "saturated pixel: "+this._sipIntra.getSaturatedPixel()+"\n"+
                 "threshold: "+this._sipIntra.getThresholdMaxima()+"\n"+
                 "number of zero: "+this._nbZero+"\n"+
-                "factor: "+ _factorParam +"\n"+
+                "factor: "+ _sipIntra.getFactor() +"\n"+
                 "fdr: "+this._sipIntra.getFdr()+"\n"+
                 "delete images: "+_delImages+"\n"+
                 "cpu: "+ _cpu+"\n" +
@@ -186,6 +182,7 @@ public class HiC {
         System.out.println("########### Starting dump Step inter chromosomal interactions");
 
         _parameterCheck.optionalParametersValidity(_sipIntra);
+        _parameterCheck.speOption(_sipIntra);
         processDumpData.go(_input, _sipIntra, _juicerTool, _juicerNorm);
         System.out.println("########### End of the dump step\n");
 
@@ -209,6 +206,7 @@ public class HiC {
         _sipIntra.setIsProcessed(false);
         _sipIntra.setIsCooler(false);
 
+
         String allParam = "SIPHiC hic: \n" +
                 "input: "+_input+"\n" +
                 "output: "+_output+"\n"+
@@ -223,6 +221,8 @@ public class HiC {
                 "fdr "+this._sipInter.getFdr()+"\n"+
                 "delete images "+_delImages+"\n"+
                 "cpu "+ _cpu+"\n";
+        _parameterCheck.optionalParametersValidity(_sipInter);
+
         processDumpData.go(_input,_sipInter, _juicerTool, _juicerNorm);
 
         String loopFileRes = _sipInter.getOutputDir()+"finalLoops.txt";
@@ -249,8 +249,7 @@ public class HiC {
         int diagSize = 6;
         double saturatedPixel = 0.01;
         boolean isDroso = false;
-        ArrayList<Integer> factor = new ArrayList<Integer>();
-        factor.add(1);
+        int factorParam = 1;
 
         if (_cmd.hasOption("min")) min = Double.parseDouble(_cmd.getOptionValue("min"));
         if (_cmd.hasOption("max")) max = Double.parseDouble(_cmd.getOptionValue("max"));
@@ -262,18 +261,13 @@ public class HiC {
         if (_cmd.hasOption("diagonal")) diagSize = Integer.parseInt(_cmd.getOptionValue("diagonal"));
         if (_cmd.hasOption("saturated")) saturatedPixel = Double.parseDouble(_cmd.getOptionValue("saturated"));
         if (_cmd.hasOption("isDroso")) isDroso = Boolean.parseBoolean(_cmd.getOptionValue("isDroso"));
-        if (_cmd.hasOption("factor")) {
-            _factorParam = Integer.parseInt(_cmd.getOptionValue("factor"));
-            if (_factorParam == 2)  factor.add(2);
-            else if (_factorParam == 4) {
-                factor.add(2);
-                factor.add(5);
-            } else factor.add(5);
-
+        if (_cmd.hasOption("factor")){
+            factorParam = Integer.parseInt(_cmd.getOptionValue("factor"));
+            _parameterCheck.checkFactor(factorParam);
         }
-       _sipIntra = new SIPIntra(_output, _chrSizeFile, gauss, min, max, resolution, saturatedPixel,
-                             thresholdMax, diagSize, matrixSize, _nbZero, factor, fdr, isDroso,_delImages, _cpu);
 
+       _sipIntra = new SIPIntra(_output, _chrSizeFile, gauss, min, max, resolution, saturatedPixel,
+                             thresholdMax, diagSize, matrixSize, _nbZero, factorParam, fdr, isDroso,_delImages, _cpu);
     }
     /**
      *
@@ -281,19 +275,10 @@ public class HiC {
      */
     private void setSipIntraGUI(){
 
-        ArrayList<Integer> factor = new ArrayList<Integer>();
-        factor.add(1);
-
-         if(this._guiAnalysis.getFactorChoice() == 2) factor.add(2);
-         else if(this._guiAnalysis.getFactorChoice() == 4){
-              factor.add(2);
-              factor.add(5);
-         }else if(this._guiAnalysis.getFactorChoice() == 3)  factor.add(5);
-
           _sipIntra = new SIPIntra(_output, _chrSizeFile, _guiAnalysis.getGaussian(), _guiAnalysis.getMin(),
                _guiAnalysis.getMax(), _guiAnalysis.getResolution(), _guiAnalysis.getSaturatedPixel(),
                _guiAnalysis.getThresholdMaxima(), _guiAnalysis.getDiagSize(), _guiAnalysis.getMatrixSize(),
-               _nbZero, factor, _guiAnalysis.getFDR(), _guiAnalysis.isDroso(),_delImages, _cpu);
+               _nbZero, _guiAnalysis.getFactorChoice(), _guiAnalysis.getFDR(), _guiAnalysis.isDroso(),_delImages, _cpu);
 
 
     }

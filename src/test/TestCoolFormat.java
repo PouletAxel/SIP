@@ -35,10 +35,8 @@ public class TestCoolFormat {
 		int nbZero = 6;
 		int thresholdMax = 2800;
 		double saturatedPixel = 0.01;
-		ArrayList<Integer> factor = new ArrayList<Integer>();
-		factor.add(1);
-		factor.add(2);
-		factor.add(5);
+		int factor = 4;
+
 		boolean keepTif = false;
 		int cpu = 1;
 				

@@ -48,6 +48,7 @@ public class SIPIntra extends SIPObject {
 	private double _medianAP = 0;
 	/** median of loop regional AP score */
 	private double _medianAPReg = 0;
+	private int _factor = 0;
 
 
 	/**
@@ -69,13 +70,13 @@ public class SIPIntra extends SIPObject {
 	 * @param diagonalSize size of the diagonal, where the value will be not use
 	 * @param matrixSize size of the image
 	 * @param nbZero number of zero allowed around loops
-	 * @param listFactor multi resolution calling loops used this list of factor
+	 * @param factor multi resolution calling loops used this list of factor
 	 * @param fdr fdr value for final loops filtering
 	 * @param isDroso false if it isn't drosophila input
 	 */
 	public SIPIntra(String output, String chrFile, double gauss, double min,
 					double max, int resolution, double saturatedPixel, double thresholdMax,
-					int diagonalSize, int matrixSize, int nbZero, ArrayList<Integer> listFactor,
+					int diagonalSize, int matrixSize, int nbZero, int factor,
 					double fdr, boolean isDroso, boolean delImage, int cpu) {
 
 		super( output, output,  gauss, resolution, thresholdMax, matrixSize, nbZero,  fdr, chrFile, delImage, cpu);
@@ -87,8 +88,14 @@ public class SIPIntra extends SIPObject {
 		this._saturatedPixel = saturatedPixel;
 		this._diagonalSize = diagonalSize;
 		this._step = matrixSize/2;
-		this._listFactor = listFactor;
 		this._isDroso = isDroso;
+		this._factor = factor;
+		_listFactor.add(1);
+		if (_factor == 2)  _listFactor.add(2);
+		else if (_factor == 4) {
+			_listFactor.add(2);
+			_listFactor.add(5);
+		} else if(_factor == 3) _listFactor.add(5);
 	}
 
 	/**
@@ -106,12 +113,12 @@ public class SIPIntra extends SIPObject {
 	 * @param diagonalSize size of the diagonal, where the value will be not use
 	 * @param matrixSize size of the image
 	 * @param nbZero number of zero allowed around loops
-	 * @param listFactor multi resolution calling loops used this list of factor
+	 * @param factor multi resolution calling loops used this list of factor
 	 * @param fdr fdr value for final loops filtering
 	 */
 	public SIPIntra(String input, String output, String chrSize, double gauss, double min,
 					double max, int resolution, double saturatedPixel, double thresholdMax,
-					int diagonalSize, int matrixSize, int nbZero, ArrayList<Integer> listFactor,
+					int diagonalSize, int matrixSize, int nbZero, int factor,
 					double fdr, boolean isDroso, boolean delImage,  int cpu) {
 
 		super( input, output,  gauss, resolution, thresholdMax, matrixSize, nbZero,  fdr, chrSize, delImage,cpu );
@@ -122,8 +129,15 @@ public class SIPIntra extends SIPObject {
 		this._saturatedPixel = saturatedPixel;
 		this._diagonalSize = diagonalSize;
 		this._step = matrixSize/2;
-		this._listFactor = listFactor;
 		this._isDroso = isDroso;
+		this._factor = factor;
+		_listFactor.add(1);
+		if (_factor == 2)  _listFactor.add(2);
+		else if (_factor == 4) {
+			_listFactor.add(2);
+			_listFactor.add(5);
+		} else if(_factor == 3) _listFactor.add(5);
+
 
 	}
 	
@@ -349,7 +363,11 @@ public class SIPIntra extends SIPObject {
 	 */
 	public void setIsDroso(boolean droso){	this._isDroso = droso;}
 
-
+	/**
+	 * Getter of list of integer for multi resolution loop calling
+	 * @return list of integer
+	 */
+	public int getFactor() {return this._factor;}
 
 
 	
