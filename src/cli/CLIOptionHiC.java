@@ -37,9 +37,8 @@ public class CLIOptionHiC extends CLIOptionProcessed {
            this._cmd = this._parser.parse(this._options, args,true);
         }
         catch (ParseException exp){
-            System.out.println(exp.getMessage()+"\n");
-           // System.out.println(getHelperInfos());
-            System.exit(1);
+            System.out.println("\n"+exp.getMessage()+"\n");
+            CLIHelper.CmdHelpHiC();
         }
 
     }

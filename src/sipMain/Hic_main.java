@@ -109,8 +109,7 @@ public class Hic_main {
 				MCool mCool = new MCool(args);
 
 			}else {
-				System.out.println(CLIHelper.getHelperInfos()+"\n"+CLIHelper.getAuthors());
-				return;
+				CLIHelper.getHelperAllInfos();
 			}
 		}
 		/*GUI */
@@ -131,7 +130,7 @@ public class Hic_main {
 				}
 			}else {
 				System.out.println("SIP closed: if you want the help: -h");
-				return;
+				CLIHelper.getHelperAllInfos();
 			}
 		}
 
@@ -330,7 +329,7 @@ public class Hic_main {
 	 * @param index table index where start to read the arguments
 	 * @throws IOException if some parameters don't exist
 	 */
-	private static void readOption(String args[], int index) throws IOException{
+	/*private static void readOption(String args[], int index) throws IOException{
 		if(index < args.length){
 			for(int i = index; i < args.length;i+=2){
 				if(args[i].equals("-res")){
@@ -356,7 +355,7 @@ public class Hic_main {
 						catch(NumberFormatException e){ returnError("-cpu",args[i+1],"int");}
 						if(_cpu > Runtime.getRuntime().availableProcessors() || _cpu <= 0){
 							System.out.println("the number of CPU "+ _cpu+" is superior of the server/computer' cpu "+Runtime.getRuntime().availableProcessors()+"\n");
-							SIPIntra.docError();
+							//SIPIntra.docError();
 							System.exit(0);
 						}
 				}else if(args[i].equals("-nbZero")){
@@ -417,80 +416,11 @@ public class Hic_main {
 				}
 			}
 		}
-	}
+	}*/
 	
-	/**
-	 * Return specifci error on function of thearugnent problems 
-	 * 
-	 * @param param String name of the arugment
-	 * @param value	String value of the argument
-	 * @param type Strint type of the argument
-	 */
-	private static void returnError(String param, String value, String type){
-		System.out.println(param+" has to be an integer "+value+" can't be convert in "+type+"\n");
-		SIPIntra.docError();
-		System.exit(0);
-	}
-	
-	
-	public static boolean testTools(String pathTools, int first, int second, int third) {
-		Runtime runtime = Runtime.getRuntime();
-		String cmd = pathTools+" --version";
-		Process process;
-		try {
-			process = runtime.exec(cmd);
-	
-		new ReturnFlux(process.getInputStream()).start();
-		new ReturnFlux(process.getErrorStream()).start();
-		process.waitFor();
-		
-		} catch (IOException | InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		String [] tline = _logError.split(" ");
-		System.out.println(_logError);
-		_logError = "";
-		if(tline.length > 0){
-			tline = tline[tline.length-1].split("\\.");
-			tline[2] = tline[2].replace("\n", "");
-			if(Integer.parseInt(tline[0]) >= first && Integer.parseInt(tline[1]) >= second) //&& Integer.parseInt(tline[2]) >= third)
-				return true;
-			else
-				return false;
-		}else
-			return false;
-	}
-	
-	public static class ReturnFlux extends Thread {  
 
-		/**  Flux to redirect  */
-		private InputStream _flux;
+	
 
-		/**
-		 * <b>Constructor of ReturnFlux</b>
-		 * @param flux
-		 *  flux to redirect
-		 */
-		public ReturnFlux(InputStream flux){this._flux = flux; }
-		
-		/**
-		 * 
-		 */
-		public void run(){
-			try {    
-				InputStreamReader reader = new InputStreamReader(this._flux);
-				BufferedReader br = new BufferedReader(reader);
-				String line=null;
-				while ( (line = br.readLine()) != null) {
-					if(line.contains("WARN")== false) _logError = _logError+line+"\n";
-				}
-			}
-			catch (IOException ioe){
-				ioe.printStackTrace();
-			}
-		}		
-	}
 	
 	
 }

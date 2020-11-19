@@ -104,7 +104,7 @@ public class CLIOptionProcessed {
      * @param args
      * @throws Exception
      */
-    public CLIOptionProcessed(String[] args)throws Exception  {
+    public CLIOptionProcessed(String[] args)  {
          /*required parameters*/
         this._options.addOption(_inputFolder);
         this._options.addOption(_outputFolder);
@@ -131,11 +131,25 @@ public class CLIOptionProcessed {
             _cmd = _parser.parse(this._options, args);
         }
         catch (ParseException  exp){
-            System.out.println(exp.getMessage()+"\n");
-            System.out.println(CLIHelper.getHelperInfos()+"\n");
-            System.exit(1);
+            System.out.println("\n"+exp.getMessage()+"\n");
+            CLIHelper.CmdHelpProcessed();
          }
     }
 
+    /**
+     *
+     * @return
+     */
+    public CommandLine getCommandLine() {
+        return _cmd;
+    }
+
+    /**
+     *
+     * @return
+     */
+    public Options getOptions() {
+        return _options;
+    }
 
 }

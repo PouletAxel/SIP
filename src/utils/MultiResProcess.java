@@ -16,6 +16,7 @@ import java.util.stream.Collectors;
 import javax.swing.JOptionPane;
 
 
+import cli.CLIHelper;
 import multiProcesing.ProcessDetectLoops;
 import loops.Loop;
 import sip.SIPIntra;
@@ -64,9 +65,8 @@ public class MultiResProcess {
 				if(_sip.isGui()) {
 					JOptionPane.showMessageDialog(null,"Resolution problem", "Enable to find all the directories needed for SIP (-factor option)", JOptionPane.ERROR_MESSAGE);
 				}
-				System.out.println("!!!! It is missing one or several directories for factor paramter\n");
-				SIPIntra.docError();
-				System.exit(0);
+				System.out.println("!!!! It is missing one or several directories for factor parameter\n");
+				CLIHelper.CmdHelpProcessed();
 			}
 		}
 

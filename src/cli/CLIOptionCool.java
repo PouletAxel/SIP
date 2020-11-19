@@ -46,9 +46,8 @@ public class CLIOptionCool extends CLIOptionProcessed {
             _commandLine = _parser.parse(this._options, args);
         }
         catch (ParseException  exp){
-            System.out.println(exp.getMessage()+"\n");
-            System.out.println(CLIHelper.getHelperInfos()+"\n"+CLIHelper.getAuthors());
-            System.exit(1);
+            System.out.println("\n"+exp.getMessage()+"\n");
+            CLIHelper.CmdHelpCool();
         }
 
     }

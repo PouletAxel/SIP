@@ -61,7 +61,7 @@ public class HiC {
      * @param args
      * @throws Exception
      */
-    public HiC(String args []) throws Exception {
+    public HiC(String args []){
         _isGui = false;
         String [] argsSubset = Arrays.copyOfRange(args, 1, args.length);
         CLIOptionHiC cli = new CLIOptionHiC(argsSubset);
