@@ -79,13 +79,11 @@ public class ProcessDetectLoops{
 	 * multiprocessing  for sip on inter-chromosomal interaction
 	 * for each couple of chromosome, RunnableDetectInterLoop is call.
 	 * @param sipInter SIPInter object
-	 * @param nbCPU number of cpu
-	 * @param delImage boolean if true del all the tif file
 	 * @param resuFile path to results file
 	 * @throws InterruptedException exception
 	 */
-	public void go(SIPInter sipInter, int nbCPU, boolean delImage, String resuFile) throws InterruptedException {
-		ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(nbCPU);
+	public void go(SIPInter sipInter, String resuFile) throws InterruptedException {
+		ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(sipInter.getCpu());
 		HashMap<String,Integer> chrSize = sipInter.getChrSizeHashMap();
 		Object [] chrName = chrSize.keySet().toArray();
 

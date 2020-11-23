@@ -1,6 +1,7 @@
 package process;
 
 
+import cli.CLIHelper;
 import cli.CLIOptionHiC;
 import gui.GuiAnalysis;
 import multiProcesing.ProcessDetectLoops;
@@ -9,12 +10,12 @@ import org.apache.commons.cli.CommandLine;
 import sip.SIPInter;
 import sip.SIPIntra;
 import utils.MultiResProcess;
-
+import org.apache.commons.cli.ParseException;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.Arrays;
+
 
 /**
  *
@@ -26,20 +27,18 @@ public class HiC {
     private SIPInter _sipInter;
     /** */
     private CommandLine _cmd;
-
     /** */
     private String _input;
     /** */
     private String _output;
     /** */
     private String _chrSizeFile;
-
     /** */
-    private int _nbZero;
+    private int _nbZero = 6;
     /** */
-    private boolean _delImages;
+    private boolean _delImages = true;
     /** */
-    private int _cpu;
+    private int _cpu =1;
     /** */
     private boolean _isGui;
     /** */
@@ -51,9 +50,9 @@ public class HiC {
     /** */
     private ParametersCheck _parameterCheck;
     /** */
-    private  String _juicerNorm;
+    private String _juicerNorm = "KR";
     /** */
-    String _log;
+    private String _log;
 
     /**
      *
@@ -62,16 +61,12 @@ public class HiC {
      */
     public HiC(String args []){
         _isGui = false;
-        String [] argsSubset = Arrays.copyOfRange(args, 1, args.length);
-        CLIOptionHiC cli = new CLIOptionHiC(argsSubset);
-        _cmd = cli.getCommandLine();
-        _input = _cmd.getOptionValue("input");
-        _output = _cmd.getOptionValue("output");
-        _log = _output+File.separator+"log.txt";
-        _juicerNorm = "KR";
-        _delImages = true;
-        _nbZero = 6;
-        _cpu = 1;
+        CLIOptionHiC cli = new CLIOptionHiC(args);
+       _cmd = cli.getCommandLine();
+       _input = _cmd.getOptionValue("input");
+       _output = _cmd.getOptionValue("output");
+       System.out.println(_input+"\n"+_output+"\n"+_cmd.getOptionValue("j"));
+       _log = _output+File.separator+"log.txt";
     }
 
     /**
@@ -84,10 +79,6 @@ public class HiC {
         _input =  this._guiAnalysis.getInput();
         _output = this._guiAnalysis.getOutputDir();
         _log = _output+File.separator+"log.txt";
-        _juicerNorm = "KR";
-        _delImages = true;
-        _nbZero = 6;
-        _cpu = 1;
     }
     /**
      *
@@ -98,11 +89,7 @@ public class HiC {
      * @throws InterruptedException
      */
     public void run() throws IOException, InterruptedException {
-
         String allParam;
-
-        BufferedWriter writer = new BufferedWriter(new FileWriter(new File(_log)));
-
         if(_isGui) {
             _juicerTool = this._guiAnalysis.getJuicerTool();
             if(this._guiAnalysis.isInter())  _interOrIntra = "inter";
@@ -116,16 +103,23 @@ public class HiC {
             _cpu = this._guiAnalysis.getNbCpu();
         }else {
             /* common required parameters*/
-            _juicerTool = _cmd.getOptionValue("_juicerTool");
+            _juicerTool = _cmd.getOptionValue("juicerTool");
             _interOrIntra = _cmd.getOptionValue("lt");
+            System.out.println(_interOrIntra);
             _chrSizeFile = _cmd.getOptionValue("chrSize");
             /* common optional parameters */
             if (_cmd.hasOption("norm")) _juicerNorm = _cmd.getOptionValue("norm");
             if (_cmd.hasOption("nbZero")) _nbZero = Integer.parseInt(_cmd.getOptionValue("nbZero"));
-            if (_cmd.hasOption("delete"))_delImages = Boolean.parseBoolean(_cmd.getOptionValue("delImages"));
+            if (_cmd.hasOption("delete"))_delImages = false;
             if (_cmd.hasOption("cpu")) _cpu = Integer.parseInt(_cmd.getOptionValue("cpu"));
         }
-        _parameterCheck = new ParametersCheck(_input, _output, _chrSizeFile, _interOrIntra);
+
+        File file = new File(_output);
+        if(!file.exists()) file.mkdir();
+
+        BufferedWriter writer = new BufferedWriter(new FileWriter(new File(_log)));
+
+        _parameterCheck = new ParametersCheck(_input, _chrSizeFile, _interOrIntra, writer,false);
         _parameterCheck.testHiCOption(_juicerTool, _juicerNorm);
 
         if(_interOrIntra.equals("intra"))
@@ -133,10 +127,9 @@ public class HiC {
         else
             allParam = runInter();
 
-
+       ;
         writer.write(allParam);
-
-
+        writer.close();
     }
 
     /**
@@ -147,41 +140,18 @@ public class HiC {
      */
     private String runIntra() throws IOException, InterruptedException {
         /* Param spe intra chromosomal loop*/
-        if(_isGui)
-            this.setSipIntraGUI();
-        else
-            this.setSipIntraCLI();
+        if(_isGui) this.setSipIntraGUI();
+        else  this.setSipIntraCLI();
 
         _sipIntra.setIsGui(_isGui);
         _sipIntra.setIsProcessed(false);
         _sipIntra.setIsCooler(false);
 
-       ProcessDumpData processDumpData = new ProcessDumpData();
-       String allParam = "SIPHiC hic: \n" +
-                "input: "+_input+"\n" +
-                "output: "+_output+"\n"+
-                "juiceBox: "+ _juicerTool +"\n"+
-                "norm: "+ _juicerNorm +"\n" +
-                "inter or intra chromosomal: "+ _interOrIntra +"\n" +
-                "gauss: "+this._sipIntra.getGauss()+"\n"+
-                "min: "+this._sipIntra.getMin()+"\n"+
-                "max: "+this._sipIntra.getMax()+"\n"+
-                "matrix size: "+this._sipIntra.getMatrixSize()+"\n"+
-                "diagonal size: "+this._sipIntra.getDiagonalSize()+"\n"+
-                "resolution: "+this._sipIntra.getResolution()+"\n"+
-                "saturated pixel: "+this._sipIntra.getSaturatedPixel()+"\n"+
-                "threshold: "+this._sipIntra.getThresholdMaxima()+"\n"+
-                "number of zero: "+this._nbZero+"\n"+
-                "factor: "+ _sipIntra.getFactor() +"\n"+
-                "fdr: "+this._sipIntra.getFdr()+"\n"+
-                "delete images: "+_delImages+"\n"+
-                "cpu: "+ _cpu+"\n" +
-                "isDroso: "+this._sipIntra.isDroso()+"\n";
 
+       _parameterCheck.optionalParametersValidity(_sipIntra);
+       _parameterCheck.speOption(_sipIntra);
         System.out.println("########### Starting dump Step inter chromosomal interactions");
-
-        _parameterCheck.optionalParametersValidity(_sipIntra);
-        _parameterCheck.speOption(_sipIntra);
+        ProcessDumpData processDumpData = new ProcessDumpData();
         processDumpData.go(_input, _sipIntra, _juicerTool, _juicerNorm);
         System.out.println("########### End of the dump step\n");
 
@@ -189,7 +159,14 @@ public class HiC {
         MultiResProcess multi = new MultiResProcess(_sipIntra, _chrSizeFile);
         multi.run();
         System.out.println("###########End loop detection step\n");
-        return allParam;
+
+       // System.out.println(allParam);
+        return  "SIPHiC hic: \n" +    "input: "+_input+"\n" + "output: "+_output+"\n"+  "juiceBox: "+ _juicerTool +"\n"+
+                "norm: "+ _juicerNorm +"\n" + "inter or intra chromosomal: "+ _interOrIntra +"\n" + "gauss: "+this._sipIntra.getGauss()+"\n"+
+                "min: "+this._sipIntra.getMin()+"\n"+ "max: "+this._sipIntra.getMax()+"\n"+ "matrix size: "+this._sipIntra.getMatrixSize()+"\n"+
+                "diagonal size: "+this._sipIntra.getDiagonalSize()+"\n"+ "resolution: "+this._sipIntra.getResolution()+"\n"+ "saturated pixel: "+this._sipIntra.getSaturatedPixel()+"\n"+
+                "threshold: "+this._sipIntra.getThresholdMaxima()+"\n"+ "number of zero: "+this._nbZero+"\n"+ "factor: "+ _sipIntra.getFactor() +"\n"+
+                "fdr: "+this._sipIntra.getFdr()+"\n"+ "delete images: "+_delImages+"\n"+  "cpu: "+ _cpu+"\n" + "isDroso: "+this._sipIntra.isDroso()+"\n";
     }
 
 
@@ -202,34 +179,26 @@ public class HiC {
 
         this.setSipInter();
         _sipInter.setIsGui(_isGui);
-        _sipIntra.setIsProcessed(false);
-        _sipIntra.setIsCooler(false);
+        _sipInter.setIsProcessed(false);
+        _sipInter.setIsCooler(false);
 
 
-        String allParam = "SIPHiC hic: \n" +
-                "input: "+_input+"\n" +
-                "output: "+_output+"\n"+
-                "juiceBox: "+ _juicerTool +"\n"+
-                "norm: "+ _juicerNorm +"\n" +
-                "inter or intra chromosomal: "+ _interOrIntra +"\n" +
-                "gauss: "+this._sipInter.getGauss()+"\n"+
-                "matrix size: "+this._sipInter.getMatrixSize()+"\n"+
-                "resolution: "+this._sipInter.getResolution()+"\n"+
-                "threshold: "+this._sipInter.getThresholdMaxima()+"\n"+
-                "number of zero :"+_nbZero+"\n"+
-                "fdr "+this._sipInter.getFdr()+"\n"+
-                "delete images "+_delImages+"\n"+
-                "cpu "+ _cpu+"\n";
         _parameterCheck.optionalParametersValidity(_sipInter);
 
         processDumpData.go(_input,_sipInter, _juicerTool, _juicerNorm);
 
         String loopFileRes = _sipInter.getOutputDir()+"finalLoops.txt";
-
+        BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(new File(loopFileRes)));
         ProcessDetectLoops detectLoops = new ProcessDetectLoops();
-        detectLoops.go(_sipInter, _cpu, _delImages, loopFileRes);
 
-        return allParam;
+        detectLoops.go(_sipInter, loopFileRes);
+
+        return "SIPHiC hic: \n" +  "input: "+_input+"\n" +  "output: "+_output+"\n"+ "juiceBox: "+ _juicerTool +"\n"+
+                "norm: "+ _juicerNorm +"\n" + "inter or intra chromosomal: "+ _interOrIntra +"\n" +
+                "gauss: "+this._sipInter.getGauss()+"\n"+ "matrix size: "+this._sipInter.getMatrixSize()+"\n"+
+                "resolution: "+this._sipInter.getResolution()+"\n"+  "threshold: "+this._sipInter.getThresholdMaxima()+"\n"+
+                "number of zero :"+_nbZero+"\n"+ "fdr "+this._sipInter.getFdr()+"\n"+ "delete images "+_delImages+"\n"+
+                "cpu "+ _cpu+"\n";
 
     }
 
@@ -249,24 +218,27 @@ public class HiC {
         double saturatedPixel = 0.01;
         boolean isDroso = false;
         int factorParam = 1;
-
-        if (_cmd.hasOption("min")) min = Double.parseDouble(_cmd.getOptionValue("min"));
-        if (_cmd.hasOption("max")) max = Double.parseDouble(_cmd.getOptionValue("max"));
-        if (_cmd.hasOption("gaussian")) gauss = Double.parseDouble(_cmd.getOptionValue("gaussian"));
-        if (_cmd.hasOption("matrixSize")) matrixSize = Integer.parseInt(_cmd.getOptionValue("matrixSize"));
-        if (_cmd.hasOption("threshold")) thresholdMax = Double.parseDouble(_cmd.getOptionValue("threshold"));
-        if (_cmd.hasOption("fdr")) fdr = Double.parseDouble(_cmd.getOptionValue("fdr"));
-        if (_cmd.hasOption("resolution")) resolution = Integer.parseInt(_cmd.getOptionValue("resolution"));
-        if (_cmd.hasOption("diagonal")) diagSize = Integer.parseInt(_cmd.getOptionValue("diagonal"));
-        if (_cmd.hasOption("saturated")) saturatedPixel = Double.parseDouble(_cmd.getOptionValue("saturated"));
-        if (_cmd.hasOption("isDroso")) isDroso = Boolean.parseBoolean(_cmd.getOptionValue("isDroso"));
-        if (_cmd.hasOption("factor")){
-            factorParam = Integer.parseInt(_cmd.getOptionValue("factor"));
-            _parameterCheck.checkFactor(factorParam);
-        }
-
-       _sipIntra = new SIPIntra(_output, _chrSizeFile, gauss, min, max, resolution, saturatedPixel,
+        try {
+            if (_cmd.hasOption("min")) min = Double.parseDouble(_cmd.getOptionValue("min"));
+            if (_cmd.hasOption("max")) max = Double.parseDouble(_cmd.getOptionValue("max"));
+            if (_cmd.hasOption("gaussian")) gauss = Double.parseDouble(_cmd.getOptionValue("gaussian"));
+            if (_cmd.hasOption("matrixSize")) matrixSize = Integer.parseInt(_cmd.getOptionValue("matrixSize"));
+            if (_cmd.hasOption("threshold")) thresholdMax = Double.parseDouble(_cmd.getOptionValue("threshold"));
+            if (_cmd.hasOption("fdr")) fdr = Double.parseDouble(_cmd.getOptionValue("fdr"));
+            if (_cmd.hasOption("resolution")) resolution = Integer.parseInt(_cmd.getOptionValue("resolution"));
+            if (_cmd.hasOption("diagonal")) diagSize = Integer.parseInt(_cmd.getOptionValue("diagonal"));
+            if (_cmd.hasOption("saturated")) saturatedPixel = Double.parseDouble(_cmd.getOptionValue("saturated"));
+            if (_cmd.hasOption("isDroso")){ isDroso = true; }
+            if (_cmd.hasOption("factor")){
+                factorParam = Integer.parseInt(_cmd.getOptionValue("factor"));
+                _parameterCheck.checkFactor(factorParam);
+            }
+             _sipIntra = new SIPIntra(_output, _chrSizeFile, gauss, min, max, resolution, saturatedPixel,
                              thresholdMax, diagSize, matrixSize, _nbZero, factorParam, fdr, isDroso,_delImages, _cpu);
+        }catch (NumberFormatException ex) {
+                System.out.println("\n!!!!!! Error number is needed : \n"+ex.toString()+"\n");
+                CLIHelper.getHelperAllInfos();
+        } catch (IOException e) {   e.printStackTrace(); }
     }
     /**
      *
@@ -286,7 +258,7 @@ public class HiC {
      *
      *
      */
-    private void setSipInter() throws IOException {
+    private void setSipInter(){
 
         if(_isGui){
             _sipInter = new SIPInter(_output, _chrSizeFile, _guiAnalysis.getGaussian(), _guiAnalysis.getResolution(),
@@ -295,7 +267,7 @@ public class HiC {
         }else{
             double gauss = 1;
             int matrixSize = 500;
-            double thresholdMax = 0.01;
+            double thresholdMax = 0.9;
             double fdr = 0.025;
             int resolution = 100000;
             if (_cmd.hasOption("gaussian")) gauss = Double.parseDouble(_cmd.getOptionValue("gaussian"));

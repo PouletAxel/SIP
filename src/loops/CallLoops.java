@@ -106,7 +106,7 @@ public class CallLoops {
 				if(pixelPercent < 7)  
 					thresh =  _thresholdMaxima/5;
 				FindMaxima findLoop = new FindMaxima(imgNorm, imgFilter, chr, thresh, this._diagSize, this._resolution);
-				HashMap<String,Loop> temp = findLoop.findloop(numImage, this._nbZero,imgRaw, this._backgroudValue);	
+				HashMap<String,Loop> temp = findLoop.findLoop(numImage, this._nbZero,imgRaw, this._backgroudValue);
 				PeakAnalysisScore pas = new PeakAnalysisScore(imgNorm,temp);
 				pas.computeScore();
 				

@@ -15,7 +15,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.Arrays;
+
 
 /**
  *
@@ -63,8 +63,7 @@ public class Cool {
      */
     public Cool(String args []){
         _isGui = false;
-        String [] argsSubset = Arrays.copyOfRange(args, 1, args.length);
-        CLIOptionHiC cli = new CLIOptionHiC(argsSubset);
+        CLIOptionHiC cli = new CLIOptionHiC(args);
         _cmd = cli.getCommandLine();
         _input = _cmd.getOptionValue("input");
         _output = _cmd.getOptionValue("output");
@@ -100,8 +99,6 @@ public class Cool {
 
         String allParam;
 
-        BufferedWriter writer = new BufferedWriter(new FileWriter(new File(_log)));
-
         if(_isGui) {
             _cooler = this._guiAnalysis.getCooler();
             if(this._guiAnalysis.isInter())  _interOrIntra = "inter";
@@ -123,8 +120,13 @@ public class Cool {
             if (_cmd.hasOption("delete"))_delImages = Boolean.parseBoolean(_cmd.getOptionValue("delImages"));
             if (_cmd.hasOption("cpu")) _cpu = Integer.parseInt(_cmd.getOptionValue("cpu"));
         }
-        _parameterCheck = new ParametersCheck(_input, _output, _chrSizeFile, _interOrIntra);
-        _parameterCheck.testCoolOption(_coolTool, _cooler, _isGui);
+        File file = new File(_output);
+        if(!file.exists()) file.mkdir();
+        BufferedWriter writer = new BufferedWriter(new FileWriter(new File(_log)));
+
+        _parameterCheck = new ParametersCheck(_input, _chrSizeFile, _interOrIntra, writer,false);
+
+        _parameterCheck.testCoolOption(_coolTool, _cooler);
 
         if(_interOrIntra.equals("intra"))
             allParam = runIntra();
@@ -133,8 +135,7 @@ public class Cool {
 
 
         writer.write(allParam);
-
-
+        writer.close();
     }
 
     /**
@@ -238,7 +239,7 @@ public class Cool {
     /**
      *
      */
-    private void setSipIntraCLI(){
+    private void setSipIntraCLI() throws IOException {
         double min = 2.0;
         double max = 2.0;
         double gauss = 1.5;

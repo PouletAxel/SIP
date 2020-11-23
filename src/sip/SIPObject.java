@@ -89,7 +89,7 @@ public class SIPObject {
      */
     public SIPObject ( String output, double gauss, int resolution, double thresholdMax, int matrixSize, int nbZero,  double fdr, String chrSizeFile,
           boolean delTif, int cpu){
-
+        if(!output.endsWith(File.separator))  output = output+File.separator;
         this._output = output;
         this._gauss = gauss;
         this._resolution = resolution;

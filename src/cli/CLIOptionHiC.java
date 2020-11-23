@@ -6,7 +6,7 @@ public class CLIOptionHiC extends CLIOptionProcessed {
 
 
 
-    public CLIOptionHiC(String [] args){
+    public CLIOptionHiC(String [] args) {
         this._options.addOption(_inputFolder);
         this._options.addOption(_outputFolder);
         this._options.addOption(_chrSize);
@@ -34,12 +34,16 @@ public class CLIOptionHiC extends CLIOptionProcessed {
                 .type(String.class).desc("\n<NONE/VC/VC_SQRT/KR> (default KR)\n").numberOfArgs(1).build());
 
        try {
-           this._cmd = this._parser.parse(this._options, args,true);
+           this._cmd = this._parser.parse(this._options, args, false);
         }
         catch (ParseException exp){
             System.out.println("\n"+exp.getMessage()+"\n");
             CLIHelper.CmdHelpHiC();
-        }
+        }catch (IllegalArgumentException exp){
+           System.out.println( exp.getMessage());
+           CLIHelper.CmdHelpHiC();
+       }
+
 
     }
 

@@ -93,7 +93,7 @@ public class FindMaxima{
 	 * @return HashMap loop loop name => Loop object
 	 */
 
-	public HashMap<String, Loop> findloop(int index, int nbZero, ImagePlus raw, float val){
+	public HashMap<String, Loop> findLoop(int index, int nbZero, ImagePlus raw, float val){
 		run(nbZero, raw, val);
 		ArrayList<String> temp = this.getMaxima();
 		ImageProcessor ipN = this._imgNorm.getProcessor();

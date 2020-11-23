@@ -58,13 +58,10 @@ public class MultiResProcess {
 	public void run() throws InterruptedException, IOException{
 		ArrayList<Integer> listFactor = this._sip.getListFactor();
 		ArrayList<String> listOfFile = new ArrayList<String>();
-		File outDir = new File(_sip.getOutputDir());
-		if (!outDir.exists()) outDir.mkdir();
 		if (_sip.isProcessed()){
 			if(!this.testDir()){
-				if(_sip.isGui()) {
-					JOptionPane.showMessageDialog(null,"Resolution problem", "Enable to find all the directories needed for SIP (-factor option)", JOptionPane.ERROR_MESSAGE);
-				}
+				BufferedWriter writer = new BufferedWriter(new FileWriter(new File(_sip.getOutputDir()+"log.txt"), true));
+				writer.write("!!!! It is missing one or several directories for factor parameter\nEnable to find all the directories needed for SIP (-factor option)\n\n");
 				System.out.println("!!!! It is missing one or several directories for factor parameter\n");
 				CLIHelper.CmdHelpProcessed();
 			}

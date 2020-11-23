@@ -56,8 +56,7 @@ public class Processed {
      */
     public Processed(String args []){
         _isGui = false;
-        String [] argsSubset = Arrays.copyOfRange(args, 1, args.length);
-        CLIOptionProcessed cli = new CLIOptionProcessed(argsSubset);
+        CLIOptionProcessed cli = new CLIOptionProcessed(args);
         _cmd = cli.getCommandLine();
         _input = _cmd.getOptionValue("input");
         _output = _cmd.getOptionValue("output");
@@ -93,8 +92,6 @@ public class Processed {
 
         String allParam;
 
-        BufferedWriter writer = new BufferedWriter(new FileWriter(new File(_log)));
-
         if(_isGui) {
             if(this._guiAnalysis.isInter())  _interOrIntra = "inter";
             else  _interOrIntra = "intra";
@@ -111,7 +108,11 @@ public class Processed {
             if (_cmd.hasOption("delete"))_delImages = Boolean.parseBoolean(_cmd.getOptionValue("delImages"));
             if (_cmd.hasOption("cpu")) _cpu = Integer.parseInt(_cmd.getOptionValue("cpu"));
         }
-        _parameterCheck = new ParametersCheck(_input, _output, _chrSizeFile, _interOrIntra);
+        File file = new File(_output);
+        if(!file.exists()) file.mkdir();
+        BufferedWriter writer = new BufferedWriter(new FileWriter(new File(_log)));
+
+        _parameterCheck = new ParametersCheck(_input, _chrSizeFile, _interOrIntra, writer,true);
 
         if(_interOrIntra.equals("intra"))
             allParam = runIntra();
@@ -120,6 +121,7 @@ public class Processed {
 
 
         writer.write(allParam);
+        writer.close();
 
 
     }
@@ -179,7 +181,7 @@ public class Processed {
      * @throws IOException
      */
     private String runInter() throws IOException, InterruptedException {
-        ProcessDumpData processDumpData = new ProcessDumpData();
+
 
         this.setSipInter();
         _sipInter.setIsGui(_isGui);
@@ -204,7 +206,7 @@ public class Processed {
         String loopFileRes = _sipInter.getOutputDir()+"finalLoops.txt";
 
         ProcessDetectLoops detectLoops = new ProcessDetectLoops();
-        detectLoops.go(_sipInter, _cpu, _delImages, loopFileRes);
+        detectLoops.go(_sipInter, loopFileRes);
 
         return allParam;
 
@@ -214,7 +216,7 @@ public class Processed {
     /**
      *
      */
-    private void setSipIntraCLI(){
+    private void setSipIntraCLI() throws IOException {
         double min = 2.0;
         double max = 2.0;
         double gauss = 1.5;
@@ -262,7 +264,7 @@ public class Processed {
      *
      *
      */
-    private void setSipInter() throws IOException {
+    private void setSipInter() {
 
         if(_isGui){
             _sipInter = new SIPInter(_input,_output, _chrSizeFile, _guiAnalysis.getGaussian(), _guiAnalysis.getResolution(),
@@ -271,7 +273,7 @@ public class Processed {
         }else{
             double gauss = 1;
             int matrixSize = 500;
-            double thresholdMax = 0.01;
+            double thresholdMax = 0.9;
             double fdr = 0.025;
             int resolution = 100000;
             if (_cmd.hasOption("gaussian")) gauss = Double.parseDouble(_cmd.getOptionValue("gaussian"));

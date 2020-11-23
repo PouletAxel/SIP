@@ -15,6 +15,10 @@ public class CLIOptionProcessed {
             .type(String.class).desc("Path to input .hic, .mcool or SIP folder containing processed data\n")
             .numberOfArgs(1).build();
     /** */
+    Option _interOrIntra = Option.builder("lt").longOpt("loopsType").required()
+            .type(String.class).desc("value: inter or intra, call loops inter chromosomal or intra chromosomal interactions\n")
+            .numberOfArgs(1).build();
+    /** */
     Option _outputFolder= Option.builder("o").longOpt("output").required()
             .type(String.class).desc("Path to output folder for SIP's files \n")
             .numberOfArgs(1).build();
@@ -23,15 +27,14 @@ public class CLIOptionProcessed {
             .type(String.class).desc("Path to the chr size file, with the same name of the chr as in the hic file (i.e. chr1 does not match Chr1 or 1).\n")
             .numberOfArgs(1).build();
     /** */
-    Option _resolution = Option.builder("r").longOpt("resolution")
-            .type(Number.class).desc("Resolution in bp (default inter 5000 bp, intra 100 000 bp)\n")
-            .numberOfArgs(1).build();
+    Option _resolution = Option.builder("r").longOpt("resolution").numberOfArgs(1)
+            .type(Number.class).desc("Resolution in bp (default inter 5000 bp, intra 100 000 bp)\n").build();
     /** */
     Option _sizeImage = Option.builder("ms").longOpt("matrixSize")
             .type(Number.class).desc("Matrix size to use for each chunk of the chromosome (default intra 2000 bins, inter 500)\n")
             .numberOfArgs(1).build();
     /** */
-    Option _cpu = Option.builder("cpu")
+    Option _cpu = Option.builder("cpu").longOpt("cpu")
             .type(Number.class).desc("Number of CPU used for SIP processing (default 1)\n")
             .numberOfArgs(1).build();
     /** */
@@ -43,24 +46,21 @@ public class CLIOptionProcessed {
             .type(Number.class).desc("Threshold for loops detection (default intra 2800, inter 0.01)\n")
             .numberOfArgs(1).build();
     /** */
-    Option _nbZero = Option.builder("nbZero")
+    Option _nbZero = Option.builder("nb").longOpt("nbZero")
             .type(Number.class).desc("Number of zeros: number of pixels equal to zero that are allowed in the 24 pixels surrounding the detected loop (default 6)\n")
             .numberOfArgs(1).build();
     /** */
-    Option _fdr = Option.builder("fdr")
+    Option _fdr = Option.builder("fdr").longOpt("fdr")
             .type(Number.class).desc("Empirical FDR value for filtering based on random sites (default intra value: 0.01, inter value: 0.025)\n")
             .numberOfArgs(1).build();
     /** */
-    Option _deleteImage = Option.builder("d").longOpt("delete")
-            .type(boolean.class).desc("Delete tif files used for loop detection (default true)\n")
-            .build();
+    Option _deleteImage = Option.builder("k").longOpt("keepImage").hasArg(false)
+            .type(boolean.class).desc("keep tif in output folder if used\n")
+            .numberOfArgs(0).build();
+
     /** */
-    Option _interOrIntra = Option.builder("lt").longOpt("loopsType").required()
-            .type(String.class).desc("value: inter or intra, call loops inter chromosomal or intra chromosomal interactions\n")
-            .build();
-    /** */
-    Option _isDroso = Option.builder("isDroso")
-            .type(boolean.class).desc("If true apply extra filter to help detect loops similar to those found in D. mel cells (Default: false, used only for intra chromosomal)\n")
+    final Option _isDroso = Option.builder("isDroso").longOpt("isDroso").hasArg(false)
+            .type(boolean.class).desc("If option use, apply extra filter to help detect loops similar to those found in D. mel cells (used only for intra chromosomal)\n")
             .build();
     /** */
     Option _diagonal = Option.builder("d").longOpt("diagonal")
@@ -128,12 +128,16 @@ public class CLIOptionProcessed {
         this._options.addOption(_isDroso);
 
         try {
-            _cmd = _parser.parse(this._options, args);
+            _cmd = _parser.parse(this._options, args,false);
         }
-        catch (ParseException  exp){
+        catch (ParseException  exp ){
             System.out.println("\n"+exp.getMessage()+"\n");
             CLIHelper.CmdHelpProcessed();
-         }
+         }catch (IllegalArgumentException exp){
+            System.out.println( exp.getMessage());
+            System.exit(1);
+        }
+
     }
 
     /**

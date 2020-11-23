@@ -1,6 +1,7 @@
 package sipMain;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import cli.CLIHelper;
 import gui.GuiAnalysis;
@@ -30,30 +31,35 @@ public class Hic_main {
 	 * @throws IOException  exception
 	 * @throws InterruptedException exception
 	 */
-	public static void main(String[] args) throws Exception {
+	public static void main(String[] args) throws IOException, InterruptedException {
 
+
+		//command line test:
+		// hic -i /home/plop/Desktop/SIP/GSE104333_Rao-2017-treated_6hr_combined_30.hic -o /home/plop/Desktop/test -j /home/plop/Tools/juicer_tools_1.19.02.jar -c /home/plop/Desktop/SIP/testSize.tab -lt intra
 		/*CLI */
-		if(args.length >= 1) {
+		if(args.length == 1) {
+			CLIHelper.getHelperAllInfos();
+		}else if(args.length > 1) {
+			String [] argsSubset = Arrays.copyOfRange(args, 1, args.length);
 			if (args[0].equals("hic")) {
 				if(args[1].equals("-h") || args[1].equals("--help"))
 					CLIHelper.CmdHelpHiC();
-
-				HiC hic = new HiC(args);
+				HiC hic = new HiC(argsSubset);
 				hic.run();
 
 			}else if (args[0].equals("processed")) {
 				if(args[1].equals("-h") || args[1].equals("--help"))
 					CLIHelper.CmdHelpProcessed();
 
-				Processed processed = new Processed(args);
+				Processed processed = new Processed(argsSubset);
 				processed.run();
 
 			}else if (args[0].equals("cool")) {
 				if(args[1].equals("-h") || args[1].equals("--help"))
 					CLIHelper.CmdHelpCool();
 
-				Cool Cool = new Cool(args);
-
+				Cool cool = new Cool(argsSubset);
+				cool.run();
 
 			}else
 				CLIHelper.getHelperAllInfos();
@@ -71,13 +77,15 @@ public class Hic_main {
 					HiC hic = new HiC(gui);
 					hic.run();
 				}else if(gui.isCool()){
+					Cool cool = new Cool(args);
+					cool.run();
 
 				}else if(gui.isProcessed()){
 					Processed processed = new Processed(gui);
 					processed.run();
 				}
 			}else {
-				System.out.println("SIP closed: if you want the help: -h");
+				System.out.println("\nSIP closed: ");
 				CLIHelper.getHelperAllInfos();
 			}
 		}

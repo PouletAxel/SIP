@@ -149,6 +149,7 @@ public class GuiAnalysis extends JFrame{
 		this.setResizable(false);
 		this.setLocationByPlatform(true);
 		this.setBackground(Color.LIGHT_GRAY);
+		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
 		
 		this._container = getContentPane();

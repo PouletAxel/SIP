@@ -6,8 +6,7 @@ import org.apache.commons.cli.*;
  *
  */
 public class CLIOptionCool extends CLIOptionProcessed {
-    /** */
-    private CommandLine _commandLine;
+
     /**
      *
      * @param args
@@ -43,11 +42,14 @@ public class CLIOptionCool extends CLIOptionProcessed {
 
 
         try {
-            _commandLine = _parser.parse(this._options, args);
+            _cmd = _parser.parse(this._options, args,false);
         }
         catch (ParseException  exp){
             System.out.println("\n"+exp.getMessage()+"\n");
             CLIHelper.CmdHelpCool();
+        }catch (IllegalArgumentException exp){
+            System.out.println( exp.getMessage());
+            CLIHelper.CmdHelpHiC();
         }
 
     }

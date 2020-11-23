@@ -28,10 +28,9 @@ public class SIPInter  extends SIPObject {
      * @param matrixSize image size
      * @param nbZero nb of zero allowed around a loop
      * @param fdr fdr value for the final loops filter
-     * @throws IOException exception
      */
     public SIPInter(String output,String chrSize, double gauss,  int resolution, double thresholdMax, int matrixSize, int nbZero,double fdr,
-      boolean delTif, int cpu) throws IOException {
+      boolean delTif, int cpu) {
         super(output, gauss, resolution, thresholdMax,matrixSize, nbZero,  fdr,chrSize, delTif, cpu) ;
 
     }
@@ -73,6 +72,7 @@ public class SIPInter  extends SIPObject {
         double FDRcutoff = fdrDetection.getFDRCutoff();
         System.out.println("Filtering value at "+fdr+" FDR is "+FDRcutoff+" APscore and "+RFDRcutoff+" RegionalAPscore\n");
         BufferedWriter writer;
+
         if(first) writer = new BufferedWriter(new FileWriter(new File(pathFile), true));
         else{
             writer = new BufferedWriter(new FileWriter(new File(pathFile)));

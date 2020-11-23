@@ -2,8 +2,6 @@ package cli;
 
 import org.apache.commons.cli.HelpFormatter;
 
-import java.io.PrintWriter;
-
 public class CLIHelper {
 
     /** */
@@ -36,10 +34,10 @@ public class CLIHelper {
         String argument =  "-i path/to/hicFile.hic -c path/to/chrSizeFile.txt -o path/to/output/folder -j path/to/juicerTool.jar -lt intra ";
         String[] argv = argument.split(" ");
         CLIOptionHiC command = new CLIOptionHiC (argv);
-        String usage = _cool+argument+" [options]";
+        String usage = _hic+argument+" [options]";
         HelpFormatter formatter = new HelpFormatter();
 
-        System.out.println("\nHelp for "+_cool+"!!!!!!! \n");
+        System.out.println("\nHelp for "+_hic+"!!!!!!! \n");
         formatter.printHelp(200, usage, "SIP_HiC version"+_version+"option hic: ", command.getOptions(),getAuthors());
         System.exit(1);
      }
@@ -83,10 +81,8 @@ public class CLIHelper {
      */
     public static void  getHelperInfos() {
         System.out.println( "More details :\n" +
-                "java -jar SIPHiC"+ _version +".jar hic --help \n" +
-                "or \n"+
+                "java -jar SIPHiC"+ _version +".jar hic -h or --help \n" +
                 "java -jar SIPHiC-"+ _version +".jar cool -h or --help\n"+
-                "or \n" +
                 "java -jar SIPHiC-"+ _version +".jar processed -h or --help \n" +
                 "\n\nCommand line g:\n" +
                 "\tjava -jar SIP_HiC.jar hic -i path/to/hicFile.hic -c path/to/chrSizeFile -o path/to/output/folder -j path/to/juicerTool.jar -lt intra [options]\n" +
@@ -102,22 +98,20 @@ public class CLIHelper {
      * @return
      */
     public static void  getHelperAllInfos() {
-        System.out.println( "More details :\n" +
-                "java -jar SIPHiC"+ _version +".jar hic --help \n" +
-                "or \n"+
+        System.out.println( "\nMore details :\n" +
+                "java -jar SIPHiC"+ _version +".jar hic -h or --help \n" +
                 "java -jar SIPHiC-"+ _version +".jar cool -h or --help\n"+
-                "or \n" +
                 "java -jar SIPHiC-"+ _version +".jar processed -h or --help \n" +
                 "\n\nCommand line g:\n" +
                 "\tjava -jar SIP_HiC.jar hic -i path/to/hicFile.hic -c path/to/chrSizeFile -o path/to/output/folder -j path/to/juicerTool.jar -lt intra [options]\n" +
                 "\tjava -jar SIP_HiC.jar cool -i path/to/hicFile.hic -c path/to/chrSizeFile -o path/to/output/folder -cooltools path/to/cooltools -cooler path/to/cooler -lt intra [options]\n" +
                 "\tjava -jar SIP_HiC.jar processed -i SIP path/to/folder/SIPProcessedData -c path/to/chrSizeFile  -o path/to/output/folder -lt intra [options]\n" +
                 "\nAuthors:\n" +
-                "\nAxel Poulet\n" +
+                "Axel Poulet\n" +
                 "Department of Molecular, Cellular  and Developmental Biology Yale University \n" +
-                "\nM. Jordan Rowley\n" +
+                "M. Jordan Rowley\n" +
                 "Department of Genetics, Cell Biology and Anatomy, University of Nebraska Medical\n" +
-                "\nContact: pouletaxel@gmail.com OR jordan.rowley@unmc.edu\n");
+                "Contact: \npouletaxel@gmail.com OR jordan.rowley@unmc.edu\n");
         System.exit(1);
 
     }
@@ -128,11 +122,11 @@ public class CLIHelper {
      */
     public static String getAuthors() {
         return  "Authors:\n" +
-                "\nAxel Poulet\n" +
+                "Axel Poulet\n" +
                 "Department of Molecular, Cellular  and Developmental Biology Yale University \n" +
-                "\nM. Jordan Rowley\n" +
+                "M. Jordan Rowley\n" +
                 "Department of Genetics, Cell Biology and Anatomy, University of Nebraska Medical\n" +
-                "\nContact: pouletaxel@gmail.com OR jordan.rowley@unmc.edu\n";
+                "Contact:\npouletaxel@gmail.com OR jordan.rowley@unmc.edu\n";
     }
 
 

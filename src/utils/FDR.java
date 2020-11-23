@@ -58,7 +58,7 @@ public class FDR {
 			if(dubFDR2 > 0) myFDRValues.add(dubFDR2);
 			if(dubFDR3 > 0) myFDRValues.add(dubFDR3);
 		
-	
+
 			float dubRFDR = loop.getRegionalPaScoreAvgFDR();
 			float dubRFDR2 = loop.getRegionalPaScoreAvgFDR2();
 			float dubRFDR3 = loop.getRegionalPaScoreAvgFDR3();

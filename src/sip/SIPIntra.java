@@ -153,7 +153,6 @@ public class SIPIntra extends SIPObject {
 	public void saveFile(String pathFile, HashMap<String, Loop> data, boolean first) throws IOException{
 		double fdr = this.getFdr();
 		FDR fdrDetection = new FDR (fdr, data);
-
 		fdrDetection.run();
 		double RFDRcutoff = fdrDetection.getRFDRCutoff();
 		double FDRcutoff = fdrDetection.getFDRCutoff();

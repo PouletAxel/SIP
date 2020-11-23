@@ -31,7 +31,7 @@ public class TestInter {
        //process.go(input,sipInter,chrsize,juicerTools,norm,2);
 
         ProcessDetectLoops detectLoops = new ProcessDetectLoops();
-        detectLoops.go(sipInter, 1, false, "/home/plop/Desktop/testInter/loops.txt");
+        detectLoops.go(sipInter, "/home/plop/Desktop/testInter/loops.txt");
 
 
         System.out.println("end");
