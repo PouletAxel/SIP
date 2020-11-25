@@ -1,6 +1,9 @@
 package multiProcesing;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.concurrent.Executors;
@@ -77,14 +80,18 @@ public class ProcessDumpData {
 	 * @param normJuiceBox String normalization method
 	 * @throws InterruptedException exception
 	 */
-	public void go(String hicFile, SIPInter sipInter, String juiceBoxTools, String normJuiceBox) throws InterruptedException {
+	public void go(String hicFile, SIPInter sipInter, String juiceBoxTools, String normJuiceBox) throws InterruptedException, IOException {
 		ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(sipInter.getCpu());
 		HashMap<String,Integer> chrSize = sipInter.getChrSizeHashMap();
 		Object [] chrName = chrSize.keySet().toArray();
 
-		System.out.println(sipInter.getOutputDir());
-		File outDir = new File(sipInter.getOutputDir());
-		if (!outDir.exists()) outDir.mkdir();
+		if (chrName.length < 2){
+			System.out.println("Error: !!! only one chromosome in"+ sipInter.getChrSizeFile() +", you  need at least 2 chromosome in your file.\n");
+			BufferedWriter writer = new BufferedWriter(new FileWriter(new File(sipInter.getOutputDir()+File.separator+"log.txt")));
+			writer.write("Error: !!! only one chromosome in"+ sipInter.getChrSizeFile() +", you  need at least 2 chromosome in your file.\n");
+			writer.close();
+			System.exit(1);
+		}
 		for(int i = 0; i < chrName.length;++i){
 			String chr1 = chrName[i].toString();
 			for(int j = i+1; j < chrName.length;++j){

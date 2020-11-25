@@ -182,17 +182,17 @@ public class HiC {
         _sipInter.setIsProcessed(false);
         _sipInter.setIsCooler(false);
 
-
         _parameterCheck.optionalParametersValidity(_sipInter);
-
+        System.out.println("########### Starting dump Step inter chromosomal interactions");
         processDumpData.go(_input,_sipInter, _juicerTool, _juicerNorm);
-
+        System.out.println("########### !!! End dump Step inter chromosomal interactions");
         String loopFileRes = _sipInter.getOutputDir()+"finalLoops.txt";
         BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(new File(loopFileRes)));
         ProcessDetectLoops detectLoops = new ProcessDetectLoops();
 
+        System.out.println("########### Starting loop detection");
         detectLoops.go(_sipInter, loopFileRes);
-
+        System.out.println("########### !!!!!!! end loops detection");
         return "SIPHiC hic: \n" +  "input: "+_input+"\n" +  "output: "+_output+"\n"+ "juiceBox: "+ _juicerTool +"\n"+
                 "norm: "+ _juicerNorm +"\n" + "inter or intra chromosomal: "+ _interOrIntra +"\n" +
                 "gauss: "+this._sipInter.getGauss()+"\n"+ "matrix size: "+this._sipInter.getMatrixSize()+"\n"+
