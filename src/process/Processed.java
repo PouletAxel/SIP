@@ -185,8 +185,8 @@ public class Processed {
 
         this.setSipInter();
         _sipInter.setIsGui(_isGui);
-        _sipIntra.setIsProcessed(true);
-        _sipIntra.setIsCooler(false);
+        _sipInter.setIsProcessed(true);
+        _sipInter.setIsCooler(false);
 
 
         String allParam = "SIPHiC processed: \n" +
