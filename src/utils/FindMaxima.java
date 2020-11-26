@@ -12,6 +12,8 @@ import ij.process.ByteProcessor;
 import ij.process.ImageProcessor;
 import loops.Loop;
 
+import static java.lang.System.out;
+
 /**
  * Detection of regional maxima in image. Return the HashMap<String,Loop>, the loop can be corrected. 
  * the class uses is the imageJ class to detect the maxima.
@@ -38,6 +40,8 @@ public class FindMaxima{
 	private int _resolution;
 	/** gaussian Filter strength*/
 	private double _gaussian;
+	/** gaussian Filter strength*/
+	private int _nbZero;
 
 	
 	/**
@@ -68,13 +72,14 @@ public class FindMaxima{
 	 * @param resolution int size of the pixel in base
 	 * @param gaussian gaussian filter strength
 	 */
-	public FindMaxima( ImagePlus imgDiff, String chr1,String chr2, double thresholdMaxima, int resolution, double gaussian){
+	public FindMaxima( ImagePlus imgDiff, String chr1,String chr2, double thresholdMaxima, int resolution, double gaussian, int nbZero){
 		this._imgFilter = imgDiff;
 		this._thresholdMaxima = thresholdMaxima;
 		this._chr2 = chr2;
 		this._chr = chr1;
 		this._resolution = resolution;
 		this._gaussian = gaussian;
+		this._nbZero = nbZero;
 	}
 
 
@@ -137,7 +142,6 @@ public class FindMaxima{
 	 * @return HashMap loop loop name => Loop object
 	 */
 	public HashMap<String,Loop> findLoopInter(String pathRaw){
-
 		ImagePlus raw = IJ.openImage(pathRaw);
 		ImageProcessor ipFilter = _imgFilter.getProcessor();
 		runInter(raw);
@@ -152,12 +156,13 @@ public class FindMaxima{
 			String name= this._chr+"\t"+this._chr2+"\t"+temp.get(j);
 			float avg = average(x,y);
 			float std = standardDeviation(x,y,avg);
-			int nbOfZero = detectNbOfZero(x,y,ipRaw.getf(x, y));
-			if(nbOfZero <= 3){ // filter on the loop value and region value
+			int nbOfZero = detectNbOfZero(x,y,1);
+			if(nbOfZero <= this._nbZero ){//&& nbOfZero > 0){ // filter on the loop value and region value
+				System.out.print("loop "+nbOfZero+" ref "+_nbZero+" "+ipFilter.getf(x,y)+"\n");
 				DecayAnalysis da = new DecayAnalysis(raw,x,y);
 				float n1 =da.getNeighbourhood1();
 				float n2 =da.getNeighbourhood2();
-					if(n2>n1 && n1 >= 0 && n2 >= 0){ // filter on the neighborood for hic datatset
+					if(n2>n1 && n1 > 0 && n2 > 0){ // filter on the neighborood for hic datatset
 					Loop maxima = new Loop(temp.get(j),x,y,this._chr,this._chr2,avg,std,ipRaw.getf(x, y));
 					maxima.setValueDiff(ipFilter.getf(x,y));
 					maxima.setNeigbhoord1(n1);
@@ -227,7 +232,7 @@ public class FindMaxima{
 			nbZero = 0;
 			for (int i = x - 2; i <= x + 2; ++i) {
 				for (int j = y - 2; j <= y + 2; ++j) {
-					if (ip.getf(i, j) <= 1) {
+					if (ip.getf(i, j) <= val) {
 						nbZero++;
 					} else if (Double.isNaN(ip.getf(i, j))) {
 						nbZero++;

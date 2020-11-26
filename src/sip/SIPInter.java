@@ -85,7 +85,7 @@ public class SIPInter  extends SIPObject {
             while (it.hasNext()) {
                 Loop loop = hLoop.get(it.next());
                 ArrayList<Integer> coord = loop.getCoordinates();
-                if (loop.getPaScoreAvg() > FDRcutoff && loop.getRegionalPaScoreAvg() > RFDRcutoff && loop.getValueDiff() > 1.3 && loop.getValue() >= 8) {
+               if (loop.getPaScoreAvg() > FDRcutoff && loop.getRegionalPaScoreAvg() > RFDRcutoff ){//&& loop.getValue() >= 8 && loop.getValueDiff() > 1.3){//){//&& loop.getValueDiff() > 1.3 && loop.getValue() >= 8) {
                     writer.write(loop.getChr() + "\t" + coord.get(0) + "\t" + coord.get(1) + "\t" + loop.getChr2() + "\t" + coord.get(2) + "\t" + coord.get(3) + "\t0,0,0"
                             + "\t" + loop.getPaScoreAvg() + "\t" + loop.getRegionalPaScoreAvg() + "\t" + loop.getNeigbhoord1() + "\t" + loop.getNeigbhoord2() + "\t" + loop.getAvg() + "\t"
                             + loop.getStd() + "\t" + loop.getValue() + "\t" +loop.getValueDiff()  + "\t" + loop.getNbOfZero() +"\t"+loop.getPaScoreAvgdev()+"\n");

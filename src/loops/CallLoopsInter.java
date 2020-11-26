@@ -23,6 +23,7 @@ public class CallLoopsInter {
     private int _resolution;
     private double _noiseTolerance;
     private double _gaussian;
+    private int _nbZero;
 
     /**
      *
@@ -33,6 +34,7 @@ public class CallLoopsInter {
         _resolution = sipInter.getResolution();
         _noiseTolerance= sipInter.getThresholdMaxima();
         _gaussian = sipInter.getGauss();
+        _nbZero = sipInter.getNbZero();
     }
 
     /**
@@ -59,7 +61,7 @@ public class CallLoopsInter {
                 //System.out.println(imgPath);
                 saveFile(img, imgPath);
                 ImagePlus imageDiff = imgDiff(img,imgPath);
-                FindMaxima findMaxima = new FindMaxima( imageDiff, chrName1,chrName2, _noiseTolerance, _resolution,_gaussian);
+                FindMaxima findMaxima = new FindMaxima( imageDiff, chrName1,chrName2, _noiseTolerance, _resolution,_gaussian,_nbZero);
                 HashMap<String, Loop> temp = findMaxima.findLoopInter(imgPath);
                 PeakAnalysisScore pas = new PeakAnalysisScore(img,temp);
                 pas.computeScore();

@@ -43,11 +43,11 @@ public class CLIOptionProcessed {
             .numberOfArgs(1).build();
     /** */
     Option _threshold = Option.builder("t").longOpt("threshold")
-            .type(Number.class).desc("Threshold for loops detection (default intra 2800, inter 0.01)\n")
+            .type(Number.class).desc("Threshold for loops detection (default intra 2800, inter 0.9)\n")
             .numberOfArgs(1).build();
     /** */
     Option _nbZero = Option.builder("nb").longOpt("nbZero")
-            .type(Number.class).desc("Number of zeros: number of pixels equal to zero that are allowed in the 24 pixels surrounding the detected loop (default 6)\n")
+            .type(Number.class).desc("Number of zeros: number of pixels equal to zero that are allowed in the 24 pixels surrounding the detected loop (default intra 6; inter 3)\n")
             .numberOfArgs(1).build();
     /** */
     Option _fdr = Option.builder("fdr").longOpt("fdr")

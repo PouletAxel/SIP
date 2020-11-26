@@ -33,11 +33,9 @@ public class Processed {
     /** */
     private String _chrSizeFile;
     /** */
-    private int _nbZero;
+    private boolean _delImages = true;
     /** */
-    private boolean _delImages;
-    /** */
-    private int _cpu;
+    private int _cpu = 1;
     /** */
     private boolean _isGui;
     /** */
@@ -61,9 +59,7 @@ public class Processed {
         _input = _cmd.getOptionValue("input");
         _output = _cmd.getOptionValue("output");
         _log = _output+File.separator+"log.txt";
-        _delImages = true;
-        _nbZero = 6;
-        _cpu = 1;
+
     }
 
     /**
@@ -76,9 +72,6 @@ public class Processed {
         _input =  this._guiAnalysis.getInput();
         _output = this._guiAnalysis.getOutputDir();
         _log = _output+File.separator+"log.txt";
-        _delImages = true;
-        _nbZero = 6;
-        _cpu = 1;
     }
     /**
      *
@@ -96,7 +89,6 @@ public class Processed {
             if(this._guiAnalysis.isInter())  _interOrIntra = "inter";
             else  _interOrIntra = "intra";
             _chrSizeFile = this._guiAnalysis.getChrSizeFile();
-            _nbZero = this._guiAnalysis.getNbZero();
             _delImages = this._guiAnalysis.isDeletTif();
             _cpu = this._guiAnalysis.getNbCpu();
         }else {
@@ -104,8 +96,7 @@ public class Processed {
             _interOrIntra = _cmd.getOptionValue("lt");
             _chrSizeFile = _cmd.getOptionValue("chrSize");
             /* common optional parameters */
-            if (_cmd.hasOption("nbZero")) _nbZero = Integer.parseInt(_cmd.getOptionValue("nbZero"));
-            if (_cmd.hasOption("delete"))_delImages = Boolean.parseBoolean(_cmd.getOptionValue("delImages"));
+            if (_cmd.hasOption("keepImage"))_delImages = false;
             if (_cmd.hasOption("cpu")) _cpu = Integer.parseInt(_cmd.getOptionValue("cpu"));
         }
         File file = new File(_output);
@@ -144,27 +135,6 @@ public class Processed {
         _sipIntra.setIsCooler(false);
 
 
-        String allParam = "SIPHiC processed: \n" +
-                "input: "+_input+"\n" +
-                "output: "+_output+"\n"+
-                "inter or intra chromosomal: "+ _interOrIntra +"\n" +
-                "gauss: "+this._sipIntra.getGauss()+"\n"+
-                "min: "+this._sipIntra.getMin()+"\n"+
-                "max: "+this._sipIntra.getMax()+"\n"+
-                "matrix size: "+this._sipIntra.getMatrixSize()+"\n"+
-                "diagonal size: "+this._sipIntra.getDiagonalSize()+"\n"+
-                "resolution: "+this._sipIntra.getResolution()+"\n"+
-                "saturated pixel: "+this._sipIntra.getSaturatedPixel()+"\n"+
-                "threshold: "+this._sipIntra.getThresholdMaxima()+"\n"+
-                "number of zero: "+this._nbZero+"\n"+
-                "factor: "+ _sipIntra.getFactor() +"\n"+
-                "fdr: "+this._sipIntra.getFdr()+"\n"+
-                "delete images: "+_delImages+"\n"+
-                "cpu: "+ _cpu+"\n" +
-                "isDroso: "+this._sipIntra.isDroso()+"\n";
-
-        System.out.println("########### Starting dump Step inter chromosomal interactions");
-
         _parameterCheck.optionalParametersValidity(_sipIntra);
         _parameterCheck.speOption(_sipIntra);
 
@@ -172,7 +142,13 @@ public class Processed {
         MultiResProcess multi = new MultiResProcess(_sipIntra, _chrSizeFile);
         multi.run();
         System.out.println("###########End loop detection step\n");
-        return allParam;
+        return "SIPHiC processed: \n" + "input: "+_input+"\n" +  "output: "+_output+"\n"+
+                "inter or intra chromosomal: "+ _interOrIntra +"\n" + "gauss: "+this._sipIntra.getGauss()+"\n"+
+                "min: "+this._sipIntra.getMin()+"\n"+ "max: "+this._sipIntra.getMax()+"\n"+ "matrix size: "+this._sipIntra.getMatrixSize()+"\n"+
+                "diagonal size: "+this._sipIntra.getDiagonalSize()+"\n"+ "resolution: "+this._sipIntra.getResolution()+"\n"+
+                "saturated pixel: "+this._sipIntra.getSaturatedPixel()+"\n"+ "threshold: "+this._sipIntra.getThresholdMaxima()+"\n"+
+                "number of zero: "+this._sipIntra.getNbZero()+"\n"+ "factor: "+ _sipIntra.getFactor() +"\n"+ "fdr: "+this._sipIntra.getFdr()+"\n"+ "delete images: "+_delImages+"\n"+
+                "cpu: "+ _cpu+"\n" + "isDroso: "+this._sipIntra.isDroso()+"\n";
     }
 
 
@@ -188,27 +164,20 @@ public class Processed {
         _sipInter.setIsProcessed(true);
         _sipInter.setIsCooler(false);
 
-
-        String allParam = "SIPHiC processed: \n" +
-                "input: "+_input+"\n" +
-                "output: "+_output+"\n"+
-                "inter or intra chromosomal: "+ _interOrIntra +"\n" +
-                "gauss: "+this._sipInter.getGauss()+"\n"+
-                "matrix size: "+this._sipInter.getMatrixSize()+"\n"+
-                "resolution: "+this._sipInter.getResolution()+"\n"+
-                "threshold: "+this._sipInter.getThresholdMaxima()+"\n"+
-                "number of zero :"+_nbZero+"\n"+
-                "fdr "+this._sipInter.getFdr()+"\n"+
-                "delete images "+_delImages+"\n"+
-                "cpu "+ _cpu+"\n";
         _parameterCheck.optionalParametersValidity(_sipInter);
 
         String loopFileRes = _sipInter.getOutputDir()+"finalLoops.txt";
+        BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(new File(loopFileRes)));
 
+        System.out.println("########### Start loop detection\n");
         ProcessDetectLoops detectLoops = new ProcessDetectLoops();
         detectLoops.go(_sipInter, loopFileRes);
+        System.out.println("###########End loop detection step\n");
 
-        return allParam;
+        return "SIPHiC processed: \n" +  "input: "+_input+"\n" + "output: "+_output+"\n"+ "inter or intra chromosomal: "+ _interOrIntra +"\n" +
+                "gauss: "+this._sipInter.getGauss()+"\n"+ "matrix size: "+this._sipInter.getMatrixSize()+"\n"+ "resolution: "+this._sipInter.getResolution()+"\n"+
+                "threshold: "+this._sipInter.getThresholdMaxima()+"\n"+ "number of zero :"+_sipInter.getNbZero()+"\n"+"fdr "+this._sipInter.getFdr()+"\n"+ "delete images "+_delImages+"\n"+
+                "cpu "+ _cpu+"\n";
 
     }
 
@@ -228,9 +197,11 @@ public class Processed {
         double saturatedPixel = 0.01;
         boolean isDroso = false;
         int factorParam = 1;
+        int nbZero = 6;
 
         if (_cmd.hasOption("min")) min = Double.parseDouble(_cmd.getOptionValue("min"));
         if (_cmd.hasOption("max")) max = Double.parseDouble(_cmd.getOptionValue("max"));
+        if (_cmd.hasOption("nbZero")) nbZero = Integer.parseInt(_cmd.getOptionValue("nbZero"));
         if (_cmd.hasOption("gaussian")) gauss = Double.parseDouble(_cmd.getOptionValue("gaussian"));
         if (_cmd.hasOption("matrixSize")) matrixSize = Integer.parseInt(_cmd.getOptionValue("matrixSize"));
         if (_cmd.hasOption("threshold")) thresholdMax = Double.parseDouble(_cmd.getOptionValue("threshold"));
@@ -238,14 +209,14 @@ public class Processed {
         if (_cmd.hasOption("resolution")) resolution = Integer.parseInt(_cmd.getOptionValue("resolution"));
         if (_cmd.hasOption("diagonal")) diagSize = Integer.parseInt(_cmd.getOptionValue("diagonal"));
         if (_cmd.hasOption("saturated")) saturatedPixel = Double.parseDouble(_cmd.getOptionValue("saturated"));
-        if (_cmd.hasOption("isDroso")) isDroso = Boolean.parseBoolean(_cmd.getOptionValue("isDroso"));
+        if (_cmd.hasOption("isDroso")) isDroso = true;
         if (_cmd.hasOption("factor")){
             factorParam = Integer.parseInt(_cmd.getOptionValue("factor"));
             _parameterCheck.checkFactor(factorParam);
         }
 
         _sipIntra = new SIPIntra(_input,_output, _chrSizeFile, gauss, min, max, resolution, saturatedPixel,
-                thresholdMax, diagSize, matrixSize, _nbZero, factorParam, fdr, isDroso,_delImages, _cpu);
+                thresholdMax, diagSize, matrixSize, nbZero, factorParam, fdr, isDroso,_delImages, _cpu);
     }
     /**
      *
@@ -255,7 +226,7 @@ public class Processed {
         _sipIntra = new SIPIntra(_input, _output, _chrSizeFile, _guiAnalysis.getGaussian(), _guiAnalysis.getMin(),
                 _guiAnalysis.getMax(), _guiAnalysis.getResolution(), _guiAnalysis.getSaturatedPixel(),
                 _guiAnalysis.getThresholdMaxima(), _guiAnalysis.getDiagSize(), _guiAnalysis.getMatrixSize(),
-                _nbZero, _guiAnalysis.getFactorChoice(), _guiAnalysis.getFDR(), _guiAnalysis.isDroso(),_delImages, _cpu);
+                this._guiAnalysis.getNbZero(), _guiAnalysis.getFactorChoice(), _guiAnalysis.getFDR(), _guiAnalysis.isDroso(),_delImages, _cpu);
 
 
     }
@@ -268,7 +239,7 @@ public class Processed {
 
         if(_isGui){
             _sipInter = new SIPInter(_input,_output, _chrSizeFile, _guiAnalysis.getGaussian(), _guiAnalysis.getResolution(),
-                    _guiAnalysis.getThresholdMaxima(), _guiAnalysis.getMatrixSize(), _nbZero, _guiAnalysis.getFDR(), _delImages,_cpu);
+                    _guiAnalysis.getThresholdMaxima(), _guiAnalysis.getMatrixSize(), this._guiAnalysis.getNbZero(), _guiAnalysis.getFDR(), _delImages,_cpu);
 
         }else{
             double gauss = 1;
@@ -276,12 +247,14 @@ public class Processed {
             double thresholdMax = 0.9;
             double fdr = 0.025;
             int resolution = 100000;
+            int nbZero = 3;
             if (_cmd.hasOption("gaussian")) gauss = Double.parseDouble(_cmd.getOptionValue("gaussian"));
             if (_cmd.hasOption("matrixSize")) matrixSize = Integer.parseInt(_cmd.getOptionValue("matrixSize"));
             if (_cmd.hasOption("threshold")) thresholdMax = Double.parseDouble(_cmd.getOptionValue("threshold"));
             if (_cmd.hasOption("fdr")) fdr = Double.parseDouble(_cmd.getOptionValue("fdr"));
             if (_cmd.hasOption("resolution")) resolution = Integer.parseInt(_cmd.getOptionValue("resolution"));
-            _sipInter = new SIPInter(_input,_output, _chrSizeFile, gauss, resolution,  thresholdMax, matrixSize, _nbZero, fdr, _delImages,_cpu);
+            if (_cmd.hasOption("nbZero")) nbZero = Integer.parseInt(_cmd.getOptionValue("nbZero"));
+            _sipInter = new SIPInter(_input,_output, _chrSizeFile, gauss, resolution,  thresholdMax, matrixSize, nbZero, fdr, _delImages,_cpu);
         }
 
 

@@ -12,6 +12,8 @@ public class TestInter {
 
     public static void main(String[] args) throws IOException, InterruptedException {
         //String chr = "chr21";
+        // hic -i SIP/GSE104333_Rao-2017-treated_6hr_combined_30.hic -c SIP/testSize.tab -o /home/plop/Desktop/interTreatedP -j /home/plop/Tools/juicer_tools_1.19.02.jar -lt inter -cpu 2 -r 50000 -ms 500
+        //processed -i /home/plop/Desktop/interTreatedP/ -c /home/plop/Desktop/SIP/testSize.tab -o /home/plop/Desktop/re -lt inter -cpu 2 -r 50000 -ms 500 -t 0.001 --nbZero 6 -k -fdr 1 -g 1
         String input = "/home/plop/Desktop/testInter/";
         String output = "/home/plop/Desktop/testInter/";
         String fileChr = "/home/plop/Desktop/SIP/testSize.tab";
