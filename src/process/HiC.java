@@ -5,12 +5,12 @@ import cli.CLIHelper;
 import cli.CLIOptionHiC;
 import gui.GuiAnalysis;
 import multiProcesing.ProcessDetectLoops;
-import multiProcesing.ProcessDumpData;
+import multiProcesing.ProcessDumpHic;
 import org.apache.commons.cli.CommandLine;
 import sip.SIPInter;
 import sip.SIPIntra;
 import utils.MultiResProcess;
-import org.apache.commons.cli.ParseException;
+
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -147,7 +147,7 @@ public class HiC {
        _parameterCheck.optionalParametersValidity(_sipIntra);
        _parameterCheck.speOption(_sipIntra);
         System.out.println("########### Starting dump Step inter chromosomal interactions");
-        ProcessDumpData processDumpData = new ProcessDumpData();
+        ProcessDumpHic processDumpData = new ProcessDumpHic();
         processDumpData.go(_input, _sipIntra, _juicerTool, _juicerNorm);
         System.out.println("########### End of the dump step\n");
 
@@ -171,7 +171,7 @@ public class HiC {
      * @throws IOException
      */
     private String runInter() throws IOException, InterruptedException {
-        ProcessDumpData processDumpData = new ProcessDumpData();
+        ProcessDumpHic processDumpData = new ProcessDumpHic();
 
         this.setSipInter();
         _sipInter.setIsGui(_isGui);

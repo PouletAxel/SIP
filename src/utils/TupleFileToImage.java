@@ -171,6 +171,48 @@ public class TupleFileToImage {
 		return img;
 	}
 
+	/**
+	 * Method to make the image with an input tuple file from inter chromosomal process
+	 * @return ImagePlus
+	 */
+	public ImagePlus readTupleFileInterCool(){
+		ImagePlus img = new ImagePlus();
+		BufferedReader br;
+		FloatProcessor pRaw = new FloatProcessor(_size, _size);
+		String[] tfile = _file.split("_");
+		//chr3	150000000	150100000	chr4	150000000	150100000	2	1.31032e-05
+		int numImageX = Integer.parseInt(tfile[tfile.length-5])/(_size*_resolution);
+		int numImageY = Integer.parseInt(tfile[tfile.length-2])/(_size*_resolution);
+		try {
+			pRaw.abs();
+			br = new BufferedReader(new FileReader(_file));
+			StringBuilder sb = new StringBuilder();
+			String line = br.readLine();
+			while (line != null){
+				sb.append(line);
+				String[] parts = line.split("\\t");
+				float raw = 0;
+
+				if(!(parts[2].equals("NAN"))){
+					raw =Float.parseFloat(parts[7])*1000000;
+					if (raw < 0) raw = 0;
+				}
+
+				int correctionX = numImageX*_size*_resolution;
+				int correctionY = numImageY*_size*_resolution;
+				int i = (Integer.parseInt(parts[1]) - correctionX)/_resolution;
+				int j = (Integer.parseInt(parts[4]) - correctionY)/_resolution;
+				if(i < _size && j< _size){
+					pRaw.setf(i, j, raw);
+				}
+				sb.append(System.lineSeparator());
+				line = br.readLine();
+			}
+			br.close();
+		} catch (IOException e) { e.printStackTrace();}
+		img.setProcessor(pRaw);
+		return img;
+	}
 
 	/**
 	 * Compute the standard deviation of the pixel non zero values of m_img 

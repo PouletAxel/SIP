@@ -3,9 +3,8 @@ package process;
 
 import cli.CLIOptionHiC;
 import gui.GuiAnalysis;
-import multiProcesing.ProcessCoolerDumpData;
+import multiProcesing.ProcessDumpCooler;
 import multiProcesing.ProcessDetectLoops;
-import multiProcesing.ProcessDumpData;
 import org.apache.commons.cli.CommandLine;
 import sip.SIPInter;
 import sip.SIPIntra;
@@ -153,9 +152,9 @@ public class Cool {
 
         _sipIntra.setIsGui(_isGui);
         _sipIntra.setIsProcessed(false);
-        _sipIntra.setIsCooler(false);
+        _sipIntra.setIsCooler(true);
 
-        ProcessCoolerDumpData processDumpData = new ProcessCoolerDumpData();
+        ProcessDumpCooler processDumpData = new ProcessDumpCooler();
         String allParam = "SIPHiC hic: \n" +
                 "input: "+_input+"\n" +
                 "output: "+_output+"\n"+
@@ -198,41 +197,30 @@ public class Cool {
      * @throws IOException
      */
     private String runInter() throws IOException, InterruptedException {
-       System.out.println("PAS finis de dev\n");
-       //TODO inter chromosomal loop with cool option
-        /*ProcessDumpData processDumpData = new ProcessDumpData();
+        ProcessDumpCooler processDumpData = new ProcessDumpCooler();
 
         this.setSipInter();
         _sipInter.setIsGui(_isGui);
-        _sipIntra.setIsProcessed(false);
-        _sipIntra.setIsCooler(false);
+        _sipInter.setIsProcessed(false);
+        _sipInter.setIsCooler(true);
 
-
-        String allParam = "SIPHiC hic: \n" +
-                "input: "+_input+"\n" +
-                "output: "+_output+"\n"+
-                "juiceBox: "+ _juicerTool +"\n"+
-                "norm: "+ _juicerNorm +"\n" +
-                "inter or intra chromosomal: "+ _interOrIntra +"\n" +
-                "gauss: "+this._sipInter.getGauss()+"\n"+
-                "matrix size: "+this._sipInter.getMatrixSize()+"\n"+
-                "resolution: "+this._sipInter.getResolution()+"\n"+
-                "threshold: "+this._sipInter.getThresholdMaxima()+"\n"+
-                "number of zero :"+_nbZero+"\n"+
-                "fdr "+this._sipInter.getFdr()+"\n"+
-                "delete images "+_delImages+"\n"+
-                "cpu "+ _cpu+"\n";
         _parameterCheck.optionalParametersValidity(_sipInter);
-
-        processDumpData.go(_input,_sipInter, _juicerTool, _juicerNorm);
-
+        System.out.println("########### Starting dump Step inter chromosomal interactions");
+        processDumpData.go(_cooler, _sipInter, _input);
+        System.out.println("########### !!! End dump Step inter chromosomal interactions");
         String loopFileRes = _sipInter.getOutputDir()+"finalLoops.txt";
-
+        BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(new File(loopFileRes)));
         ProcessDetectLoops detectLoops = new ProcessDetectLoops();
-        detectLoops.go(_sipInter, _cpu, _delImages, loopFileRes);
-        */
-        return "plopi";
 
+        System.out.println("########### Starting loop detection");
+        detectLoops.go(_sipInter, loopFileRes);
+        System.out.println("########### !!!!!!! end loops detection");
+        return "SIPHiC hic: \n" +  "input: "+_input+"\n" +  "output: "+_output+"\n"+ "cooler: "+ _cooler +"\n"+
+                "inter or intra chromosomal: "+ _interOrIntra +"\n" +
+                "gauss: "+this._sipInter.getGauss()+"\n"+ "matrix size: "+this._sipInter.getMatrixSize()+"\n"+
+                "resolution: "+this._sipInter.getResolution()+"\n"+  "threshold: "+this._sipInter.getThresholdMaxima()+"\n"+
+                "number of zero :"+_sipInter.getNbZero()+"\n"+ "fdr "+this._sipInter.getFdr()+"\n"+ "delete images "+_delImages+"\n"+
+                "cpu "+ _cpu+"\n";
     }
 
 

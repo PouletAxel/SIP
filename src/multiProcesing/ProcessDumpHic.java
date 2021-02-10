@@ -10,9 +10,9 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+import dumpProcessing.HicDumpIntra;
+import dumpProcessing.HicDumpInter;
 import gui.Progress;
-import dumpProcessing.DumpData;
-import dumpProcessing.DumpInterChromosomal;
 import sip.SIPInter;
 import sip.SIPIntra;
 
@@ -25,14 +25,14 @@ import sip.SIPIntra;
  * @author axel poulet
  *
  */
-public class ProcessDumpData {
+public class ProcessDumpHic {
 	/** progress bar if gui is true*/
 	private Progress _p;
 
 	/**
 	 * 
 	 */
-	public ProcessDumpData(){ }
+	public ProcessDumpHic(){ }
 	
 	/**
 	 *  run SiP for intra chr loops
@@ -51,8 +51,8 @@ public class ProcessDumpData {
 		if (!outDir.exists()) outDir.mkdir();
 		while(chrName.hasNext()){
 			String chr = chrName.next();
-			DumpData dumpData = new DumpData(juiceBoxTools, hicFile, normJuiceBox);
-			RunnableDumpDataHiC task =  new RunnableDumpDataHiC(sip.getOutputDir(), chr, chrSize.get(chr), dumpData, sip.getResolution(), sip.getMatrixSize(), sip.getStep(), sip.getListFactor());
+			HicDumpIntra dumpData = new HicDumpIntra(juiceBoxTools, hicFile, normJuiceBox);
+			RunnableDumpHicIntra task =  new RunnableDumpHicIntra(sip.getOutputDir(), chr, chrSize.get(chr), dumpData, sip.getResolution(), sip.getMatrixSize(), sip.getStep(), sip.getListFactor());
 			executor.execute(task);
 		}
 		executor.shutdown();
@@ -99,8 +99,8 @@ public class ProcessDumpData {
 				int size1 = chrSize.get(chr1);
 				int size2 = chrSize.get(chr2);
 				System.out.println(chr1+"\t"+size1+"\t"+chr2+"\t"+size2);
-				DumpInterChromosomal DumpInterChromosomal = new DumpInterChromosomal(juiceBoxTools, hicFile, normJuiceBox);
-				RunnableDumpInterChromoData task =  new RunnableDumpInterChromoData(sipInter.getOutputDir(), chr1, chrSize.get(chr1),
+				HicDumpInter DumpInterChromosomal = new HicDumpInter(juiceBoxTools, hicFile, normJuiceBox);
+				RunnableDumpHicInter task =  new RunnableDumpHicInter(sipInter.getOutputDir(), chr1, chrSize.get(chr1),
 						chr2, chrSize.get(chr2),DumpInterChromosomal, sipInter.getResolution(), sipInter.getMatrixSize());
 				executor.execute(task);
 			}

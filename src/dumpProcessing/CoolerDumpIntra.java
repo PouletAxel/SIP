@@ -18,7 +18,7 @@ import java.util.ArrayList;
  * https://github.com/open2c/cooler
  * Abdennur, N., and Mirny, L. (2019). Cooler: scalable storage for Hi-C data and other genomically labeled arrays. Bioinformatics. doi: 10.1093/bioinformatics/btz540.
  */
-public class CoolerDumpData {
+public class CoolerDumpIntra {
 
 	
 	/** String to stock the error if need of juicerbox_tools*/
@@ -39,7 +39,7 @@ public class CoolerDumpData {
 	 * @param cooler path to cooler bin
 	 * @param coolFile path of mcool file
 	 */
-	public CoolerDumpData(String cooler, String coolFile) {
+	public CoolerDumpIntra(String cooler, String coolFile) {
 		this._coolFile = coolFile;
 		this._cooler = cooler;
 	}
@@ -94,8 +94,8 @@ public class CoolerDumpData {
 			String [] tline = line.split("\t");
 			int dist = Math.abs((Integer.parseInt(tline[1])-Integer.parseInt(tline[4]))/resolution);
 			if(!tline[7].equals("NaN")){
-				double normalizedValue = ((Double.parseDouble(tline[7])*10000+1)/(this._lExpected.get(dist)*10000+1));
-				double oMe = (Double.parseDouble(tline[7])*1000-this._lExpected.get(dist)*1000);
+				double normalizedValue = ((Double.parseDouble(tline[7])*1000000+1)/(this._lExpected.get(dist)*1000000+1));
+				double oMe = (Double.parseDouble(tline[7])*1000000-this._lExpected.get(dist)*1000000);
 				writer.write(tline[1]+"\t"+tline[4]+"\t"+oMe+"\t"+normalizedValue+"\n");
 			}
 		}

@@ -12,7 +12,7 @@ import java.util.HashMap;
  * @author axel poulet
  *
  */
-public class RunnableDetectLoops extends Thread implements Runnable{
+public class RunnableDetectIntraLoops extends Thread implements Runnable{
 	/** SIP object containing all the parameter for the loops detection*/
 	private SIPIntra _sip;
 	/** CallLoops object */
@@ -38,7 +38,7 @@ public class RunnableDetectLoops extends Thread implements Runnable{
 	 * @param normVectorFile path to normalized vector
 	 *
 	 */
-	public RunnableDetectLoops (String chr, String resuFile, SIPIntra sip, String normVectorFile){
+	public RunnableDetectIntraLoops(String chr, String resuFile, SIPIntra sip, String normVectorFile){
 		this._sip = sip;
 		this._callLoops = new CallLoops(sip);
 		this._chr= chr;
@@ -55,7 +55,7 @@ public class RunnableDetectLoops extends Thread implements Runnable{
 	 * @param sip SIPIntra
 	 *
 	 */
-	public RunnableDetectLoops (String chr, String resuFile, SIPIntra sip){
+	public RunnableDetectIntraLoops(String chr, String resuFile, SIPIntra sip){
 		this._sip = sip;
 		this._callLoops = new CallLoops(sip);
 		this._chr= chr;
@@ -84,6 +84,7 @@ public class RunnableDetectLoops extends Thread implements Runnable{
 				if(!_sip.isCooler()) {
 					System.out.println(_normVectorFile +"normVector end loading file: "+_chr+".norm "+resName);
 				}
+				System.out.println(dir);
 				data = this._callLoops.detectLoops(listOfFiles,this._chr,this._normVector);
 				synchronized(this) {
 					if (file.length() == 0)	_sip.saveFile(this._resuFile,data,false);

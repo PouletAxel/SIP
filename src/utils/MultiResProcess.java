@@ -77,6 +77,7 @@ public class MultiResProcess {
 			if(file.exists()) 
 				file.delete();
 			if(indexFact == 0) {
+				//System.out.println("plopi");
 				ProcessDetectLoops processDetectloops = new ProcessDetectLoops();
 				processDetectloops.go(this._sip, resuFile,resName);
 			}else {

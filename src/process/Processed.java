@@ -4,7 +4,6 @@ package process;
 import cli.CLIOptionProcessed;
 import gui.GuiAnalysis;
 import multiProcesing.ProcessDetectLoops;
-import multiProcesing.ProcessDumpData;
 import org.apache.commons.cli.CommandLine;
 import sip.SIPInter;
 import sip.SIPIntra;
@@ -14,7 +13,6 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.Arrays;
 
 /**
  *

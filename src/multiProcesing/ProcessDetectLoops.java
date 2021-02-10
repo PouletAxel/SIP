@@ -47,7 +47,7 @@ public class ProcessDetectLoops{
 		while(chrName.hasNext()){
 			String chr = chrName.next();
 			if(sip.isCooler()){
-				RunnableDetectLoops task =  new RunnableDetectLoops(chr, resuFile, sip);
+				RunnableDetectIntraLoops task =  new RunnableDetectIntraLoops(chr, resuFile, sip);
 				executor.execute(task);	
 				
 			}else {
@@ -55,7 +55,7 @@ public class ProcessDetectLoops{
 				if (sip.isProcessed()){
 					normFile = sip.getInputDir()+resName+File.separator+"normVector"+File.separator+chr+".norm";
 				}
-				RunnableDetectLoops task =  new RunnableDetectLoops(chr, resuFile, sip,normFile);
+				RunnableDetectIntraLoops task =  new RunnableDetectIntraLoops(chr, resuFile, sip,normFile);
 				executor.execute(task);	
 			}
 		}

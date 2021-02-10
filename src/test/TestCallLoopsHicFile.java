@@ -4,9 +4,8 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
 
-import multiProcesing.ProcessDumpData;
+import multiProcesing.ProcessDumpHic;
 import utils.MultiResProcess;
 import sip.SIPIntra;
 
@@ -76,7 +75,7 @@ public class TestCallLoopsHicFile{
 			
 			SIPIntra sip = new SIPIntra(output, fileChr, gauss, min, max, resolution, saturatedPixel, thresholdMax, diagSize, matrixSize, nbZero,factor,0.01,false, keepTif,cpu );
 			sip.setIsGui(false);
-			ProcessDumpData processDumpData = new ProcessDumpData();
+			ProcessDumpHic processDumpData = new ProcessDumpHic();
 			processDumpData.go(input, sip, juiceBoxTools, juiceBoXNormalisation);
 			
 			MultiResProcess multi = new MultiResProcess(sip, fileChr);

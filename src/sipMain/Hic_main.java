@@ -97,14 +97,14 @@ public class Hic_main {
 			sip = new SIPIntra(_output, _chrSizeFile, _gauss, _min, _max, _resolution, _saturatedPixel,
 					_thresholdMax, _diagSize, _matrixSize, _nbZero, _factor,_fdr, _isProcessed,_isDroso);
 			sip.setIsGui(_gui);
-			ProcessDumpData processDumpData = new ProcessDumpData();
+			ProcessDumpHic processDumpData = new ProcessDumpHic();
 			processDumpData.go(_input, sip, _juiceBoxTools, _juiceBoXNormalisation, _cpu);
 			System.out.println("########### End of the dump Step");
 		}else if(_isCool){
 			sip = new SIPIntra(_output, _chrSizeFile, _gauss, _min, _max, _resolution, _saturatedPixel, _thresholdMax, _diagSize, _matrixSize, _nbZero, _factor,_fdr, _isProcessed,_isDroso);
 			sip.setIsCooler(_isCool);
 
-			ProcessCoolerDumpData processDumpData = new ProcessCoolerDumpData();
+			ProcessDumpCooler processDumpData = new ProcessDumpCooler();
 			processDumpData.go(_cooltools, _cooler, sip, _input, _cpu);
 			
 			}else{

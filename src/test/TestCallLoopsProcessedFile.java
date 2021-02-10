@@ -20,14 +20,14 @@ public class TestCallLoopsProcessedFile {
 	 * @throws InterruptedException 
 	 */
 	public static void main(String[] args) throws IOException, InterruptedException {
-		String input = "/home/plop/Desktop/GM12878TestBis";
-		String output= "/home/plop/Desktop/testChr";
-		int matrixSize = 2000;
-		int resolution = 5000;
-		int diagSize = 5;
+		String input = "/home/plop/Desktop/Cool";
+		String output= "/home/plop/Desktop/Bis";
+		int matrixSize = 500;
+		int resolution = 25000;
+		int diagSize = 2;
 		double gauss = 1.5;
 		int thresholdMax = 2800;// 2800;//1800
-		int nbZero = 6;//6;
+		int nbZero = 8;//6;
 		double min = 2;//1.5;
 		double max = 2;//1.5;
 		double saturatedPixel = 0.01;//0.005;
@@ -37,9 +37,9 @@ public class TestCallLoopsProcessedFile {
 		//factor.add(2);
 		//factor.add(5);
 		//SIP_HiC_v1.3.6.jar hic SIP/Kc_allcombined.hic SIP/armsizes.txt SIP/Droso/ ../Tools/juicer_tools_1.13.02.jar 
-		String chrSizeFile = "/home/plop/Desktop/w_hg19.sizes";
+		String chrSizeFile = "/home/plop/Desktop/SIP/hg38_small.size";
 		SIPIntra sip = new SIPIntra(input,output, chrSizeFile, gauss, min, max, resolution, saturatedPixel,
-				thresholdMax, diagSize, matrixSize, nbZero,factor,0.01,false,true,2);
+				thresholdMax, diagSize, matrixSize, nbZero,factor,0.01,false,false,2);
 		sip.setIsGui(false);
 		sip.setIsProcessed(true);
 		int cpu = 2;

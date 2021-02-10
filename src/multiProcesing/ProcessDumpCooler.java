@@ -1,6 +1,9 @@
 package multiProcesing;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -8,9 +11,11 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+import dumpProcessing.CoolerDumpIntra;
+import dumpProcessing.CoolerDumpInter;
 import gui.Progress;
-import dumpProcessing.CoolerDumpData;
 import dumpProcessing.CoolerExpected;
+import sip.SIPInter;
 import sip.SIPIntra;
 
 /**
@@ -20,7 +25,7 @@ import sip.SIPIntra;
  * 
  * @author axel poulet
  */
-public class ProcessCoolerDumpData {
+public class ProcessDumpCooler {
 	
 	/** progress bar if gui is true*/
 	private Progress _p;
@@ -28,7 +33,7 @@ public class ProcessCoolerDumpData {
 	/**
 	 * Constructor
 	 */
-	public ProcessCoolerDumpData(){ }
+	public ProcessDumpCooler(){ }
 		
 	/**
 	 * run the processing on different cpu, if all cpu are running, take break else run a new one.
@@ -68,8 +73,8 @@ public class ProcessCoolerDumpData {
 		
 		while(chrName.hasNext()){
 			String chr = chrName.next();
-			CoolerDumpData dumpData = new CoolerDumpData( cooler, coolFile);
-			RunnableDumpDataCooler task =  new RunnableDumpDataCooler(sip.getOutputDir(), chr, chrSize.get(chr), dumpData, sip.getResolution(), sip.getMatrixSize(), sip.getStep(), sip.getListFactor());
+			CoolerDumpIntra dumpData = new CoolerDumpIntra( cooler, coolFile);
+			RunnableDumpCoolerIntra task =  new RunnableDumpCoolerIntra(sip.getOutputDir(), chr, chrSize.get(chr), dumpData, sip.getResolution(), sip.getMatrixSize(), sip.getStep(), sip.getListFactor());
 			executor.execute(task);	
 		}
 		executor.shutdown();
@@ -92,5 +97,57 @@ public class ProcessCoolerDumpData {
 				if(name.contains(".expected"))  listOfFiles[i].delete();
 		}
 		if(sip.isGui())	_p.dispose();
+	}
+
+
+	/**
+	 *
+	 * @param cooler
+	 * @param sipInter
+	 * @param coolFile
+	 * @throws InterruptedException
+	 * @throws IOException
+	 */
+	public void go(String cooler, SIPInter sipInter, String coolFile) throws InterruptedException, IOException {
+		ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(sipInter.getCpu());
+		HashMap<String,Integer> chrSize = sipInter.getChrSizeHashMap();
+		Object [] chrName = chrSize.keySet().toArray();
+
+		if (chrName.length < 2){
+			System.out.println("Error: !!! only one chromosome in"+ sipInter.getChrSizeFile() +", you  need at least 2 chromosome in your file.\n");
+			BufferedWriter writer = new BufferedWriter(new FileWriter(new File(sipInter.getOutputDir()+File.separator+"log.txt")));
+			writer.write("Error: !!! only one chromosome in"+ sipInter.getChrSizeFile() +", you  need at least 2 chromosome in your file.\n");
+			writer.close();
+			System.exit(1);
+		}
+		for(int i = 0; i < chrName.length;++i){
+			String chr1 = chrName[i].toString();
+			for(int j = i+1; j < chrName.length;++j){
+				String chr2 = chrName[j].toString();
+				int size1 = chrSize.get(chr1);
+				int size2 = chrSize.get(chr2);
+				System.out.println(chr1+"\t"+size1+"\t"+chr2+"\t"+size2);
+				CoolerDumpInter coolerDumpInter= new CoolerDumpInter(cooler, coolFile);
+
+				RunnableDumpCoolerInter task =  new RunnableDumpCoolerInter(sipInter.getOutputDir(), chr1, chrSize.get(chr1),
+						chr2, chrSize.get(chr2), coolerDumpInter, sipInter.getResolution(), sipInter.getMatrixSize());
+				executor.execute(task);
+			}
+		}
+
+		executor.shutdown();
+		int nb = 0;
+
+		if(sipInter.isGui()){
+			_p = new Progress("Loop Detection step",sipInter.getChrSizeHashMap().size()+1);
+			_p._bar.setValue(nb);
+		}
+		while (!executor.awaitTermination(30, TimeUnit.SECONDS)) {
+			if (nb != executor.getCompletedTaskCount()) {
+				nb = (int) executor.getCompletedTaskCount();
+				if(sipInter.isGui()) _p._bar.setValue(nb);
+			}
+		}
+		if(sipInter.isGui())	_p.dispose();
 	}
 }

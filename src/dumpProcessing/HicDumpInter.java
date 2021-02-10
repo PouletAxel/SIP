@@ -23,7 +23,7 @@ import java.io.InputStreamReader;
  * @author axel poulet
  *
  */
-public class DumpInterChromosomal {
+public class HicDumpInter {
 
     /** path of juiceBox  */
     private String _juiceBoxTools;
@@ -43,7 +43,7 @@ public class DumpInterChromosomal {
      * @param hicFile path to the hic file
      * @param norm normalization methode used
      */
-    public DumpInterChromosomal(String juiceboxTools,String hicFile, String norm) {
+    public HicDumpInter(String juiceboxTools, String hicFile, String norm) {
         this._juiceBoxTools = juiceboxTools;
         this._normalisation = norm;
         this._hicFile = hicFile;
@@ -68,8 +68,8 @@ public class DumpInterChromosomal {
             this._log = this._log+"\n"+obs+"\t"+line;
             Process process = runtime.exec(line);
 
-            new DumpInterChromosomal.ReturnFlux(process.getInputStream()).start();
-            new DumpInterChromosomal.ReturnFlux(process.getErrorStream()).start();
+            new HicDumpInter.ReturnFlux(process.getInputStream()).start();
+            new HicDumpInter.ReturnFlux(process.getErrorStream()).start();
             exitValue=process.waitFor();
         }
         catch (IOException | InterruptedException e) {	e.printStackTrace();}

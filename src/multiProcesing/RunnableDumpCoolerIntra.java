@@ -4,7 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import dumpProcessing.CoolerDumpData;
+import dumpProcessing.CoolerDumpIntra;
 import dumpProcessing.CoolerExpected;
 
 /**
@@ -12,15 +12,15 @@ import dumpProcessing.CoolerExpected;
  * @author axel poulet
  *
  */
-public class RunnableDumpDataCooler extends Thread implements Runnable{
+public class RunnableDumpCoolerIntra extends Thread implements Runnable{
 	/**String: path where save the dump data  */
 	private String _outdir ;
 	/**String: name of the chr*/
 	private String _chrName;
 	/**int: chr size */
 	private int _chrSize;
-	/** DumpData object run juicertoolbox.jar*/
-	private CoolerDumpData _coolerDumpData;
+	/** HicDumpIntra object run juicertoolbox.jar*/
+	private CoolerDumpIntra _coolerDumpData;
 	/**int: bin resolution*/
 	private int _res;
 	/**int: image Size */
@@ -37,13 +37,13 @@ public class RunnableDumpDataCooler extends Thread implements Runnable{
 	 * @param outdir string path outdir
 	 * @param chrName string chr name
 	 * @param chrSize int chr size
-	 * @param dumpData  CoolerDumpData Object
+	 * @param dumpData  CoolerDumpIntra Object
 	 * @param res bin size
 	 * @param matrixSize image size
 	 * @param step step between each image
 	 * @param listFactor  List of integer for multi-resolution loop calling
 	 */
-	public RunnableDumpDataCooler (String outdir, String chrName, int chrSize, CoolerDumpData dumpData,int res, int matrixSize, int step, ArrayList<Integer> listFactor){
+	public RunnableDumpCoolerIntra(String outdir, String chrName, int chrSize, CoolerDumpIntra dumpData, int res, int matrixSize, int step, ArrayList<Integer> listFactor){
 		this._outdir = outdir;
 		this._chrName = chrName;
 		this._chrSize = chrSize;

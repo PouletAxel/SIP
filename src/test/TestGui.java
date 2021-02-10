@@ -1,10 +1,9 @@
 package test;
 
 import java.io.IOException;
-import java.util.ArrayList;
 
 import gui.GuiAnalysis;
-import multiProcesing.ProcessDumpData;
+import multiProcesing.ProcessDumpHic;
 import sip.SIPIntra;
 
 
@@ -59,7 +58,7 @@ public class TestGui {
 						+"\nthreshold: "+thresholdMax+"\n number of zero:"+nbZero+"\n ");
 				sip = new SIPIntra(output, chrSize, gauss, min, max, resolution, saturatedPixel, thresholdMax, diagSize, matrixSize, nbZero,factor,0.01,false,true,2);
 				sip.setIsGui(true);
-				ProcessDumpData processDumpData = new ProcessDumpData();
+				ProcessDumpHic processDumpData = new ProcessDumpHic();
 				processDumpData.go(input, sip, juiceBoxTools, juiceBoXNormalisation);
 			}else{
 				System.out.println("processed mode:\ninput: "+input+"\noutput: "+output+"\njuiceBox: "+juiceBoxTools+"\nnorm: "+ juiceBoXNormalisation+"\ngauss: "+gauss

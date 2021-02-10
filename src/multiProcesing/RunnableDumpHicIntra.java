@@ -1,5 +1,5 @@
 package multiProcesing;
-import dumpProcessing.DumpData;
+import dumpProcessing.HicDumpIntra;
 
 import java.io.File;
 import java.io.IOException;
@@ -15,15 +15,15 @@ import java.util.ArrayList;
  * @author axel poulet
  *
  */
-public class RunnableDumpDataHiC extends Thread implements Runnable{
+public class RunnableDumpHicIntra extends Thread implements Runnable{
 	/**String: path where save the dump data  */
 	private String _outdir;
 	/**String: name of the chr*/
 	private String _chrName;
 	/**int: chr size */
 	private int _chrSize;
-	/** DumpData object run juicertoolbox.jar*/
-	private DumpData _dumpData;
+	/** HicDumpIntra object run juicertoolbox.jar*/
+	private HicDumpIntra _dumpData;
 	/**int: bin resolution*/
 	private int _res;
 	/**int: image Size */
@@ -40,13 +40,13 @@ public class RunnableDumpDataHiC extends Thread implements Runnable{
 	 * @param outdir string path outdir
 	 * @param chrName string chr name
 	 * @param chrSize int chr size
-	 * @param dumpData  CoolerDumpData Object
+	 * @param dumpData  CoolerDumpIntra Object
 	 * @param res bin size
 	 * @param matrixSize image size
 	 * @param step step between each image
 	 * @param listFactor  List of integer for multi-resolution loop calling
 	 */
-	public RunnableDumpDataHiC (String outdir, String chrName, int chrSize, DumpData dumpData,int res, int matrixSize, int step, ArrayList<Integer> listFactor){
+	public RunnableDumpHicIntra(String outdir, String chrName, int chrSize, HicDumpIntra dumpData, int res, int matrixSize, int step, ArrayList<Integer> listFactor){
 		this._outdir = outdir;
 		this._chrName = chrName;
 		this._chrSize = chrSize;

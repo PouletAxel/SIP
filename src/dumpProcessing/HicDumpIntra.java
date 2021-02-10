@@ -30,7 +30,7 @@ import java.util.ArrayList;
  * @author axel poulet
  *
  */
-public class DumpData {
+public class HicDumpIntra {
 	/** String to stock the error if need of juicerbox_tools*/
 	private String _logError = "";
 	/** String for the log*/
@@ -53,7 +53,7 @@ public class DumpData {
 	 * @param hicFile: String: path to the HiC file
 	 * @param norm: String: type of normalisation
 	 */
-	public DumpData(String juiceboxTools,String hicFile, String norm) {
+	public HicDumpIntra(String juiceboxTools, String hicFile, String norm) {
 		this._juiceBoxTools = juiceboxTools;
 		this._normalisation = norm;
 		this._hicFile = hicFile;
