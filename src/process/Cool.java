@@ -1,6 +1,7 @@
 package process;
 
 
+import cli.CLIOptionCool;
 import cli.CLIOptionHiC;
 import gui.GuiAnalysis;
 import multiProcesing.ProcessDumpCooler;
@@ -62,7 +63,7 @@ public class Cool {
      */
     public Cool(String args []){
         _isGui = false;
-        CLIOptionHiC cli = new CLIOptionHiC(args);
+        CLIOptionCool cli = new CLIOptionCool(args);
         _cmd = cli.getCommandLine();
         _input = _cmd.getOptionValue("input");
         _output = _cmd.getOptionValue("output");
@@ -111,7 +112,7 @@ public class Cool {
             /* common required parameters*/
 
             _cooler = _cmd.getOptionValue("cooler");
-            _coolTool = _cmd.getOptionValue("coolTool");
+            _coolTool = _cmd.getOptionValue("cooltools");
             _interOrIntra = _cmd.getOptionValue("lt");
             _chrSizeFile = _cmd.getOptionValue("chrSize");
             /* common optional parameters */
@@ -159,7 +160,7 @@ public class Cool {
                 "input: "+_input+"\n" +
                 "output: "+_output+"\n"+
                 "cooler: "+ _cooler +"\n"+
-                "coolTool: "+ _coolTool +"\n" +
+                "cooltools: "+ _coolTool +"\n" +
                 "inter or intra chromosomal: "+ _interOrIntra +"\n" +
                 "gauss: "+this._sipIntra.getGauss()+"\n"+
                 "min: "+this._sipIntra.getMin()+"\n"+
@@ -263,20 +264,17 @@ public class Cool {
      *
      */
     private void setSipIntraGUI(){
-
         _sipIntra = new SIPIntra(_output, _chrSizeFile, _guiAnalysis.getGaussian(), _guiAnalysis.getMin(),
                 _guiAnalysis.getMax(), _guiAnalysis.getResolution(), _guiAnalysis.getSaturatedPixel(),
                 _guiAnalysis.getThresholdMaxima(), _guiAnalysis.getDiagSize(), _guiAnalysis.getMatrixSize(),
                 _nbZero, _guiAnalysis.getFactorChoice(), _guiAnalysis.getFDR(), _guiAnalysis.isDroso(),_delImages, _cpu);
-
-
     }
 
     /**
      *
      *
      */
-    private void setSipInter() throws IOException {
+    private void setSipInter(){
 
         if(_isGui){
             _sipInter = new SIPInter(_output, _chrSizeFile, _guiAnalysis.getGaussian(), _guiAnalysis.getResolution(),
@@ -285,7 +283,7 @@ public class Cool {
         }else{
             double gauss = 1;
             int matrixSize = 500;
-            double thresholdMax = 0.01;
+            double thresholdMax = 10;
             double fdr = 0.025;
             int resolution = 100000;
             if (_cmd.hasOption("gaussian")) gauss = Double.parseDouble(_cmd.getOptionValue("gaussian"));

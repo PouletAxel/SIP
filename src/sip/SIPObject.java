@@ -5,6 +5,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 /**
@@ -46,6 +47,8 @@ public class SIPObject {
     private HashMap<String,Integer> _chrSizeHashMap =  new HashMap<String,Integer>();
     /** */
     private String _chrSizeFile;
+    /** */
+    private ArrayList<String> _listChr =  new ArrayList<>();
     private int _cpu;
 
     /**
@@ -276,6 +279,12 @@ public class SIPObject {
      */
     public HashMap<String,Integer> getChrSizeHashMap(){return this._chrSizeHashMap;}
 
+    /**
+     * getter of chrSize hashMap
+     * @return hashMap chr name => chr size
+     */
+    public ArrayList<String> getChrList(){return this._listChr;}
+
 
     /**
      * getter of chrSize hashMap
@@ -299,6 +308,7 @@ public class SIPObject {
                 String[] parts = line.split("\\t");
                 String chr = parts[0];
                 int size = Integer.parseInt(parts[1]);
+                _listChr.add(chr);
                 _chrSizeHashMap.put(chr, size);
                 sb.append(System.lineSeparator());
                 line = br.readLine();

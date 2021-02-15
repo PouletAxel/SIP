@@ -42,28 +42,35 @@ public class Hic_main {
 		}else if(args.length > 1) {
 			String [] argsSubset = Arrays.copyOfRange(args, 1, args.length);
 			if (args[0].equals("hic")) {
-				if(args[1].equals("-h") || args[1].equals("--help"))
+				if(args[1].equals("-h") || args[1].equals("--help")) {
 					CLIHelper.CmdHelpHiC();
-				HiC hic = new HiC(argsSubset);
-				hic.run();
+				}else if(args.length > 2){
+					HiC hic = new HiC(argsSubset);
+					hic.run();
+				}else{
+					CLIHelper.CmdHelpHiC();
+				}
 
 			}else if (args[0].equals("processed")) {
-				if(args[1].equals("-h") || args[1].equals("--help"))
+				if(args[1].equals("-h") || args[1].equals("--help")) {
 					CLIHelper.CmdHelpProcessed();
-
-				Processed processed = new Processed(argsSubset);
-				processed.run();
-
+				}else if(args.length > 2){
+					Processed processed = new Processed(argsSubset);
+					processed.run();
+				}else{
+					CLIHelper.CmdHelpProcessed();
+				}
 			}else if (args[0].equals("cool")) {
-				if(args[1].equals("-h") || args[1].equals("--help"))
+				if(args[1].equals("-h") || args[1].equals("--help")) {
 					CLIHelper.CmdHelpCool();
-
-				Cool cool = new Cool(argsSubset);
-				cool.run();
-
+				}else if(args.length > 2){
+					Cool cool = new Cool(argsSubset);
+					cool.run();
+				}else{
+					CLIHelper.CmdHelpCool();
+				}
 			}else
 				CLIHelper.getHelperAllInfos();
-
 		}
 		/*GUI */
 		else{

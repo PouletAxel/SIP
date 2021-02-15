@@ -59,7 +59,7 @@ public class RunnableDetectInterLoops extends Thread implements Runnable {
         try {
             File folder = new File(dir);
             File[] listOfFiles = folder.listFiles();
-            System.out.println(dir);
+            System.out.println(dir+" "+listOfFiles.length);
             if (listOfFiles.length == 0) System.out.println("!!!!!!!!!! dumped directory of chromosome"+this._chr1+"_"+_chr2+"empty");
             else{
                 File file = new File(this._resuFile);

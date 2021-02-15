@@ -32,8 +32,8 @@ public class ParametersCheck {
         File file = new File(input);
 
         if(processed && !file.isDirectory()){
-            System.out.println("\nFDirectory problem !!!!\n-i "+input+": need to be a directory with processed daata from SIP !!! \n\n");
-            _logwWriter.write("\nFDirectory problem !!!!\n-i "+input+": need to be a directory with processed daata from SIP !!! \n\n");
+            System.out.println("\nDirectory problem !!!!\n-i "+input+": need to be a directory with processed data from SIP !!! \n\n");
+            _logwWriter.write("\nDirectory problem !!!!\n-i "+input+": need to be a directory with processed data from SIP !!! \n\n");
             _logwWriter.close();
             CLIHelper.getHelperInfos();
         }

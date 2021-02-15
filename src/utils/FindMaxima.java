@@ -158,11 +158,11 @@ public class FindMaxima{
 			float std = standardDeviation(x,y,avg);
 			int nbOfZero = detectNbOfZero(x,y,1);
 			if(nbOfZero <= this._nbZero ){//&& nbOfZero > 0){ // filter on the loop value and region value
-				System.out.print("loop "+nbOfZero+" ref "+_nbZero+" "+ipFilter.getf(x,y)+"\n");
+				//System.out.print("loop "+nbOfZero+" ref "+_nbZero+" "+ipFilter.getf(x,y)+"\n");
 				DecayAnalysis da = new DecayAnalysis(raw,x,y);
 				float n1 =da.getNeighbourhood1();
 				float n2 =da.getNeighbourhood2();
-					if(n2>n1 && n1 > 0 && n2 > 0){ // filter on the neighborood for hic datatset
+				if(n2>n1 && n1 > 0 && n2 > 0){ // filter on the neighborood for hic datatset
 					Loop maxima = new Loop(temp.get(j),x,y,this._chr,this._chr2,avg,std,ipRaw.getf(x, y));
 					maxima.setValueDiff(ipFilter.getf(x,y));
 					maxima.setNeigbhoord1(n1);

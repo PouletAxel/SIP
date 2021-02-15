@@ -1,5 +1,6 @@
 package multiProcesing;
 import java.io.File;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 
@@ -85,15 +86,14 @@ public class ProcessDetectLoops{
 	public void go(SIPInter sipInter, String resuFile) throws InterruptedException {
 		ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(sipInter.getCpu());
 		HashMap<String,Integer> chrSize = sipInter.getChrSizeHashMap();
-		Object [] chrName = chrSize.keySet().toArray();
-
+		ArrayList<String> chrName = sipInter.getChrList();
 		System.out.println(sipInter.getOutputDir());
 		File outDir = new File(sipInter.getOutputDir());
 		if (!outDir.exists()) outDir.mkdir();
-		for(int i = 0; i < chrName.length;++i){
-			String chr1 = chrName[i].toString();
-			for(int j = i+1; j < chrName.length;++j){
-				String chr2 = chrName[j].toString();
+		for(int i = 0; i < chrName.size();++i){
+			String chr1 = chrName.get(i);
+			for(int j = i+1; j < chrName.size();++j){
+				String chr2 = chrName.get(j);
 				int size1 = chrSize.get(chr1);
 				int size2 = chrSize.get(chr2);
 				System.out.println(chr1+"\t"+size1+"\t"+chr2+"\t"+size2);

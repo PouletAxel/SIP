@@ -24,6 +24,7 @@ public class CallLoopsInter {
     private double _noiseTolerance;
     private double _gaussian;
     private int _nbZero;
+    private boolean _cooler;
 
     /**
      *
@@ -35,6 +36,7 @@ public class CallLoopsInter {
         _noiseTolerance= sipInter.getThresholdMaxima();
         _gaussian = sipInter.getGauss();
         _nbZero = sipInter.getNbZero();
+        _cooler = sipInter.isCooler();
     }
 
     /**
@@ -54,7 +56,11 @@ public class CallLoopsInter {
             String fileName = fileList[i].toString();
             if(fileName.contains("txt")) {
                 TupleFileToImage tuple = new  TupleFileToImage(fileName, _matrixSize, _resolution);
-                ImagePlus img = tuple.readTupleFileInter();
+                ImagePlus img = new ImagePlus();
+                if(_cooler){
+                    img = tuple.readTupleFileInterCool();
+                }else
+                    img = tuple.readTupleFileInter();
                 String imgPath = fileName;
                 String [] name = fileName.split(File.separator);
                 imgPath = imgPath.replace("txt", "tif");

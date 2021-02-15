@@ -166,8 +166,12 @@ public class TupleFileToImage {
 				line = br.readLine();
 			}
 			br.close();
+			img.setProcessor(pRaw);
 		} catch (IOException e) { e.printStackTrace();}
-		img.setProcessor(pRaw);
+		catch(NumberFormatException ex){
+			img = readTupleFileInterCool();
+		}
+
 		return img;
 	}
 
@@ -209,8 +213,8 @@ public class TupleFileToImage {
 				line = br.readLine();
 			}
 			br.close();
+			img.setProcessor(pRaw);
 		} catch (IOException e) { e.printStackTrace();}
-		img.setProcessor(pRaw);
 		return img;
 	}
 
