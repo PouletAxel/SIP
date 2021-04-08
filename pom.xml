@@ -190,10 +190,10 @@
 
 	<developers>
 		<developer>
-			<id>DesTristus</id>
-			<name>Tristan Dubos</name>
-			<email>tristan.duos33@gmail.com</email>
-			<organization>iGReD</organization>
+			<id>axpoulet</id>
+			<name>Axel Poulet</name>
+			<email>pouletaxel@gmail.comm</email>
+			<organization>plop</organization>
 			<roles>
 				<role>architect</role>
 				<role>developer</role>
