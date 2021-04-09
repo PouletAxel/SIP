@@ -31,10 +31,10 @@ public class CLIHelper {
      * with example command line
      */
      public static void CmdHelpHiC() {
-        String argument =  "-i path/to/hicFile.hic -c path/to/chrSizeFile.txt -o path/to/output/folder -j path/to/juicerTool.jar -lt intra ";
+        String argument =  "-i path/to/file.hic -c path/to/chrSizeFile.txt -o path/to/output/folder -j path/to/juicerTool.jar -lt intra ";
         String[] argv = argument.split(" ");
         CLIOptionHiC command = new CLIOptionHiC (argv);
-        String usage = _hic+argument+" [options]";
+        String usage = _hic + argument + " [options]";
         HelpFormatter formatter = new HelpFormatter();
 
         System.out.println("\nHelp for "+_hic+"!!!!!!! \n");
@@ -48,7 +48,7 @@ public class CLIHelper {
      * with example command line
      */
     public static void CmdHelpCool() {
-        String argument =  "-i path/to/hicFile.hic -c path/to/chrSizeFile.txt -o path/to/output/folder -cooltools path/to/cooltools -cooler path/to/cooler -lt intra ";
+        String argument =  "-i path/to/file.mcool -c path/to/chrSizeFile.txt -o path/to/output/folder -cooltools path/to/cooltools -cooler path/to/cooler -lt intra ";
         String[] argv = argument.split(" ");
         CLIOptionCool command = new CLIOptionCool (argv);
         String usage = _cool+argument+" [options]";
@@ -64,7 +64,7 @@ public class CLIHelper {
      * with example command line
      */
     public static void CmdHelpProcessed(){
-        String argument =  "-i SIP path/to/folder/SIPProcessedData -c path/to/chrSizeFile  -o path/to/output/folder -lt intra ";
+        String argument =  "-i path/to/folder/toSIP/ProcessedData -c path/to/chrSizeFile  -o path/to/output/folder -lt intra ";
         String[] argv = argument.split(" ");
         CLIOptionProcessed command = new CLIOptionProcessed (argv);
         String usage = _processed+argument+" [options]";
