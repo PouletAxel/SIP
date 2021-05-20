@@ -6,7 +6,7 @@ WARNING: We just noticed that the newest version of Juicer Tools (v1.22) interac
 
 # What is SIP?
 
-SIP (Significant Interaction Peak caller) is a tool to identify and analyze loops that appear as high intensity
+SIP (Significant Interaction Peak caller) is a tool to identify and analyze java.plop.loops that appear as high intensity
 signal in Hi-C maps. This program is written in java and can be run on Linux, Windows, or MAC systems and
 includes either command line options or a graphical user interface.
 
@@ -18,13 +18,13 @@ Follow the links below to get started:
 
 * [View the Paper](https://genome.cshlp.org/content/early/2020/03/03/gr.257832.119.long)
 
-Rowley MJ, Poulet A, Nichols MH, Bixler BJ, Sanborn AL, Brouhard EA, Hermetz K, Linsenbaum H, Csankovszki G, Lieberman Aiden E, Corces G. Analysis of Hi-C data using SIP effectively identifies loops in organisms from C. elegans to mammals. Genome Research 2020.
+Rowley MJ, Poulet A, Nichols MH, Bixler BJ, Sanborn AL, Brouhard EA, Hermetz K, Linsenbaum H, Csankovszki G, Lieberman Aiden E, Corces G. Analysis of Hi-C data using SIP effectively identifies java.plop.loops in organisms from C. elegans to mammals. Genome Research 2020.
 
 ## SIP help menu:
 
 SIP_HiC run with java 8.
 
-SIP is implemented in java and includes achoice between command line options or	a graphical user interface (gui) allowing for more general use. This method is intended as an alternative loop caller especially for difficult to identify loops and works in conjunction with juicebox .hic files.
+SIP is implemented in java and includes achoice between command line options or	a graphical user interface (java.plop.gui) allowing for more general use. This method is intended as an alternative loop caller especially for difficult to identify java.plop.loops and works in conjunction with juicebox .hic files.
 
 
 #### Usage
@@ -51,12 +51,12 @@ SIP is implemented in java and includes achoice between command line options or	
    * **-max**: Maximum filter: increases the region of high intensity (default 2)
    * **-min**: Minimum filter: removes the isolated high value (default 2)
    * **-sat**: % of staturated pixel: enhances the contrast in the image (default 0.01)
-   * **-t**: Threshold for loops detection (default 2800 for hic)
+   * **-t**: Threshold for java.plop.loops detection (default 2800 for hic)
    * **-nbZero**: number of zeros: number of pixels equal to zero that are allowed in the 24 pixels surrounding the detected  maxima (default 6)
    * **-norm**: <NONE/VC/VC_SQRT/KR> (default KR)
    * **-del**: true or false, whether not to delete tif files used for loop detection (default true)
    * **-fdr**: Empirical FDR value for filtering based on random sites (default 0.01)
-   * **-isDroso**: default false, if true apply extra filter to help detect loops similar to those found in  D. mel cells
+   * **-isDroso**: default false, if true apply extra filter to help detect java.plop.loops similar to those found in  D. mel cells
    * -h or --help print help
 
 #### Command line eg:
