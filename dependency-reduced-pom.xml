@@ -3,14 +3,13 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>SIP</groupId>
   <artifactId>SIP</artifactId>
-  <name>SIP_HiC</name>
-  <version>0-SNAPSHOT</version>
+  <version>1.3.6-SNAPSHOT</version>
   <developers>
     <developer>
-      <id>DesTristus</id>
+      <id>axpoulet</id>
       <name>Axel Poulet</name>
       <email>pouletaxel@gmail.com</email>
-      <organization>Yale</organization>
+      <organization>iGReD</organization>
       <roles>
         <role>architect</role>
         <role>developer</role>
@@ -21,7 +20,7 @@
   <build>
     <resources>
       <resource>
-        <directory>${basedir}/src/main/resources</directory>
+        <directory>src/main/java/resources</directory>
       </resource>
       <resource>
         <directory>${project.build.sourceDirectory}</directory>
@@ -29,7 +28,7 @@
     </resources>
     <testResources>
       <testResource>
-        <directory>${basedir}/src/test/resources</directory>
+        <directory>src/main/java/plop/resources</directory>
       </testResource>
       <testResource>
         <directory>${project.build.testSourceDirectory}</directory>
@@ -115,8 +114,32 @@
       </plugin>
     </plugins>
   </build>
+  <repositories>
+    <repository>
+      <id>imagej.public</id>
+      <url>https://maven.imagej.net/content/groups/public</url>
+    </repository>
+    <repository>
+      <id>gitlab-maven</id>
+      <url>https://gitlab.com/api/v4/projects/22788291/packages/maven</url>
+    </repository>
+  </repositories>
+  <distributionManagement>
+    <repository>
+      <id>gitlab-maven</id>
+      <name>Gitlab Repository</name>
+      <url>https://gitlab.com/api/v4/projects/22788291/packages/maven</url>
+    </repository>
+    <snapshotRepository>
+      <id>gitlab-maven</id>
+      <name>Gitlab Repository</name>
+      <url>https://gitlab.com/api/v4/projects/22788291/packages/maven</url>
+    </snapshotRepository>
+  </distributionManagement>
   <properties>
     <maven.compiler.target>7</maven.compiler.target>
     <maven.compiler.source>7</maven.compiler.source>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
   </properties>
 </project>

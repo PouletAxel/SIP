@@ -26,19 +26,184 @@
 		
 
 	</dependencies>
-  
-  
-  <build>
-    <sourceDirectory>src</sourceDirectory>
-    <plugins>
-      <plugin>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.8.0</version>
-        <configuration>
-          <source>1.8</source>
-          <target>1.8</target>
-        </configuration>
-      </plugin>
-    </plugins>
-  </build>
+
+	<build>
+		<resources>
+			<resource>
+				<directory>src/main/java/resources</directory>
+			</resource>
+			<resource>
+				<directory>${project.build.sourceDirectory}</directory>
+			</resource>
+		</resources>
+		<testResources>
+			<testResource>
+				<directory>src/main/java/plop/resources</directory>
+			</testResource>
+			<testResource>
+				<directory>${project.build.testSourceDirectory}</directory>
+			</testResource>
+		</testResources>
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-assembly-plugin</artifactId>
+					<version>3.0.0</version>
+					<configuration>
+						<archive>
+							<manifest>
+								<mainClass>plop.sipMain.Hic_main</mainClass>
+							</manifest>
+						</archive>
+						<descriptorRefs>
+							<descriptorRef>jar-with-dependencies</descriptorRef>
+						</descriptorRefs>
+					</configuration>
+					<executions>
+						<execution>
+							<id>make-assembly</id>
+							<phase>package</phase>
+							<goals>
+								<goal>single</goal>
+							</goals>
+						</execution>
+					</executions>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-shade-plugin</artifactId>
+					<version>3.2.4</version>
+					<executions>
+						<execution>
+							<phase>package</phase>
+							<goals>
+								<goal>shade</goal>
+							</goals>
+							<configuration>
+								<transformers>
+									<transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+										<!-- Main class -->
+										<mainClass>plop.sipMain.Hic_main</mainClass>
+										<manifestEntries>
+											<Class-Path>.</Class-Path>
+										</manifestEntries>
+									</transformer>
+								</transformers>
+
+								<filters>
+									<filter>
+										<artifact>*:*</artifact>
+										<excludes>
+											<!--<exclude>plugins.config</exclude>-->
+											<exclude>META-INF/*.SF</exclude>
+											<exclude>META-INF/*.DSA</exclude>
+											<exclude>META-INF/*.RSA</exclude>
+										</excludes>
+									</filter>
+								</filters>
+
+							</configuration>
+						</execution>
+					</executions>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-compiler-plugin</artifactId>
+					<configuration>
+						<source>7</source>
+						<target>7</target>
+					</configuration>
+				</plugin>
+				<!--plugin>
+					<artifactId>maven-deploy-plugin</artifactId>
+					<executions>
+						<execution>
+							<goals>
+								<goal>deploy-file</goal>
+							</goals>
+							<phase>deploy</phase>
+							<configuration>
+								<repositoryId>gitlab-maven</repositoryId>
+								<url>https://gitlab.com/api/v4/projects/19044962/packages/maven</url>
+								<file>target/NucleusJ_2-1.0.2-jar-with-dependencies.jar</file>
+								<generatePom>false</generatePom>
+								<uniqueVersion>false</uniqueVersion>
+								<groupId>burp</groupId>
+								<artifactId>NucleusJ_2</artifactId>
+								<version>1.0.2</version>
+							</configuration>
+						</execution>
+					</executions>
+				</plugin-->
+			</plugins>
+		</pluginManagement>
+		<plugins>
+			<!--			<plugin>
+                            <groupId>org.apache.maven.plugins</groupId>
+                            <artifactId>maven-assembly-plugin</artifactId>
+                            <version>3.0.0</version>
+                        </plugin>-->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-shade-plugin</artifactId>
+				<version>3.2.4</version>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<configuration>
+					<source>8</source>
+					<target>8</target>
+				</configuration>
+			</plugin>
+		</plugins>
+
+	</build>
+
+	<developers>
+		<developer>
+			<id>axpoulet</id>
+			<name>Axel Poulet</name>
+			<email>pouletaxel@gmail.com</email>
+			<organization>iGReD</organization>
+			<roles>
+				<role>architect</role>
+				<role>developer</role>
+			</roles>
+			<timezone>+1</timezone>
+		</developer>
+	</developers>
+
+	<repositories>
+		<repository>
+			<id>imagej.public</id>
+			<url>https://maven.imagej.net/content/groups/public</url>
+		</repository>
+		<repository>
+			<id>gitlab-maven</id>
+			<url>https://gitlab.com/api/v4/projects/22788291/packages/maven</url>
+		</repository>
+	</repositories>
+
+	<distributionManagement>
+		<repository>
+			<id>gitlab-maven</id>
+			<name>Gitlab Repository</name>
+			<url>https://gitlab.com/api/v4/projects/22788291/packages/maven</url>
+		</repository>
+		<snapshotRepository>
+			<id>gitlab-maven</id>
+			<name>Gitlab Repository</name>
+			<url>https://gitlab.com/api/v4/projects/22788291/packages/maven</url>
+		</snapshotRepository>
+	</distributionManagement>
+
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+		<maven.compiler.source>7</maven.compiler.source>
+		<maven.compiler.target>7</maven.compiler.target>
+	</properties>
+
 </project>

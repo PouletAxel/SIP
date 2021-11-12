@@ -24,7 +24,7 @@ Rowley MJ, Poulet A, Nichols MH, Bixler BJ, Sanborn AL, Brouhard EA, Hermetz K, 
 
 SIP_HiC run with java 8.
 
-SIP is implemented in java and includes achoice between command line options or	a graphical user interface (gui) allowing for more general use. This method is intended as an alternative loop caller especially for difficult to identify loops and works in conjunction with juicebox .hic files.
+SIP is implemented in java and includes achoice between command line options or	a graphical user interface (plop.gui) allowing for more general use. This method is intended as an alternative loop caller especially for difficult to identify loops and works in conjunction with juicebox .hic files.
 
 
 #### Usage

@@ -1,6 +1,6 @@
 /bin/
-/test/
-/utils/
+/plop.test/
+/plop.utils/
 .idea
 .project
 .directory
