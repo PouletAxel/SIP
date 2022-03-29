@@ -1,4 +1,4 @@
-package plop.process;
+package plop.dumpProcessing;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -30,17 +30,17 @@ import java.util.ArrayList;
  * @author axel poulet
  *
  */
-public class DumpData {
+public class HicDumpIntra {
 	/** String to stock the error if need of juicerbox_tools*/
 	private String _logError = "";
 	/** String for the log*/
 	private String _log = "";
 	/** String => normalisation to dump the data (NONE, KR, VC, VC_SQRT or NONE)*/
-	private String _normalisation= "";
+	private String _normalisation;
 	/** path to the hic file or url link*/
-	private String _hicFile = "";
+	private String _hicFile;
 	/** path to juicer_toolsbox.jars*/
-	private String _juiceBoxTools = "";
+	private String _juiceBoxTools ;
 	/** List of doucle to stock the expected vector*/
 	private ArrayList<Double> _lExpected =  new ArrayList<Double>();
 
@@ -49,11 +49,11 @@ public class DumpData {
 	/**
 	 * Constructor of this class to iniatilise the different variables
 	 * 
-	 * @param juiceboxTools: String: path of juicertoolsBox
+	 * @param juiceboxTools: String: path of juicertools
 	 * @param hicFile: String: path to the HiC file
 	 * @param norm: String: type of normalisation
 	 */
-	public DumpData(String juiceboxTools,String hicFile, String norm) {
+	public HicDumpIntra(String juiceboxTools, String hicFile, String norm) {
 		this._juiceBoxTools = juiceboxTools;
 		this._normalisation = norm;
 		this._hicFile = hicFile;
@@ -64,8 +64,9 @@ public class DumpData {
 	 * 
 	 * @param chr: String for the name of teh chromosome
 	 * @param output: String path of the output
-	 * @return
-	 * @throws IOException
+	 * @param resolution resolutionn of interest
+	 * @return boolean
+	 * @throws IOException exception
 	 */
 	public boolean dumpObservedMExpected(String chr, String output, int resolution) throws IOException{
 		int exitValue=1;
@@ -73,7 +74,6 @@ public class DumpData {
 		String obs = output.replaceAll(".txt", "_obs.txt");
 		try {
 			String line = "java"+" -jar "+this._juiceBoxTools+" dump observed "+this._normalisation+" "+this._hicFile+" "+chr+" "+chr+" BP "+resolution+" "+obs;
-			System.out.println(line);
 			this._log = this._log+"\n"+obs+"\t"+line;
 			Process process = runtime.exec(line);
 
@@ -81,8 +81,7 @@ public class DumpData {
 			new ReturnFlux(process.getErrorStream()).start();
 			exitValue=process.waitFor();		
 		}
-		catch (IOException e) {	e.printStackTrace();}
-		catch (InterruptedException e) {e.printStackTrace();}
+		catch (IOException | InterruptedException e) {	e.printStackTrace();}
 		observedMExpected(obs,output,resolution);
 		if(_logError.contains("Exception")) {
 			System.out.println(_logError);
@@ -98,7 +97,8 @@ public class DumpData {
 	 * 
 	 * @param obs: String path with the file of the observed value
 	 * @param chr: name of the chr
-	 * @throws IOException
+ 	 * @param resolution resolution of interest
+	 * @throws IOException exception
 	 */
 	private void observedMExpected(String obs, String chr, int resolution) throws IOException{
 		BufferedReader br = Files.newBufferedReader(Paths.get(obs), StandardCharsets.UTF_8);
@@ -118,33 +118,21 @@ public class DumpData {
 		br.close();
 	}
 	
-	
-	/**
-	 * getter of the logerror file if necessary
-	 * 
-	 * @return return the String with the error
-	 */
-	public String getLogError(){ return this._logError;}
-	
-	/**
-	 * getter of the log info if necessary 
-	 * @return return a String with the log info
-	 */
-	public String getLog(){	return this._log;}
-	
+
 	/**
 	 * getter of the expected matrix. 
 	 * 
 	 * @param chr: String name of the chromosme
 	 * @param output: path to the output
-	 * @return
+	 * @param resolution resolution of interest
+	 * @return boolean
 	 */
 	public boolean getExpected(String chr,String output,int resolution){
 		int exitValue=1;
 		Runtime runtime = Runtime.getRuntime();
 		String expected = output.replaceAll(".txt", "_expected.txt");
 		String cmd = "java"+" -jar "+this._juiceBoxTools+" dump expected "+this._normalisation+" "+this._hicFile+" "+chr+" BP "+resolution+" "+expected;
-		System.out.println(cmd);
+		//System.out.println(cmd);
 		this._log = this._log+"\n"+expected+"\t"+cmd;
 		Process process;
 		try {
@@ -176,9 +164,10 @@ public class DumpData {
 	 * 
 	 * @param chr: String name of the chromosme
 	 * @param output: path to the output
-	 * @return 
-	 * @throws IOException
-	 * @throws InterruptedException
+	 * @param resolution resolution of interest
+	 * @return boolean
+	 * @throws IOException exception
+	 * @throws InterruptedException exception
 	 */
 	public boolean getNormVector(String chr,String output,int resolution) throws IOException, InterruptedException{
 		int exitValue=1;
@@ -190,12 +179,12 @@ public class DumpData {
 		new ReturnFlux(process.getErrorStream()).start();
 		process.getOutputStream();
 		exitValue=process.waitFor();
-		if(_logError!="" &&  _logError.contains("Exception") == false){
+		if(_logError!="" && !_logError.contains("Exception")){
 			System.out.println("VC vector not find, SIP is using "+this._normalisation+" for "+ chr+"\n"+_logError);
 			runtime = Runtime.getRuntime();
 			_logError ="";
 			cmd =  "java"+" -jar "+this._juiceBoxTools+" dump norm "+this._normalisation+" "+this._hicFile+" "+chr+" BP "+resolution+" "+output;
-			System.out.println(cmd);
+			//System.out.println(cmd);
 			process = runtime.exec(cmd);
 
 			new ReturnFlux(process.getInputStream()).start();
@@ -232,7 +221,7 @@ public class DumpData {
 		 * @param flux
 		 *  flux to redirect
 		 */
-		public ReturnFlux(InputStream flux){this._flux = flux; }
+		private ReturnFlux(InputStream flux){this._flux = flux; }
 		
 		/**
 		 * 
@@ -241,9 +230,9 @@ public class DumpData {
 			try {    
 				InputStreamReader reader = new InputStreamReader(this._flux);
 				BufferedReader br = new BufferedReader(reader);
-				String line=null;
+				String line;
 				while ( (line = br.readLine()) != null) {
-					if(line.contains("WARN")== false && line.contains("INFO")== false) _logError = _logError+line+"\n";
+					if(!line.contains("WARN") && !line.contains("INFO")) _logError = _logError+line+"\n";
 				}
 			}
 			catch (IOException ioe){

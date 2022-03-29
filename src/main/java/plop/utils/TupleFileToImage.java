@@ -1,4 +1,4 @@
-package plop.process;
+package plop.utils;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -23,17 +23,13 @@ public class TupleFileToImage {
 	/** Image results */
 	private ImagePlus _imgNorm = new ImagePlus();
 	/** Path of the tuple file*/
-	private String _file = "";
+	private String _file;
 	/** Size of the matrix*/
-	private int _size = 0 ;
+	private int _size;
 	/**	 Resolution of the image in base*/
-	private int _resolution = 0 ;
-	/** Step to plop.process the whole chromosme*/
+	private int _resolution;
+	/** Step to java.plop.process the whole chromosme*/
 	private int _step ;
-	/** Image value average*/
-	private float _avg = 0;
-	/** Image standard deviation */
-	private float _std = 0;
 	/** number of pixe == 0 */
 	private int _noZeroPixel = 0;
 	
@@ -53,9 +49,8 @@ public class TupleFileToImage {
 	
 	
 	/**
-	 * Method to make the image with an input tuple file return the image results
-	 *  
-	 * @return ImagePlus results
+	 * Method to make the image with an input tuple file from intra chromosomal java.plop.process
+	 *
 	 */
 	public void readTupleFile(){
 		BufferedReader br;
@@ -119,18 +114,118 @@ public class TupleFileToImage {
 				}
 			}
 		}
-		_avg = sum/_noZeroPixel;
-		_std = std(_avg,img);
+		/** Image value average*/
+		float _avg = sum / _noZeroPixel;
+		/** Image standard deviation */
+		float _std = std(_avg, img);
 		for(int i = 0; i < ip.getWidth(); ++i){
 			for(int j = 0; j < ip.getWidth(); ++j){
 				float a = ip.getf(i, j);
-				if (Math.abs(j-i) <= 2 && a >= _avg+_std*2)
-					ip.setf(i,j,_avg);
+				if (Math.abs(j-i) <= 2 && a >= _avg + _std *2)
+					ip.setf(i,j, _avg);
 			}
 		}
 		img.setProcessor(ip);
 	}
-	
+
+	/**
+	 * Method to make the image with an input tuple file from inter chromosomal java.plop.process
+	 * @return ImagePlus
+	 */
+	public ImagePlus readTupleFileInter(){
+		ImagePlus img = new ImagePlus();
+		BufferedReader br;
+
+		String[] tfile = _file.split("_");
+		//0	1	2	3	4	5
+		//4_0_191154275_6_0_171115066
+		int size = tfile.length;
+
+		int numImageX = Integer.parseInt(tfile[size-5])/(_size*_resolution);
+		int numImageY = Integer.parseInt(tfile[size-2])/(_size*_resolution);
+		int x = (((Integer.parseInt(tfile[size-4])-Integer.parseInt(tfile[size-5])))/_resolution)+1;
+		tfile[size-1] = tfile[size-1].replace(".txt","");
+		int y = (((Integer.parseInt(tfile[size-1])-Integer.parseInt(tfile[size-2])))/_resolution)+1;
+		System.out.println(_file+" "+x+" "+y);
+		FloatProcessor pRaw = new FloatProcessor(x, y);
+		try {
+			pRaw.abs();
+			br = new BufferedReader(new FileReader(_file));
+			StringBuilder sb = new StringBuilder();
+			String line = br.readLine();
+			while (line != null){
+				sb.append(line);
+				String[] parts = line.split("\\t");
+				float raw = 0;
+
+				if(!(parts[2].equals("NAN"))){
+					raw =Float.parseFloat(parts[2]);
+					if (raw < 0) raw = 0;
+				}
+
+				int correctionX = numImageX*_size*_resolution;
+				int correctionY = numImageY*_size*_resolution;
+				int i = (Integer.parseInt(parts[0]) - correctionX)/_resolution;
+				int j = (Integer.parseInt(parts[1]) - correctionY)/_resolution;
+				if(i < x && j< y){
+					pRaw.setf(i, j, raw);
+				}
+				sb.append(System.lineSeparator());
+				line = br.readLine();
+			}
+			br.close();
+			img.setProcessor(pRaw);
+		} catch (IOException e) { e.printStackTrace();}
+		catch(NumberFormatException ex){
+			img = readTupleFileInterCool();
+		}
+
+		return img;
+	}
+
+	/**
+	 * Method to make the image with an input tuple file from inter chromosomal java.plop.process
+	 * @return ImagePlus
+	 */
+	public ImagePlus readTupleFileInterCool(){
+		ImagePlus img = new ImagePlus();
+		BufferedReader br;
+		FloatProcessor pRaw = new FloatProcessor(_size, _size);
+		String[] tfile = _file.split("_");
+		//chr3	150000000	150100000	chr4	150000000	150100000	2	1.31032e-05
+		int numImageX = Integer.parseInt(tfile[tfile.length-5])/(_size*_resolution);
+		int numImageY = Integer.parseInt(tfile[tfile.length-2])/(_size*_resolution);
+		try {
+			pRaw.abs();
+			br = new BufferedReader(new FileReader(_file));
+			StringBuilder sb = new StringBuilder();
+			String line = br.readLine();
+			while (line != null){
+				sb.append(line);
+				String[] parts = line.split("\\t");
+				float raw = 0;
+
+				if(!(parts[2].equals("NAN"))){
+					raw =Float.parseFloat(parts[7])*1000000;
+					if (raw < 0) raw = 0;
+				}
+
+				int correctionX = numImageX*_size*_resolution;
+				int correctionY = numImageY*_size*_resolution;
+				int i = (Integer.parseInt(parts[1]) - correctionX)/_resolution;
+				int j = (Integer.parseInt(parts[4]) - correctionY)/_resolution;
+				if(i < _size && j< _size){
+					pRaw.setf(i, j, raw);
+				}
+				sb.append(System.lineSeparator());
+				line = br.readLine();
+			}
+			br.close();
+			img.setProcessor(pRaw);
+		} catch (IOException e) { e.printStackTrace();}
+		return img;
+	}
+
 	/**
 	 * Compute the standard deviation of the pixel non zero values of m_img 
 	 * @param mean average value in m_img
@@ -169,15 +264,5 @@ public class TupleFileToImage {
 	 * @return ImagePlus normalized image
 	 */
 	public ImagePlus getNormImage(){return this._imgNorm;}
-	
-	/**
-	 * setter for the raw Image		
-	 * @param img ImagePlus
-	 */
-	public void setRawImage(ImagePlus img){this._img = img;}
-	/**
-	 * setter of the normalized image
-	 * @param img ImagePLus
-	 */
-	public void setNormImage(ImagePlus img){this._imgNorm = img;}
+
 }

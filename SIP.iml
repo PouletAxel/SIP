@@ -19,7 +19,12 @@
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="inheritedJdk" />
     <orderEntry type="library" name="Maven: sc.fiji:Auto_Threshold:1.17.2" level="project" />
+    <orderEntry type="library" name="Maven: org.scijava:scijava-common:2.77.0" level="project" />
+    <orderEntry type="library" name="Maven: org.scijava:parsington:1.0.3" level="project" />
+    <orderEntry type="library" name="Maven: org.bushe:eventbus:1.4" level="project" />
     <orderEntry type="library" name="Maven: net.imagej:ij:1.51n" level="project" />
     <orderEntry type="library" name="Maven: fr.inra.ijpb:MorphoLibJ_:1.4.0" level="project" />
+    <orderEntry type="library" name="Maven: gov.nist.math:jama:1.0.3" level="project" />
+    <orderEntry type="library" name="Maven: commons-cli:commons-cli:1.4" level="project" />
   </component>
 </module>

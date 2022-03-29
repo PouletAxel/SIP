@@ -1,4 +1,4 @@
-package plop.utils;
+package plop.loops;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -6,18 +6,18 @@ import java.util.Iterator;
 import java.util.Set;
 
 /**
- * Method to filter the loops close to white strip or loops which don't reach the different threshold filter
+ * Method to filter the java.plop.loops close to white strip or java.plop.loops which don't reach the different threshold filter
  * @author axel poulet
  *
  */
 public class FilterLoops {
-	/** loops resoluiton*/
+	/** java.plop.loops resoluiton*/
 	private int _resolution;
 	
 	
 	/**
 	 * Constructor
-	 * @param resolution
+	 * @param resolution loop resolution
 	 */
 	public FilterLoops(int resolution){
 		this._resolution = resolution;
@@ -25,7 +25,7 @@ public class FilterLoops {
 	
 	
 	/**
-	 * Remove loops which doesn't respect the rule
+	 * Remove java.plop.loops which doesn't respect the rule
 	 * 
 	 * @param input loop collection before correction
 	 * @return loop collection after correction
@@ -53,8 +53,8 @@ public class FilterLoops {
 	/**
 	 * Removed loop close to white  strip
 	 * 
-	 * @param hLoop loop collection before correction of the loops
-	 * @return loop collection sfter correction of the loops
+	 * @param hLoop loop collection before correction of the java.plop.loops
+	 * @return loop collection sfter correction of the java.plop.loops
 	 */
 	public HashMap<String,Loop> removedLoopCloseToWhiteStrip(HashMap<String,Loop> hLoop, HashMap<Integer,String> normVector){
 		//System.out.println("plop "+hLoop.size()+" debut Filter");
@@ -119,8 +119,8 @@ public class FilterLoops {
 	/**
 	 * Removed loop close to white  strip
 	 * 
-	 * @param hLoop loop collection before correction of the loops
-	 * @return loop collection sfter correction of the loops
+	 * @param hLoop loop collection before correction of the java.plop.loops
+	 * @return loop collection sfter correction of the java.plop.loops
 	 */
 	public HashMap<String,Loop> removedLoopCloseToWhiteStrip(HashMap<String,Loop> hLoop){
 		//System.out.println("plop "+hLoop.size()+" debut Filter");
@@ -176,8 +176,8 @@ public class FilterLoops {
 		return hLoop;
 	}
 	/**
-	 * Removed loops close to biased HiC signal
-	 * @param loop Loop to plop.test
+	 * Removed java.plop.loops close to biased HiC signal
+	 * @param loop Loop to java.plop.test
 	 * @return boolean true if loop have to be removed else false
 	 */
 	private boolean removedVectoNorm(Loop loop, HashMap<Integer,String> normVector){
@@ -212,8 +212,8 @@ public class FilterLoops {
 
 	
 	/**
-	 * Remove overlapping loops
-	 * @param loop loop to plop.test
+	 * Remove overlapping java.plop.loops
+	 * @param loop loop to java.plop.test
 	 * @param input loop collection
 	 * @param removed arrayList of loop
 	 * @return removed arrayList of loop 

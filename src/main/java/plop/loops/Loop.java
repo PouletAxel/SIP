@@ -1,17 +1,19 @@
-package plop.utils;
+package plop.loops;
 
 import java.util.ArrayList;
 
 /**
- * Class making loops object with its coordinate, value, and parameters
+ * Class making java.plop.loops object with its coordinate, value, and parameters
  * 
  * @author axel poulet
  *
  */
 public class Loop {
 	/** chromosome name.*/
-	private String _chr;
-	/** loops name: chr	start end value.*/
+	private String _chr ="";
+	/** chromosome name.*/
+	private String _chr2 ="";
+	/** java.plop.loops name: chr	start end value.*/
 	private String _name;
 	/** x coordinate.*/
 	private int _x;
@@ -23,27 +25,31 @@ public class Loop {
 	private int _matrixSize;
 	/** diagonal size.*/
 	private int _diagSize;
+	/** nb of zero n = 28.*/
+	private int _nbZero;
 	/** x coordinate+resolution.*/
 	private int _xEnd;
 	/** y coordinate+resolution.*/
 	private int _yEnd;
-	/** value of the avg of the diff  between loops value and the neighbourhood 8.*/
+	/** value of the avg of the diff  between java.plop.loops value and the neighbourhood 8.*/
 	private float _neigbhoord1 = -1;
-	/** value of the peak analysis value inspirate from Rao&Huntley et al., 2014, but the score is compute foreach loop and not for a set of loops.*/
+	/** value of the peak analysis value inspirate from Rao&Huntley et al., 2014, but the score is compute foreach loop and not for a set of java.plop.loops.*/
 	private float _paScoreAvg = -1;
 	private float _paScoreAvgdev = -1;
-	/** value of the peak analysis value inspirate from Rao&Huntley et al., 2014, but the score is compute foreach loop and not for a set of loops.*/
+	/** value of the peak analysis value inspirate from Rao&Huntley et al., 2014, but the score is compute foreach loop and not for a set of java.plop.loops.*/
 	private float _paScoreMed = -1;
-	/** value of the avg of the differential between loops value and the neighbourhood 24.*/
+	/** value of the avg of the differential between java.plop.loops value and the neighbourhood 24.*/
 	private float _neigbhoord2 = -1;
-	/**  value of the peak analysis value inspirate from Rao&Huntley et al., 2014, but the score is compute foreach loop and not for a set of loops.*/
+	/**  value of the peak analysis value inspirate from Rao&Huntley et al., 2014, but the score is compute foreach loop and not for a set of java.plop.loops.*/
 	private float _regPaScoreMed = -1;
-	/**  value of the peak analysis value inspirate from Rao&Huntley et al., 2014, but the score is compute foreach loop and not for a set of loops.*/
+	/**  value of the peak analysis value inspirate from Rao&Huntley et al., 2014, but the score is compute foreach loop and not for a set of java.plop.loops.*/
 	private float _regPaScoreAvg = -1;
 	/** Average value of the neighbourhood 9.*/
 	private float _avg = -1;
 	/** Value of the loop*/
 	private float _peakValue = -1;
+	/** Value of the loop*/
+	private float _peakValueDiff = -1;
 	/** Standard deviation value of the neighbourhood 9.*/
 	private float _std = -1;
 	/** FDR score 1*/
@@ -76,7 +82,7 @@ public class Loop {
 	//chromosome1	x1	x2	chromosome2	y1	y2	color	APScoreAvg	ProbabilityofEnrichment	RegAPScoreAvg	Avg_diffMaxNeihgboor_1	Avg_diffMaxNeihgboor_2	avg	std	value
 	
 	public Loop(String loop){
-		String[] tLoop = loop.split("\t");
+		String[] tLoop = loop.toString().split("\t");
 		this._chr = tLoop[0];
 		this._name = loop;
 		this._x = Integer.parseInt(tLoop[1]);
@@ -85,14 +91,14 @@ public class Loop {
 		this._yEnd= Integer.parseInt(tLoop[5]); 
 	}
 
-	/**
-	 *  Loop constructor
+	 /**
+	 * Loop constructor
 	 * @param name String name of the loop
 	 * @param x int x coordinate
 	 * @param y int y coordinate
-	 * @param chr String name of the chromosome
-	 * @param value float
-	 * @param resolution int
+	 * @param chr String Chromosme name
+	 * @param value loop value
+	 * @param resolution loop resolution
 	 */
 	public Loop(String name, int x, int y, String chr, float value, int resolution){
 		this.setName(name);
@@ -122,7 +128,29 @@ public class Loop {
 		this._std = std;
 		this._peakValue = value;
 	}
-	
+
+	/**
+	 * Loop constructor
+	 * @param name String name of the loop
+	 * @param x int x coordinate
+	 * @param y int y coordinate
+	 * @param chr String Chromosome name
+	 * @param avg float Average
+	 * @param std float Standard deviation
+	 * @param value float
+	 */
+	public Loop(String name, int x, int y, String chr, String chr2, float avg, float std, float value){
+		this.setName(name);
+		this.setX(x);
+		this.setY(y);
+		this._chr = chr;
+		this._chr2 = chr2;
+		this._avg = avg;
+		this._std = std;
+		this._peakValue = value;
+	}
+
+
 	/**
 	 * Getter of the name loop
 	 * @return String name of the loop
@@ -134,26 +162,13 @@ public class Loop {
 	 * @param name String
 	 */
 	public void setName(String name){ this._name = name;}
+	
 
 	/**
 	 * Getter of the x coordinate
 	 * @return int x coordinate
 	 */
 	public int getX(){	return this._x;}
-
-
-	/**
-	 *
-	 * @return loop String
-	 */
-	public String loopToString(){
-		String loop = _chr+"\t"+_name+"\t"+_x+"\t"+_y+"\t"+ _resolution+"\t"+_matrixSize+"\t"+ _diagSize+"\t"+
-				_xEnd+"\t"+ _yEnd+"\t"+_neigbhoord1+"\t"+_paScoreAvg+"\t"+_paScoreAvgdev+"\t"+_paScoreMed
-				+"\t"+_neigbhoord2+"\t"+_regPaScoreMed+"\t"+_regPaScoreAvg+"\t"+_avg+"\t"+_peakValue
-				+"\t"+_std+"\t"+_paScoreFDR+"\t"+_regPaScoreFDR+"\t"+_paScoreFDR2+"\t"+_regPaScoreFDR2+"\t"
-				+_paScoreFDR3+"\t"+_regPaScoreFDR3;
-		return loop;
-	}
 
 	/**
 	 * Setter of the loop resolution
@@ -203,7 +218,7 @@ public class Loop {
 	public int getY(){ return this._y; }
 	
 	/**
-	 * Setter of the y loops coordinate's
+	 * Setter of the y java.plop.loops coordinate's
 	 * @param y int loop coordinate's 
 	 */
 	public void setY(int y){ this._y = y; }
@@ -213,6 +228,11 @@ public class Loop {
 	 * @return double loop value
 	 */
 	public float getValue(){ return this._peakValue; }
+	/**
+	 * Getter of the loop(x,y) value
+	 * @return double loop value
+	 */
+	public float getValueDiff(){ return this._peakValueDiff; }
 	/**
 	 * Getter of the n 8 average value 
 	 * @return double average of n 8 average
@@ -255,10 +275,22 @@ public class Loop {
 	 * @return double PA score
 	 */
 	public float getPaScoreAvg(){	return this._paScoreAvg; }
+
+	/**
+	 *
+	 * @return
+	 */
 	public float getPaScoreAvgdev(){	return this._paScoreAvgdev; }
 	/**
+	 *
+	 * @return
+	 */
+	public void setValueDiff(float diff){ this._peakValueDiff = diff; }
+
+	/**
 	 *	Setter  of the peak analysis loop score
-	 * @param paScore double PA score
+	 *
+	 * @param paScore
 	 */
 	public void setPaScoreAvg(float paScore){ this._paScoreAvg = paScore; }
 
@@ -276,6 +308,7 @@ public class Loop {
 	
 	/**
 	 *	Setter  of the peak analysis loop score
+	 *
 	 * @param paScore
 	 */
 	public void setPaScoreMed(float paScore){ this._paScoreMed = paScore; }
@@ -299,7 +332,7 @@ public class Loop {
 	 * @return ArrayList of integer
 	 */
 	public ArrayList<Integer> getCoordinates(){
-		ArrayList<Integer> listCoord = new ArrayList<Integer>();
+		ArrayList<Integer> listCoord = new ArrayList<>();
 		listCoord.add(this._x);
 		listCoord.add(this._xEnd);
 		listCoord.add(this._y);
@@ -307,26 +340,16 @@ public class Loop {
 		return listCoord;
 	}
 	
-	/**
-	 * 
-	 * @return
-	 */
-	public float getRegionalPaScoreMed(){ return this._regPaScoreMed; }
 
-	/**
-	 * 
-	 * @param m_RpaScore
-	 */
-	public void setRegionalPaScoreMed(float m_RpaScore){ this._regPaScoreMed = m_RpaScore; }
 
 	/**
 	 * Getter of regional peak analysis score 
 	 * @return doubl reginal PA score
 	 */
 	public float getRegionalPaScoreAvg(){ return this._regPaScoreAvg; }
-	
+
 	/**
-	 * Setter of regional PA score
+	 *
 	 * @param rpaScore
 	 */
 	public void setRegionalPaScoreAvg(float rpaScore){ this._regPaScoreAvg = rpaScore; }
@@ -338,10 +361,11 @@ public class Loop {
 	public String getChr(){ return this._chr; }
 
 	/**
-	 * Setter of the avg of th n 8 
-	 * @param avg double 
+	 * Getter of the name of the chromosome
+	 * @return String chr
 	 */
-	public void setAvg(float avg) { this._avg=avg; }
+	public String getChr2(){ return this._chr2; }
+
 
 	/**
 	 * 
@@ -404,5 +428,17 @@ public class Loop {
 	 * @param paScoreFDR3
 	 */
 	public void setPaScoreAvgFDR3(float paScoreFDR3){ this._paScoreFDR3 = paScoreFDR3; }
+	/**
+	 *
+	 * @param nbOfZero
+	 */
+	public void setNbOfZero(int nbOfZero){ this._nbZero = nbOfZero; }
+
+	/**
+	 *	getter of the nb of zero
+	 *
+	 * @return int the number of zero around the loop
+	 */
+	public int getNbOfZero(){ return this._nbZero; }
 	
 }

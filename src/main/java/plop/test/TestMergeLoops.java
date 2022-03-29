@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import plop.utils.Loop;
+import plop.loops.Loop;
 
 public class TestMergeLoops {
 

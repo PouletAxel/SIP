@@ -37,5 +37,5 @@ public class Progress extends JFrame{
 	 * 
 	 * @param args
 	 */
-	public static void main(String[] args){ new Progress("plop/test", 22);}
+	public static void main(String[] args){ new Progress("java/plop/test", 22);}
 }

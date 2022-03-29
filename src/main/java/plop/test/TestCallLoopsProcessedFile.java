@@ -1,15 +1,14 @@
 package plop.test;
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
 
-import plop.process.MultiResProcess;
-import plop.utils.SIPObject;
+import plop.sip.SIPIntra;
+import plop.utils.MultiResProcess;
+
+import java.io.IOException;
+
+
 
 /**
- * Test of calling loops on processed files
+ * Test of calling java.plop.loops on processed files
  * 
  * @author Axel Poulet
  *
@@ -23,27 +22,28 @@ public class TestCallLoopsProcessedFile {
 	 * @throws InterruptedException 
 	 */
 	public static void main(String[] args) throws IOException, InterruptedException {
-		String input = "/home/plop/Desktop/GM12878TestBis";
-		String output= "/home/plop/Desktop/testChr";
-		int matrixSize = 2000;
-		int resolution = 5000;
-		int diagSize = 5;
+		String input = "/home/plop/Desktop/Cool";
+		String output= "/home/plop/Desktop/Bis";
+		int matrixSize = 500;
+		int resolution = 25000;
+		int diagSize = 2;
 		double gauss = 1.5;
 		int thresholdMax = 2800;// 2800;//1800
-		int nbZero = 6;//6;
+		int nbZero = 8;//6;
 		double min = 2;//1.5;
 		double max = 2;//1.5;
 		double saturatedPixel = 0.01;//0.005;
 		//boolean keepTif = false;
-		ArrayList<Integer> factor = new ArrayList<Integer>();
-		factor.add(1);
+
+		int factor = 1;
 		//factor.add(2);
 		//factor.add(5);
 		//SIP_HiC_v1.3.6.jar hic SIP/Kc_allcombined.hic SIP/armsizes.txt SIP/Droso/ ../Tools/juicer_tools_1.13.02.jar 
-		String chrSizeFile = "/home/plop/Desktop/w_hg19.sizes";
-		HashMap<String,Integer> chrsize = readChrSizeFile(chrSizeFile);
-		SIPObject sip = new SIPObject(input,output, chrsize, gauss, min, max, resolution, saturatedPixel, thresholdMax, diagSize, matrixSize, nbZero,factor,0.01,true,false);
+		String chrSizeFile = "/home/plop/Desktop/SIP/hg38_small.size";
+		SIPIntra sip = new SIPIntra(input,output, chrSizeFile, gauss, min, max, resolution, saturatedPixel,
+				thresholdMax, diagSize, matrixSize, nbZero,factor,0.01,false,false,2);
 		sip.setIsGui(false);
+		sip.setIsProcessed(true);
 		int cpu = 2;
 		System.out.println("Processed Data\n");
 		System.out.println("input "+input+"\n"
@@ -58,37 +58,13 @@ public class TestCallLoopsProcessedFile {
 			+ "threshold "+thresholdMax+"\n"
 			+ "isProcessed "+sip.isProcessed()+"\n");		
 		System.out.println("ahhhhhhhhhhhhh\n");
-		MultiResProcess multi = new MultiResProcess(sip, cpu, false,chrSizeFile);
+		MultiResProcess multi = new MultiResProcess(sip, chrSizeFile);
 		multi.run();
 		//ProcessDetectLoops processDetectloops = new ProcessDetectLoops();
-		//processDetectloops.go(sip, 2,false);
-		//Testpb plop = new Testpb(sip, true);
+		//processDetectloops.go(java.plop.sip, 2,false);
+		//Testpb plop = new Testpb(java.plop.sip, true);
 		//plop.run(2);
 		System.out.println("End");
 	}
 			
-	/**
-	 * 
-	 * @param chrSizeFile
-	 * @return 
-	 * @throws IOException
-	 */
-	private static HashMap<String, Integer> readChrSizeFile( String chrSizeFile) throws IOException{
-		HashMap<String,Integer> chrSize =  new HashMap<String,Integer>();
-		BufferedReader br = new BufferedReader(new FileReader(chrSizeFile));
-		StringBuilder sb = new StringBuilder();
-		String line = br.readLine();
-		while (line != null){
-			sb.append(line);
-			String[] parts = line.split("\\t");				
-			String chr = parts[0]; 
-			int size = Integer.parseInt(parts[1]);
-			
-			chrSize.put(chr, size);
-			sb.append(System.lineSeparator());
-			line = br.readLine();
-		}
-		br.close();
-		return  chrSize;
-	} 
-}	
+}
