@@ -15,7 +15,7 @@
 		<dependency>
 			<groupId>net.imagej</groupId>
 				<artifactId>ij</artifactId>
-				<version>1.51n</version>
+				<version>1.53i</version>
 		</dependency>
 		<dependency>
 			<groupId>fr.inra.ijpb</groupId>

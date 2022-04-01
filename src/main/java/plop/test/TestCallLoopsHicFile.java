@@ -29,20 +29,20 @@ public class TestCallLoopsHicFile{
 	
 	@SuppressWarnings("unused")
 	public static void main(String[] args) throws IOException, InterruptedException {
-		String output= "/home/plop/Desktop/TestErics";
+		String output= "/home/plop/Desktop/testSIPBis";
 		//output= "/home/plop/Bureau/SIPpaper/chr1/testNewNew";
 		
-		String input = "/home/plop/Desktop/SIP/Erics/MEGA_K562_WT_PMA_inter_30.hic";
+		String input = "/home/plop/Desktop/4DNFI1UEG1HD.hic\n";
 		//input =  "/home/plop/Bureau/SIPpaper/hicFileIer_0.hic"; //"https://hicfiles.s3.amazonaws.com/hiseq/gm12878/in-situ/combined_30.hic"; //";
 		//String output= "/home/plop/Bureau/DataSetImageHiC/Hichip_H3k4me1";
 		//String input= "/home/plop/Bureau/DataSetImageHiC/Hichip_H3k4me1/NT_H3K4me1_2Reps.cis18797450.allValidPairs.hic";
 		//HumanGenomeHg19/chr2.size");
 		//readChrSizeFile("/home/plop/Documents/Genome/HumanGenomeHg19/hg19_withoutChr.sizes");
 		//chrsize = readChrSizeFile("/home/plop/Documents/Genome/mammals/HumanGenomeHg19/chr1.size");
-		String fileChr = "/home/plop/Desktop/SIP/Erics/hg19_chromSizes.txt";
+		String fileChr = "/home/plop/Documents/Genome/mammals/HumanGenomeHg19/chr1.size";
 		String juiceBoxTools = "/home/plop/Tools/juicer_tools_1.19.02.jar";
 		int matrixSize = 2000;
-		int resolution = 10000;
+		int resolution = 5000;
 		int diagSize = 5;
 		double gauss = 1.5;
 		double min = 2;
@@ -56,7 +56,7 @@ public class TestCallLoopsHicFile{
 		int factor = 1;
 		//factor.add(2);
 		//factor.add(5);
-		boolean keepTif = true;
+		boolean keepTif = false;
 		int cpu = 1;
 		
 		System.out.println("input "+input+"\n"
