@@ -44,8 +44,6 @@ public class Cool {
     /** */
     private String _coolTool;
     /** */
-    private String _interOrIntra;
-    /** */
     private ParametersCheck _parameterCheck;
     /** */
     private  String _cooler;
@@ -97,8 +95,6 @@ public class Cool {
 
         if(_isGui) {
             _cooler = this._guiAnalysis.getCooler();
-            if(this._guiAnalysis.isInter())  _interOrIntra = "inter";
-            else  _interOrIntra = "intra";
             _chrSizeFile = this._guiAnalysis.getChrSizeFile();
             _coolTool = this._guiAnalysis.getCooltools();
             _nbZero = this._guiAnalysis.getNbZero();
@@ -109,7 +105,6 @@ public class Cool {
 
             _cooler = _cmd.getOptionValue("cooler");
             _coolTool = _cmd.getOptionValue("cooltools");
-            _interOrIntra = _cmd.getOptionValue("lt");
             _chrSizeFile = _cmd.getOptionValue("chrSize");
             /* common optional parameters */
             if (_cmd.hasOption("nbZero")) _nbZero = Integer.parseInt(_cmd.getOptionValue("nbZero"));
@@ -120,12 +115,11 @@ public class Cool {
         if(!file.exists()) file.mkdir();
         BufferedWriter writer = new BufferedWriter(new FileWriter(new File(_log)));
 
-        _parameterCheck = new ParametersCheck(_input, _chrSizeFile, _interOrIntra, writer,false);
+        _parameterCheck = new ParametersCheck(_input, _chrSizeFile,  writer,false);
 
         _parameterCheck.testCoolOption(_coolTool, _cooler);
 
-        if(_interOrIntra.equals("intra"))
-            allParam = runIntra();
+         allParam = runIntra();
 
 
 
@@ -156,7 +150,6 @@ public class Cool {
                 "output: "+_output+"\n"+
                 "cooler: "+ _cooler +"\n"+
                 "cooltools: "+ _coolTool +"\n" +
-                "inter or intra chromosomal: "+ _interOrIntra +"\n" +
                 "gauss: "+this._sipIntra.getGauss()+"\n"+
                 "min: "+this._sipIntra.getMin()+"\n"+
                 "max: "+this._sipIntra.getMax()+"\n"+

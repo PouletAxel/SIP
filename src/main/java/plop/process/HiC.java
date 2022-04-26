@@ -41,8 +41,6 @@ public class HiC {
     /** */
     private String _juicerTool;
     /** */
-    private String _interOrIntra;
-    /** */
     private ParametersCheck _parameterCheck;
     /** */
     private String _juicerNorm = "KR";
@@ -87,8 +85,6 @@ public class HiC {
         String allParam ="";
         if(_isGui) {
             _juicerTool = this._guiAnalysis.getJuicerTool();
-            if(this._guiAnalysis.isInter())  _interOrIntra = "inter";
-            else  _interOrIntra = "intra";
             _chrSizeFile = this._guiAnalysis.getChrSizeFile();
             if(this._guiAnalysis.isNONE()) _juicerNorm = "NONE";
             else if (this._guiAnalysis.isVC()) _juicerNorm = "VC";
@@ -98,8 +94,6 @@ public class HiC {
         }else {
             /* common required parameters*/
             _juicerTool = _cmd.getOptionValue("juicerTool");
-            _interOrIntra = _cmd.getOptionValue("lt");
-            System.out.println(_interOrIntra);
             _chrSizeFile = _cmd.getOptionValue("chrSize");
             /* common optional parameters */
             if (_cmd.hasOption("norm")) _juicerNorm = _cmd.getOptionValue("norm");
@@ -112,12 +106,11 @@ public class HiC {
 
         BufferedWriter writer = new BufferedWriter(new FileWriter(new File(_log)));
 
-        _parameterCheck = new ParametersCheck(_input, _chrSizeFile, _interOrIntra, writer,false);
+        _parameterCheck = new ParametersCheck(_input, _chrSizeFile,  writer,false);
         _parameterCheck.testHiCOption(_juicerTool, _juicerNorm);
 
 
-        if(_interOrIntra.equals("intra"))
-            allParam = runIntra();
+         allParam = runIntra();
 
 
         writer.write(allParam);
@@ -154,7 +147,7 @@ public class HiC {
 
        // System.out.println(allParam);
         return  "SIPHiC hic: \n" +    "input: "+_input+"\n" + "output: "+_output+"\n"+  "juiceBox: "+ _juicerTool +"\n"+
-                "norm: "+ _juicerNorm +"\n" + "inter or intra chromosomal: "+ _interOrIntra +"\n" + "gauss: "+this._sipIntra.getGauss()+"\n"+
+                "norm: "+ _juicerNorm +"\n"  + "gauss: "+this._sipIntra.getGauss()+"\n"+
                 "min: "+this._sipIntra.getMin()+"\n"+ "max: "+this._sipIntra.getMax()+"\n"+ "matrix size: "+this._sipIntra.getMatrixSize()+"\n"+
                 "diagonal size: "+this._sipIntra.getDiagonalSize()+"\n"+ "resolution: "+this._sipIntra.getResolution()+"\n"+ "saturated pixel: "+this._sipIntra.getSaturatedPixel()+"\n"+
                 "threshold: "+this._sipIntra.getThresholdMaxima()+"\n"+ "number of zero: "+this._sipIntra.getNbZero()+"\n"+ "factor: "+ _sipIntra.getFactor() +"\n"+

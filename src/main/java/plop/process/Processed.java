@@ -36,8 +36,6 @@ public class Processed {
     /** */
     private GuiAnalysis _guiAnalysis;
     /** */
-    private String _interOrIntra;
-    /** */
     private ParametersCheck _parameterCheck;
      /** */
     String _log;
@@ -81,14 +79,11 @@ public class Processed {
         String allParam ="";
 
         if(_isGui) {
-            if(this._guiAnalysis.isInter())  _interOrIntra = "inter";
-            else  _interOrIntra = "intra";
             _chrSizeFile = this._guiAnalysis.getChrSizeFile();
             _delImages = this._guiAnalysis.isDeletTif();
             _cpu = this._guiAnalysis.getNbCpu();
         }else {
             /* common required parameters*/
-            _interOrIntra = _cmd.getOptionValue("lt");
             _chrSizeFile = _cmd.getOptionValue("chrSize");
             /* common optional parameters */
             if (_cmd.hasOption("keepImage"))_delImages = false;
@@ -98,10 +93,8 @@ public class Processed {
         if(!file.exists()) file.mkdir();
         BufferedWriter writer = new BufferedWriter(new FileWriter(new File(_log)));
 
-        _parameterCheck = new ParametersCheck(_input, _chrSizeFile, _interOrIntra, writer,true);
-
-        if(_interOrIntra.equals("intra"))
-            allParam = runIntra();
+        _parameterCheck = new ParametersCheck(_input, _chrSizeFile, writer,true);
+         allParam = runIntra();
 
 
 
@@ -137,7 +130,7 @@ public class Processed {
         multi.run();
         System.out.println("###########End loop detection step\n");
         return "SIPHiC processed: \n" + "input: "+_input+"\n" +  "output: "+_output+"\n"+
-                "inter or intra chromosomal: "+ _interOrIntra +"\n" + "gauss: "+this._sipIntra.getGauss()+"\n"+
+                "gauss: "+this._sipIntra.getGauss()+"\n"+
                 "min: "+this._sipIntra.getMin()+"\n"+ "max: "+this._sipIntra.getMax()+"\n"+ "matrix size: "+this._sipIntra.getMatrixSize()+"\n"+
                 "diagonal size: "+this._sipIntra.getDiagonalSize()+"\n"+ "resolution: "+this._sipIntra.getResolution()+"\n"+
                 "saturated pixel: "+this._sipIntra.getSaturatedPixel()+"\n"+ "threshold: "+this._sipIntra.getThresholdMaxima()+"\n"+

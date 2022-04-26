@@ -99,6 +99,48 @@ public class SIPIntra extends SIPObject {
 	}
 
 	/**
+	 *
+	 * @param output
+	 * @param gauss
+	 * @param min
+	 * @param max
+	 * @param resolution
+	 * @param saturatedPixel
+	 * @param thresholdMax
+	 * @param diagonalSize
+	 * @param matrixSize
+	 * @param nbZero
+	 * @param factor
+	 * @param fdr
+	 * @param isDroso
+	 * @param delImage
+	 * @param cpu
+	 */
+	public SIPIntra(String output, double gauss, double min,
+					double max, int resolution, double saturatedPixel,
+					double thresholdMax, int diagonalSize, int matrixSize, int nbZero, int factor,
+					double fdr, boolean isDroso, boolean delImage, int cpu) {
+
+		super( output, gauss, resolution, thresholdMax, matrixSize, nbZero,  fdr, delImage, cpu);
+
+
+
+		this._min = min;
+		this._max = max;
+		this._saturatedPixel = saturatedPixel;
+		this._diagonalSize = diagonalSize;
+		this._step = matrixSize/2;
+		this._isDroso = isDroso;
+		this._factor = factor;
+		_listFactor.add(1);
+		if (_factor == 2)  _listFactor.add(2);
+		else if (_factor == 4) {
+			_listFactor.add(2);
+			_listFactor.add(5);
+		} else if(_factor == 3) _listFactor.add(5);
+	}
+
+	/**
 	 * SIPIntra constructor for processed SIP data
 	 *
 	 * @param input path file with the file created by the first step of SIP
@@ -137,8 +179,6 @@ public class SIPIntra extends SIPObject {
 			_listFactor.add(2);
 			_listFactor.add(5);
 		} else if(_factor == 3) _listFactor.add(5);
-
-
 	}
 	
 	
@@ -169,6 +209,7 @@ public class SIPIntra extends SIPObject {
 		else 
 			System.out.println("Filtering value at "+fdr+" FDR is "+FDRcutoff+" APscore and "+RFDRcutoff+" RegionalAPscore\n");
 		BufferedWriter writer;
+		System.out.println(pathFile);
 		if(first) writer = new BufferedWriter(new FileWriter(new File(pathFile), true));
 		else{
 			writer = new BufferedWriter(new FileWriter(new File(pathFile)));

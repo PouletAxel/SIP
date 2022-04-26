@@ -85,9 +85,9 @@ public class CLIHelper {
                 "java -jar SIPHiC-"+ _version +".jar cool -h or --help\n"+
                 "java -jar SIPHiC-"+ _version +".jar processed -h or --help \n" +
                 "\n\nCommand line g:\n" +
-                "\tjava -jar SIP_HiC.jar hic -i path/to/hicFile.hic -c path/to/chrSizeFile -o path/to/output/folder -j path/to/juicerTool.jar -lt intra [options]\n" +
-                "\tjava -jar SIP_HiC.jar cool -i path/to/hicFile.hic -c path/to/chrSizeFile -o path/to/output/folder -cooltools path/to/cooltools -cooler path/to/cooler -lt intra [options]\n" +
-                "\tjava -jar SIP_HiC.jar processed -i SIP path/to/folder/SIPProcessedData -c path/to/chrSizeFile  -o path/to/output/folder -lt intra [options]\n");
+                "\tjava -jar SIP_HiC.jar hic -i path/to/hicFile.hic -c path/to/chrSizeFile -o path/to/output/folder -j path/to/juicerTool.jar [options]\n" +
+                "\tjava -jar SIP_HiC.jar cool -i path/to/hicFile.hic -c path/to/chrSizeFile -o path/to/output/folder -cooltools path/to/cooltools -cooler path/to/cooler [options]\n" +
+                "\tjava -jar SIP_HiC.jar processed -i SIP path/to/folder/SIPProcessedData -c path/to/chrSizeFile  -o path/to/output/folder [options]\n");
         System.exit(1);
 
     }
@@ -103,9 +103,9 @@ public class CLIHelper {
                 "java -jar SIPHiC-"+ _version +".jar cool -h or --help\n"+
                 "java -jar SIPHiC-"+ _version +".jar processed -h or --help \n" +
                 "\n\nCommand line g:\n" +
-                "\tjava -jar SIP_HiC.jar hic -i path/to/hicFile.hic -c path/to/chrSizeFile -o path/to/output/folder -j path/to/juicerTool.jar -lt intra [options]\n" +
-                "\tjava -jar SIP_HiC.jar cool -i path/to/hicFile.hic -c path/to/chrSizeFile -o path/to/output/folder -cooltools path/to/cooltools -cooler path/to/cooler -lt intra [options]\n" +
-                "\tjava -jar SIP_HiC.jar processed -i SIP path/to/folder/SIPProcessedData -c path/to/chrSizeFile  -o path/to/output/folder -lt intra [options]\n" +
+                "\tjava -jar SIP_HiC.jar hic -i path/to/hicFile.hic -c path/to/chrSizeFile -o path/to/output/folder -j path/to/juicerTool.jar [options]\n" +
+                "\tjava -jar SIP_HiC.jar cool -i path/to/hicFile.hic -c path/to/chrSizeFile -o path/to/output/folder -cooltools path/to/cooltools -cooler path/to/cooler [options]\n" +
+                "\tjava -jar SIP_HiC.jar processed -i SIP path/to/folder/SIPProcessedData -c path/to/chrSizeFile  -o path/to/output/folder [options]\n" +
                 "\nAuthors:\n" +
                 "Axel Poulet\n" +
                 "Department of Molecular, Cellular  and Developmental Biology Yale University \n" +
@@ -136,7 +136,7 @@ public class CLIHelper {
      * @return
      */
     private String getCool() {
-        return "-i mcoolFile -c chrSizeFile -o Output -cooltools cooltoolsPath -cooler coolerPath -tl intra";
+        return "-i mcoolFile -c chrSizeFile -o Output -cooltools cooltoolsPath -cooler coolerPath";
     }
 
     /**
@@ -144,7 +144,7 @@ public class CLIHelper {
      * @return
      */
     private String getPocessed() {
-        return  "-i PathDirectoryWithProcessedData -c chrSizeFile --o Output -tl intra ";
+        return  "-i PathDirectoryWithProcessedData -c chrSizeFile --o Output ";
     }
 
 }

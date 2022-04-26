@@ -21,13 +21,16 @@ public class ParametersCheck {
 
     String _logError;
 
+
     /**
      *
      * @param input
      * @param chrSizeFile
-     * @param interOrIntra
+     * @param log
+     * @param processed
+     * @throws IOException
      */
-    public ParametersCheck(String input, String chrSizeFile, String interOrIntra, BufferedWriter log, boolean processed) throws IOException {
+    public ParametersCheck(String input, String chrSizeFile, BufferedWriter log, boolean processed) throws IOException {
         _logwWriter = log;
         File file = new File(input);
 
@@ -52,12 +55,6 @@ public class ParametersCheck {
             CLIHelper.getHelperInfos();
         }
 
-        if(!interOrIntra.equals("inter") && !interOrIntra.equals("intra")){
-            System.out.println("\nParameter value error !!!!\n-tl "+interOrIntra+", wrong value, choose inter or intra !!! \n\n");
-            _logwWriter.write("\nParameter value error !!!!\n-tl "+interOrIntra+", wrong value, choose inter or intra !!! \n\n");
-            _logwWriter.close();
-            CLIHelper.getHelperInfos();
-        }
     }
 
     /**

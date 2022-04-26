@@ -46,7 +46,13 @@ public class TupleFileToImage {
 		this._resolution = resolution;
 		this._step = size/2;
 	}
-	
+
+	/**
+	 *
+	 */
+	public TupleFileToImage(){
+	}
+
 	
 	/**
 	 * Method to make the image with an input tuple file from intra chromosomal java.plop.process

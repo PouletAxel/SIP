@@ -91,23 +91,18 @@ public class SIPObject {
      * @param nbZero
      * @param fdr
      */
-    public SIPObject ( String output, double gauss, int resolution, double thresholdMax, int matrixSize, int nbZero,  double fdr, String chrSizeFile,
+    public SIPObject ( String output, double gauss, int resolution, double thresholdMax, int matrixSize, int nbZero,  double fdr,
           boolean delTif, int cpu){
         if(!output.endsWith(File.separator))  output = output+File.separator;
-        this._input = output;
+        this._output = output;
         this._gauss = gauss;
         this._resolution = resolution;
         this._thresholdMaxima = thresholdMax;
         this._matrixSize = matrixSize;
         this._nbZero = nbZero;
         _fdr = fdr;
-        this._chrSizeFile = chrSizeFile;
-        setChrSize(this._chrSizeFile);
         this._delImage = delTif;
         this._cpu = cpu;
-
-
-
     }
 
     public SIPObject(){

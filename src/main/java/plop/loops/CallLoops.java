@@ -120,10 +120,46 @@ public class CallLoops {
 			hLoop = filterLoops.removedLoopCloseToWhiteStrip(hLoop);
 		else
 			hLoop = filterLoops.removedLoopCloseToWhiteStrip(hLoop,normVector);
-		System.out.println("####### End java.plop.loops detection for chr "+ chr +"\t"+hLoop.size()+" java.plop.loops before the FDR filter");
+		System.out.println("####### loops detection for chr "+ chr +"\t"+hLoop.size()+" loops before the FDR filter");
 		return hLoop;
-	}	
-	
+	}
+
+
+	/**
+	 *
+	 * @param imagePlusRaw
+	 * @param imagePlusNorm
+	 * @param name
+	 * @param chr
+	 * @param numImage
+	 * @return
+	 * @throws IOException
+	 */
+	public HashMap<String, Loop> detectLoops(ImagePlus imagePlusRaw, ImagePlus imagePlusNorm,
+											 String name, String chr,int numImage) throws IOException{//,HashMap<Integer,String> normVector) throws IOException{
+
+		FilterLoops filterLoops = new FilterLoops(this._resolution);
+		System.out.println(numImage+" "+name);
+		ImagePlus imgFilter = imagePlusRaw.duplicate();
+		TupleFileToImage tuple = new TupleFileToImage();
+		tuple.correctImage(imgFilter);
+		ImageProcessingMethod m = new ImageProcessingMethod(imgFilter,this._min,this._max,this._gauss);
+		imageProcessing(imgFilter, m);
+		double thresh = this._thresholdMaxima;
+		double pixelPercent = (double)100*tuple.getNbZero()/(this._matrixSize*this._matrixSize);
+		if(pixelPercent < 7)
+			thresh =  _thresholdMaxima/5;
+
+		FindMaxima findLoop = new FindMaxima(imagePlusNorm, imgFilter, chr, thresh, this._diagSize, this._resolution);
+		HashMap<String,Loop> temp = findLoop.findLoop(numImage, this._nbZero,imagePlusRaw, this._backgroudValue);
+		PeakAnalysisScore pas = new PeakAnalysisScore(imagePlusNorm,temp);
+		pas.computeScore();
+
+		temp = filterLoops.removedBadLoops(temp);
+		//hLoop = filterLoops.removedLoopCloseToWhiteStrip(hLoop,normVector);
+		temp = filterLoops.removedLoopCloseToWhiteStrip(temp);
+		return temp;
+	}
 
 	
 	/**
@@ -147,7 +183,25 @@ public class CallLoops {
 		else 
 			saveFile(imgFilter, fileName.replaceAll(".txt", "_processed.tif"));
 	}
-	
+
+
+	/**
+	 * Image processing method
+	 * @param imgFilter ImagePlus to correct
+	 * @param pm ProcessMethod object
+	 */
+	private void imageProcessing(ImagePlus imgFilter, ImageProcessingMethod pm){
+		pm.enhanceContrast(this._saturatedPixel);
+		pm.runGaussian();
+		imgFilter.setProcessor(Morphology.whiteTopHat(imgFilter.getProcessor(), _strel));
+		pm.setImg(imgFilter);
+		pm.runGaussian();
+		pm.runMin(this._min);
+		pm.runMax(this._max);
+		pm.runMax(this._max);
+		pm.runMin(this._min);
+	}
+
 
 	/**
 	 * Make Image from tuple file give in input via the TupleFileToImage Object

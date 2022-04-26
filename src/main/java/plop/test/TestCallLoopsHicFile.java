@@ -39,8 +39,8 @@ public class TestCallLoopsHicFile{
 		//HumanGenomeHg19/chr2.size");
 		//readChrSizeFile("/home/plop/Documents/Genome/HumanGenomeHg19/hg19_withoutChr.sizes");
 		//chrsize = readChrSizeFile("/home/plop/Documents/Genome/mammals/HumanGenomeHg19/chr1.size");
-		String fileChr = "/home/plop/Documents/Genome/mammals/HumanGenomeHg19/chr1.size";
-		String juiceBoxTools = "/home/plop/Tools/juicer_tools_1.19.02.jar";
+		String fileChr = "/home/plop/Documents/Genome/mammals/hg38.chr2.sizes";
+		String juiceBoxTools = "/home/plop/Tools/juicer_tools_2.13.06.jar";
 		int matrixSize = 2000;
 		int resolution = 5000;
 		int diagSize = 5;

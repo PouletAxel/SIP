@@ -1,10 +1,6 @@
 package plop.multiProcessing;
 
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.concurrent.Executors;
@@ -12,7 +8,6 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import plop.dumpProcessing.HicDumpIntra;
-import plop.dumpProcessing.HicDumpInter;
 import plop.gui.Progress;
 import plop.sip.SIPIntra;
 

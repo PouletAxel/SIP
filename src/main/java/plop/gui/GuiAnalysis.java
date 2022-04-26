@@ -83,13 +83,6 @@ public class GuiAnalysis extends JFrame{
     /** */
     private JRadioButton _jrbVC_sqrt = new JRadioButton("VC SQRT");
 
-	/** */
-	private ButtonGroup _bIntraOrInter = new ButtonGroup();
-    /** */
-	private JRadioButton _jrbIntra = new JRadioButton("Intra");
-	/** */
-	private JRadioButton _jrbInter = new JRadioButton("Inter");
-
 
     /** */
 	private JFormattedTextField _jtfMatrixSize = new JFormattedTextField(Number.class);
@@ -555,20 +548,6 @@ public class GuiAnalysis extends JFrame{
 				GridBagConstraints.NONE, new Insets(285, 10, 0, 0), 0, 0
 		));
 
-		this._bIntraOrInter.add(this._jrbInter);
-		this._bIntraOrInter.add(this._jrbIntra);
-		this._jrbInter.setFont(new java.awt.Font("arial",2,12));
-		this._jrbIntra.setFont(new java.awt.Font("arial",2,12));
-
-		this._container.add(this._jrbIntra,new GridBagConstraints(
-				0, 2, 0, 0, 0.0, 0.0, GridBagConstraints.NORTHWEST,
-				GridBagConstraints.NONE, new Insets(282, 270, 0, 0), 0, 0
-		));
-		this._container.add(this._jrbInter,new GridBagConstraints(
-				0, 2, 0, 0,  0.0, 0.0, GridBagConstraints.NORTHWEST,
-				GridBagConstraints.NONE,new Insets(282, 340, 0, 0), 0, 0
-		));
-		this._jrbIntra.setSelected(true);
 
 		this._checkboxDeleteTif.setFont(new java.awt.Font("arial",1,12));
 		this._container.add(this._checkboxDeleteTif,new GridBagConstraints(
@@ -607,8 +586,6 @@ public class GuiAnalysis extends JFrame{
 	  	this._jrbHic.addActionListener(hic);
 	  	this._jrbProcessed.addActionListener(hic);
 	  	this._jrbCool.addActionListener(hic);
-		this._jrbInter.addActionListener(hic);
-		this._jrbIntra.addActionListener(hic);
 	  	WorkDirectoryListener wdListener = new WorkDirectoryListener();
 	  	this._jbOutputDir.addActionListener(wdListener);
 		FileListener chr = new FileListener(this._jtfChrSize);
@@ -788,16 +765,7 @@ public class GuiAnalysis extends JFrame{
 	 * @return
 	 */
 	public boolean isHic(){ return this._jrbHic.isSelected();}
-	/**
-	 *
-	 * @return
-	 */
-	public boolean isInter(){ return this._jrbInter.isSelected();}
-	/**
-	 *
-	 * @return
-	 */
-	public boolean isIntra(){ return this._jrbIntra.isSelected();}
+
 	
 	/**
 	 * 
@@ -914,10 +882,6 @@ public class GuiAnalysis extends JFrame{
 		 *
 		 */
 		private void changeHic(){
-			_gui._jrbInter.setEnabled(true);
-			_gui._jrbIntra.setEnabled(true);
-			if(_gui.isIntra())changeIntra();
-			else if(_gui.isInter()) changeInter();
 			_gui._jrbVC_sqrt.setEnabled(true);
 			_gui._jrbVC.setEnabled(true);
 			_gui._jrbNone.setEnabled(true);
@@ -931,10 +895,6 @@ public class GuiAnalysis extends JFrame{
 		}
 
 		private void changeProcessed(){
-			_gui._jrbInter.setEnabled(true);
-			_gui._jrbIntra.setEnabled(true);
-			if(_gui.isIntra())changeIntra();
-			else if(_gui.isInter()) changeInter();
 			_gui._jrbVC_sqrt.setEnabled(false);
 			_gui._jrbVC.setEnabled(false);
 			_gui._jrbNone.setEnabled(false);
@@ -948,9 +908,6 @@ public class GuiAnalysis extends JFrame{
 		}
 
 		private void changeCool(){
-			_gui._jrbIntra.isSelected();
-			_gui._jrbInter.setEnabled(false);
-			_gui._jrbIntra.setEnabled(false);
 
 			changeIntra();
 			_gui._jrbVC_sqrt.setEnabled(false);
