@@ -9,8 +9,5 @@
         <module name="SIP" />
       </profile>
     </annotationProcessing>
-    <bytecodeTargetLevel>
-      <module name="SIP" target="8" />
-    </bytecodeTargetLevel>
   </component>
 </project>

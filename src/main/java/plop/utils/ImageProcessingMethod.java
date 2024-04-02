@@ -7,7 +7,7 @@ import ij.plugin.filter.RankFilters;
 import ij.process.ImageProcessor;
 
 /**
- * Method of image pre-processing before call maxima, to enhance the java.plop.loops and reduce the noise
+ * Method of image pre-processing before call maxima, to enhance the loops and reduce the noise
  * This class is using the ImageJ methode for the different filters (min, max, gaussian).
  * 
  * @author axel poulet
@@ -73,11 +73,31 @@ public class ImageProcessingMethod{
 	public void runMin(double min){	
 		this._rF.rank(this._ip, min, RankFilters.MIN);
 	}
-
+	
+	
+	/**
+	 * White "tophat" method to enhance the light structure
+	 * 
+	 */
+	public void topHat(){
+		GaussianBlur gb = new GaussianBlur();
+		gb.blurGaussian(this._ip, this._gaussianFilterRadius);
+		this._rF.rank(this._ip, this._minFilterRadius, RankFilters.MIN);
+		this._rF.rank(this._ip, this._maxFilterRadius, RankFilters.MAX);
+		this._rF.rank(this._ip, this._maxFilterRadius, RankFilters.MAX);
+		this._rF.rank(this._ip, this._minFilterRadius, RankFilters.MIN);
+	}
+	
+	/**
+	 * Getter of the image filtered
+	 * @return ImagePlus image filtered
+	 */
+	public ImagePlus getImg(){ return _img;}
 	
 	/**
 	 * Setter of the raw image
-	 * @param img raw Image
+	 *
+	 * @param img
 	 */
 	public void setImg(ImagePlus img){ this._img = img;}
 	
@@ -93,9 +113,9 @@ public class ImageProcessingMethod{
 
 	/**
 	 * 
-	 * @param max max filter strength
+	 * @param m_max
 	 */
-	public void runMax(double max) {
-		_rF.rank(_ip, max, RankFilters.MAX);
+	public void runMax(double m_max) {
+		_rF.rank(_ip, m_max, RankFilters.MAX);
 	}
 }
