@@ -1,29 +1,35 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-<modelVersion>4.0.0</modelVersion>
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+		 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+		https://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
   <groupId>SIP</groupId>
   <artifactId>SIP</artifactId>
-  <version>1.6.3</version>
+  <version>1.6.4</version>
   
   	<dependencies>
 
 		<!-- https://mvnrepository.com/artifact/sc.fiji/Auto_Threshold -->
 		<dependency>
-    		<groupId>sc.fiji</groupId>
-    		<artifactId>Auto_Threshold</artifactId>
-    		<version>1.17.2</version>
-		</dependency>
-		<dependency>
-			<groupId>net.imagej</groupId>
-				<artifactId>ij</artifactId>
-				<version>1.51n</version>
+			<groupId>sc.fiji</groupId>
+			<artifactId>imagescience</artifactId>
+			<version>2.4.1</version>
 		</dependency>
 		<dependency>
 			<groupId>fr.inra.ijpb</groupId>
 			<artifactId>MorphoLibJ_</artifactId>
 			<version>1.4.0</version>
 		</dependency>
+		<!-- http://mvnrepository.com/artifact/net.imagej/imagej -->
+		<!-- https://mvnrepository.com/artifact/net.imagej/ij -->
+		<dependency>
+			<groupId>net.imagej</groupId>
+			<artifactId>ij</artifactId>
+			<version>1.54i</version>
+		</dependency>
 
-		
+
 
 	</dependencies>
 

@@ -12,16 +12,16 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * multi thread class
- * Construct all the RunnableDetectLoops Object and run them sequencily with the available processors
+ * Construct all the RunnableDetectLoops Object and run them one by one with the available processors
  * 
  * @author axel poulet
  *
  */
 public class ProcessDetectLoops{
 	
-	/**int: number of processus*/
+	/**int: number of processors*/
 	static int _nbLance = 0;
-	/** boolean: if true continue the plop.process else take a break*/
+	/** boolean: if true continue the process else take a break*/
 	static boolean _continuer;
 	/** */
 	static int _indice = 0;
@@ -73,14 +73,11 @@ public class ProcessDetectLoops{
 	
 	/**
 	 * 
-	 * @param dirToTest
-	 * @return
+	 * @param dirToTest folder to test
+	 * @return boolean
 	 */
 	 private boolean isProcessedMcool(String dirToTest) {
 		 File test = new File (dirToTest);
-		 if (test.exists() == false) 
-				 return true;
-		 else 
-			 return false;
+		 return !test.exists();
 	 }
 }

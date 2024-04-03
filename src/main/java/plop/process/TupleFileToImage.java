@@ -61,8 +61,8 @@ public class TupleFileToImage {
 		BufferedReader br;
 		ShortProcessor pRaw = new ShortProcessor(this._size,this._size);
 		FloatProcessor pNorm = new FloatProcessor(this._size,this._size);
-		String[] tfile = this._file.split("_");
-		int numImage = Integer.parseInt(tfile[tfile.length-2])/(this._step*this._resolution);
+		String[] tFile = this._file.split("_");
+		int numImage = Integer.parseInt(tFile[tFile.length-2])/(this._step*this._resolution);
 		try {
 			pRaw.abs();
 			br = new BufferedReader(new FileReader(this._file));
@@ -104,7 +104,7 @@ public class TupleFileToImage {
 	
 	/**
 	 * Method to correct the image, remove the high value close to the diagonal to allow 
-	 * the dection of the structure of interest
+	 * the detection of the structure of interest
 	 * @param img ImagePlus to correct
 	 */
 	public void correctImage(ImagePlus img){
@@ -132,7 +132,7 @@ public class TupleFileToImage {
 	}
 	
 	/**
-	 * Compute the standard deviation of the pixel non zero values of m_img 
+	 * Compute the standard deviation of the pixel > 0 of m_img
 	 * @param mean average value in m_img
 	 * @param img ImagePlus
 	 * @return double satndard deivation

@@ -23,8 +23,8 @@ public class TestCallLoopsProcessedFile {
 	 * @throws InterruptedException 
 	 */
 	public static void main(String[] args) throws IOException, InterruptedException {
-		String input = "/home/plop/Desktop/GM12878TestBis";
-		String output= "/home/plop/Desktop/testChr";
+		String input = "/home/plop/Desktop/testSip";
+		String output= "/home/plop/Desktop/testSip";
 		int matrixSize = 2000;
 		int resolution = 5000;
 		int diagSize = 5;
@@ -40,7 +40,7 @@ public class TestCallLoopsProcessedFile {
 		//factor.add(2);
 		//factor.add(5);
 		//SIP_HiC_v1.3.6.jar hic SIP/Kc_allcombined.hic SIP/armsizes.txt SIP/Droso/ ../Tools/juicer_tools_1.13.02.jar 
-		String chrSizeFile = "/home/plop/Desktop/w_hg19.sizes";
+		String chrSizeFile = "/home/plop/Desktop/grch38.size";
 		HashMap<String,Integer> chrsize = readChrSizeFile(chrSizeFile);
 		SIPObject sip = new SIPObject(input,output, chrsize, gauss, min, max, resolution, saturatedPixel, thresholdMax, diagSize, matrixSize, nbZero,factor,0.01,true,false);
 		sip.setIsGui(false);

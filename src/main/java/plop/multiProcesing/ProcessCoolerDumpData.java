@@ -31,22 +31,26 @@ public class ProcessCoolerDumpData {
 	public ProcessCoolerDumpData(){ }
 		
 	/**
-	 *  * run the processing on different cpu, if all cpu are running, take break else run a new one.
-	 * 
+	 * Run the process of cool file on different cpu, if all cpu are running,
+	 * take break else run a new one.
 	 *
-	 * @param coolTools
-	 * @param cooler
-	 * @param sip
-	 * @param coolFile
-	 * @param chrSize
-	 * @param nbCPU
-	 * @throws InterruptedException
+	 * @param coolTools path to coolTools
+	 * @param cooler  path to coolTools
+	 * @param sip  SIP object
+	 * @param coolFile input cool file
+	 * @param chrSize chromosome size file
+	 * @param nbCPU number of cpu use for the analysis
+	 * @throws InterruptedException test if the chr file exist or the cool file exist
 	 */
-	public void go(String coolTools, String cooler, SIPObject sip, String coolFile, HashMap<String,Integer> chrSize,int nbCPU) throws InterruptedException {
+	public void go(String coolTools, String cooler,
+				   SIPObject sip, String coolFile,
+				   HashMap<String,Integer> chrSize,int nbCPU)
+			throws InterruptedException {
 		ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(nbCPU);
 		Iterator<String> chrName = chrSize.keySet().iterator();
 		File outDir = new File(sip.getOutputDir());
-		if (outDir.exists()==false) outDir.mkdir();
+		if (!outDir.exists())
+			outDir.mkdir();
 		
 		ArrayList<Integer> listFactor = sip.getListFactor();
 		for(int indexFact = 0; indexFact < listFactor.size(); ++indexFact) {

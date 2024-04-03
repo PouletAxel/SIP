@@ -13,25 +13,23 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 
 /**
- * Class aims to dump the data of the hic file. this classe need juicer_toolbox.jar to obtain the raw data and does the 2D images which will represent the HiC matrix.
- * If some error is detected a file log is created for that.
- * At the end this class a file by step is created (coordinate1	coordinate2 hic_value). The file created if the oMe option is chosse the substarction Observed-Expected
- * is done to obatin the value of the interaction between two bins.
- * If observed is used the value will be the observed. 
- * 
- * You can also chosse the option of the normalisation for the hic matrix, the different normalisations are these one available in juicertoolnox.jar 
- * (https://github.com/theaidenlab/juicer/wiki).
- * 
- * eg of commad line use : dump observed KR https://hicfiles.s3.amazonaws.com/hiseq/gm12878/in-situ/combined.hic 1:20480000:40960000 1:20480000:40960000 BP 10000 combined_10Kb.txt 
- * 
- * Neva C. Durand, Muhammad S. Shamim, Ido Machol, Suhas S. P. Rao, Miriam H. Huntley, Eric S. Lander, and Erez Lieberman Aiden. "Juicer provides a 
- * one-click system for analyzing loop-resolution Hi-C experiments." Cell Systems 3(1), 2016.
- * 
+ * Class aims to dump the data of the hic file. this classe need juicer_toolbox.jar to obtain the raw data and does the
+ * 2D images which will represent the HiC matrix. If some error is detected a file log is created for that. At the end
+ * this class a file by step is created (coordinate1	coordinate2 hic_value). The file created if the oMe option is
+ * used the subtraction Observed-Expected is done to obtain the value of the interaction between two bins. If observed
+ * is used the value will be the observed. You can also use the option of the normalisation for the hic matrix,
+ * the different normalisations available are these one available in juicertoolbox.jar (<a href="https://github.com/theaidenlab/juicer/wiki">...</a>).
+ * Example of command line use:
+ * dump observed KR <a href="https://hicfiles.s3.amazonaws.com/hiseq/gm12878/in-situ/combined.hic">...</a> 1:20480000:40960000 1:20480000:40960000 BP 10000 combined_10Kb.txt
+ * Neva C. Durand, Muhammad S. Shamim, Ido Machol, Suhas S. P. Rao, Miriam H. Huntley, Eric S. Lander,
+ * and Erez Lieberman Aiden. "Juicer provides one-click system for analyzing loop-resolution Hi-C experiments."
+ * Cell Systems 3(1), 2016.
+ *
  * @author axel poulet
  *
  */
 public class DumpData {
-	/** String to stock the error if need of juicerbox_tools*/
+	/** String to stock the error of juicertoolbox*/
 	private String _logError = "";
 	/** String for the log*/
 	private String _log = "";
@@ -72,17 +70,18 @@ public class DumpData {
 		Runtime runtime = Runtime.getRuntime();
 		String obs = output.replaceAll(".txt", "_obs.txt");
 		try {
-			String line = "java"+" -jar "+this._juiceBoxTools+" dump observed "+this._normalisation+" "+this._hicFile+" "+chr+" "+chr+" BP "+resolution+" "+obs;
-			System.out.println(line);
+			String line = "java"+" -jar "+this._juiceBoxTools+
+					" dump observed "+this._normalisation+" "+
+					this._hicFile+" "+chr+" "+chr+" BP "+
+					resolution+" "+obs;
+			//System.out.println(line);
 			this._log = this._log+"\n"+obs+"\t"+line;
 			Process process = runtime.exec(line);
-
 			new ReturnFlux(process.getInputStream()).start();
 			new ReturnFlux(process.getErrorStream()).start();
 			exitValue=process.waitFor();		
 		}
-		catch (IOException e) {	e.printStackTrace();}
-		catch (InterruptedException e) {e.printStackTrace();}
+		catch (IOException | InterruptedException e) {	e.printStackTrace();}
 		observedMExpected(obs,output,resolution);
 		if(_logError.contains("Exception")) {
 			System.out.println(_logError);
@@ -95,7 +94,6 @@ public class DumpData {
 	 * Compute the value observed-expected, the norm vector and also the distance normalized value
 	 *  and write the output file the "tuple": x y oMe DistanceNormalized.
 	 * this method are only for the intra chromosomal interaction.
-	 * 
 	 * @param obs: String path with the file of the observed value
 	 * @param chr: name of the chr
 	 * @throws IOException
@@ -104,12 +102,12 @@ public class DumpData {
 		BufferedReader br = Files.newBufferedReader(Paths.get(obs), StandardCharsets.UTF_8);
 		BufferedWriter 	writer = new BufferedWriter(new FileWriter(new File(chr)));
 		for (String line = null; (line = br.readLine()) != null;){
-			String [] tline = line.split("\t");
-			int dist = Math.abs((Integer.parseInt(tline[0])-Integer.parseInt(tline[1]))/resolution);
-			if(!tline[2].equals("NaN")){
-				double normalizedValue = (Double.parseDouble(tline[2])+1)/(this._lExpected.get(dist)+1);
-				double oMe = Double.parseDouble(tline[2])-this._lExpected.get(dist);
-				writer.write(tline[0]+"\t"+tline[1]+"\t"+oMe+"\t"+normalizedValue+"\n");
+			String [] tLine = line.split("\t");
+			int dist = Math.abs((Integer.parseInt(tLine[0])-Integer.parseInt(tLine[1]))/resolution);
+			if(!tLine[2].equals("NaN")){
+				double normalizedValue = (Double.parseDouble(tLine[2])+1)/(this._lExpected.get(dist)+1);
+				double oMe = Double.parseDouble(tLine[2])-this._lExpected.get(dist);
+				writer.write(tLine[0]+"\t"+tLine[1]+"\t"+oMe+"\t"+normalizedValue+"\n");
 			}
 		}
 		File file = new File(obs);
@@ -121,7 +119,6 @@ public class DumpData {
 	
 	/**
 	 * getter of the logerror file if necessary
-	 * 
 	 * @return return the String with the error
 	 */
 	public String getLogError(){ return this._logError;}
@@ -134,7 +131,7 @@ public class DumpData {
 	
 	/**
 	 * getter of the expected matrix. 
-	 * 
+
 	 * @param chr: String name of the chromosme
 	 * @param output: path to the output
 	 * @return
@@ -144,7 +141,7 @@ public class DumpData {
 		Runtime runtime = Runtime.getRuntime();
 		String expected = output.replaceAll(".txt", "_expected.txt");
 		String cmd = "java"+" -jar "+this._juiceBoxTools+" dump expected "+this._normalisation+" "+this._hicFile+" "+chr+" BP "+resolution+" "+expected;
-		System.out.println(cmd);
+		System.out.println("dump expected "+this._normalisation+" "+this._hicFile+" "+chr);
 		this._log = this._log+"\n"+expected+"\t"+cmd;
 		Process process;
 		try {
@@ -190,11 +187,12 @@ public class DumpData {
 		new ReturnFlux(process.getErrorStream()).start();
 		process.getOutputStream();
 		exitValue=process.waitFor();
-		if(_logError!="" &&  _logError.contains("Exception") == false){
+		if(_logError!="" && !_logError.contains("Exception")){
 			System.out.println("VC vector not find, SIP is using "+this._normalisation+" for "+ chr+"\n"+_logError);
 			runtime = Runtime.getRuntime();
 			_logError ="";
-			cmd =  "java"+" -jar "+this._juiceBoxTools+" dump norm "+this._normalisation+" "+this._hicFile+" "+chr+" BP "+resolution+" "+output;
+			cmd =  "java"+" -jar "+this._juiceBoxTools+" dump norm "+this._normalisation+" "+this._hicFile+" "+chr+
+					" BP "+resolution+" "+output;
 			System.out.println(cmd);
 			process = runtime.exec(cmd);
 
@@ -243,7 +241,7 @@ public class DumpData {
 				BufferedReader br = new BufferedReader(reader);
 				String line=null;
 				while ( (line = br.readLine()) != null) {
-					if(line.contains("WARN")== false && line.contains("INFO")== false) _logError = _logError+line+"\n";
+					if(!line.contains("WARN") && !line.contains("INFO")) _logError = _logError+line+"\n";
 				}
 			}
 			catch (IOException ioe){

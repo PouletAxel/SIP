@@ -32,19 +32,21 @@ public class ProcessHicDumpData{
 	/**
 	 *  * run the processing on different cpu, if all cpu are running, take break else run a new one.
 	 * 
-	 * @param hicFile
-	 * @param sip
-	 * @param chrSize
-	 * @param juiceBoxTools
-	 * @param normJuiceBox
-	 * @param nbCPU
-	 * @throws InterruptedException
+	 * @param hicFile path to the hic file
+	 * @param sip SIP object storing the parameters
+	 * @param chrSize path to the chromosome file
+	 * @param juiceBoxTools path to juicer tool
+	 * @param normJuiceBox Normalization method use for the dumped data
+	 * @param nbCPU number of cpu use for the analysis
+	 * @throws InterruptedException if input file doesn't exist throw an exception
 	 */
-	public void go(String hicFile, SIPObject sip, HashMap<String,Integer> chrSize, String juiceBoxTools, String normJuiceBox,int nbCPU) throws InterruptedException {
+	public void go(String hicFile, SIPObject sip, HashMap<String,Integer> chrSize,
+				   String juiceBoxTools, String normJuiceBox,int nbCPU) throws InterruptedException {
 		ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(nbCPU);
 		Iterator<String> chrName = chrSize.keySet().iterator();
 		File outDir = new File(sip.getOutputDir());
-		if (outDir.exists()==false) outDir.mkdir();
+		if (!outDir.exists())
+			outDir.mkdir();
 		while(chrName.hasNext()){
 			String chr = chrName.next();
 			DumpData dumpData = new DumpData(juiceBoxTools, hicFile, normJuiceBox);

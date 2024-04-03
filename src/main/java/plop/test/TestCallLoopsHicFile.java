@@ -45,7 +45,7 @@ public class TestCallLoopsHicFile{
 		HashMap<String,Integer> chrsize = readChrSizeFile(fileChr);
 		String juiceBoxTools = "/home/plop/Tools/juicer_tools_1.13.01.jar";
 		int matrixSize = 2000;
-		int resolution = 10000;
+		int resolution = 5000;
 		int diagSize = 5;
 		double gauss = 1.5;
 		double min = 2;
@@ -85,7 +85,8 @@ public class TestCallLoopsHicFile{
 			ProcessHicDumpData processDumpData = new ProcessHicDumpData();
 			processDumpData.go(input, sip, chrsize, juiceBoxTools, juiceBoXNormalisation,cpu);
 			
-			MultiResProcess multi = new MultiResProcess(sip, cpu, keepTif,fileChr);
+			//MultiResProcess multi = new MultiResProcess(sip, cpu, keepTif,fileChr);
+		MultiResProcess multi = new MultiResProcess(sip, cpu, false,fileChr);
 			multi.run();
 			//String cooler = "/home/plop/anaconda3/bin/cooler";
 			//String cooltools = "/home/plop/anaconda3/bin/cooltools";

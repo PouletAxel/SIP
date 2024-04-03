@@ -4,9 +4,8 @@ import ij.ImagePlus;
 import ij.process.ImageProcessor;
 
 /**
- * Class for the loop decay analysis. Take in input the raw imagePlus, and the loop coordiantes.
+ * Class for the loop decay analysis. Take in input the raw imagePlus, and the loop coordinates.
  * Compute the average between the loop and the neighbourhood 8 or 24.
- *  
  * @author Axel Poulet
  *
  */
@@ -22,8 +21,8 @@ public class DecayAnalysis {
 	 * DecayAnalysis constructor.
 	 * 
 	 * @param img: ImagePlus the raw image 
-	 * @param x: int for the x coordinate's of the loop
-	 * @param y: int for the y coordinat's of the loop
+	 * @param x: int for the x coordinate of the loop
+	 * @param y: int for the y coordinate of the loop
 	 */
 	public DecayAnalysis(ImagePlus img, int x, int y){
 		this._x = x;
@@ -32,20 +31,22 @@ public class DecayAnalysis {
 	}
 	
 	/**
-	 * getter computing the average difference beetwen the loop value and the neighbourhood 8 values
+	 * getter computing the average difference between the loop value and the neighbourhood 8 values
 	 * @return double stocking the average differential value of the neighbourhood 8.
 	 */
 	public float getNeighbourhood1(){return computeDiff(1);}
 	
 	/**
-	 * getter computing the average difference beetwen the loop value and the neighbourhood 24 values (exclude the values of the 8 neighbourhood)
+	 * getter computing the average difference between the loop value and the neighbourhood 24 values (exclude
+	 * the values of the 8 neighbourhood)
 	 * @return double stocking the average differential value of the neighbourhood 24.
 	 */
 	public float getNeighbourhood2(){return computeDiff(2);}
 
 	
 	/**
-	 * getter computing the average difference beetwen the loop value and the neighbourhood 24 values (exclude the values of the 8 neighbourhood)
+	 * getter computing the average difference between the loop value and the neighbourhood 24 values (exclude
+	 * the values of the 8 neighbourhood)
 	 * @return double stocking the average differential value of the neighbourhood 24.
 	 */
 	public float getNeighbourhood3(){return computeDiff(3);}
@@ -53,9 +54,9 @@ public class DecayAnalysis {
 	/**
 	 * Private method computing the average difference between the loop value and the chosen neighbourhood. 
 	 * @param c int; stock the choice: 1 = neighbourhood 8; 2 = neighbourhood 24
-	 * @return double differentila average
+	 * @return double differential average
 	 */
-	private float computeDiff (int c ){
+	private float computeDiff (int c){
 		float sum = 0;
 		ImageProcessor ip = this._img.getProcessor();
 		int nb = 0; 

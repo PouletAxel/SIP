@@ -34,9 +34,10 @@ public class PeakAnalysisScore {
 		
 	
 	/**
-	 * Method to compute the score of each loop. on a 11*11 square, the average of the corner (3*3) are computed. then the ration between the loops value and this avg is computed.
-	 * For the regional value, the avg of the n_8 value of the loops are done, then a ratio is computed with the avg value of the corner,
-	 * This method is used for the observed and oMe method.
+	 * Method to compute the score of each loop. on a 11*11 square, the average of the corner (3*3) are computed.
+	 * then the ration between the loops value and this avg is computed. For the regional value, the avg of the n_8
+	 * value of the loops are done, then a ratio is computed with the avg value of the corner. This method is used for
+	 * the observed and oMe method.
 	 * 
 	 */
 	public void computeScore(){
@@ -58,16 +59,16 @@ public class PeakAnalysisScore {
 				
 				float probnum = 0;
 				float factorial = 1;
-				int countnumber = (int) (corner);
-				for (int i = 0; i < countnumber; i++) {
+				int countNumber = (int) (corner);
+				for (int i = 0; i < countNumber; i++) {
 					if (i == 0) {
 						factorial = 1;
 					}else {
 						factorial = 1;
 						for (int j = 1; j<= i; j++) factorial = factorial*j;
 					}
-					float tmpprobnum = (float) ((Math.pow(2.718,((center)*-1))*Math.pow((center),i))/factorial);
-					probnum = probnum + tmpprobnum;
+					float tmpProbnum = (float) ((Math.pow(2.718,((center)*-1))*Math.pow((center),i))/factorial);
+					probnum = probnum + tmpProbnum;
 				}
 				loop.setPaScoreAvgdev(1-probnum);
 				

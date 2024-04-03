@@ -189,7 +189,7 @@ public class Loop {
 	 * Getter of the diagonal size
 	 * @return int diagonal size
 	 */
-	public int getDiagSize(){ return this._diagSize; }
+	public int getDiagonalSize(){ return this._diagSize; }
 		
 	/**
 	 * Setter of x coordinate
@@ -295,7 +295,7 @@ public class Loop {
 	}
 	
 	/**
-	 * Getter of loop corrdinate, return arraylist 0: x; 1: x_end; 2: y; 3: y_end 
+	 * Getter of loop coordinate, return arraylist 0: x; 1: x_end; 2: y; 3: y_end
 	 * @return ArrayList of integer
 	 */
 	public ArrayList<Integer> getCoordinates(){
@@ -321,7 +321,7 @@ public class Loop {
 
 	/**
 	 * Getter of regional peak analysis score 
-	 * @return doubl reginal PA score
+	 * @return double regional PA score
 	 */
 	public float getRegionalPaScoreAvg(){ return this._regPaScoreAvg; }
 	

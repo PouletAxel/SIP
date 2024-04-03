@@ -21,14 +21,14 @@ public class CoolerDumpData {
 	private String _log = "";
 	/** path to the hic file or url link*/
 	private String _coolFile = "";
-	/** List of doucle to stock the expected vector*/
+	/** List of double to stock the expected vector*/
 	private ArrayList<Double> _lExpected =  new ArrayList<Double>();
 
 	private String _cooler = "";
 	
 	
 	/**
-	 * Constructor of this class to iniatilise the different variables
+	 * Constructor of this class to initialize the different variables
 	 *
 	 * @param cooler
 	 * @param coolFile
@@ -60,8 +60,9 @@ public class CoolerDumpData {
 			new ReturnFlux(process.getErrorStream()).start();
 			exitValue=process.waitFor();		
 		}
-		catch (IOException e) {	e.printStackTrace();}
-		catch (InterruptedException e) {e.printStackTrace();}
+		catch (IOException | InterruptedException e) {
+			e.printStackTrace();
+		}
 		if(_logError!=""){
 			System.out.println(_logError);
 			System.exit(0);
@@ -139,13 +140,12 @@ public class CoolerDumpData {
 				BufferedReader br = new BufferedReader(reader);
 				String line=null;
 				while ( (line = br.readLine()) != null) {
-					if(line.contains("WARN")== false) _logError = _logError+line+"\n";
+					if(!line.contains("WARN")) _logError = _logError+line+"\n";
 				}
 			}
 			catch (IOException ioe){
 				ioe.printStackTrace();
 			}
 		}		
-	}  
-
+	}
 }

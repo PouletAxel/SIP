@@ -16,11 +16,11 @@ import java.util.Set;
 /**
  * Analyse and detect a whole genome HiC with .hic file or already processed data.
  * The class is used for the observed and oMe method.
- * 
  * MorpholibJ method used
- * 
- * Collection of mathematical morphology methods and plugins for ImageJ, created at the INRA-IJPB Modeling and Digital Imaging lab.
- * David Legland, Ignacio Arganda-Carreras, Philippe Andrey; MorphoLibJ: integrated library and plugins for mathematical morphology with ImageJ.
+ * Collection of mathematical morphology methods and plugins for ImageJ, created at the INRA-IJPB Modeling and Digital
+ * Imaging lab.
+ * David Legland, Ignacio Arganda-Carreras, Philippe Andrey; MorphoLibJ: integrated library and plugins for mathematical
+ * morphology with ImageJ.
  * Bioinformatics 2016; 32 (22): 3532-3534. doi: 10.1093/bioinformatics/btw413
  * 
  * @author axel poulet
@@ -37,7 +37,7 @@ public class SIPObject {
 	private double _min;
 	/** Strength of the max filter*/
 	private double _max;
-	/** % of staurated pixel after enhance contrast*/
+	/** % of saturated pixel after enhance contrast*/
 	private double _saturatedPixel;
 	/** Image size*/
 	private int _matrixSize = 0;
@@ -47,9 +47,9 @@ public class SIPObject {
 	private int _thresholdMaxima;
 	/** HashMap of the chr size, the key = chr name, value = size of chr*/
 	private HashMap<String,Integer> _chrSize =  new HashMap<String,Integer>();
-	/** Diage size to removed maxima close to diagonal*/
-	private int _diagSize;
-	/** Size of the step to plop.process each chr (step = matrixSize/2)*/
+	/** Diagonal size to removed maxima close to diagonal*/
+	private int _diagonalSize;
+	/** Size of the step to process each chr (step = matrixSize/2)*/
 	private int _step;
 	/** Number of pixel = 0 allowed around the loop*/
 	private int _nbZero = -1;
@@ -57,11 +57,10 @@ public class SIPObject {
 	private ArrayList<Integer> _listFactor = new ArrayList<Integer>();
 	/** fdr value */
 	private double _fdr;
-	/** is processed booelan*/
+	/** is processed boolean*/
 	private boolean _isProcessed = false;
 	/** if is plop.gui analysis*/
 	private boolean _isGui = false;
-	/** if rfdr*/
 	private boolean _isDroso = false;
 	private double _medianAP = 0;
 	private double _medianAPReg = 0;
@@ -89,13 +88,13 @@ public class SIPObject {
 	 * @param listFactor
 	 * @param fdr
 	 * @param isProcessed
-	 * @param rfdr
+	 * @param rFdr
 	 */
 	public SIPObject(String output, HashMap<String, Integer> chrSize, double gauss, double min,
 			double max, int resolution, double saturatedPixel, int thresholdMax,
 			int diagSize, int matrixSize, int nbZero,ArrayList<Integer> listFactor,
-			double fdr, boolean isProcessed, boolean rfdr) {
-		if(output.endsWith(File.separator) == false) 
+			double fdr, boolean isProcessed, boolean rFdr) {
+		if(!output.endsWith(File.separator))
 			output = output+File.separator;
 		this._output = output;
 		this._input = output;
@@ -107,13 +106,13 @@ public class SIPObject {
 		this._resolution = resolution;
 		this._saturatedPixel = saturatedPixel;
 		this._thresholdMaxima = thresholdMax;
-		this._diagSize = diagSize;
+		this._diagonalSize = diagSize;
 		this._step = matrixSize/2;
 		this._nbZero = nbZero;
 		this._listFactor = listFactor;
 		this._fdr = fdr;
 		this._isProcessed = isProcessed;
-		this._isDroso = rfdr;
+		this._isDroso = rFdr;
 	}
 
 	/**
@@ -140,9 +139,9 @@ public class SIPObject {
 			double max, int resolution, double saturatedPixel, int thresholdMax,
 			int diagSize, int matrixSize, int nbZero,ArrayList<Integer> listFactor,
 			double fdr, boolean isProcessed, boolean rfdr) {
-		if(output.endsWith(File.separator) == false) 
+		if(!output.endsWith(File.separator))
 			output = output+File.separator;
-		if(input.endsWith(File.separator) == false) 
+		if(!input.endsWith(File.separator))
 			input = input+File.separator;
 		this._output = output;
 		this._input = input;
@@ -154,7 +153,7 @@ public class SIPObject {
 		this._resolution = resolution;
 		this._saturatedPixel = saturatedPixel;
 		this._thresholdMaxima = thresholdMax;
-		this._diagSize = diagSize;
+		this._diagonalSize = diagSize;
 		this._step = matrixSize/2;
 		this._nbZero = nbZero;
 		this._listFactor = listFactor;
@@ -175,12 +174,12 @@ public class SIPObject {
 	public void saveFile(String pathFile, HashMap<String,Loop> data, boolean first) throws IOException{
 		FDR fdrDetection = new FDR ();
 		fdrDetection.run(this._fdr, data);
-		double RFDRcutoff = fdrDetection.getRFDRcutoff();
-		double FDRcutoff = fdrDetection.getFDRcutoff();
+		double rFdrCutoff = fdrDetection.getRFDRcutoff();
+		double fdrCutoff = fdrDetection.getFDRcutoff();
 		boolean supToTen = false;
 		if(this._isDroso){ 
-			median(data,FDRcutoff);
-			System.out.println("Filtering value at "+this._fdr+" FDR is "+FDRcutoff+" APscore ");
+			median(data,fdrCutoff);
+			System.out.println("Filtering value at "+this._fdr+" FDR is "+fdrCutoff+" APscore ");
 			if(_medianAPReg > 10){
 				supToTen = true;
 				 _medianAPReg = _medianAPReg/4;
@@ -188,12 +187,14 @@ public class SIPObject {
 			}
 		}
 		else 
-			System.out.println("Filtering value at "+this._fdr+" FDR is "+FDRcutoff+" APscore and "+RFDRcutoff+" RegionalAPscore\n");
+			System.out.println("Filtering value at "+this._fdr+" FDR is "+fdrCutoff+" APscore and "+rFdrCutoff+
+					" RegionalAPscore\n");
 		BufferedWriter writer;
 		if(first) writer = new BufferedWriter(new FileWriter(new File(pathFile), true));
 		else{
 			writer = new BufferedWriter(new FileWriter(new File(pathFile)));
-			writer.write("chromosome1\tx1\tx2\tchromosome2\ty1\ty2\tcolor\tAPScoreAvg\tProbabilityofEnrichment\tRegAPScoreAvg\tAvg_diffMaxNeihgboor_1\tAvg_diffMaxNeihgboor_2\tavg\tstd\tvalue\n");
+			writer.write("chromosome1\tx1\tx2\tchromosome2\ty1\ty2\tcolor\tAPScoreAvg\tProbabilityofEnrichment\t" +
+					"RegAPScoreAvg\tAvg_diffMaxNeihgboor_1\tAvg_diffMaxNeihgboor_2\tavg\tstd\tvalue\n");
 		}
 		
 		if(data.size()>0){
@@ -204,29 +205,41 @@ public class SIPObject {
 				Loop loop = data.get(name);
 				ArrayList<Integer> coord = loop.getCoordinates();
 				if(this._isDroso){
-					if(loop.getPaScoreAvg()> 1.2 && loop.getPaScoreAvg() > 1 && loop.getPaScoreAvg() > FDRcutoff && loop.getPaScoreAvgdev() > .9 && (loop.getNeigbhoord1() > 1 || loop.getNeigbhoord2() > 1)){
+					if(loop.getPaScoreAvg()> 1.2 && loop.getPaScoreAvg() > 1 &&
+							loop.getPaScoreAvg() > fdrCutoff && loop.getPaScoreAvgdev() > .9 &&
+							(loop.getNeigbhoord1() > 1 || loop.getNeigbhoord2() > 1)){
 						if(supToTen){
-							if(loop.getRegionalPaScoreAvg() >= (_medianAPReg-_medianAPReg*0.7) && loop.getRegionalPaScoreAvg() <= (_medianAPReg*2)&& loop.getPaScoreAvg() <= (_medianAP*2)){
-								writer.write(loop.getChr()+"\t"+coord.get(2)+"\t"+coord.get(3)+"\t"+loop.getChr()+"\t"+coord.get(0)+"\t"+coord.get(1)+"\t0,0,0"
-									+"\t"+loop.getPaScoreAvg()+"\t"+loop.getPaScoreAvgdev()+"\t"+loop.getRegionalPaScoreAvg()+"\t"
-									+loop.getNeigbhoord1()+"\t"+loop.getNeigbhoord2()+"\t"+loop.getAvg()+"\t"
-									+loop.getStd()+"\t"+loop.getValue()+"\n");
+							if(loop.getRegionalPaScoreAvg() >= (_medianAPReg-_medianAPReg*0.7) &&
+									loop.getRegionalPaScoreAvg() <= (_medianAPReg*2) &&
+									loop.getPaScoreAvg() <= (_medianAP*2)){
+								writer.write(loop.getChr()+"\t"+coord.get(2)+"\t"+coord.get(3)+"\t"+loop.getChr()+
+										"\t"+coord.get(0)+"\t"+coord.get(1)+"\t0,0,0"+"\t"+loop.getPaScoreAvg()+
+										"\t"+loop.getPaScoreAvgdev()+"\t"+loop.getRegionalPaScoreAvg()+
+										"\t"+ loop.getNeigbhoord1()+"\t"+loop.getNeigbhoord2()+"\t"+loop.getAvg()+
+										"\t" +loop.getStd()+"\t"+loop.getValue()+"\n");
 							}
 						}else{
-							if( loop.getRegionalPaScoreAvg() >= (_medianAPReg-_medianAPReg*0.5) && loop.getRegionalPaScoreAvg() <= (_medianAPReg*2)&& loop.getPaScoreAvg() <= (_medianAP*2)){
-								writer.write(loop.getChr()+"\t"+coord.get(2)+"\t"+coord.get(3)+"\t"+loop.getChr()+"\t"+coord.get(0)+"\t"+coord.get(1)+"\t0,0,0"
-								+"\t"+loop.getPaScoreAvg()+"\t"+loop.getPaScoreAvgdev()+"\t"+loop.getRegionalPaScoreAvg()+"\t"
-								+loop.getNeigbhoord1()+"\t"+loop.getNeigbhoord2()+"\t"+loop.getAvg()+"\t"
-								+loop.getStd()+"\t"+loop.getValue()+"\n");
+							if( loop.getRegionalPaScoreAvg() >= (_medianAPReg-_medianAPReg*0.5) &&
+									loop.getRegionalPaScoreAvg() <= (_medianAPReg*2) &&
+									loop.getPaScoreAvg() <= (_medianAP*2)){
+								writer.write(loop.getChr()+"\t"+coord.get(2)+"\t"+coord.get(3)+"\t"+loop.getChr()+
+										"\t"+coord.get(0)+"\t"+coord.get(1)+"\t0,0,0"+"\t"+loop.getPaScoreAvg()+
+										"\t"+loop.getPaScoreAvgdev()+"\t"+loop.getRegionalPaScoreAvg()+
+										"\t"+loop.getNeigbhoord1()+"\t"+loop.getNeigbhoord2()+"\t"+loop.getAvg()
+										+"\t" +loop.getStd()+"\t"+loop.getValue()+"\n");
 							}
 						}
 					}
 				}else{
-					if(loop.getPaScoreAvg()> 1.2 && loop.getPaScoreAvg() > 1 && loop.getPaScoreAvg() > FDRcutoff && loop.getRegionalPaScoreAvg() > RFDRcutoff && loop.getPaScoreAvgdev() > .9){
-						writer.write(loop.getChr()+"\t"+coord.get(2)+"\t"+coord.get(3)+"\t"+loop.getChr()+"\t"+coord.get(0)+"\t"+coord.get(1)+"\t0,0,0"
-							+"\t"+loop.getPaScoreAvg()+"\t"+loop.getPaScoreAvgdev()+"\t"+loop.getRegionalPaScoreAvg()+"\t"
-							+loop.getNeigbhoord1()+"\t"+loop.getNeigbhoord2()+"\t"+loop.getAvg()+"\t"
-							+loop.getStd()+"\t"+loop.getValue()+"\n");
+					if(loop.getPaScoreAvg()> 1.2 && loop.getPaScoreAvg() > 1 &&
+							loop.getPaScoreAvg() > fdrCutoff &&
+							loop.getRegionalPaScoreAvg() > rFdrCutoff &&
+							loop.getPaScoreAvgdev() > 0.9){
+						writer.write(loop.getChr()+"\t"+coord.get(2)+"\t"+coord.get(3)+"\t"+loop.getChr()+
+								"\t"+coord.get(0)+"\t"+coord.get(1)+"\t0,0,0"+"\t"+loop.getPaScoreAvg()+
+								"\t"+loop.getPaScoreAvgdev()+"\t"+loop.getRegionalPaScoreAvg()+
+								"\t"+loop.getNeigbhoord1()+"\t"+loop.getNeigbhoord2()+"\t"+loop.getAvg()+
+								"\t"+loop.getStd()+"\t"+loop.getValue()+"\n");
 					}
 				}
 			}
@@ -234,8 +247,7 @@ public class SIPObject {
 		}
 	}
 
-	
-	
+
 	/**
 	 * Full the list with file in directory
 	 * @param dir
@@ -264,7 +276,9 @@ public class SIPObject {
 			String line = br.readLine();
 			while (line != null){
 				sb.append(line);
-				if((line.equals("NaN")|| line.equals("NAN") || line.equals("nan") || line.equals("na")  || Double.parseDouble(line) < 0.30)){
+				if((line.equals("NaN")|| line.equals("NAN") ||
+						line.equals("nan") || line.equals("na")  ||
+						Double.parseDouble(line) < 0.30)){
 					vector.put(lineNumber*this._resolution, "plop");
 				}
 				++lineNumber;
@@ -290,7 +304,9 @@ public class SIPObject {
 		while (it.hasNext()){
 			String name = it.next();
 			Loop loop = data.get(name);
-			if(loop.getPaScoreAvg()> 1.2 && loop.getPaScoreAvg() > 1 && loop.getPaScoreAvg() > fdrCutoff && loop.getPaScoreAvgdev() > .9){
+			if(loop.getPaScoreAvg()> 1.2 && loop.getPaScoreAvg() > 1 &&
+					loop.getPaScoreAvg() > fdrCutoff &&
+					loop.getPaScoreAvgdev() > 0.9){
 				n1.add(loop.getPaScoreAvg());
 				n2.add(loop.getRegionalPaScoreAvg());
 				nb++;
@@ -312,8 +328,8 @@ public class SIPObject {
 	}
 	
 	
-	public double getFdr() { 	return	this._fdr; }
-	public void setFdr(double fdr) { 		this._fdr = fdr; }
+	public double getFdr() { return	this._fdr; }
+	public void setFdr(double fdr) { this._fdr = fdr; }
 	/**
 	 * Getter of the input dir
 	 * @return path of the input dir
@@ -368,12 +384,12 @@ public class SIPObject {
 	 * Getter of diagSize 
 	 * @return
 	 */
-	public int getDiagSize(){ return this._diagSize;}
+	public int getDiagSize(){ return this._diagonalSize;}
 	/**
 	 * Setter of the diagonal size
 	 * @param diagSize int of the size of the diagonal
 	 */
-	public void setDiagSize(int diagSize){ 	this._diagSize = diagSize; }
+	public void setDiagSize(int diagSize){ 	this._diagonalSize = diagSize; }
 	
 	/**
 	 * Getter of the min filter strength

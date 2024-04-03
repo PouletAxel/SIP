@@ -8,16 +8,16 @@ import java.util.ArrayList;
 /**
  * Runnable class dumping the raw data set via juicer tool.
  * The data are dumped by chr and by windows size, with user's parameters choose.
- * 
- * two sorts of file file will be created one for the raw value with the observed minus expected value and also with the diatnce normalized value.
- * Then the "norm" vector is also dump in an other deirectory.
+ * Two different files will be created one for the raw value with the observed minus expected value and also with the
+ * distance normalized value.
+ * Then the "norm" vector is also dump in another folder.
  * 
  * @author axel poulet
  *
  */
 public class RunnableDumpDataHiC extends Thread implements Runnable{
 	/**String: path where save the dump data  */
-	private String _outdir ="";
+	private String _outDir ="";
 	/**String: name of the chr*/
 	private String _chrName = "";
 	/**int: chr size */
@@ -37,16 +37,16 @@ public class RunnableDumpDataHiC extends Thread implements Runnable{
 	/**
 	 * Constructor, initialize the variables of interest
 	 *  
-	 * @param outdir
-	 * @param chrName
-	 * @param chrSize
-	 * @param dumpData
-	 * @param res
-	 * @param matrixSize
-	 * @param step
+	 * @param outDir output folder path
+	 * @param chrName chromosome name
+	 * @param chrSize chromosome size
+	 * @param dumpData DumpData object
+	 * @param res resolution (size of the bin)
+	 * @param matrixSize number of pixel in the image
+	 * @param step step to go through the genome
 	 */
-	public RunnableDumpDataHiC (String outdir, String chrName, int chrSize, DumpData dumpData,int res, int matrixSize, int step, ArrayList<Integer> listFactor){
-		this._outdir = outdir;
+	public RunnableDumpDataHiC (String outDir, String chrName, int chrSize, DumpData dumpData,int res, int matrixSize, int step, ArrayList<Integer> listFactor){
+		this._outDir = outDir;
 		this._chrName = chrName;
 		this._chrSize = chrSize;
 		this._res = res;
@@ -68,20 +68,22 @@ public class RunnableDumpDataHiC extends Thread implements Runnable{
 			String nameRes = String.valueOf(res);
 			nameRes = nameRes.replace("000", "");
 			nameRes = nameRes+"kb";
-			String outdir = this._outdir+nameRes+File.separator+this._chrName+File.separator;
+			String outdir = this._outDir +nameRes+File.separator+this._chrName+File.separator;
 			File file = new File(outdir);
-			if (file.exists()==false) file.mkdirs();
+			if (!file.exists())
+				file.mkdirs();
 			int step = this._step*res;
 			int j = matrixSize*res;
 			String test = this._chrName+":0:"+j;
 			String name = outdir+this._chrName+"_0_"+j+".txt";
 			this._dumpData.getExpected(test,name,res);
-			String normOutput = this._outdir+nameRes+File.separator+"normVector";
+			String normOutput = this._outDir +nameRes+File.separator+"normVector";
 			file = new File(normOutput);
-			if (file.exists()==false) file.mkdir();
+			if (!file.exists()) 
+				file.mkdir();
 			try {
 				this._dumpData.getNormVector(this._chrName,normOutput+File.separator+this._chrName+".norm",res);
-				System.out.println("start dump "+this._chrName+" size "+this._chrSize+" res "+ nameRes);
+				//System.out.println("start dump "+this._chrName+" size "+this._chrSize+" res "+ nameRes);
 				if(j > this._chrSize) j = this._chrSize;
 				for(int i = 0 ; j-1 <= this._chrSize; i+=step,j+=step){
 					int end =j-1;

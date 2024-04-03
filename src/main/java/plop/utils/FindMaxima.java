@@ -21,14 +21,14 @@ public class FindMaxima{
 	private ImagePlus _imgNorm;
 	/**	 name of the chromosome*/
 	private String _chr;
-	/**	 Image fileterred with min, max and gaussian filter*/
+	/**	 Image filtered with min, max and gaussian filter*/
 	private ImagePlus _imgFilter;
 	/**	binary image pixel white = the maxima detected*/
 	private ImagePlus _imgResu = new ImagePlus();
-	/**	 threshold for the imageJ class MaximumFinder, this class is call to detecte the maxima */
+	/**	 threshold for the imageJ class MaximumFinder, this class is call to detect the maxima */
 	private double _noiseTolerance =-1;
 	/**	diagonal size in bin*/
-	private int _diagSize =-1;
+	private int _diagonalSize =-1;
 	/**	 Resolution of the image in base*/
 	private int _resolution = -1;
 
@@ -39,15 +39,15 @@ public class FindMaxima{
 	 * @param imgFilter ImagePlus filtered image
 	 * @param chr String chromosome
 	 * @param noiseTolerance double threshold to detect maxima
-	 * @param diag int the size of the diagonal
+	 * @param diagonal int the size of the diagonal
 	 * @param resolution int size of the pixel in base
 	 */
-	public FindMaxima(ImagePlus img, ImagePlus imgFilter, String chr, double noiseTolerance, int diag, int resolution){
+	public FindMaxima(ImagePlus img, ImagePlus imgFilter, String chr, double noiseTolerance, int diagonal, int resolution){
 		this._imgNorm =  img;
 		this._imgFilter = imgFilter;
 		this._noiseTolerance = noiseTolerance;
 		this._chr = chr;
-		this._diagSize = diag;
+		this._diagonalSize = diagonal;
 		this._resolution = resolution;
 	}
 	
@@ -61,7 +61,7 @@ public class FindMaxima{
 	 * @param val int background value of the image
 	 * @return
 	 */
-	public HashMap<String,Loop> findloop(int index, int nbZero, ImagePlus raw, float val){
+	public HashMap<String,Loop> findLoop(int index, int nbZero, ImagePlus raw, float val){
 		run(nbZero, raw, val);
 		ArrayList<String> temp = this.getMaxima();
 		ImageProcessor ipN = this._imgNorm.getProcessor();
@@ -84,7 +84,7 @@ public class FindMaxima{
 					maxima.setNeigbhoord2(n2);
 					maxima.setResolution(this._resolution);
 					//System.out.println(_resolution+" "+maxima.getResolution());
-					maxima.setDiagSize(this._diagSize);
+					maxima.setDiagSize(this._diagonalSize);
 					maxima.setMatrixSize(this._imgNorm.getWidth());
 					data.put(name, maxima);
 				}
@@ -289,7 +289,7 @@ public class FindMaxima{
 			for(int j= 2;j< h-2;++j){
 				if(ipResu.getPixel(i, j) > 0){
 					int thresh = nbZero;
-					if (j-i <= this._diagSize+2)
+					if (j-i <= this._diagonalSize +2)
 						thresh = thresh+1;
 					int nb = 0;
 					for(int ii = i-2; ii <= i+2; ++ii){

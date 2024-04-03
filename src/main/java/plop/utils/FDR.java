@@ -14,9 +14,9 @@ import java.util.Set;
  */
 public class FDR {
 	/**	 */
-	private double _RFDRcutoff = 10000;
+	private double _rFdrCutoff = 10000;
 	/** */
-	private double _FDRcutoff = 10000;
+	private double _fdrCutoff = 10000;
 	
 	/**
 	 * 
@@ -31,8 +31,8 @@ public class FDR {
 	public void run(double fdr,HashMap<String,Loop> data){
 		Set<String> key = data.keySet();
 		Iterator<String> it = key.iterator();
-		List<Float> myFDRvals = new ArrayList<Float>();
-		List<Float> myRFDRvals = new ArrayList<Float>();
+		List<Float> myFdrVals = new ArrayList<Float>();
+		List<Float> myRFdrVals = new ArrayList<Float>();
 		
 		while (it.hasNext()) {
 			String loopName = it.next();
@@ -42,29 +42,31 @@ public class FDR {
 			float dubFDR2 = loop.getPaScoreAvgFDR2();
 			float dubFDR3 = loop.getPaScoreAvgFDR3();
 				
-			if(dubFDR > 0)  myFDRvals.add(dubFDR);
-			if(dubFDR2 > 0) myFDRvals.add(dubFDR2);
-			if(dubFDR3 > 0) myFDRvals.add(dubFDR3);
+			if(dubFDR > 0)  myFdrVals.add(dubFDR);
+			if(dubFDR2 > 0) myFdrVals.add(dubFDR2);
+			if(dubFDR3 > 0) myFdrVals.add(dubFDR3);
 		
 	
 			float dubRFDR = loop.getRegionalPaScoreAvgFDR();
 			float dubRFDR2 = loop.getRegionalPaScoreAvgFDR2();
 			float dubRFDR3 = loop.getRegionalPaScoreAvgFDR3();
 				
-			if(dubRFDR > 0)	 myRFDRvals.add(dubRFDR);
-			if(dubRFDR2 > 0) myRFDRvals.add(dubRFDR2);
-			if(dubRFDR3 > 0) myRFDRvals.add(dubRFDR3);
+			if(dubRFDR > 0)	 myRFdrVals.add(dubRFDR);
+			if(dubRFDR2 > 0) myRFdrVals.add(dubRFDR2);
+			if(dubRFDR3 > 0) myRFdrVals.add(dubRFDR3);
 		}
 			
-		Collections.sort(myFDRvals);
-		int topFDRs = (int)(myFDRvals.size()*fdr);
+		Collections.sort(myFdrVals);
+		int topFDRs = (int)(myFdrVals.size()*fdr);
 		if(topFDRs != 0){
-			List<Float> topFDRlist = new ArrayList<Float>(myFDRvals.subList(myFDRvals.size() -topFDRs,  myFDRvals.size() -(topFDRs-1)));
-			this._FDRcutoff = topFDRlist.get(0);
-			Collections.sort(myRFDRvals);
-			int topRFDRs = (int)(myRFDRvals.size()*fdr);
-			List<Float> topRFDRlist = new ArrayList<Float>(myRFDRvals.subList(myRFDRvals.size() -topRFDRs,  myRFDRvals.size() -(topRFDRs-1)));
-			this._RFDRcutoff = topRFDRlist.get(0);
+			List<Float> topFDRlist = new ArrayList<Float>(myFdrVals.subList(myFdrVals.size() -topFDRs,
+					myFdrVals.size() -(topFDRs-1)));
+			this._fdrCutoff = topFDRlist.get(0);
+			Collections.sort(myRFdrVals);
+			int topRFDRs = (int)(myRFdrVals.size()*fdr);
+			List<Float> topRFDRlist = new ArrayList<Float>(myRFdrVals.subList(myRFdrVals.size() -topRFDRs,
+					myRFdrVals.size() -(topRFDRs-1)));
+			this._rFdrCutoff = topRFDRlist.get(0);
 		}
 	}
 
@@ -72,11 +74,11 @@ public class FDR {
 	 * 
 	 * @return
 	 */
-	public double getRFDRcutoff() {	return _RFDRcutoff; }
+	public double getRFDRcutoff() {	return _rFdrCutoff; }
 
 	/**
 	 * 
 	 * @return
 	 */
-	public double getFDRcutoff() {	return _FDRcutoff; }
+	public double getFDRcutoff() {	return _fdrCutoff; }
 }

@@ -12,13 +12,13 @@ import java.util.HashMap;
 
 public class CoolerExpected {
 	
-	/** String to stock the error if need of juicerbox_tools*/
+	/** String to store the error if needed of juicerboxtool.jar*/
 	private String _logError = "";
 	/** String for the log*/
 	private String _log = "";
 	/** path to the hic file or url link*/
 	private String _coolFile = "";
-	/** List of doucle to stock the expected vector*/
+	/** List of double to stock the expected vector*/
 	private int _resolution = 0;
 	private int _imgSize = 0;
 	private String _expected;

@@ -41,7 +41,7 @@ public class CoordinatesCorrection {
 			x = loop.getX();
 			y = loop.getY();
 			int resolution = loop.getResolution(); 
-			int diagSize = loop.getDiagSize()*resolution;
+			int diagSize = loop.getDiagonalSize()*resolution;
 			int imageSize = loop.getMatrixSize();
 	
 			int a = (x+(index*step))*resolution;

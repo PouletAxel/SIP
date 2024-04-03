@@ -7,7 +7,7 @@ import java.io.IOException;
 import java.util.HashMap;
 
 /**
- * Runnable class for loops detcetion
+ * Runnable class for loops detection
  * 
  * @author axel poulet
  *
@@ -26,18 +26,18 @@ public class RunnableDetectLoops extends Thread implements Runnable{
 	/** norn vector table for the chr of interest*/
 	private HashMap<Integer, String> _normVector = new HashMap<Integer, String> ();
 	/** */
-	private String _normvectorFile;
+	private String _normVectorFile;
 	
 	
 
 	/**
-	 * Construtor, initialize all the variables  of interest
+	 * Constructor, initialize all the variables  of interest
 	 *
-	 * @param chr
-	 * @param resuFile
-	 * @param sip
-	 * @param normVectorFile
-	 * @param delFile
+	 * @param chr chromosome name
+	 * @param resuFile path to the result file
+	 * @param sip SIP object
+	 * @param normVectorFile path to the normalise vector for the chromosome of interest
+	 * @param delFile true => del tif file
 	 */
 	public RunnableDetectLoops (String chr, String resuFile, SIPObject sip, String normVectorFile, boolean delFile){
 		this._sip = sip;
@@ -46,15 +46,15 @@ public class RunnableDetectLoops extends Thread implements Runnable{
 		this._resuFile = resuFile;
 		this._normVector = sip.getNormValueFilter(normVectorFile);
 		this._delImages = delFile;
-		this._normvectorFile = normVectorFile; 
+		this._normVectorFile = normVectorFile;
 	}
 
 	/**
 	 *
-	 * @param chr
-	 * @param resuFile
-	 * @param sip
-	 * @param delFile
+	 * @param chr chromosome name
+	 * @param resuFile path to the result file
+	 * @param sip SIP object
+	 * @param delFile true => del tif file
 	 */
 	public RunnableDetectLoops (String chr, String resuFile, SIPObject sip, boolean delFile){
 		this._sip = sip;
@@ -65,8 +65,8 @@ public class RunnableDetectLoops extends Thread implements Runnable{
 	}
 	
 	/**
-	 * Run all the plop.process for loops detection by chr using the objet CallLoops and then save loops in
-	 * txt file with SIPObject via he method saveFile
+	 * Run all the process for loops detection by chr using the objet CallLoops and then save loops in
+	 * txt file with SIPObject via the method saveFile
 	 * 
 	 */
 	public void run(){
@@ -81,8 +81,8 @@ public class RunnableDetectLoops extends Thread implements Runnable{
 			if (listOfFiles.length == 0) System.out.println("!!!!!!!!!! dumped directory of chromosome"+this._chr+" empty");
 			else{
 				File file = new File(this._resuFile);
-				if(_sip.isCooler() == false) {
-					System.out.println(_normvectorFile+"normVector end loading file: "+_chr+".norm "+resName);
+				if(!_sip.isCooler()) {
+					System.out.println(_normVectorFile +"normVector end loading file: "+_chr+".norm "+resName);
 				}
 				data = this._callLoops.detectLoops(listOfFiles,this._chr,this._normVector);
 				synchronized(this) {

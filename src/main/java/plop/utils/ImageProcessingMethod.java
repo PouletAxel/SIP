@@ -79,13 +79,13 @@ public class ImageProcessingMethod{
 	 * White "tophat" method to enhance the light structure
 	 * 
 	 */
-	public void topHat(){
-		GaussianBlur gb = new GaussianBlur();
-		gb.blurGaussian(this._ip, this._gaussianFilterRadius);
-		this._rF.rank(this._ip, this._minFilterRadius, RankFilters.MIN);
-		this._rF.rank(this._ip, this._maxFilterRadius, RankFilters.MAX);
-		this._rF.rank(this._ip, this._maxFilterRadius, RankFilters.MAX);
-		this._rF.rank(this._ip, this._minFilterRadius, RankFilters.MIN);
+	public void topHat(double min, double max){
+		//GaussianBlur gb = new GaussianBlur();
+		//gb.blurGaussian(this._ip, this._gaussianFilterRadius);
+		this._rF.rank(this._ip, min, RankFilters.MIN);
+		this._rF.rank(this._ip, max, RankFilters.MAX);
+		this._rF.rank(this._ip, max, RankFilters.MAX);
+		this._rF.rank(this._ip, min, RankFilters.MIN);
 	}
 	
 	/**

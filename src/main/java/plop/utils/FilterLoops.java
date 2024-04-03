@@ -11,7 +11,7 @@ import java.util.Set;
  *
  */
 public class FilterLoops {
-	/** loops resoluiton*/
+	/** loops resolution*/
 	private int _resolution;
 	
 	
@@ -54,9 +54,10 @@ public class FilterLoops {
 	 * Removed loop close to white  strip
 	 * 
 	 * @param hLoop loop collection before correction of the loops
-	 * @return loop collection sfter correction of the loops
+	 * @return loop collection after correction of the loops
 	 */
-	public HashMap<String,Loop> removedLoopCloseToWhiteStrip(HashMap<String,Loop> hLoop, HashMap<Integer,String> normVector){
+	public HashMap<String,Loop> removedLoopCloseToWhiteStrip(
+			HashMap<String,Loop> hLoop, HashMap<Integer,String> normVector){
 		//System.out.println("plop "+hLoop.size()+" debut Filter");
 		Set<String> key = hLoop.keySet();
 		Iterator<String> it = key.iterator();
@@ -83,7 +84,8 @@ public class FilterLoops {
 									testBreak =true;
 									break;
 								}else if(hLoop.get(test).getResolution() == hLoop.get(name).getResolution()){
-									if((Math.abs(x-hLoop.get(test).getX()) < this._resolution*3 || Math.abs(y-hLoop.get(test).getY()) < this._resolution*3)){
+									if((Math.abs(x-hLoop.get(test).getX()) < this._resolution*3 ||
+											Math.abs(y-hLoop.get(test).getY()) < this._resolution*3)){
 										if(hLoop.get(test).getAvg() > hLoop.get(name).getAvg()){
 											removed.add(name);
 											testBreak =true;
@@ -145,7 +147,8 @@ public class FilterLoops {
 								testBreak =true;
 								break;
 							}else if(hLoop.get(test).getResolution() == hLoop.get(name).getResolution()){
-								if((Math.abs(x-hLoop.get(test).getX()) < this._resolution*3 || Math.abs(y-hLoop.get(test).getY()) < this._resolution*3)){
+								if((Math.abs(x-hLoop.get(test).getX()) < this._resolution*3 ||
+										Math.abs(y-hLoop.get(test).getY()) < this._resolution*3)){
 									if(hLoop.get(test).getAvg() > hLoop.get(name).getAvg()){
 										removed.add(name);
 										testBreak =true;
@@ -190,7 +193,8 @@ public class FilterLoops {
 				test = true;
 		}
 		else if(loop.getResolution() == this._resolution*2){
-			if(normVector.containsKey(x) || normVector.containsKey(y) ||normVector.containsKey(x+this._resolution) || normVector.containsKey(y+this._resolution))
+			if(normVector.containsKey(x) || normVector.containsKey(y) ||
+					normVector.containsKey(x+this._resolution) || normVector.containsKey(y+this._resolution))
 				test = true;
 		}
 		else if(loop.getResolution() == this._resolution*5){
@@ -218,7 +222,8 @@ public class FilterLoops {
 	 * @param removed arrayList of loop
 	 * @return removed arrayList of loop 
 	 */
-	private ArrayList<String> removeOverlappingLoops(Loop loop, HashMap<String, Loop> input, ArrayList<String> removed){
+	private ArrayList<String> removeOverlappingLoops(
+			Loop loop, HashMap<String, Loop> input, ArrayList<String> removed){
 		Set<String> key = input.keySet();
 		Iterator<String> it = key.iterator();
 		while (it.hasNext()){

@@ -7,6 +7,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -17,6 +18,11 @@ import plop.multiProcesing.ProcessCoolerDumpData;
 import plop.multiProcesing.ProcessHicDumpData;
 import plop.process.MultiResProcess;
 import plop.utils.SIPObject;
+
+import java.time.LocalTime; // import the LocalTime class
+
+
+
 
 /**
  * 
@@ -38,7 +44,7 @@ public class Hic_main {
 	private static String _cooler = "";
 	/** Path to the jucier_tools_box to dump the data not necessary for Processed and dumped method */
 	private static String _cooltools = "";
-	/**Normalisation method to dump the the data with hic method (KR,NONE.VC,VC_SQRT)*/
+	/**Normalisation method to dump the data with hic method (KR,NONE.VC,VC_SQRT)*/
 	private static String _juiceBoXNormalisation = "KR";
 	/**Size of the core for the gaussian blur filter allow to smooth the signal*/
 	private static double _gauss = 1.5;
@@ -49,22 +55,22 @@ public class Hic_main {
 	/**Matrix size: size in bins of the final image and defined the zone of interest in the hic map*/
 	private static int _matrixSize = 2000;
 	/**Distance to the diagonal where the loops are ignored*/
-	private static int _diagSize = 6;
-	/**Resolution of the matric in bases*/
+	private static int _diagonalSize = 6;
+	/**Resolution of the matrix in bases*/
 	private static int _resolution = 5000;
 	/** % of saturated pixel in the image, allow the enhancement of the contrast in the image*/
 	private static double _saturatedPixel = 0.01;
-	/** Threshold to accepet a maxima in the images as a loop*/
+	/** Threshold to accept a maxima in the images as a loop*/
 	private static int _thresholdMax = 2800;
 	/**number of pixel = 0 allowed around the loop*/
 	private static int _nbZero = 6;
-	/** boolean if true run all the plop.process (dump data + image +image processing*/
+	/** boolean if true run all the process (dump data + image +image processing*/
 	private static boolean _isHic = true;
-	/** boolean if true run all the plop.process (dump data + image +image processing*/
+	/** boolean if true run all the process (dump data + image +image processing*/
 	private static boolean _isCool = false;
-	/** boolean if true run all the plop.process (dump data + image +image processing*/
+	/** boolean if true run all the process (dump data + image +image processing*/
 	private static boolean _isDroso = false;
-	/** factor(s) used to nalyse the matrix*/
+	/** factor(s) used to analyse the matrix*/
 	private static ArrayList<Integer> _factor = new ArrayList<Integer>();
 	/** String factor option*/
 	private static String _factOption = "1";
@@ -90,10 +96,12 @@ public class Hic_main {
 			+ "\tcool <mcoolFile> <chrSizeFile> <Output> <cooltoolsPath> <coolerPath> [options]\n"
 			+ "\tprocessed <Directory with processed data> <chrSizeFile> <Output> [options]\n"
 			+ "\nParameters:\n"
-			+ "\t chrSizeFile: path to the chr size file, with the same name of the chr as in the hic file (i.e. chr1 does not match Chr1 or 1)\n"
+			+ "\t chrSizeFile: path to the chr size file, with the same name of the chr as in the hic file" +
+			" (i.e. chr1 does not match Chr1 or 1)\n"
 			+ "\t-res: resolution in bp (default 5000 bp)\n"
 			+ "\t-mat: matrix size to use for each chunk of the chromosome (default 2000 bins)\n"
-			+ "\t-d: diagonal size in bins, remove the maxima found at this size (eg: a size of 2 at 5000 bp resolution removes all maxima"
+			+ "\t-d: diagonal size in bins, remove the maxima found at this size (eg: a size of 2 at " +
+			"5000 bp resolution removes all maxima"
 			+ " detected at a distance inferior or equal to 10kb) (default 6 bins).\n"
 			+ "\t-g: Gaussian filter: smoothing factor to reduce noise during primary maxima detection (default 1.5)\n"
 			+ "\t-cpu: Number of CPU used for SIP processing (default 1)\n"
@@ -106,28 +114,31 @@ public class Hic_main {
 			+ "\t-min: Minimum filter: removes the isolated high value (default 2)\n"
 			+ "\t-sat: % of saturated pixel: enhances the contrast in the image (default 0.01)\n"
 			+ "\t-t Threshold for loops detection (default 2800)\n"
-			+ "\t-nbZero: number of zeros: number of pixels equal to zero that are allowed in the 24 pixels surrounding the detected maxima (default 6)\n"
+			+ "\t-nbZero: number of zeros: number of pixels equal to zero that are allowed in the 24 pixels " +
+			"surrounding the detected maxima (default 6)\n"
 			+ "\t-norm: <NONE/VC/VC_SQRT/KR/SCALE> (default KR)\n"
 			+ "\t-del: true or false, whether not to delete tif files used for loop detection (default true)\n"
 			+ "\t-fdr: Empirical FDR value for filtering based on random sites (default 0.01)\n"
-			+ "\t-isDroso: default false, if true apply extra filter to help detect loops similar to those found in D. mel cells\n"
+			+ "\t-isDroso: default false, if true apply extra filter to help detect loops similar to those found" +
+			" in D. mel cells\n"
 			+ "\t-h, --help print help\n"
 			+ "\nCommand line eg:\n"
-			+ "\tjava -jar SIP_HiC.jar processed inputDirectory pathToChromosome.size OutputDir .... paramaters\n"
+			+ "\tjava -jar SIP_HiC.jar processed inputDirectory pathToChromosome.size OutputDir .... parameters\n"
 			+ "\tjava -jar SIP_HiC.jar hic inputDirectory pathToChromosome.size OutputDir juicer_tools.jar\n"
 			+ "\nAuthors:\n"
 			+ "Axel Poulet\n"
 			+ "\tDepartment of Molecular, Cellular  and Developmental Biology Yale University 165 Prospect St\n"
 			+ "\tNew Haven, CT 06511, USA\n"
 			+ "M. Jordan Rowley\n"
-			+ "\tDepartment of Genetics, Cell Biology and Anatomy, University of Nebraska Medical Center Omaha,NE 68198-5805\n"
+			+ "\tDepartment of Genetics, Cell Biology and Anatomy, University of Nebraska Medical Center" +
+			" Omaha,NE 68198-5805\n"
 			+ "\nContact: pouletaxel@gmail.com OR jordan.rowley@unmc.edu");
 			
 	/**
-	 * Main function to run all the plop.process, can be run with plop.gui or in command line.
+	 * Main function to run all the process, can be run with plop.gui or in command line.
 	 * With command line with 1 or less than 5 parameter => run only the help
 	 * With zero parameter only java -jar SIP.jar  => plop.gui
-	 * With more than 5 paramter => command line mode
+	 * With more than 5 parameter => command line mode
 	 * 
 	 * @param args
 	 * @throws IOException 
@@ -142,21 +153,28 @@ public class Hic_main {
 			if (args[0].equals("hic") || args[0].equals("processed") || args[0].equals("cool")){
 				_input = args[1];
 				_output = args[3];
-				_chrSizeFile = args[2];	
-				if (args[0].equals("hic")){
-					readOption(args,5);
-					_juiceBoxTools = args[4];
-				}else if(args[0].equals("processed")){
-					_isHic = false;
-					_isProcessed = true;
-					readOption(args,4);
-				}else if(args[0].equals("cool")){
-					_isHic = false;
-					_isProcessed = false;
-					_isCool = true;
-					_cooler = args[5];
-					_cooltools = args[4];
-					readOption(args,6);
+				_chrSizeFile = args[2];
+				switch (args[0]) {
+					case "hic":
+						readOption(args, 5);
+						_juiceBoxTools = args[4];
+						break;
+					case "processed":
+						_isHic = false;
+						_isProcessed = true;
+						readOption(args, 4);
+						break;
+					case "cool":
+						_isHic = false;
+						_isProcessed = false;
+						_isCool = true;
+						_cooler = args[5];
+						_cooltools = args[4];
+						readOption(args, 6);
+						break;
+					default:
+
+						break;
 				}
 			}else{
 				System.out.println(args[0]+" not defined\n");
@@ -177,7 +195,7 @@ public class Hic_main {
 				_output = gui.getOutputDir();
 				_input = gui.getRawDataDir();
 				_matrixSize = gui.getMatrixSize();
-				_diagSize = gui.getDiagSize();
+				_diagonalSize = gui.getDiagSize();
 				_resolution = gui.getResolution();
 				_delImages = gui.isDeletTif();
 				_gauss = gui.getGaussian();
@@ -214,14 +232,14 @@ public class Hic_main {
 		}
 		File f = new File(_input);
 			
-		if(f.exists()==false &&  _input.startsWith("https")==false){
+		if(!f.exists() && !_input.startsWith("https")){
 				System.out.println(_input+" doesn't existed !!! \n\n");
 				System.out.println(_doc);
 				return;
 		}
 		
 		f = new File(_chrSizeFile);
-		if(f.exists()==false ){
+		if(!f.exists()){
 				System.out.println(_chrSizeFile+" doesn't existed !!! \n\n");
 				System.out.println(_doc);
 				return;
@@ -230,101 +248,124 @@ public class Hic_main {
 		
 		SIPObject sip;
 		readChrSizeFile(_chrSizeFile);
+		LocalDateTime myObj = LocalDateTime.now();
+		String date = myObj.toString().replaceAll(":","");
+		date = date.replaceAll("\\.","_");
 		if(_isHic){
 			f = new File(_juiceBoxTools);
-			if(f.exists()==false){
+			if(!f.exists()){
 				System.out.println(_juiceBoxTools+" doesn't existed !!! \n\n");
 				System.out.println(_doc);
 				return;
 			}
-			System.out.println("hic mode: \n"+ "input: "+_input+"\n"+ "output: "+_output+"\n"+ "juiceBox: "+_juiceBoxTools+"\n"+ "norm: "+ _juiceBoXNormalisation+"\n"
-					+ "gauss: "+_gauss+"\n"+ "min: "+_min+"\n"+ "max: "+_max+"\n"+ "matrix size: "+_matrixSize+"\n"+ "diag size: "+_diagSize+"\n"+ "resolution: "+_resolution+"\n"
-					+ "saturated pixel: "+_saturatedPixel+"\n"+ "threshold: "+_thresholdMax+"\n"+ "number of zero :"+_nbZero+"\n"+ "factor "+ _factOption+"\n"+ "fdr "+_fdr+"\n"
-					+ "del "+_delImages+"\n"+ "cpu "+ _cpu+"\n-isDroso "+_isDroso+"\n");
+			System.out.println("hic mode: \n"+ "input: "+_input+"\n"+ "output: "+_output+"\n"+ "juiceBox: "+
+					_juiceBoxTools+"\n"+ "norm: "+ _juiceBoXNormalisation+"\n" + "gauss: "+_gauss+"\n"+ "min: "+
+					_min+"\n"+ "max: "+_max+"\n"+ "matrix size: "+_matrixSize+"\n"+ "diag size: "+ _diagonalSize +"\n"+
+					"resolution: "+_resolution+"\n" + "saturated pixel: "+_saturatedPixel+"\n"+ "threshold: "+
+					_thresholdMax+"\n"+ "number of zero :"+_nbZero+"\n"+ "factor "+ _factOption+"\n"+ "fdr "+
+					_fdr+"\n"+ "del "+_delImages+"\n"+ "cpu "+ _cpu+"\n-isDroso "+_isDroso+"\n");
 			
 			sip = new SIPObject(_output, _chrSize, _gauss, _min, _max, _resolution, _saturatedPixel,
-					_thresholdMax, _diagSize, _matrixSize, _nbZero, _factor,_fdr, _isProcessed,_isDroso);
+					_thresholdMax, _diagonalSize, _matrixSize, _nbZero, _factor,_fdr, _isProcessed,_isDroso);
 			sip.setIsGui(_gui);
 			ProcessHicDumpData processDumpData = new ProcessHicDumpData();
 			processDumpData.go(_input, sip, _chrSize, _juiceBoxTools, _juiceBoXNormalisation, _cpu);
 			System.out.println("########### End of the dump Step");
 		}else if(_isCool){
 			f = new File(_cooltools);
-			if(f.exists()==false){
+			if(!f.exists()){
 				System.out.println(_cooltools+" doesn't existed or wrong path !!! \n\n");
 				System.out.println(_doc);
 				return;
 			}
 			f = new File(_cooler);
-			if(f.exists()==false){
+			if(!f.exists()){
 				System.out.println(_cooler+" doesn't existed or wrong path !!! \n\n");
 				System.out.println(_doc);
 				return;
 			}
-			if( testTools(_cooltools,0,3,0) == false || testTools(_cooler,0,8,6) == false) {
-				System.out.println( _cooltools +" or" + _cooler+" is not the good version for SIP (it needs cooltools version >= 0.3.0 and cooler version >= 0.8.6) !!! \n\n");
+			if( !testTools(_cooltools, 0, 3, 0) || !testTools(_cooler, 0, 8, 6)) {
+				System.out.println( _cooltools +" or" + _cooler+" is not the good version for SIP (it needs cooltools " +
+						"version >= 0.3.0 and cooler version >= 0.8.6) !!! \n\n");
 				System.out.println(_doc);
 				if(_gui){
-					JOptionPane.showMessageDialog(null, "Error SIP program", _cooltools +" or" + _cooler+" is not the good version for SIP (it needs cooltools version >= 0.3.0 and cooler version >= 0.8.6) !!!"
+					JOptionPane.showMessageDialog(null, "Error SIP program",
+							_cooltools +" or" + _cooler+" is not the good version for SIP (it needs cooltools " +
+									"version >= 0.3.0 and cooler version >= 0.8.6) !!!"
 							 , JOptionPane.ERROR_MESSAGE);
 				}
 				return;
 			}
-			System.out.println("cool mode: \n"+ "input: "+_input+"\n"+ "output: "+_output+"\n"+"cooltools: "+_cooltools+"\n"+ "cooler: "+_cooler+"\n"+ "norm: "+ _juiceBoXNormalisation+"\n"
-					+ "gauss: "+_gauss+"\n"+ "min: "+_min+"\n"+ "max: "+_max+"\n"+ "matrix size: "+_matrixSize+"\n"+ "diag size: "+_diagSize+"\n"+ "resolution: "+_resolution+"\n"
-					+ "saturated pixel: "+_saturatedPixel+"\n"+ "threshold: "+_thresholdMax+"\n"+ "number of zero :"+_nbZero+"\n"+ "factor "+ _factOption+"\n"+ "fdr "+_fdr+"\n"
-					+ "del "+_delImages+"\n"+ "cpu "+ _cpu+"\n-isDroso "+_isDroso+"\n");
-			sip = new SIPObject(_output, _chrSize, _gauss, _min, _max, _resolution, _saturatedPixel, _thresholdMax, _diagSize, _matrixSize, _nbZero, _factor,_fdr, _isProcessed,_isDroso);
+			System.out.println("cool mode: \n"+ "input: "+_input+"\n"+ "output: "+_output+"\n"+"cooltools: "+
+					_cooltools+"\n"+ "cooler: "+_cooler+"\n"+ "norm: "+ _juiceBoXNormalisation+"\n" + "gauss: "+
+					_gauss+"\n"+ "min: "+_min+"\n"+ "max: "+_max+"\n"+ "matrix size: "+_matrixSize+"\n"+
+					"diag size: "+ _diagonalSize +"\n"+ "resolution: "+_resolution+"\n"+ "saturated pixel: "+
+					_saturatedPixel+ "\n"+ "threshold: "+_thresholdMax+"\n"+ "number of zero :"+_nbZero+"\n"+
+					"factor "+ _factOption+ "\n"+ "fdr "+_fdr+"\n" + "del "+_delImages+"\n"+ "cpu "+ _cpu+
+					"\n-isDroso "+_isDroso+"\n");
+			sip = new SIPObject(_output, _chrSize, _gauss, _min, _max, _resolution, _saturatedPixel, _thresholdMax,
+					_diagonalSize, _matrixSize, _nbZero, _factor,_fdr, _isProcessed,_isDroso);
 			sip.setIsCooler(_isCool);
 
 			ProcessCoolerDumpData processDumpData = new ProcessCoolerDumpData();
 			processDumpData.go(_cooltools, _cooler, sip, _input, _chrSize,_cpu);
 			
 			}else{
-			System.out.println("processed mode:\n"+ "input: "+_input+"\n"+ "output: "+_output+"\n"+ "juiceBox: "+_juiceBoxTools+"\n"
-					+ "norm: "+ _juiceBoXNormalisation+"\n"+ "gauss: "+_gauss+"\n"+ "min: "+_min+"\n"+ "max: "+_max+"\n"+ "matrix size: "+_matrixSize+"\n"
-					+ "diag size: "+_diagSize+"\n"+ "resolution: "+_resolution+"\n"+ "saturated pixel: "+_saturatedPixel+"\n"+ "threshold: "+_thresholdMax+"\n"
-					+ "isHic: "+_isHic+"\n"	+ "isProcessed: "+_isProcessed+"\n"+ "number of zero:"+_nbZero+"\n"+ "factor "+ _factOption+"\n"+ "fdr "+_fdr+ "\n"
-					+ "del "+_delImages+"\n"+"cpu "+ _cpu+"\n-isDroso "+_isDroso+"\n");
+			System.out.println("processed mode:\n"+ "input: "+_input+"\n"+ "output: "+_output+"\n"+ "juiceBox: "+
+					_juiceBoxTools+"\n" + "norm: "+ _juiceBoXNormalisation+"\n"+ "gauss: "+_gauss+"\n"+ "min: "+
+					_min+"\n"+ "max: "+_max+"\n"+ "matrix size: "+_matrixSize+"\n" + "diag size: "+ _diagonalSize +
+					"\n"+ "resolution: "+_resolution+"\n"+ "saturated pixel: "+_saturatedPixel+"\n"+ "threshold: "+
+					_thresholdMax+"\n" + "isHic: "+_isHic+"\n"	+ "isProcessed: "+_isProcessed+"\n"+
+					"number of zero:"+_nbZero+"\n"+ "factor "+ _factOption+"\n"+ "fdr "+_fdr+ "\n" + "del "
+					+_delImages+"\n"+"cpu "+ _cpu+"\n-isDroso "+_isDroso+"\n");
 			
-			sip = new SIPObject(_input,_output, _chrSize, _gauss, _min, _max, _resolution, _saturatedPixel, _thresholdMax,
-					_diagSize, _matrixSize, _nbZero,_factor,_fdr,_isProcessed, _isDroso);
+			sip = new SIPObject(_input,_output, _chrSize, _gauss, _min, _max, _resolution, _saturatedPixel,
+					_thresholdMax, _diagonalSize, _matrixSize, _nbZero,_factor,_fdr,_isProcessed, _isDroso);
 			sip.setIsGui(_gui);
 		}
-		System.out.println("Start loop detction step");
+		System.out.println("Start loop detection step");
 		
+
+
+
 		MultiResProcess multi = new MultiResProcess(sip, _cpu, _delImages,_chrSizeFile);
 		multi.run();
-		System.out.println("###########End loop detction step");
-		BufferedWriter writer = new BufferedWriter(new FileWriter(new File(_output+File.separator+"parameters.txt")));
+		System.out.println("###########End loop detection step");
+		BufferedWriter writer = new BufferedWriter(new FileWriter(new
+				File(_output+File.separator+"parameters_"+date+".txt"))
+		);
 		if(_isProcessed){
-				writer.write("java -jar Sip_HiC.jar processed "+ _input+" "+ _chrSizeFile+" "+_output+" -g "+_gauss+" -mat "+_matrixSize+" -d "+_diagSize
-					+" -res "+_resolution+" -t "+_thresholdMax+" -min "+_min+" -max "+_max+" -sat "+_saturatedPixel+" -nbZero "+_nbZero
-					+" -factor "+ _factOption+" -fdr "+_fdr+" -del "+_delImages+" -cpu "+ _cpu+" -isDroso "+_isDroso+"\n");
-			
+				writer.write("java -jar Sip_HiC.jar processed "+ _input+" "+ _chrSizeFile+" "+_output+" -g "+
+						_gauss+" -mat "+_matrixSize+" -d "+ _diagonalSize +" -res "+_resolution+" -t "+_thresholdMax+
+						" -min "+_min+" -max "+_max+" -sat "+_saturatedPixel+" -nbZero "+_nbZero+" -factor "+
+						_factOption+" -fdr "+_fdr+" -del "+_delImages+" -cpu "+ _cpu+" -isDroso "+_isDroso+"\n");
 		}else if(_isCool){
-			writer.write("java -jar SIP_HiC.jar hic "+_input+" "+_chrSizeFile+" "+_output+" "+_cooltools+" "+_cooler+
-					" -g "+_gauss+" -min "+_min+" -max "+_max+" -mat "+_matrixSize+
-					" -d "+_diagSize+" -res "+_resolution+" -sat "+_saturatedPixel+" -t "+_thresholdMax+" -nbZero "+_nbZero+
-					" -factor "+ _factOption+" -fdr "+_fdr+" -del "+_delImages+" -cpu "+ _cpu+" -isDroso "+_isDroso+"\n");
+			writer.write("java -jar SIP_HiC.jar hic "+_input+" "+_chrSizeFile+" "+_output+" "+_cooltools+" "+
+					_cooler+ " -g "+_gauss+" -min "+_min+" -max "+_max+" -mat "+_matrixSize+" -d "+ _diagonalSize +
+					" -res "+_resolution+" -sat "+_saturatedPixel+" -t "+_thresholdMax+" -nbZero "+_nbZero+
+					" -factor "+ _factOption+" -fdr "+_fdr+" -del "+_delImages+" -cpu "+ _cpu+" -isDroso "+
+					_isDroso+"\n");
 		}else{
 			writer.write("java -jar SIP_HiC.jar hic "+_input+" "+_chrSizeFile+" "+_output+" "+_juiceBoxTools+
 					" -norm "+ _juiceBoXNormalisation+" -g "+_gauss+" -min "+_min+" -max "+_max+" -mat "+_matrixSize+
-					" -d "+_diagSize+" -res "+_resolution+" -sat "+_saturatedPixel+" -t "+_thresholdMax+" -nbZero "+_nbZero+
-					" -factor "+ _factOption+" -fdr "+_fdr+" -del "+_delImages+" -cpu "+ _cpu+" -isDroso "+_isDroso+"\n");
+					" -d "+ _diagonalSize +" -res "+_resolution+" -sat "+_saturatedPixel+" -t "+_thresholdMax+
+					" -nbZero "+_nbZero+ " -factor "+ _factOption+" -fdr "+_fdr+" -del "+_delImages+" -cpu "+
+					_cpu+" -isDroso "+_isDroso+"\n");
 		}
 		writer.close();	
 		
 		if(_gui){
-			JOptionPane.showMessageDialog(null,"Results available: "+_output , "End of SIP program", JOptionPane.INFORMATION_MESSAGE);
+			JOptionPane.showMessageDialog(null,"Results available: "+_output ,
+					"End of SIP program", JOptionPane.INFORMATION_MESSAGE);
 		}
-		System.out.println("End of SIP loops are available in "+_output);
+		System.out.println("End of SIP loops are available in "+_output+"\n Bye!!! ");
+		System.exit(0);
 	}
 	
 	/**
 	 * Run the input file and stock the info of name chr and their size in hashmap
 	 * @param chrSizeFile path chr size file
-	 * @throws IOException if file does't exist
+	 * @throws IOException if file does not exist
 	 */
 	private static void readChrSizeFile( String chrSizeFile) throws IOException{
 		BufferedReader br = new BufferedReader(new FileReader(chrSizeFile));
@@ -378,15 +419,18 @@ public class Hic_main {
 						_factor.add(2);
 						_factor.add(5);
 					}else if(a == 3){ _factor.add(5);}
-					else if(a != 1)	returnError("-factor ",args[i+1]," int or not correct choice (1, 2, 3, 4)");
+					else if(a != 1)	returnError("-factor ",args[i+1]," int or not" +
+							" correct choice (1, 2, 3, 4)");
 				}else if(args[i].equals("-d")){
-					try{_diagSize =Integer.parseInt(args[i+1]);}
+					try{
+						_diagonalSize =Integer.parseInt(args[i+1]);}
 					catch(NumberFormatException e){ returnError("-d",args[i+1],"int");}
 				}else if(args[i].equals("-cpu")){
 						try{_cpu =Integer.parseInt(args[i+1]);}
 						catch(NumberFormatException e){ returnError("-cpu",args[i+1],"int");}
 						if(_cpu > Runtime.getRuntime().availableProcessors() || _cpu <= 0){
-							System.out.println("the number of CPU "+ _cpu+" is superior of the server/computer' cpu "+Runtime.getRuntime().availableProcessors()+"\n");
+							System.out.println("the number of CPU "+ _cpu+" is superior of the " +
+									"server/computer' cpu "+Runtime.getRuntime().availableProcessors()+"\n");
 							System.out.println(_doc);
 							System.exit(0);
 						}
@@ -451,7 +495,7 @@ public class Hic_main {
 	}
 	
 	/**
-	 * Return specifci error on function of thearugnent problems 
+	 * Return specific error on function of the argument
 	 * 
 	 * @param param String name of the arugment
 	 * @param value	String value of the argument
@@ -485,7 +529,8 @@ public class Hic_main {
 		if(tline.length > 0){
 			tline = tline[tline.length-1].split("\\.");
 			tline[2] = tline[2].replace("\n", "");
-			if(Integer.parseInt(tline[0]) >= first && Integer.parseInt(tline[1]) >= second) //&& Integer.parseInt(tline[2]) >= third)
+			if(Integer.parseInt(tline[0]) >= first && Integer.parseInt(tline[1]) >= second)
+				//&& Integer.parseInt(tline[2]) >= third)
 				return true;
 			else
 				return false;
@@ -522,6 +567,4 @@ public class Hic_main {
 			}
 		}		
 	}
-	
-	
 }
