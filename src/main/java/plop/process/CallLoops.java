@@ -167,7 +167,7 @@ public class CallLoops {
 	 * @param imagePlusInput image to save
 	 * @param pathFile path to save the image
 	 */	
-	public void saveFile ( ImagePlus imagePlusInput, String pathFile){
+	public void saveFile (ImagePlus imagePlusInput, String pathFile){
 		FileSaver fileSaver = new FileSaver(imagePlusInput);
 	    fileSaver.saveAsTiff(pathFile);
 	}
