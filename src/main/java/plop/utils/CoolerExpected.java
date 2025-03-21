@@ -74,6 +74,23 @@ public class CoolerExpected {
 					System.out.println("cooltools error !!!!");
 					System.exit(0);
 				}
+			}else if(_logError.contains("Error") && _logError.contains("No such command")){
+				runtime = Runtime.getRuntime();
+				_logError ="";
+				System.out.println(_logError);
+				cmd = this._coolTools+" expected-cis "+_coolFile+" -p "+_cpu+" --ignore-diags 0 -o "+expected;
+				System.out.println(cmd);
+				process = runtime.exec(cmd);
+
+				new ReturnFlux(process.getInputStream()).start();
+				new ReturnFlux(process.getErrorStream()).start();
+				exitValue=process.waitFor();
+
+				if(_logError.contains("Error")){
+					System.out.println(_logError);
+					System.out.println("cooltools error !!!!");
+					System.exit(0);
+				}
 			}
 			this._expected =  expected;
 			this.parseExpectedFile();
@@ -91,7 +108,10 @@ public class CoolerExpected {
 		String line = br.readLine();
 		for (line = null; (line = br.readLine()) != null;){
 			String [] tline = line.split("\t");
-			if(Integer.parseInt(tline[1]) < this._imgSize) {
+			int a = Integer.parseInt(tline[2]);
+			if(!tline[1].equals(tline[0]))
+				a = Integer.parseInt(tline[2]);
+			if(a < this._imgSize) {
 				if(!tline[tline.length-1].equals("nan")){
 					if (_hashExpected.containsKey(tline[0])){
 						ArrayList<Double> lExpected =  _hashExpected.get(tline[0]);
