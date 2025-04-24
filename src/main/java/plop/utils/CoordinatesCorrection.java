@@ -51,7 +51,7 @@ public class CoordinatesCorrection {
 			String newName = loop.getChr()+"\t"+a+"\t"+b;
 			if(a!=b && Math.abs(a-b) > diagSize){
 				if (x > 1 && y > 1 && y < imageSize-2 && x < imageSize-2){
-					if(this._data.containsKey(newName) == false){
+					if(!this._data.containsKey(newName)){
 						loop.setCoordinates(a, a_end, b, b_end);
 						loop.setName(newName);
 						//System.out.println(newName+" "+resolution+" "+step+" "+index+" "+x);

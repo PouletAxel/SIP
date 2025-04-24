@@ -72,6 +72,10 @@ public class RunnableDetectLoops extends Thread implements Runnable{
 	public void run(){
 		String resName = String.valueOf(this._sip.getResolution());
 		resName = resName.replace("000", "")+"kb";
+		if(this._sip.getResolution() < 1000){
+			resName = String.valueOf(this._sip.getResolution());
+			resName = resName+"b";
+		}
 		String dir =  this._sip.getOutputDir()+resName+File.separator+_chr+File.separator;
 		HashMap<String, Loop> data = new HashMap<String, Loop> ();
 		if (this._sip.isProcessed()) dir = this._sip.getInputDir()+resName+File.separator+this._chr+File.separator;

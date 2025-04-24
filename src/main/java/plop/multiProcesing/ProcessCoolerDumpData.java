@@ -58,10 +58,14 @@ public class ProcessCoolerDumpData {
 			int res = sip.getResolution()*listFactor.get(indexFact);
 			int matrixSize = sip.getMatrixSize()/listFactor.get(indexFact);
 			CoolerExpected expected = new CoolerExpected(coolTools,coolFile,  res, matrixSize, nbCPU);
-			String nameRes = String.valueOf(res);
-			nameRes = nameRes.replace("000", "");
-			nameRes = nameRes+"kb"; 
-			String expectedFile = sip.getOutputDir()+nameRes+".expected";
+			String resName = String.valueOf(res);
+			resName = resName.replace("000", "");
+			resName = resName+"kb";
+			if(res < 1000){
+				resName = String.valueOf(res);
+				resName = resName+"b";
+			}
+			String expectedFile = sip.getOutputDir()+resName+".expected";
 			System.out.println("start "+expectedFile);
 			expected.dumpExpected(expectedFile);
 			System.out.println("!!!!!!! End "+expectedFile);

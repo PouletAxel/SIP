@@ -130,6 +130,10 @@ public class MultiResProcess {
 			int res = this._sip.getResolution()*listFactor.get(indexFact);
 			String resName = String.valueOf(res);
 			resName = resName.replace("000", "")+"kb";
+			if(res < 1000){
+				resName = String.valueOf(res);
+				resName = resName+"b";
+			}
 			String resuFile = this._sip.getOutputDir()+File.separator+resName+"Loops_"+this._date+".txt";
 			listOfFile.add(resuFile);
 			File file = new File(resuFile);
@@ -184,6 +188,10 @@ public class MultiResProcess {
 			int res = this._sip.getResolution() * integer;
 			String resName = String.valueOf(res);
 			resName = resName.replace("000", "") + "kb";
+			if(res < 1000){
+				resName = String.valueOf(res);
+				resName = resName+"b";
+			}
 			File inputDir = new File(input + resName);
 			if (!inputDir.exists()) {
 				return false;

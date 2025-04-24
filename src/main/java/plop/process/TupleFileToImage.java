@@ -10,7 +10,7 @@ import ij.process.ShortProcessor;
 
 
 /**
- * Make an image with a tuple file (x y value). Take in entrees the resolution the matrix size and the other parameters of the tuple
+ * Make an image with a tuple file (x y value). Take in input the resolution the matrix size and the other parameters of the tuple
  * file.
  * 
  * @author axel poulet
@@ -28,7 +28,7 @@ public class TupleFileToImage {
 	private int _size = 0 ;
 	/**	 Resolution of the image in base*/
 	private int _resolution = 0 ;
-	/** Step to plop.process the whole chromosme*/
+	/** Step to split the whole chromosome*/
 	private int _step ;
 	/** Image value average*/
 	private float _avg = 0;

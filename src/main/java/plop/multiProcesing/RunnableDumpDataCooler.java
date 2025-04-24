@@ -65,16 +65,20 @@ public class RunnableDumpDataCooler extends Thread implements Runnable{
 			int res = _res*this._listFactor.get(indexFact);
 			int matrixSize = _matrixSize/this._listFactor.get(indexFact);
 			_step = matrixSize/2;
-			String nameRes = String.valueOf(res);
-			nameRes = nameRes.replace("000", "");
-			nameRes = nameRes+"kb"; 
-			String expectedFile = this._outdir+File.separator+nameRes+".expected";
+			String resName = String.valueOf(res);
+			resName = resName.replace("000", "");
+			resName = resName+"kb";
+			if(res < 1000){
+				resName = String.valueOf(res);
+				resName = resName+"b";
+			}
+			String expectedFile = this._outdir+File.separator+resName+".expected";
 			CoolerExpected expected = new CoolerExpected(expectedFile, matrixSize);
 			try {
 				expected.parseExpectedFile();
 				ArrayList<Double> lExpected = expected.getExpected(_chrName);
 				_coolerDumpData.setExpected(lExpected);
-				String outdir = this._outdir+File.separator+nameRes+File.separator+this._chrName+File.separator;
+				String outdir = this._outdir+File.separator+resName+File.separator+this._chrName+File.separator;
 				File file = new File(outdir);
 				if (!file.exists())
 					file.mkdirs();
@@ -83,13 +87,13 @@ public class RunnableDumpDataCooler extends Thread implements Runnable{
 				String name = outdir+this._chrName+"_0_"+j+".txt";
 				if (!file.exists())
 					file.mkdir();
-				System.out.println("start dump "+this._chrName+" size "+this._chrSize+" res "+ nameRes);
+				System.out.println("start dump "+this._chrName+" size "+this._chrSize+" res "+ resName);
 				if(j > this._chrSize) j = this._chrSize;
 				for(int i = 0 ; j-1 <= this._chrSize; i+=step,j+=step){
 					int end =j-1;
 					String dump = this._chrName+":"+i+"-"+end;
 					name = outdir+this._chrName+"_"+i+"_"+end+".txt";
-					System.out.println("start dump "+this._chrName+" size "+this._chrSize+" dump "+dump+" res "+ nameRes);
+					System.out.println("start dump "+this._chrName+" size "+this._chrSize+" dump "+dump+" res "+ resName);
 					coolerTools = this._coolerDumpData.dumpObservedMExpected(dump,name,res);
 					if (!coolerTools){
 						System.out.print(dump+" "+"\n"+coolerTools+"\n");
@@ -100,7 +104,7 @@ public class RunnableDumpDataCooler extends Thread implements Runnable{
 						i+=step;
 						dump = this._chrName+":"+i+"-"+j;
 						name = outdir+this._chrName+"_"+i+"_"+j+".txt";
-						System.out.println("start dump "+this._chrName+" size "+this._chrSize+" dump "+dump+" res "+ nameRes);
+						System.out.println("start dump "+this._chrName+" size "+this._chrSize+" dump "+dump+" res "+ resName);
 						coolerTools = this._coolerDumpData.dumpObservedMExpected(dump,name,res);
 						if (!coolerTools){
 							System.out.print(dump+" "+"\n"+coolerTools+"\n");
@@ -109,7 +113,7 @@ public class RunnableDumpDataCooler extends Thread implements Runnable{
 					}
 				}
 			} catch (IOException e) {	e.printStackTrace();}
-			System.out.println("##### End dump "+this._chrName+" "+nameRes);
+			System.out.println("##### End dump "+this._chrName+" "+resName);
 			System.gc();
 		}
 	}
